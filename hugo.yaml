@@ -13,12 +13,12 @@ minify:
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  title: ExampleSite
-  description: "ExampleSite description"
-  keywords: [Blog, Portfolio, PaperMod]
-  author: Me
+  title: HyperAccel Tech Blog
+  description: "HyperAccel Tech Blog"
+  keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
+  author: [Minho Park, Dongseok Han]
   # author: ["Me", "You"] # multiple authors
-  images: ["<link or path of image for opengraph, twitter-cards>"]
+  images: ["./assets/images/logo.png"]
   DateFormat: "January 2, 2006"
   defaultTheme: auto # dark, light
   disableThemeToggle: false
@@ -42,15 +42,15 @@ params:
   assets:
     # disableHLJS: true # to disable highlight.js
     # disableFingerprinting: true
-    favicon: "<link / abs url>"
-    favicon16x16: "<link / abs url>"
-    favicon32x32: "<link / abs url>"
-    apple_touch_icon: "<link / abs url>"
-    safari_pinned_tab: "<link / abs url>"
+    favicon: "./assets/favicon_io/favicon.ico"
+    favicon16x16: "./assets/favicon_io/favicon-16x16.png"
+    favicon32x32: "./assets/favicon_io/favicon-32x32.png"
+    apple_touch_icon: "./assets/favicon_io/apple-touch-icon.png"
+    safari_pinned_tab: "./assets/favicon_io/safari-pinned-tab.svg"
 
   label:
     text: "Home"
-    icon: /apple-touch-icon.png
+    icon: "./assets/images/logo.png"
     iconHeight: 35
 
   # profile-mode
@@ -70,20 +70,20 @@ params:
 
   # home-info mode
   homeInfoParams:
-    Title: "Hi there \U0001F44B"
-    Content: Welcome to my blog
+    Title: "HyperAccel Tech Blog"
+    Content: Welcome to HyperAccel Tech Blog
 
   socialIcons:
-    - name: x
-      url: "https://x.com/"
-    - name: stackoverflow
-      url: "https://stackoverflow.com"
     - name: github
-      url: "https://github.com/"
+      url: "https://github.com/Hyper-Accel"
+    - name: linkedin
+      url: "https://www.linkedin.com/company/hyperaccel/"
+    - name: homepage
+      url: "https://hyperaccel.ai/"
 
   analytics:
     google:
-      SiteVerificationTag: "XYZabc"
+      SiteVerificationTag: "G-CP27F7KKBJ"
     bing:
       SiteVerificationTag: "XYZabc"
     yandex:
@@ -95,7 +95,7 @@ params:
     hiddenInSingle: true # hide on single page
 
   editPost:
-    URL: "https://github.com/<path_to_repo>/content"
+    URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/content"
     Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
@@ -112,17 +112,33 @@ params:
     keys: ["title", "permalink", "summary", "content"]
 menu:
   main:
+    - identifier: about
+      name: about
+      url: /about/
+      weight: 5
+    - identifier: posts
+      name: posts
+      url: /posts/
+      weight: 10
+    - identifier: authors
+      name: authors
+      url: /authors/
+      weight: 10
     - identifier: categories
       name: categories
       url: /categories/
-      weight: 10
+      weight: 15
     - identifier: tags
       name: tags
       url: /tags/
       weight: 20
-    - identifier: example
-      name: example.org
-      url: https://example.org
+    - identifier: search
+      name: search
+      url: /search/
+      weight: 25
+    - identifier: baseurl
+      name: HyperAccel
+      url: https://hyperaccel.ai/
       weight: 30
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
@@ -137,3 +153,9 @@ markup:
 
 pagenation:
   pageSize: 5
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
