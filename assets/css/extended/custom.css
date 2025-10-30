@@ -1,0 +1,75 @@
+/* /assets/css/extended/custom.css */
+
+/* 포스트 헤더의 작성자 정보 박스 */
+.post-author {
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 15px 0;
+}
+
+.author-box {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* 아바타와 상세정보 사이 간격 */
+}
+
+.author-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* 원형 프로필 사진 */
+    object-fit: cover;
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.author-name a {
+    text-decoration: none;
+    color: var(--primary); /* 테마 기본 링크 색상 사용 */
+    border-bottom: none !;
+}
+
+.author-name a:hover {
+    text-decoration: none ;
+    border-bottom: none !;
+}
+
+.author-bio {
+    font-size: 0.9rem;
+    color: var(--secondary); /* 테마 보조 텍스트 색상 사용 */
+    margin: 5px 0 0 0;
+}
+
+.author-social-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 아이콘 사이의 간격 */
+    margin-top: 4px; /* 이름과의 상단 간격 */
+}
+
+.author-social-icons a {
+    text-decoration: none ;
+    color: var(--secondary); /* 아이콘 기본 색상 */
+    display: inline-block;
+    border-bottom: none ;
+}
+
+.author-social-icons a:hover {
+    color: var(--primary); /* 마우스 올렸을 때 색상 */
+    text-decoration: none ;
+    border-bottom: none ;
+}
+
+/* 아이콘 SVG 크기 조절 */
+.author-social-icons svg {
+    width: 20px;
+    height: 20px;
+}

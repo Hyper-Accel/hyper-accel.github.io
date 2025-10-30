@@ -9,7 +9,7 @@ cover:
   alt: "<alt text>"
   caption: "<text>"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-author:
+authors: [] # must match with content/authors
 tags: []
 categories: []
 summary: []

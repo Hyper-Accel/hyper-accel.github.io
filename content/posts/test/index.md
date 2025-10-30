@@ -2,7 +2,7 @@
 date: '2025-10-30T14:13:21+09:00'
 title: 'Test'
 draft: false
-author: 'Minho Park'
+authors: ['Minho Park']
 cover:
   image: 'logo.png'
   alt: "logo"

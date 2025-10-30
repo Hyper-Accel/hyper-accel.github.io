@@ -45,6 +45,7 @@ params:
     favicon32x32: "./assets/favicon_io/favicon-32x32.png"
     apple_touch_icon: "./assets/favicon_io/apple-touch-icon.png"
     safari_pinned_tab: "./assets/favicon_io/safari-pinned-tab.svg"
+    customCSS: ["css/extended/custom.css"]
 
   label:
     text: "Home"
@@ -157,3 +158,8 @@ outputs:
     - HTML
     - RSS
     - JSON
+
+taxonomies:
+  tag: tags
+  category: categories
+  author: authors

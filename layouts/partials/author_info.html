@@ -1,0 +1,45 @@
+{{/* layouts/partials/author_info.html */}}
+{{- if .Params.authors }}
+<div class="post-authors">
+    {{- range .Params.authors }}
+        {{ $authorID := . }}
+        {{/* /content/authors/xxx/_index.md 페이지를 찾습니다. */}}
+        {{ $authorPage := $.Site.GetPage (printf "/authors/%s" $authorID) }}
+
+        {{- with $authorPage }}
+        <div class="author-box">
+            {{- with .Params.image }}
+            <div class="author-avatar">
+                <img src="{{ . | absURL }}" alt="{{ $authorPage.Title }}">
+            </div>
+            {{- end }}
+            <div class="author-details">
+                <strong class="author-name">
+                    <a href="{{ .Permalink }}">{{ .Title }}</a>
+                </strong>
+                <div class="author-social-icons">
+                    {{- with .Params.linkedin }}
+                    <a href="{{ . }}" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                        {{- partial "svg.html" (dict "name" "linkedin") -}}
+                    </a>
+                    {{- end }}
+                    {{- with .Params.github }}
+                    <a href="{{ . }}" target="_blank" rel="noopener noreferrer" title="GitHub">
+                        {{- partial "svg.html" (dict "name" "github") -}}
+                    </a>
+                    {{- end }}
+                </div>
+                {{- with .Params.bio }}
+                <p class="author-bio">{{ . }}</p>
+                {{- end }}
+            </div>
+        </div>
+        {{- else }}
+        {{/* 프로필 페이지를 못찾을 경우 ID만 표시 */}}
+        <div class="author-box">
+            <strong class="author-name">{{ $authorID | title }}</strong>
+        </div>
+        {{- end }}
+    {{- end }}
+</div>
+{{- end }}
