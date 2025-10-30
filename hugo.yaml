@@ -36,8 +36,8 @@ params:
   comments: false
   hidemeta: false
   hideSummary: false
-  showtoc: false
-  tocopen: false
+  showtoc: true
+  tocopen: true
 
   assets:
     # disableHLJS: true # to disable highlight.js
@@ -95,7 +95,7 @@ params:
     hiddenInSingle: true # hide on single page
 
   editPost:
-    URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/content"
+    URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/blob/main/content"
     Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
