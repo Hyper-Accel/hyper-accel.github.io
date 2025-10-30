@@ -16,8 +16,6 @@ params:
   title: HyperAccel Tech Blog
   description: "HyperAccel Tech Blog"
   keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
-  author: [Minho Park, Dongseok Han]
-  # author: ["Me", "You"] # multiple authors
   images: ["./assets/images/logo.png"]
   DateFormat: "January 2, 2006"
   defaultTheme: auto # dark, light
@@ -27,7 +25,7 @@ params:
   ShowShareButtons: true
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
-  ShowCodeCopyButtons: false
+  ShowCodeCopyButtons: true
   ShowWordCount: true
   ShowRssButtonInSectionTermList: true
   UseHugoToc: true
@@ -90,9 +88,9 @@ params:
       SiteVerificationTag: "XYZabc"
 
   cover:
-    hidden: true # hide everywhere but not in structured data
-    hiddenInList: true # hide on list pages and home
-    hiddenInSingle: true # hide on single page
+    hidden: false 
+    hiddenInList: false 
+    hiddenInSingle: false 
 
   editPost:
     URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/blob/main/content"
