@@ -46,6 +46,78 @@ sudo snap install hugo
 
 [Hugo Releases](https://github.com/gohugoio/hugo/releases)에서 운영체제에 맞는 바이너리를 다운로드하여 설치할 수 있습니다.
 
+## 👤 Author(저자) 추가 방법
+
+새로운 Author(저자) 프로필을 추가하려면 아래 과정을 따라주세요.
+
+### 1. author 마크다운 파일 생성
+
+`content/authors/<author_id>/_index.md` 경로에 새로운 디렉터리와 `_index.md` 파일을 만듭니다.  
+`<author_id>`는 일반적으로 깃허브 아이디나 본인의 고유 닉네임을 소문자/영문으로 사용합니다.
+
+예시 (author_id가 `Minho Park`인 경우):
+
+```bash
+mkdir -p content/authors/Minho\ Park
+hugo new content/authors/Minho\ Park/_index.md
+```
+
+### 2. `_index.md` 파일 내용 작성
+
+아래 템플릿을 참고하여 정보를 입력합니다.
+
+```markdown
+---
+title: "Minho Park"
+image: "https://avatars.githubusercontent.com/u/33409967?v=4" # 본인 이미지 URL (optional)
+linkedin: "https://www.linkedin.com/in/minho-park-804a56142/"   # (optional)
+github: "https://github.com/mino-park7"                         # (optional)
+bio: "ML Engineering Lead"
+---
+```
+
+필수:  
+- `title` — 이름  
+- `bio` — 간단한 한 줄 소개
+
+선택:  
+- `image` — 프로필 사진 URL (깃허브/노션/직접 업로드 등)  
+- `linkedin`/`github` — 소셜 미디어 링크
+
+### 3. 포스트에 author 지정하기
+
+포스트의 프론트매터(맨 위 `---` 사이)에 아래와 같이 작성자의 author id를 배열로 추가합니다.
+
+```yaml
+authors: ["Minho Park", "다른-author-id"]
+```
+
+예시 전체 메타데이터:
+
+```yaml
+---
+title: "Awesome LPU Tips"
+date: 2024-06-08
+authors: ["Minho Park"]
+tags: ["LPU", "Tips"]
+categories: ["AI"]
+---
+```
+
+> 여러 명 공동 저자는 배열로 추가할 수 있습니다.
+
+### 4. 페이지에서 author 정보 확인
+
+포스트 또는 `/authors/` 페이지 등에서 프로필 사진, 이름, 소개, 깃허브/링크드인 링크 등이 자동으로 표시됩니다.  
+(author 정보가 안 뜬다면 author id 오타나 파일 위치를 다시 확인해 주세요!)
+
+### 참고
+
+- author 템플릿 샘플: [`archetypes/authors.md`](archetypes/authors.md) 참고
+- 작성 예시: [`content/authors/Minho Park/_index.md`](content/authors/Minho%20Park/_index.md) 참고
+
+
+
 ## ✍️ 블로그 포스트 작성
 
 ### 1. 새 포스트 생성
