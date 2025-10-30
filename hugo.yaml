@@ -1,5 +1,5 @@
-baseURL: "https://examplesite.com/"
-title: ExampleSite
+baseURL: "https://hyper-accel.github.io/"
+title: HyperAccel Tech Blog
 theme: PaperMod
 
 enableRobotsTXT: true
@@ -16,7 +16,7 @@ params:
   title: HyperAccel Tech Blog
   description: "HyperAccel Tech Blog"
   keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
-  images: ["./assets/images/logo.png"]
+  images: ["/images/logo.png"]
   DateFormat: "January 2, 2006"
   defaultTheme: auto # dark, light
   disableThemeToggle: false
@@ -40,16 +40,16 @@ params:
   assets:
     # disableHLJS: true # to disable highlight.js
     # disableFingerprinting: true
-    favicon: "./assets/favicon_io/favicon.ico"
-    favicon16x16: "./assets/favicon_io/favicon-16x16.png"
-    favicon32x32: "./assets/favicon_io/favicon-32x32.png"
-    apple_touch_icon: "./assets/favicon_io/apple-touch-icon.png"
-    safari_pinned_tab: "./assets/favicon_io/safari-pinned-tab.svg"
+    favicon: "/favicon.ico"
+    favicon16x16: "/favicon-16x16.png"
+    favicon32x32: "/favicon-32x32.png"
+    apple_touch_icon: "/apple-touch-icon.png"
+    safari_pinned_tab: "/safari-pinned-tab.svg"
     customCSS: ["css/extended/custom.css"]
 
   label:
     text: "Home"
-    icon: "./assets/images/logo.png"
+    icon: "/images/logo.png"
     iconHeight: 35
 
   # profile-mode
