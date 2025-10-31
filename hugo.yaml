@@ -83,10 +83,8 @@ params:
   analytics:
     google:
       SiteVerificationTag: "G-CP27F7KKBJ"
-    bing:
-      SiteVerificationTag: "XYZabc"
-    yandex:
-      SiteVerificationTag: "XYZabc"
+    naver:
+      SiteVerificationTag: "3baa94ca57659"
 
   cover:
     hidden: false 
