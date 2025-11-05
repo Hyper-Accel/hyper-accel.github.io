@@ -161,3 +161,9 @@ taxonomies:
   tag: tags
   category: categories
   author: authors
+
+sitemap:
+  changefreq: daily
+  disable: false
+  filename: sitemap.xml
+  priority: 0.5
