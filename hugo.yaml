@@ -109,6 +109,20 @@ params:
     keys: ["title", "permalink", "summary", "content"]
   math: true
 
+  giscus:
+    repo: Hyper-Accel/hyper-accel.github.io
+    repoID: R_kgDOQL9hnw
+    category: Announcements
+    categoryID: DIC_kwDOQL9hn84CxP6H
+    mapping: pathname
+    strict: 0
+    reactionsEnabled: 1
+    emitMetadata: 0
+    inputPosition: bottom
+    theme: preferred_color_scheme
+    lang: ko
+    loading: lazy
+
 menu:
   main:
     - identifier: about

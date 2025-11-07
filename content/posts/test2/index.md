@@ -13,7 +13,7 @@ authors: ["Minho Park"]
 tags: ["test"]
 categories: ["test"]
 summary: []
-math: true
+comments: true
 ---
 
 This is a test post for the blog.

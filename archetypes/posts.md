@@ -13,4 +13,5 @@ authors: [] # must match with content/authors
 tags: []
 categories: []
 summary: []
+comments: true
 ---
