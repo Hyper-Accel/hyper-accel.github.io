@@ -2,6 +2,78 @@ baseURL: "https://hyper-accel.github.io/"
 title: HyperAccel Tech Blog
 theme: PaperMod
 
+defaultContentLanguage: ko
+
+languages:
+  ko:
+    languageName: 한국어
+    weight: 1
+    title: HyperAccel Tech Blog
+    menu:
+      main:
+        - identifier: about
+          name: 소개
+          url: /about/
+          weight: 5
+        - identifier: posts
+          name: 포스트
+          url: /posts/
+          weight: 10
+        - identifier: authors
+          name: 작성자
+          url: /authors/
+          weight: 10
+        - identifier: categories
+          name: 카테고리
+          url: /categories/
+          weight: 15
+        - identifier: tags
+          name: 태그
+          url: /tags/
+          weight: 20
+        - identifier: search
+          name: 검색
+          url: /search/
+          weight: 25
+        - identifier: baseurl
+          name: HyperAccel
+          url: https://hyperaccel.ai/
+          weight: 30
+  en:
+    languageName: English
+    weight: 2
+    title: HyperAccel Tech Blog
+    menu:
+      main:
+        - identifier: about
+          name: About
+          url: /en/about/
+          weight: 5
+        - identifier: posts
+          name: Posts
+          url: /en/posts/
+          weight: 10
+        - identifier: authors
+          name: Authors
+          url: /en/authors/
+          weight: 10
+        - identifier: categories
+          name: Categories
+          url: /en/categories/
+          weight: 15
+        - identifier: tags
+          name: Tags
+          url: /en/tags/
+          weight: 20
+        - identifier: search
+          name: Search
+          url: /en/search/
+          weight: 25
+        - identifier: baseurl
+          name: HyperAccel
+          url: https://hyperaccel.ai/
+          weight: 30
+
 enableRobotsTXT: true
 buildDrafts: false
 buildFuture: false
@@ -123,36 +195,6 @@ params:
     lang: ko
     loading: lazy
 
-menu:
-  main:
-    - identifier: about
-      name: about
-      url: /about/
-      weight: 5
-    - identifier: posts
-      name: posts
-      url: /posts/
-      weight: 10
-    - identifier: authors
-      name: authors
-      url: /authors/
-      weight: 10
-    - identifier: categories
-      name: categories
-      url: /categories/
-      weight: 15
-    - identifier: tags
-      name: tags
-      url: /tags/
-      weight: 20
-    - identifier: search
-      name: search
-      url: /search/
-      weight: 25
-    - identifier: baseurl
-      name: HyperAccel
-      url: https://hyperaccel.ai/
-      weight: 30
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:

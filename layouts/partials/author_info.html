@@ -4,7 +4,16 @@
     {{- range .Params.authors }}
         {{ $authorID := . }}
         {{/* /content/authors/xxx/_index.md 페이지를 찾습니다. */}}
+        {{/* 다국어 지원: 모든 언어에서 author 페이지를 찾습니다. */}}
         {{ $authorPage := $.Site.GetPage (printf "/authors/%s" $authorID) }}
+        {{- if not $authorPage }}
+            {{- range $.Site.Languages }}
+                {{- $langAuthorPage := $.Site.GetPage (printf "/%s/authors/%s" .Lang $authorID) }}
+                {{- if $langAuthorPage }}
+                    {{- $authorPage = $langAuthorPage }}
+                {{- end }}
+            {{- end }}
+        {{- end }}
 
         {{- with $authorPage }}
         <div class="author-box">

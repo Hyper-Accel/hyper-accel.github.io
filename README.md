@@ -6,6 +6,7 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 
 - [Hugo 설치](#hugo-설치)
 - [프로젝트 설정](#프로젝트-설정)
+- [다국어 지원 (Multilingual)](#다국어-지원-multilingual)
 - [블로그 포스트 작성](#블로그-포스트-작성)
 - [로컬 개발 서버 실행](#로컬-개발-서버-실행)
 - [포스트 배포](#포스트-배포)
@@ -46,88 +47,174 @@ sudo snap install hugo
 
 [Hugo Releases](https://github.com/gohugoio/hugo/releases)에서 운영체제에 맞는 바이너리를 다운로드하여 설치할 수 있습니다.
 
+## 🌐 다국어 지원 (Multilingual)
+
+이 블로그는 한국어(ko)와 영어(en)를 지원합니다. 모든 콘텐츠는 기본 버전(한국어)과 영어 버전(.en)을 작성해야 합니다.
+
+### URL 구조
+
+- **한국어 (기본 언어)**: `/posts/포스트-제목/` (언어 코드 없음)
+- **영어**: `/en/posts/포스트-제목/` (언어 코드 포함)
+
+### 중요 사항
+
+⚠️ **새 포스트부터는 반드시 다국어 버전을 모두 작성해야 합니다.**
+
+- 기본 버전(한국어): `index.md` 또는 `index.ko.md`
+- 영어 버전: `index.en.md`
+
+두 파일은 **같은 slug(폴더명 또는 기본 파일명)**를 가져야 하며, Hugo가 자동으로 번역으로 연결합니다.
+
 ## 👤 Author(저자) 추가 방법
 
 새로운 Author(저자) 프로필을 추가하려면 아래 과정을 따라주세요.
 
 ### 1. author 마크다운 파일 생성
 
-`content/authors/<author_id>/_index.md` 경로에 새로운 디렉터리와 `_index.md` 파일을 만듭니다.  
-`<author_id>`는 일반적으로 깃허브 아이디나 본인의 고유 닉네임을 소문자/영문으로 사용합니다.
+`content/authors/<author_id>/` 경로에 새로운 디렉터리를 만들고, **기본 버전과 영어 버전** 두 개의 파일을 생성합니다.
 
 예시 (author_id가 `Minho Park`인 경우):
 
 ```bash
 mkdir -p content/authors/Minho\ Park
 hugo new content/authors/Minho\ Park/_index.md
+hugo new content/authors/Minho\ Park/_index.en.md
 ```
 
-### 2. `_index.md` 파일 내용 작성
-
-아래 템플릿을 참고하여 정보를 입력합니다.
+### 2. `_index.md` 파일 내용 작성 (기본 버전 - 한국어)
 
 ```markdown
 ---
 title: "Minho Park"
-image: "https://avatars.githubusercontent.com/u/33409967?v=4" # 본인 이미지 URL (optional)
-linkedin: "https://www.linkedin.com/in/minho-park-804a56142/"   # (optional)
-github: "https://github.com/mino-park7"                         # (optional)
+image: "https://avatars.githubusercontent.com/u/33409967?v=4"
+linkedin: "https://www.linkedin.com/in/minho-park-804a56142/"
+github: "https://github.com/mino-park7"
 bio: "ML Engineering Lead"
 ---
 ```
 
-필수:  
-- `title` — 이름  
-- `bio` — 간단한 한 줄 소개
+### 3. `_index.en.md` 파일 내용 작성 (영어 버전)
 
-선택:  
-- `image` — 프로필 사진 URL (깃허브/노션/직접 업로드 등)  
+```markdown
+---
+title: "Minho Park"
+image: "https://avatars.githubusercontent.com/u/33409967?v=4"
+linkedin: "https://www.linkedin.com/in/minho-park-804a56142/"
+github: "https://github.com/mino-park7"
+bio: "ML Engineering Lead"
+---
+```
+
+**필수 사항:**
+- `title` — 이름 (한국어/영어 동일 가능)
+- `bio` — 간단한 한 줄 소개 (언어별로 다를 수 있음)
+
+**선택 사항:**
+- `image` — 프로필 사진 URL
 - `linkedin`/`github` — 소셜 미디어 링크
 
-### 3. 포스트에 author 지정하기
+### 4. 포스트에 author 지정하기
 
-포스트의 프론트매터(맨 위 `---` 사이)에 아래와 같이 작성자의 author id를 배열로 추가합니다.
-
-```yaml
-authors: ["Minho Park", "다른-author-id"]
-```
-
-예시 전체 메타데이터:
+포스트의 프론트매터에 작성자의 author id를 배열로 추가합니다.
 
 ```yaml
----
-title: "Awesome LPU Tips"
-date: 2024-06-08
 authors: ["Minho Park"]
-tags: ["LPU", "Tips"]
-categories: ["AI"]
----
 ```
 
-> 여러 명 공동 저자는 배열로 추가할 수 있습니다.
+### 5. 페이지에서 author 정보 확인
 
-### 4. 페이지에서 author 정보 확인
-
-포스트 또는 `/authors/` 페이지 등에서 프로필 사진, 이름, 소개, 깃허브/링크드인 링크 등이 자동으로 표시됩니다.  
-(author 정보가 안 뜬다면 author id 오타나 파일 위치를 다시 확인해 주세요!)
+포스트 또는 `/authors/` (한국어), `/en/authors/` (영어) 페이지에서 프로필 정보가 자동으로 표시됩니다.
 
 ### 참고
 
 - author 템플릿 샘플: [`archetypes/authors.md`](archetypes/authors.md) 참고
-- 작성 예시: [`content/authors/Minho Park/_index.md`](content/authors/Minho%20Park/_index.md) 참고
+- 작성 예시: [`content/authors/Minho Park/`](content/authors/Minho%20Park/) 참고
 
 
 
 ## ✍️ 블로그 포스트 작성
 
-### 1. 새 포스트 생성
+### 1. 새 포스트 생성 (다국어 지원)
+
+**⚠️ 중요: 새 포스트는 반드시 기본 버전과 영어 버전을 모두 작성해야 합니다.**
+
+#### 방법 1: 페이지 번들 방식 (권장)
+
+같은 폴더에 두 개의 파일을 생성합니다:
 
 ```bash
-# 기본 포스트 생성
+# 폴더 생성
+mkdir -p content/posts/포스트-제목
+
+# 기본 버전 (한국어) 생성
 hugo new content/posts/포스트-제목/index.md
 
-# 예시
-hugo new content/posts/hugo-블로그-작성-가이드/index.md
+# 영어 버전 생성
+hugo new content/posts/포스트-제목/index.en.md
+```
+
+**파일 구조:**
+```
+content/posts/포스트-제목/
+├── index.md      (한국어 버전)
+└── index.en.md   (영어 버전)
+```
+
+#### 방법 2: 단일 파일 방식
+
+언어 접미사를 가진 두 개의 파일을 생성합니다:
+
+```bash
+# 기본 버전 (한국어)
+hugo new content/posts/포스트-제목.ko.md
+
+# 영어 버전
+hugo new content/posts/포스트-제목.en.md
+```
+
+**파일 구조:**
+```
+content/posts/
+├── 포스트-제목.ko.md  (한국어 버전)
+└── 포스트-제목.en.md  (영어 버전)
+```
+
+### 다국어 포스트 작성 가이드
+
+1. **같은 slug 사용**: 두 파일은 같은 slug(폴더명 또는 기본 파일명)를 가져야 합니다.
+2. **제목과 내용**: 각 언어별로 제목과 내용을 다르게 작성할 수 있습니다.
+3. **자동 연결**: Hugo가 자동으로 두 버전을 번역으로 연결합니다.
+4. **URL 생성**: 
+   - 한국어 (기본 언어): `/posts/포스트-제목/` (언어 코드 없음)
+   - 영어: `/en/posts/포스트-제목/` (언어 코드 포함)
+
+**예시:**
+```yaml
+# content/posts/my-post/index.md (한국어)
+---
+title: '나의 첫 포스트'
+date: '2025-01-15T10:00:00+09:00'
+draft: false
+authors: ['Minho Park']
+---
+
+# 나의 첫 포스트
+
+이것은 한국어 버전입니다.
+```
+
+```yaml
+# content/posts/my-post/index.en.md (영어)
+---
+title: 'My First Post'
+date: '2025-01-15T10:00:00+09:00'
+draft: false
+authors: ['Minho Park']
+---
+
+# My First Post
+
+This is the English version.
 ```
 
 ### 2. 포스트 메타데이터 설명
@@ -309,18 +396,78 @@ git push origin feature/포스트-제목
 ```
 hyper-accel.github.io/
 ├── content/
-│   └── posts/           # 블로그 포스트들
+│   ├── about/
+│   │   ├── index.md      # About 페이지 (한국어)
+│   │   └── index.en.md   # About 페이지 (영어)
+│   ├── authors/
+│   │   └── Minho Park/
+│   │       ├── _index.md    # Author 프로필 (한국어)
+│   │       └── _index.en.md # Author 프로필 (영어)
+│   └── posts/            # 블로그 포스트들
 │       └── 포스트-제목/
-│           ├── index.md # 포스트 내용
-│           └── images/  # 포스트 이미지들
+│           ├── index.md     # 포스트 내용 (한국어)
+│           ├── index.en.md  # 포스트 내용 (영어)
+│           └── images/      # 포스트 이미지들
 ├── archetypes/
 │   └── posts.md         # 포스트 템플릿
 ├── assets/
 │   └── images/          # 전역 이미지들
+├── i18n/
+│   ├── ko.yaml          # 한국어 번역 파일
+│   └── en.yaml          # 영어 번역 파일
 ├── themes/
 │   └── PaperMod/        # Hugo 테마
 ├── hugo.yaml           # Hugo 설정 파일
 └── README.md           # 이 파일
+```
+
+### 다국어 파일 구조 요약
+
+**포스트 (Posts):**
+- `content/posts/포스트-제목/index.md` (한국어)
+- `content/posts/포스트-제목/index.en.md` (영어)
+
+**작성자 (Authors):**
+- `content/authors/작성자명/_index.md` (한국어)
+- `content/authors/작성자명/_index.en.md` (영어)
+
+**About 페이지:**
+- `content/about/index.md` (한국어)
+- `content/about/index.en.md` (영어)
+
+### About 페이지 작성 방법
+
+About 페이지도 다국어 버전을 모두 작성해야 합니다:
+
+```bash
+# About 페이지 생성
+touch content/about/index.md
+touch content/about/index.en.md
+```
+
+**예시:**
+```markdown
+# content/about/index.md (한국어)
+---
+date: '2025-01-15T10:00:00+09:00'
+title: 'About'
+---
+
+# HyperAccel
+
+HyperAccel에 대한 소개입니다.
+```
+
+```markdown
+# content/about/index.en.md (영어)
+---
+date: '2025-01-15T10:00:00+09:00'
+title: 'About'
+---
+
+# HyperAccel
+
+Introduction to HyperAccel.
 ```
 
 ## 🎨 포스트 작성 팁
@@ -335,6 +482,16 @@ hyper-accel.github.io/
 
 - **태그**: 포스트의 세부 주제 (예: "hugo", "blog", "tech")
 - **카테고리**: 포스트의 주요 분류 (예: "Tech", "Tutorial", "News")
+
+### 3. 다국어 작성 체크리스트
+
+새 포스트 작성 시 확인 사항:
+
+- [ ] 기본 버전 (`index.md` 또는 `index.ko.md`) 작성
+- [ ] 영어 버전 (`index.en.md`) 작성
+- [ ] 두 파일이 같은 slug를 사용하는지 확인
+- [ ] 각 언어별로 제목과 내용이 적절히 번역되었는지 확인
+- [ ] 메타데이터(authors, tags, categories 등)가 일관성 있게 설정되었는지 확인
 
 
 ## 🔄 워크플로우 요약
