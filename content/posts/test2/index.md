@@ -13,6 +13,7 @@ authors: ["Minho Park"]
 tags: ["test"]
 categories: ["test"]
 summary: []
+math: true
 ---
 
 This is a test post for the blog.
@@ -21,3 +22,14 @@ You can use this post to verify Hugo and PaperMod configuration,
 or to test markdown features and formatting.
 
 Enjoy blogging with HyperAccel Tech Blog!
+
+- equation 1 $ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $
+
+- equation 2
+$$
+x = {-b \pm \sqrt{b^2-4ac} \over 2a}
+x = {-b \pm \sqrt{b^2-4ac} \over 2a}
+x = {-b \pm \sqrt{b^2-4ac} \over 2a}
+$$
+
+
