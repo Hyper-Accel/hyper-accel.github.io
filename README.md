@@ -148,6 +148,70 @@ hugo new content/posts/hugo-블로그-작성-가이드/index.md
 - **`categories`**: 포스트 카테고리 (배열)
 - **`summary`**: 포스트 요약
 
+#### SEO 최적화를 위한 메타데이터
+
+검색 엔진 최적화와 소셜 미디어 공유를 위해 다음 필드들을 설정하는 것을 권장합니다:
+
+- **`description`**: 포스트 설명 (150-160자 권장)
+  - 검색 결과에 표시되는 설명문
+  - Open Graph와 Twitter Cards에 사용
+  - 설정하지 않으면 `summary`가 자동으로 사용됨
+  
+- **`keywords`**: 포스트별 키워드 (배열, 선택사항)
+  - 검색 엔진에 전달되는 키워드
+  - 설정하지 않으면 `tags`가 자동으로 사용됨
+  - 예: `keywords: ["Hugo", "SEO", "블로그"]`
+
+- **`lastmod`**: 마지막 수정일 (선택사항)
+  - 콘텐츠 업데이트 시 설정
+  - 검색 엔진이 최신 콘텐츠로 인식
+  - 형식: `lastmod: '2025-01-15T10:30:00+09:00'`
+
+- **`canonicalURL`**: Canonical URL (선택사항)
+  - 중복 콘텐츠 방지
+  - 원본 콘텐츠가 다른 곳에 있을 때 설정
+  - 예: `canonicalURL: "https://example.com/original-post"`
+
+- **`locale`**: 언어 설정 (선택사항)
+  - Open Graph locale 설정
+  - 예: `locale: "ko_KR"` (기본값: 사이트 언어 설정)
+
+- **`robotsNoIndex`**: 검색 엔진 인덱싱 제어 (선택사항)
+  - `true`로 설정 시 검색 엔진 인덱싱 방지
+  - 초안이나 임시 포스트에 사용
+
+#### SEO 최적화 예시
+
+```yaml
+---
+date: '2025-01-15T10:00:00+09:00'
+lastmod: '2025-01-20T15:30:00+09:00'
+title: 'Hugo 블로그 SEO 가이드'
+draft: false
+authors: ['Minho Park']
+description: 'Hugo와 PaperMod 테마를 사용한 블로그의 SEO 최적화 방법을 알아봅니다. 메타 태그, Open Graph, Schema.org 설정 등을 포함합니다.'
+keywords: ['Hugo', 'SEO', '블로그', 'PaperMod', '검색엔진최적화']
+tags: ['Hugo', 'SEO', 'Tutorial']
+categories: ['Tech']
+summary: 'Hugo 블로그의 SEO 최적화 가이드입니다.'
+cover:
+  image: 'seo-guide.png'
+  alt: 'SEO 최적화 가이드 커버 이미지'
+  caption: 'Hugo 블로그 SEO 가이드'
+  relative: true
+---
+```
+
+#### 커버 이미지 SEO 최적화
+
+커버 이미지는 Open Graph와 Twitter Cards에 사용되므로 다음을 권장합니다:
+
+- **권장 크기**: 1200x630px (Open Graph 표준)
+- **최소 크기**: 600x315px
+- **파일 형식**: JPG, PNG, WebP
+- **파일 크기**: 1MB 이하 권장
+- **`alt` 텍스트**: 이미지 설명을 반드시 작성 (접근성 및 SEO)
+
 ### 3. 포스트 내용 작성
 
 Markdown 문법을 사용하여 포스트 내용을 작성합니다:
@@ -159,13 +223,6 @@ Markdown 문법을 사용하여 포스트 내용을 작성합니다:
 
 일반 텍스트 내용입니다.
 
-### 코드 블록
-
-```python
-def hello_world():
-    print("Hello, World!")
-```
-
 ### 이미지 삽입
 
 ![이미지 설명](images/image-name.jpg)
@@ -174,6 +231,14 @@ def hello_world():
 
 [HyperAccel 홈페이지](https://hyperaccel.ai/)
 ```
+
+### 코드 블록
+
+    ```python
+    def hello_world():
+        print("Hello, World!")
+    ```
+
 
 ### 4. 포스트 미리보기
 
@@ -271,11 +336,6 @@ hyper-accel.github.io/
 - **태그**: 포스트의 세부 주제 (예: "hugo", "blog", "tech")
 - **카테고리**: 포스트의 주요 분류 (예: "Tech", "Tutorial", "News")
 
-### 3. SEO 최적화
-
-- `summary` 필드에 포스트 요약 작성
-- `cover` 이미지 설정
-- 의미있는 제목과 URL 사용
 
 ## 🔄 워크플로우 요약
 
