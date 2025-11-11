@@ -42,20 +42,20 @@ comments: true
 
 ### Scalable
 
-대규모 모델 학습과 추론을 위한 확장성 솔루션들이 주목받았습니다. 기존에는 대규모 분산 학습/추론을 위해 third-party SW를 사용해야 하는 경우가 많았습니다. (Megatron, DeepSpeed, Horovod, ...) 하지만 이번 PyTorch Conference에서는 PyTorch Organization에서 자체적으로 지원하는 분학 학습 프레임워크 및 통식 라이브러리, 추상화 개념을 소개했습니다.
+대규모 모델 학습과 추론을 위한 확장성 솔루션들이 주목받았습니다. 기존에는 대규모 분산 학습/추론을 위해 third-party SW를 사용해야 하는 경우가 많았습니다. (Megatron, DeepSpeed, Horovod, ...) 하지만 이번 PyTorch Conference에서는 PyTorch Organization에서 자체적으로 지원하는 분산 학습 프레임워크 및 통신 라이브러리, 추상화 개념을 소개했습니다.
 
 
 #### **Monarch**
 
 ![monarch](./monarch.png)
 
-- Monarch는 PyTorch를 위한 **Distributed Programming Framework**로써, 대규모 모델의 효율적 분산 학습과 추론을 지원하기 위해 설계됨.
+- Monarch는 PyTorch를 위한 **Distributed Programming Framework**로써, 대규모 모델의 효율적 분산 학습과 추론을 지원하기 위해 설계되었습니다.
 - API를 보았을 때, [Ray](https://ray.io)의 Actor, Task 개념에 상당히 영향을 많이 받은 것으로 보입니다.
 - 복잡한 병렬화 전략을 수동으로 구성할 필요 없이, 자동화된 **분할 및 통신 최적화 기능**을 제공합니다.
 - 이를 통해 기존 분산 학습 프레임워크 대비 **코드 복잡도와 통신 오버헤드**를 크게 줄였습니다.
 - **DTensor**: 여러 디바이스에 걸친 모델 병렬화를 단순화합니다. 복잡한 분산 설정 없이도 대규모 모델을 효율적으로 실행할 수 있게 해주는 추상화 레이어입니다.
 
-#### **TorchComms**: 
+#### **TorchComms**
 
 ![torchcomms](./torchcomms.png)
 
@@ -81,7 +81,7 @@ comments: true
 ![Helion](./helion.png)
 
 - PyTorch의 eDSL(Embedded Domain-Specific Language)로, 컴파일 타임 최적화를 통해 런타임 성능을 극대화합니다. 복잡한 연산 그래프를 더 효율적으로 실행할 수 있게 해줍니다.
-- Transformer를 빠르게 실행하기 위해, 다양한 회사에서 엄청나게 많은 양의 **Custom Kernels**가 사용되고 있음, 하지만 Custom Kernel을 새로운 하드웨어 지원이 어렵고 이로 인해 굉장히 빠르게 기술부채가 될 수 있습니다.
+- Transformer를 빠르게 실행하기 위해, 다양한 회사에서 엄청나게 많은 양의 **Custom Kernels**가 사용되고 있습니다. 하지만 새로운 하드웨어에서 Custom Kernel을 지원하기는 어려워, 이는 굉장히 빠르게 기술 부채가 될 수 있습니다.
 - Triton 커널 작성 시 manual하게 해야 하는 작업을 자동화해주는 Higher Level DSL입니다.
 - 실제 Helion DSL의 결과는 Triton Kernel이 되고, Triton Kernel의 Backend추가로 다양한 Hardware지원이 가능합니다.
 - 다양한 Hardware를 agnostic하게 지원할 수 있는 필수적인 Abstraction Layer가 될 수 있을 것으로 보입니다.
@@ -93,9 +93,9 @@ comments: true
 ![cuTile](./cutile.png)
 
 - GPU Architecture가 진화함에 따라, 다양한 기능들이 추가되기 시작했습니다. (Ex, TMA in Hopper, TensorCore from Turing Architecture)
-- GPU Kernerl PTX를 통해 구현을 하게되면, 하드웨어의 새로운 spec이 추가될 경우 기존 커널들은 그 기능을 지원하기 어려운 문제가 있습니다.
-- 또한 PTX 레벨의 구현은 User가 직접 work를 block 단위로 나누고, 데이터를 tile로 나누어주어야 하고, 직접 thread에 매핑까지 해야합니다., 이런 abstraction은 방대한 코드 작성을 불러일으킵니다.
-- Tile IR의 경우, Syetem이 work를 thread에 매핑하는 작성을 대신 수행해줍니다.
+- GPU Kernel PTX를 통해 구현을 하게되면, 하드웨어의 새로운 spec이 추가될 경우 기존 커널들은 그 기능을 지원하기 어려운 문제가 있습니다.
+- 또한 PTX 레벨의 구현은 User가 직접 work를 block 단위로 나누고, 데이터를 tile로 나누어주어야 하고, 직접 thread에 매핑까지 해야 합니다. 이런 abstraction은 방대한 코드 작성을 불러일으킵니다.
+- Tile IR의 경우, System이 work를 thread에 매핑하는 작성을 대신 수행해줍니다.
 - 이런 Tile Level의 abstraction은 [Triton-lang](https://triton-lang.org/main/index.html)에서 소개되었으며, 위에서 소개드린 Helion에서도 Tile Level의 abstraction을 통해 DSL을 지원합니다.
 - CUDA에서도 Tile Level의 DSL 및 IR을 지원하게 됨으로써, User와 System 사이의 적절한 abstraction layer를 설정하였습니다.
 
@@ -130,8 +130,8 @@ LLM 추론 엔진에 대한 세션이 많았고, 실제 산업계 적용 사례�
 
 ![vLLM](./vLLM.png)
 
-- vLLM은 더욱 더 PyTorch와 서로 관여되고 있으며, vLLM은 PyTorch의 기능들을 향상시키는 데 큰 역할을 하고있고, PyTorch의 새로운 feature들로 vLLM은 더욱 더 가속화되고 있습니다.
-- vLLM은 LLM Inference Framework로써 새로운 Model 지원 및 Hardware를 지원할 수 있는 Hub로써 역할을 하고 있습니다.
+- vLLM은 더욱 더 PyTorch와 서로 관여되고 있으며, vLLM은 PyTorch의 기능들을 향상시키는 데 큰 역할을 하고 있고, PyTorch의 새로운 feature들로 vLLM은 더욱 더 가속화되고 있습니다.
+- vLLM은 LLM Inference Framework로서 새로운 Model 지원 및 Hardware를 지원할 수 있는 Hub로서 역할을 하고 있습니다.
 - PyTorch Conference 2025에서는 기조연설 및 단독 세션에서 7개의 관련 발표가 있을 정도로 가장 주요한 프로젝트 중 하나였습니다.
 - HyperAccel에서도 vLLM의 feature를 최대한 지원하는 것을 Software Group의 가장 큰 목표로 삼고 있습니다.
 
