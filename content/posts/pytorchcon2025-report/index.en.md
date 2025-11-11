@@ -54,7 +54,7 @@ Scalability solutions for large-scale model training and inference received sign
 - This significantly reduces **code complexity and communication overhead** compared to existing distributed training frameworks.
 - **DTensor**: Simplifies model parallelization across multiple devices. It's an abstraction layer that enables efficient execution of large-scale models without complex distributed setup.
 
-#### **TorchComms**: 
+#### **TorchComms** 
 
 ![torchcomms](./torchcomms.png)
 
