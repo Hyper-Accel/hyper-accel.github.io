@@ -1,7 +1,7 @@
 ---
-title: "<user_name>"
-image: "<image path/url>"
-linkedin: "<linkedin url>"
-github: "<github profile url>"
-bio: "<bio>"
+title: "Jaewoo Kim"
+image: ""
+linkedin: "https://www.linkedin.com/in/jaewoo-kim-b38325237/"
+github: "https://github.com/JustinKim98"
+bio: "LPU Compiler engineer"
 ---
