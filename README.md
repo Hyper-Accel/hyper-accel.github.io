@@ -11,6 +11,13 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 - [로컬 개발 서버 실행](#로컬-개발-서버-실행)
 - [포스트 배포](#포스트-배포)
 
+## Repository clone 받기
+```bash
+git clone git@github.com:Hyper-Accel/hyper-accel.github.io.git
+git submodule update --init --recursive
+```
+Repository를 clone받고, submodule을 초기화합니다. (recursive 옵션을 붙여 주십시오)
+
 ## 🚀 Hugo 설치
 
 ### macOS (Homebrew 사용)
