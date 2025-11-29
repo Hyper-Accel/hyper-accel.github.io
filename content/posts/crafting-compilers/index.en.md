@@ -1,6 +1,6 @@
 ---
 date: '2025-11-16T15:10:28+09:00'
-draft: true
+draft: false
 title: 'Crafting Compilers'
 cover:
   image: "486.jpeg"
