@@ -3,7 +3,7 @@ date: '2025-11-16T15:10:28+09:00'
 draft: true
 title: 'Crafting Compilers'
 cover:
-  image: "Hoya.jpg"
+  image: "486.jpeg"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "<alt text>"
