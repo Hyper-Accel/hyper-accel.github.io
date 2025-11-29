@@ -6,10 +6,10 @@ cover:
   image: "sglang1.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "RadixAttention example from SGLang paper"
+  caption: "RadixAttention example from SGLang paper"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [jaewoo kim] # must match with content/authors
+authors: [Jaewoo Kim] # must match with content/authors
 tags: [SGLang]
 categories: [LLM serving]
 summary: [Paper review of SGLang, the high-performance LLM serving framework]
@@ -31,7 +31,7 @@ The authors argue this process has been inefficient in current solutions for the
     1. Current solutions lack effective mechanisms to reuse KV-cache.
     2. When output format is fixed or follows certain grammar rules, current solutions cannot effectively leverage this, since they always emit tokens one at a time.
 
-The Core idea of the SGLang is to simplify LM programs into structure using new programming language (in Python-embedded DSL) which can be compiled.
+The core idea of the SGLang is to simplify LM programs into structure using new programming language (in Python-embedded DSL) which can be compiled.
 
 ### SGLang DSL
 
@@ -67,7 +67,7 @@ def multi_dimensional_judge(s, path, essay):
 	dim + ". End your judgment with the word 'END'")
 	f += assistant("Judgment:" + gen("judgment", stop="END"))
 	
-	# Fetch the judgement results & merge the judgments
+	# Fetch the judgements results & merge the judgments
 	judgment = "\n".join(f["judgment"] for f in forks)
 	
 	# Generate a summary and a grade. Return in the JSON format.
@@ -86,11 +86,11 @@ print(state["output"]) # Runs an SGLang program
 
 With SGLang, this can be written with simple expressions, which is much shorter than previous solutions.
 
-In the program, we can observe SGLang language primitives such as `fork`, `join`, `regex`  .etc.
+In the program, we can observe SGLang language primitives such as `fork`, `join`, `regex` ,etc.
 
 `fork` will generate multiple requests to judge the essay in multiple dimensions, (it is going to judge the essay in different fields) while `join` will merge all judgements. `regex` accepts regular expressions, and it can constrain output of the LLM to be in specific format.  `+=` operator is used to append the string.
 
-Some primitives will instruct SGLang execute in asynchronous stream, such as `select`, `gen` or `extend`. Authors say we can view this as launching CUDA kernels with CUDA streams asynchrounously.
+Some primitives will instruct SGLang execute in asynchronous stream, such as `select`, `gen` or `extend`. Authors say we can view this as launching CUDA kernels with CUDA streams asynchronously.
 
 ## RadixAttention
 
@@ -121,7 +121,7 @@ If you've read this far, you might wonder: what if cache performance goes down d
 ## Constrained decoding with compressed FSM
 
 
-SSome LM programs require output in a specific format (such as JSON in our example). If we're building an AI program for generating presentation slides, we want the LLM output to follow a specific format. SGLang supports this efficiently using FSMs.
+Some LM programs require output in a specific format (such as JSON in our example). If we're building an AI program for generating presentation slides, we want the LLM output to follow a specific format. SGLang supports this efficiently using FSMs.
 
 During decoding, the correct LLM output is sometimes always fixed. For example, if an LLM is prompted to output JSON, we always know when to output colons, commas, or braces—which can be expressed as regex in SGLang DSL.
 
@@ -139,7 +139,7 @@ In the example above, `{ \n ____ "name"` is merged into a single compressed expr
 
 ## Evaluations
 
-SGLang is very effective in agent-based AI workloads due to inference context-aware KV-cache mechanisms, which will be most of the inference workloads in the future. 
+SGLang is very effective in agent-based AI workloads due to inference context-aware KV-cache mechanisms, which will be most of the inference workloads in the future.
 
 ![compressed](./sglang3.png)
 
