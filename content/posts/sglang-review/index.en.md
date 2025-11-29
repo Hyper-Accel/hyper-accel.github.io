@@ -3,11 +3,11 @@ date: '2025-11-16T15:10:28+09:00'
 draft: true
 title: 'SGLang paper review'
 cover:
-  image: "sglang1.png"
+  image: "sglang.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "RadixAttention example from SGLang paper"
-  caption: "RadixAttention example from SGLang paper"
+  alt: "SGLang"
+  caption: "SGLang"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
 tags: [SGLang]
