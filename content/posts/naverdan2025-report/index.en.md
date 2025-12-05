@@ -10,7 +10,7 @@ cover:
 authors: [Sinhyun Park]
 tags: [conference, report, MLOps, distributed storage]
 categories: [report]
-summary: []
+summary: ['A summary of key highlights from NAVER DAN 2025 attended by the HyperAccel ML team. This post covers technical insights on large-scale AI cluster operations, including IDC Seamless HDFS for multi-IDC distributed storage architecture, GPU resource consolidation through the MLXP platform, and network topology-aware scheduling.']
 comments: true
 ---
 
