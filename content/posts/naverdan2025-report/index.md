@@ -142,6 +142,6 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
 
 HyperAccel은 LLM 추론을 위한 차세대 AI 칩을 개발하고 있습니다. FPGA 검증을 완료했으며, 곧 ASIC 칩과 서버 솔루션을 출시할 예정입니다. PyTorch 생태계와의 통합을 통해 개발자들이 쉽게 사용할 수 있는 솔루션을 만들어가고 있습니다.
 
-**채용 사이트** : https://hyperaccel.career.greetinghr.com/ko/guide
+**채용 사이트**: https://hyperaccel.career.greetinghr.com/ko/guide
 
 혹시 관심이 있으시다면 언제든지 연락 주세요!
