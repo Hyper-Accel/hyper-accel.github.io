@@ -48,7 +48,7 @@ NAVER는 평촌, 판교, 세종 등 여러 IDC에 걸쳐 `대규모 Hadoop 클�
 
 ![Data Recovery issue on disaster](./data_recovery.png)
 
-- **데이처 복구(Data Recovery)**
+- **데이터 복구(Data Recovery)**
   - 데이터가 특정 IDC에만 고립되어 저장되므로, 화재 등으로 해당 IDC가 전소될 경우 데이터가 영구 소실될 위험이 있습니다.
 
 
