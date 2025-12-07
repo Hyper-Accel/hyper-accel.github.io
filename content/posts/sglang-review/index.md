@@ -141,3 +141,8 @@ SGLang는 추론 컨텍스트 인식 KV-cache 메커니즘으로 인해 에이�
 ## 개인적인 생각
 
 우리는 agentic AI의 세계에 살고 있으며, agentic AI 의 사용 분야는 갈수록 확장되고 있습니다. AI 워크로드는 코딩, 슬라이드 생성, 음악 생성, 작업 도구 등 다양한 서비스에 통합되고 있습니다. 이러한 워크로드는 모델을 제어하기 위해 많은 시스템 프롬프트와 출력 제약이 필요합니다. 저는 개인적으로 SGLang가 radix attention과 정말 잘 맞기 때문에 이러한 경우에 매우 효율적일 것이라고 생각합니다. 또한 토큰을 생성할 필요가 없을 때 regex와 함께 FSM을 사용하여 시간과 에너지를 절약하는 아이디어를 좋아했습니다. SGLang이 항상 vLLM보다 나은 것은 아니지만, 에이전트 AI 워크로드에 훨씬 더 적합하지 않을까 생각합니다.
+
+
+### Reference
+[SGLang: Efficient Execution of Structured Language Model Programs](https://arxiv.org/abs/2312.07104)
+

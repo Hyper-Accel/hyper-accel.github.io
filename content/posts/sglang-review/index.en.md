@@ -148,3 +148,6 @@ Performance speedup comes from Radix attention, FSM based decoding. Authors say 
 ## My personal thoughts
 
 We are living in a world of agentic AI, and agentic AI workloads are expanding. AI workloads are integrated into various services, including coding, creating slides, creating music, and work tools. These workloads require many system prompts and output constraints to control the model. I personally think SGLang will be very efficient in these cases since they fit really well with radix attention. Also, I liked the idea of saving time and energy using FSMs with regex when tokens don't need to be generated. While SGLang won't always be better than vLLM, it would be much more suitable for agentic AI workloads.
+
+### Reference
+[SGLang: Efficient Execution of Structured Language Model Programs](https://arxiv.org/abs/2312.07104)
