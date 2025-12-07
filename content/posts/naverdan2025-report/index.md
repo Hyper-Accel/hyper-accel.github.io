@@ -105,7 +105,7 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
   - Category & Purpose: Serving(고가용성), Training(배치), Interactive(개발) 등 목적에 따라 우선순위를 세분화하여 스케줄링의 공정성을 확보했습니다.
 
 
-#### AI 워크로드 특성에 최적화된 네트워크 토플로지 인지 스케줄링
+#### AI 워크로드 특성에 최적화된 네트워크 토폴로지 인지 스케줄링
 
 ![K8S vs Volcano scheduler](./volcano.png)
 
