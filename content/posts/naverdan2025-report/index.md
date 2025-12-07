@@ -39,7 +39,7 @@ comments: true
 #### 문제: **데이터 고립**과 **데이터 복구**
 NAVER는 평촌, 판교, 세종 등 여러 IDC에 걸쳐 `대규모 Hadoop 클러스터(C3)`를 운영 중인데, IDC 간 물리적 거리로 인해 다음과 같은 한계에 봉착했습니다.
 
-![Data Silo in inter IDC comunication](./data_silo.png)
+![Data Silo in inter IDC communication](./data_silo.png)
 
 - **데이터 고립(Data Silo)**
   - 클러스터가 IDC별로 독립적으로 구성되어 있어, 타 IDC에 있는 데이터에 접근하려면 `IDC 간 네트워크(DCI)`를 타야 합니다.
