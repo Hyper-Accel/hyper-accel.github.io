@@ -1,6 +1,6 @@
 ---
-date: '2025-11-16T15:10:28+09:00'
-draft: true
+date: '2025-11-29T15:10:28+09:00'
+draft: false
 title: 'SGLang paper review'
 cover:
   image: "sglang.png"
@@ -24,11 +24,11 @@ This requires a wide range of prompting techniques, such as skeleton of thought 
 
 The authors argue this process has been inefficient in current solutions for the following reasons:
 
-1. Programming LM programs is difficult since LLMs are non-deterministic.
+1. Programming LM(Language Model) programs is difficult since LLMs are non-deterministic.
     1. We cannot predict what LLMs will emit before running a command.
     2. This reduces readability of LLM outputs.
 2. Executing LM programs is inefficient due to redundant computation and memory usage.
-    1. Current solutions lack effective mechanisms to reuse KV-cache.
+    1. Current solution (Solutions like vLLM or TGI at the time when this paper was written) lack effective mechanisms to reuse KV-cache.
     2. When output format is fixed or follows certain grammar rules, current solutions cannot effectively leverage this, since they always emit tokens one at a time.
 
 The core idea of the SGLang is to simplify LM programs into structure using new programming language (in Python-embedded DSL) which can be compiled.
@@ -90,7 +90,7 @@ In the program, we can observe SGLang language primitives such as `fork`, `join`
 
 `fork` will generate multiple requests to judge the essay in multiple dimensions, (it is going to judge the essay in different fields) while `join` will merge all judgements. `regex` accepts regular expressions, and it can constrain output of the LLM to be in specific format.  `+=` operator is used to append the string.
 
-Some primitives will instruct SGLang execute in asynchronous stream, such as `select`, `gen` or `extend`. Authors say we can view this as launching CUDA kernels with CUDA streams asynchronously.
+Some primitives will instruct SGLang execute in __asynchronous stream__, such as `select`, `gen` or `extend`. Authors say we can view this as launching CUDA kernels with CUDA streams asynchronously.
 
 ## RadixAttention
 
@@ -116,9 +116,9 @@ Here is an example of a radix tree, which can express multiple possible contexts
 8. We receive a new message after "Hello" and "Hi!", so we append a new node. However, due to lack of KV cache space, we evict other least-recently-used nodes.
 9. Now, we have more requests sharing the same prompts up to "Answer 3", but we must evict other nodes until we have enough space for them. We evict them using LRU policy.
 
-If you've read this far, you might wonder: what if cache performance goes down due to suboptimal request ordering? You're very sharp—the authors thought of this too. They designed a cache-aware scheduling algorithm to maximize performance. It sorts requests by the prefix length that best matches the radix-tree KV cache (essentially pre-evaluating cache hit rate before processing incoming requests).
+If you've read this far, you might wonder: what if cache performance goes down due to suboptimal request ordering? You're very sharp—the authors thought of this too. They designed a __cache-aware scheduling__ algorithm to maximize performance. It sorts requests by the prefix length that best matches the radix-tree KV cache (essentially pre-evaluating cache hit rate before processing incoming requests).
 
-## Constrained decoding with compressed FSM
+## Constrained decoding with compressed FSM (Finite state machine)
 
 
 Some LM programs require output in a specific format (such as JSON in our example). If we're building an AI program for generating presentation slides, we want the LLM output to follow a specific format. SGLang supports this efficiently using FSMs.
