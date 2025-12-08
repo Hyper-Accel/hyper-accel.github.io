@@ -58,22 +58,21 @@ def multi_dimensional_judge(s, path, essay):
 	# Return directly if it is not related
 	s += user("Is the essay related to the image?")
 	s += assistant(select("related", choices=["yes", "no"]))
-	if s["related"] == "no": return
+	if s["related"] == "no": 
+		return
 	
 	# Judge multiple dimensions in parallel
 	forks = s.fork(len(dimensions))
 	for f, dim in zip(forks, dimensions):
-	f += user("Evaluate based on the following dimension:" +
-	dim + ". End your judgment with the word 'END'")
-	f += assistant("Judgment:" + gen("judgment", stop="END"))
+		f += user("Evaluate based on the following dimension:" + dim + ". End your judgment with the word 'END'")
+		f += assistant("Judgment:" + gen("judgment", stop="END"))
 	
 	# Fetch the judgement results & merge the judgments
 	judgment = "\n".join(f["judgment"] for f in forks)
 	
 	# Generate a summary and a grade. Return in the JSON format.
 	s += user("Provide the judgment, summary, and a letter grade")
-	s += assistant(judgment + "In summary," + gen("summary", stop=".")
-	+ "The grade of it is" + gen("grade"))
+	s += assistant(judgment + "In summary," + gen("summary", stop=".") + "The grade of it is" + gen("grade"))
 	schema = r'\{"summary": "[\w\d\s]+\.", "grade": "[ABCD][+-]?"\}'
 	s += user("Return in the JSON format.")
 	
