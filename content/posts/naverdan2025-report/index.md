@@ -39,7 +39,7 @@ comments: true
 #### 문제: **데이터 고립**과 **데이터 복구**
 NAVER는 평촌, 판교, 세종 등 여러 IDC에 걸쳐 `대규모 Hadoop 클러스터(C3)`를 운영 중인데, IDC 간 물리적 거리로 인해 다음과 같은 한계에 봉착했습니다.
 
-![Data Silo in inter IDC comunication](./data_silo.png)
+![Data Silo in inter IDC communication](./data_silo.png)
 
 - **데이터 고립(Data Silo)**
   - 클러스터가 IDC별로 독립적으로 구성되어 있어, 타 IDC에 있는 데이터에 접근하려면 `IDC 간 네트워크(DCI)`를 타야 합니다.
@@ -48,7 +48,7 @@ NAVER는 평촌, 판교, 세종 등 여러 IDC에 걸쳐 `대규모 Hadoop 클�
 
 ![Data Recovery issue on disaster](./data_recovery.png)
 
-- **데이처 복구(Data Recovery)**
+- **데이터 복구(Data Recovery)**
   - 데이터가 특정 IDC에만 고립되어 저장되므로, 화재 등으로 해당 IDC가 전소될 경우 데이터가 영구 소실될 위험이 있습니다.
 
 
@@ -105,7 +105,7 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
   - Category & Purpose: Serving(고가용성), Training(배치), Interactive(개발) 등 목적에 따라 우선순위를 세분화하여 스케줄링의 공정성을 확보했습니다.
 
 
-#### AI 워크로드 특성에 최적화된 네트워크 토플로지 인지 스케줄링
+#### AI 워크로드 특성에 최적화된 네트워크 토폴로지 인지 스케줄링
 
 ![K8S vs Volcano scheduler](./volcano.png)
 
@@ -142,6 +142,6 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
 
 HyperAccel은 LLM 추론을 위한 차세대 AI 칩을 개발하고 있습니다. FPGA 검증을 완료했으며, 곧 ASIC 칩과 서버 솔루션을 출시할 예정입니다. PyTorch 생태계와의 통합을 통해 개발자들이 쉽게 사용할 수 있는 솔루션을 만들어가고 있습니다.
 
-**채용 사이트** : https://hyperaccel.career.greetinghr.com/ko/guide
+**채용 사이트**: https://hyperaccel.career.greetinghr.com/ko/guide
 
 혹시 관심이 있으시다면 언제든지 연락 주세요!
