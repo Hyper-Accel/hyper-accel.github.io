@@ -109,7 +109,7 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
 
 ![K8S vs Volcano scheduler](./volcano.png)
 
-`Kubernetes`의 기본 스케줄러는 **AI 워크로드(Batch, Gang Scheduling)**에 최적화되어 있지 않아 성능 저하를 유발했습니다. 이를 해결하기 위해 `Volcano 스케줄러`를 기반으로 기능을 고도화했습니다.
+`Kubernetes`의 기본 스케줄러는 **AI 워크로드(Batch, Gang Scheduling)** 에 최적화되어 있지 않아 성능 저하를 유발했습니다. 이를 해결하기 위해 `Volcano 스케줄러`를 기반으로 기능을 고도화했습니다.
 
 ![Gang scheduling](./gang.png)
 
