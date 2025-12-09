@@ -136,6 +136,11 @@ NAVER는 물리적 노드들을 각 조직에게 할당하는 `Private Zone` 방
 결국, 좋은 AI 칩을 만드는 것만으로는 충분하지 않습니다. **스케줄러를 비롯한 SW 스택까지 함께 개발**해야 자사 칩을 효율적으로 활용할 수 있다는 점을 다시 한번 확인할 수 있었습니다. 
 
 
+### Reference
+[IDC Seamless HDFS: IDC의 한계를 넘어 도달한 데이터 통합의 세계](https://dan.naver.com/25/sessions/692)
+
+[MLXP: GPU 효율화를 선도하는 대규모 MLOps 플랫폼](https://dan.naver.com/25/sessions/679)
+
 ## 추신
 
 ### HyperAccel 채용 안내
