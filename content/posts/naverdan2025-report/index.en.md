@@ -133,6 +133,11 @@ The **MLXP** session provided practical insights on operating large-scale AI clu
 
 Ultimately, making good AI chips alone is not enough. We reaffirmed that **developing the SW stack including schedulers** is essential to efficiently utilize our chips.
 
+### Reference
+[IDC Seamless HDFS: IDC의 한계를 넘어 도달한 데이터 통합의 세계](https://dan.naver.com/25/sessions/692)
+
+[MLXP: GPU 효율화를 선도하는 대규모 MLOps 플랫폼](https://dan.naver.com/25/sessions/679)
+
 
 ## P.S.
 
