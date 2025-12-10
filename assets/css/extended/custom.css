@@ -138,7 +138,7 @@
     border: 1px solid var(--border);
     border-radius: 1.25rem;
     padding: 1.5rem;
-    transition: all 0.2s ease-in-out;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
     background-color: var(--theme);
 }
 

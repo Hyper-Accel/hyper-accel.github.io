@@ -51,7 +51,6 @@
   {{- $categories = $categories | append $name }}  
 {{- end }}  
 {{- $categories = $categories | sort }}  
-{{- $categories = $categories | uniq | sort }}
 
 {{- /* Category filter buttons */ -}}
 <div class="category-filter-container">
@@ -170,12 +169,12 @@
         } else {  
           if (card.style.display !== 'none') { // Only act on visible cards  
             card.style.opacity = '0';  
-            setTimeout(() => {  
-              card.style.display = 'none';  
-            }, 300); // Match CSS transition duration.  
-          }  
+            card.style.opacity = '0';
+            card.addEventListener('transitionend', () => {
+              card.style.display = 'none';
+            }, { once: true });
         }  
-      });
+      }});
     });
   });
 })();
