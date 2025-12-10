@@ -1,0 +1,153 @@
+{{- /* Generate JSON data for posts based on current page context */ -}}
+{{- $allPostsData := slice }}
+{{- $term := .term }}
+{{- $page := .page }}
+
+{{- /* Get all posts from site, not just current page */ -}}
+{{- $allPages := site.RegularPages }}
+{{- if site.Params.mainSections }}
+  {{- $allPages = where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- else }}
+  {{- /* Default to posts section if mainSections not defined */ -}}
+  {{- $allPages = where site.RegularPages "Section" "posts" }}
+{{- end }}
+
+{{- /* Dynamically detect current page context from taxonomies */ -}}
+{{- $currentFilters := dict }}
+{{- /* Check if this is a term page (category, tag, author, etc.) */ -}}
+{{- if eq $page.Kind "term" }}
+  {{- /* Get taxonomy type and term value */ -}}
+  {{- $taxonomyType := $page.Type }}
+  {{- $termValue := $page.Data.Term | urlize }}
+  {{- $currentFilters = $currentFilters | merge (dict $taxonomyType $termValue) }}
+{{- else if eq $page.Section "authors" }}
+  {{- /* Special handling for author section pages */ -}}
+  {{- $authorName := $page.Title }}
+  {{- if not $authorName }}
+    {{- $authorName = $page.File.BaseFileName }}
+  {{- end }}
+  {{- $authorNames := slice ($authorName | lower | urlize) ($authorName | lower) $authorName }}
+  {{- $currentFilters = $currentFilters | merge (dict "authors" $authorNames) }}
+{{- end }}
+
+{{- range $page := $allPages }}
+  {{- /* Apply dynamic taxonomy filters */ -}}
+  {{- $shouldInclude := true }}
+  
+  {{- range $taxonomyType, $filterValue := $currentFilters }}
+    {{- $postTaxonomyValues := slice }}
+    {{- $paramKey := $taxonomyType }}
+    {{- $taxonomyParam := index $page.Params $paramKey }}
+    
+    {{- /* Get taxonomy values from post params */ -}}
+    {{- if $taxonomyParam }}
+      {{- $paramType := printf "%T" $taxonomyParam }}
+      {{- if or (eq $paramType "[]string") (eq $paramType "[]interface {}") }}
+        {{- /* It's a slice */ -}}
+        {{- range $taxonomyParam }}
+          {{- $postTaxonomyValues = $postTaxonomyValues | append (. | urlize) }}
+          {{- $postTaxonomyValues = $postTaxonomyValues | append (. | lower) }}
+          {{- $postTaxonomyValues = $postTaxonomyValues | append . }}
+        {{- end }}
+      {{- else }}
+        {{- /* It's a single value */ -}}
+        {{- $postTaxonomyValues = $postTaxonomyValues | append ($taxonomyParam | urlize) }}
+        {{- $postTaxonomyValues = $postTaxonomyValues | append ($taxonomyParam | lower) }}
+        {{- $postTaxonomyValues = $postTaxonomyValues | append $taxonomyParam }}
+      {{- end }}
+    {{- end }}
+    
+    {{- /* Check if filter matches */ -}}
+    {{- $matches := false }}
+    {{- $filterType := printf "%T" $filterValue }}
+    {{- if or (eq $filterType "[]string") (eq $filterType "[]interface {}") }}
+      {{- /* For authors, check multiple name variations */ -}}
+      {{- range $filterName := $filterValue }}
+        {{- range $postValue := $postTaxonomyValues }}
+          {{- if eq $filterName $postValue }}
+            {{- $matches = true }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- else }}
+      {{- /* For other taxonomies, simple string match */ -}}
+      {{- range $postValue := $postTaxonomyValues }}
+        {{- if eq $postValue $filterValue }}
+          {{- $matches = true }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    
+    {{- if not $matches }}
+      {{- $shouldInclude = false }}
+      {{- break }}
+    {{- end }}
+  {{- end }}
+  
+  {{- if not $shouldInclude }}
+    {{- continue }}
+  {{- end }}
+  
+  {{- /* Get categories for filtering (minimal data) */ -}}
+  {{- $postCategories := slice }}
+  {{- if $page.Params.categories }}
+    {{- range $page.Params.categories }}
+      {{- $postCategories = $postCategories | append (. | urlize) }}
+    {{- end }}
+  {{- end }}
+  
+  {{- /* Minimal JSON data - only essential fields */ -}}
+  {{- $postData := dict
+    "title" $page.Title
+    "permalink" $page.Permalink
+    "summary" ($page.Summary | plainify | htmlUnescape)
+    "truncated" $page.Truncated
+    "categories" $postCategories
+    "date" ($page.Date | time.Format "2006-01-02T15:04:05Z07:00")
+    "class" (cond $term "post-entry tag-entry" "post-entry")
+    "hideSummary" (ne ($page.Param "hideSummary") true | not)
+    "hideMeta" ($page.Param "hideMeta")
+  }}
+  
+  {{- /* Add cover image only if exists */ -}}
+  {{- $isHidden := ($page.Param "cover.hiddenInList") | default ($page.Param "cover.hidden") | default false }}
+  {{- if (and $page.Params.cover.image (not $isHidden)) }}
+    {{- $pageBundleCover := ($page.Resources.ByType "image").GetMatch (printf "*%s*" ($page.Params.cover.image)) }}
+    {{- $globalResourcesCover := (resources.ByType "image").GetMatch (printf "*%s*" ($page.Params.cover.image)) }}
+    {{- $cover := (or $pageBundleCover $globalResourcesCover) }}
+    {{- if $cover }}
+      {{- $postData = $postData | merge (dict "coverImage" $cover.Permalink) }}
+    {{- else }}
+      {{- $postData = $postData | merge (dict "coverImage" (($page.Params.cover.image) | absURL)) }}
+    {{- end }}
+  {{- end }}
+  
+  {{- /* Add meta items only if needed for rendering */ -}}
+  {{- $metaItems := slice }}
+  {{- if not $page.Date.IsZero }}
+    {{- $metaItems = $metaItems | append (dict "type" "date" "value" ($page.Date | time.Format (default ":date_long" site.Params.DateFormat))) }}
+  {{- end }}
+  {{- if ($page.Param "ShowReadingTime") }}
+    {{- $metaItems = $metaItems | append (dict "type" "readingTime" "value" (i18n "read_time" $page.ReadingTime | default (printf "%d min" $page.ReadingTime))) }}
+  {{- end }}
+  {{- if ($page.Param "ShowWordCount") }}
+    {{- $metaItems = $metaItems | append (dict "type" "wordCount" "value" (i18n "words" $page.WordCount | default (printf "%d words" $page.WordCount))) }}
+  {{- end }}
+  {{- if not ($page.Param "hideAuthor") }}
+    {{- with (partial "author.html" $page) }}
+      {{- $metaItems = $metaItems | append (dict "type" "author" "value" .) }}
+    {{- end }}
+  {{- end }}
+  {{- if gt (len $metaItems) 0 }}
+    {{- $postData = $postData | merge (dict "metaItems" $metaItems) }}
+  {{- end }}
+  
+  {{- /* Add draft status only if draft */ -}}
+  {{- if $page.Draft }}
+    {{- $postData = $postData | merge (dict "isDraft" true) }}
+  {{- end }}
+  
+  {{- $allPostsData = $allPostsData | append $postData }}
+{{- end }}
+
+{{- return $allPostsData -}}

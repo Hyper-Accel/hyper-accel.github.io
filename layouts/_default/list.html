@@ -35,12 +35,10 @@
 {{- end }}
 
 {{- $pages := union .RegularPages .Sections }}
-{{- $allPages := $pages }}
 
 {{- if .IsHome }}
 {{- $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}
 {{- $pages = where $pages "Params.hiddenInHomeList" "!=" "true"  }}
-{{- $allPages = $pages }}
 {{- end }}
 
 {{- $paginator := .Paginate $pages }}
@@ -52,23 +50,16 @@
 {{- end }}  
 {{- $categories = $categories | sort }}  
 
+{{- /* Generate JSON data for posts based on current page context */ -}}
+{{- $term := .Data.Term }}
+{{- $allPostsData := partial "posts_json_data.html" (dict "page" . "term" $term) }}
+
 {{- /* Category filter buttons */ -}}
-<div class="category-filter-container">
-  <div class="category-filter-buttons">
-    <button class="category-filter-btn active" data-category="all">
-      전체
-    </button>
-    {{- range $categories }}
-    <button class="category-filter-btn" data-category="{{ . | urlize}}">
-      {{ . }}
-    </button>
-    {{- end }}
-  </div>
-</div>
+{{- partial "category_filter_buttons.html" (dict "categories" $categories "page" .) }}
 
 {{- /* Posts grid container */ -}}
-<div class="posts-grid-container" id="postsGrid">
-  {{- $term := .Data.Term }}
+<div class="posts-grid-container" id="postsGrid" data-posts-per-page="{{ if site.Params.pagenation.pageSize }}{{ site.Params.pagenation.pageSize }}{{ else }}5{{ end }}">
+  {{- /* Initial render of paginated posts */ -}}
   {{- range $index, $page := $paginator.Pages }}
   
   {{- $class := "post-entry" }}
@@ -116,8 +107,9 @@
   {{- end }}
 </div>
 
-{{- if gt $paginator.TotalPages 1 }}
-<footer class="page-footer">
+{{- /* Pagination footer - will be hidden when filtering */ -}}
+<footer class="page-footer" id="paginationFooter">
+  {{- if gt $paginator.TotalPages 1 }}
   <nav class="pagination">
     {{- if $paginator.HasPrev }}
     <a class="prev" href="{{ $paginator.Prev.URL | absURL }}">
@@ -136,49 +128,20 @@
     </a>
     {{- end }}
   </nav>
+  {{- end }}
 </footer>
-{{- end }}
 
 {{- /* Category filter script */ -}}
-<script>
-(function() {
-  const filterButtons = document.querySelectorAll('.category-filter-btn');
-  const postCards = document.querySelectorAll('.post-card');
-  
-  filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const selectedCategory = this.getAttribute('data-category');
-      
-      // Update active button
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      
-      // Filter posts
-      postCards.forEach(card => {
-        const cardCategories = card.getAttribute('data-categories');
-        
-        if (selectedCategory === 'all' || 
-            (cardCategories && cardCategories.includes(selectedCategory))) {  
-          if (card.style.display === 'none') { // Only act on hidden cards  
-            card.style.display = '';  
-            card.style.opacity = '0';  
-            setTimeout(() => {  
-              card.style.opacity = '1';  
-            }, 10);  
-          }  
-        } else {  
-          if (card.style.display !== 'none') { // Only act on visible cards  
-            card.style.opacity = '0';  
-            card.style.opacity = '0';
-            card.addEventListener('transitionend', () => {
-              card.style.display = 'none';
-            }, { once: true });
-        }  
-      }});
-    });
-  });
-})();
-</script>
+{{- /* Store posts data in a separate script tag to avoid parsing errors */ -}}
+{{- /* Debug: Check if data exists */ -}}
+{{- if $allPostsData }}
+<script type="application/json" id="postsData">{{ $allPostsData | jsonify }}</script>
+{{- else }}
+<script type="application/json" id="postsData">[]</script>
+{{- end }}
+{{- /* Load category filter JavaScript */ -}}
+{{- $categoryFilter := resources.Get "js/category-filter.js" | resources.Minify -}}
+<script defer src="{{ $categoryFilter.RelPermalink }}"></script>
 
 {{- end }}{{- /* end main */ -}}
 

@@ -32,3 +32,6 @@
 - id: code_copied
   translation: "복사 완료!"
 
+- id: all_categories
+  translation: "전체"
+
