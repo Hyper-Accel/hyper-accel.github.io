@@ -46,14 +46,11 @@
 {{- $paginator := .Paginate $pages }}
 
 {{- /* Get all unique categories from posts */ -}}
-{{- $categories := slice }}
-{{- range $allPages }}
-  {{- if .Params.categories }}
-    {{- range .Params.categories }}
-      {{- $categories = $categories | append . }}
-    {{- end }}
-  {{- end }}
-{{- end }}
+{{- $categories := slice }}  
+{{- range $name, $taxonomy := site.Taxonomies.categories }}  
+  {{- $categories = $categories | append $name }}  
+{{- end }}  
+{{- $categories = $categories | sort }}  
 {{- $categories = $categories | uniq | sort }}
 
 {{- /* Category filter buttons */ -}}
@@ -63,7 +60,7 @@
       전체
     </button>
     {{- range $categories }}
-    <button class="category-filter-btn" data-category="{{ . }}">
+    <button class="category-filter-btn" data-category="{{ . | urlize}}">
       {{ . }}
     </button>
     {{- end }}
@@ -84,7 +81,7 @@
   {{- $postCategories := slice }}
   {{- if $page.Params.categories }}
     {{- range $page.Params.categories }}
-      {{- $postCategories = $postCategories | append . }}
+      {{- $postCategories = $postCategories | append (. | urlize) }}
     {{- end }}
   {{- end }}
   {{- $categoryClasses := delimit $postCategories " " }}
@@ -162,17 +159,22 @@
         const cardCategories = card.getAttribute('data-categories');
         
         if (selectedCategory === 'all' || 
-            (cardCategories && cardCategories.includes(selectedCategory))) {
-          card.style.display = '';
-          // Add fade-in animation
-          card.style.opacity = '0';
-          setTimeout(() => {
-            card.style.transition = 'opacity 0.3s ease-in-out';
-            card.style.opacity = '1';
-          }, 10);
-        } else {
-          card.style.display = 'none';
-        }
+            (cardCategories && cardCategories.includes(selectedCategory))) {  
+          if (card.style.display === 'none') { // Only act on hidden cards  
+            card.style.display = '';  
+            card.style.opacity = '0';  
+            setTimeout(() => {  
+              card.style.opacity = '1';  
+            }, 10);  
+          }  
+        } else {  
+          if (card.style.display !== 'none') { // Only act on visible cards  
+            card.style.opacity = '0';  
+            setTimeout(() => {  
+              card.style.display = 'none';  
+            }, 300); // Match CSS transition duration.  
+          }  
+        }  
       });
     });
   });

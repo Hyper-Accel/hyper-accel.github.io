@@ -114,7 +114,7 @@
     border-radius: 1.5rem;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
     font-weight: 500;
 }
 
