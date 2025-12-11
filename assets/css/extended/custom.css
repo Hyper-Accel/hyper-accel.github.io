@@ -75,63 +75,26 @@
 }
 
 /* Posts 2 columns grid layout */
-.posts-grid-container {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 2rem !important;
+body .posts-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
     margin-top: 2rem;
 }
 
-.posts-grid-container .post-entry {
-    margin-bottom: 0 !important;
+body .posts-grid-container .post-entry {
+    margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
-    .posts-grid-container {
-        grid-template-columns: 1fr !important;
-        gap: 1.5rem !important;
+    body .posts-grid-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 }
 
 .post-card {
     transition: opacity 0.3s ease-in-out;
-}
-
-/* Category filter buttons */
-.category-filter-container {
-    margin: 2rem 0;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.category-filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.category-filter-btn {
-    padding: 0.5rem 1.25rem;
-    border: 1px solid var(--border);
-    background-color: var(--theme);
-    color: var(--primary);
-    border-radius: 1.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
-    font-weight: 500;
-}
-
-.category-filter-btn:hover {
-    background-color: var(--hljs-bg);
-    border-color: var(--primary);
-    transform: translateY(-1px);
-}
-
-.category-filter-btn.active {
-    background-color: var(--primary);
-    color: var(--theme);
-    border-color: var(--primary);
 }
 
 /* Post card styling for grid layout */
@@ -148,7 +111,7 @@
 
 .posts-grid-container .post-entry:hover {
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
     transform: translateY(-2px);
 }
 
