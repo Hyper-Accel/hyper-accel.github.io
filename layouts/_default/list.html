@@ -42,23 +42,10 @@
 {{- end }}
 
 {{- $paginator := .Paginate $pages }}
-
-{{- /* Get all unique categories from posts */ -}}
-{{- $categories := slice }}  
-{{- range $name, $taxonomy := site.Taxonomies.categories }}  
-  {{- $categories = $categories | append $name }}  
-{{- end }}  
-{{- $categories = $categories | sort }}  
-
-{{- /* Generate JSON data for posts based on current page context */ -}}
 {{- $term := .Data.Term }}
-{{- $allPostsData := partial "posts_json_data.html" (dict "page" . "term" $term) }}
-
-{{- /* Category filter buttons */ -}}
-{{- partial "category_filter_buttons.html" (dict "categories" $categories "page" .) }}
 
 {{- /* Posts grid container */ -}}
-<div class="posts-grid-container" id="postsGrid" data-posts-per-page="{{ if site.Params.pagenation.pageSize }}{{ site.Params.pagenation.pageSize }}{{ else }}5{{ end }}">
+<div class="posts-grid-container" id="postsGrid">
   {{- /* Initial render of paginated posts */ -}}
   {{- range $index, $page := $paginator.Pages }}
   
@@ -67,16 +54,7 @@
   {{- $class = "post-entry tag-entry" }}
   {{- end }}
   
-  {{- /* Get categories for this post */ -}}
-  {{- $postCategories := slice }}
-  {{- if $page.Params.categories }}
-    {{- range $page.Params.categories }}
-      {{- $postCategories = $postCategories | append (. | urlize) }}
-    {{- end }}
-  {{- end }}
-  {{- $categoryClasses := delimit $postCategories " " }}
-  
-  <article class="{{ $class }} post-card" data-categories="{{ $categoryClasses }}">
+  <article class="{{ $class }} post-card">
     {{- $isHidden := (.Param "cover.hiddenInList") | default (.Param "cover.hidden") | default false }}
     {{- partial "cover.html" (dict "cxt" . "IsSingle" false "isHidden" $isHidden) }}
     <header class="entry-header">
@@ -107,8 +85,8 @@
   {{- end }}
 </div>
 
-{{- /* Pagination footer - will be hidden when filtering */ -}}
-<footer class="page-footer" id="paginationFooter">
+{{- /* Pagination footer */ -}}
+<footer class="page-footer">
   {{- if gt $paginator.TotalPages 1 }}
   <nav class="pagination">
     {{- if $paginator.HasPrev }}
@@ -130,18 +108,6 @@
   </nav>
   {{- end }}
 </footer>
-
-{{- /* Category filter script */ -}}
-{{- /* Store posts data in a separate script tag to avoid parsing errors */ -}}
-{{- /* Debug: Check if data exists */ -}}
-{{- if $allPostsData }}
-<script type="application/json" id="postsData">{{ $allPostsData | jsonify }}</script>
-{{- else }}
-<script type="application/json" id="postsData">[]</script>
-{{- end }}
-{{- /* Load category filter JavaScript */ -}}
-{{- $categoryFilter := resources.Get "js/category-filter.js" | resources.Minify -}}
-<script defer src="{{ $categoryFilter.RelPermalink }}"></script>
 
 {{- end }}{{- /* end main */ -}}
 

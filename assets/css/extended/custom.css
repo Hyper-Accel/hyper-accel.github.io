@@ -76,16 +76,20 @@
 
 /* Posts 2 columns grid layout */
 .posts-grid-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem !important;
     margin-top: 2rem;
+}
+
+.posts-grid-container .post-entry {
+    margin-bottom: 0 !important;
 }
 
 @media (max-width: 768px) {
     .posts-grid-container {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
     }
 }
 
