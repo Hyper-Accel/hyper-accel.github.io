@@ -207,7 +207,7 @@ markup:
     # style: monokai
 
 pagenation:
-  pageSize: 5
+  pageSize: 4
 
 outputs:
   home:

@@ -73,3 +73,89 @@
     width: 20px;
     height: 20px;
 }
+
+/* Posts 2 columns grid layout */
+body .posts-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+body .posts-grid-container .post-entry {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    body .posts-grid-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.post-card {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Post card styling for grid layout */
+.posts-grid-container .post-entry {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    background-color: var(--theme);
+}
+
+.posts-grid-container .post-entry:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transform: translateY(-2px);
+}
+
+.posts-grid-container .post-entry .entry-header {
+    margin-bottom: 1rem;
+}
+
+.posts-grid-container .post-entry .entry-header h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.posts-grid-container .post-entry .entry-content {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.posts-grid-container .post-entry .entry-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--secondary);
+}
+
+.posts-grid-container .post-entry .entry-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+/* Cover image styling in grid */
+.posts-grid-container .post-entry .entry-cover {
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.posts-grid-container .post-entry .entry-cover img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+.posts-grid-container .post-entry:hover .entry-cover img {
+    transform: scale(1.05);
+}
