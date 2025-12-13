@@ -1,6 +1,6 @@
 ---
 date: '2025-12-13T15:10:28+09:00'
-draft: true
+draft: false
 title: 'Crafting Compilers (Chapter 1.1) : 프로그래밍 언어 만들기'
 cover:
   image: "macintosh.jpeg"
