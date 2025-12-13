@@ -9,7 +9,7 @@ cover:
   alt: "<alt text>"
   caption: "<text>"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [jaewoo kim] # must match with content/authors
+authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]
 categories: [compiler]
 summary: [First article about building a programming language]
@@ -50,7 +50,7 @@ A simple analogy:
 - With an **interpreter**, you translate each sentence as you read it and cook immediately.
 - With a **compiler**, you translate the entire cookbook into your language first and then cook smoothly without stopping.
 
-Compiled languages (like C, C++, or Rust) typically offer speed, safety analyses, and optimization, but require recompilation when the code changes. Interpreted languages (like Python, Ruby, or Perl) prioritize convenience, interactivity, and flexibility—especially during early development—but generally run slower. This is why C is generally faster than python. C can have REPL-like environments, but they are uncommon and not part of the language’s standard toolchain.
+Compiled languages (like C, C++, or Rust) typically offer speed, safety analyses, and optimization, but require recompilation when the code changes. Interpreted languages (like Python, Ruby, or Perl) prioritize convenience, interactivity, and flexibility—especially during early development—but generally run slower. This is why C is generally faster than Python. C can have REPL-like environments, but they are uncommon and not part of the language’s standard toolchain.
 
 **Languages can be compiled & interpreted at same time**
 
@@ -96,7 +96,7 @@ Example of unmanaged programming language (C)
 
 int main(){
   int size;
-  scanf("%d", size);
+  scanf("%d", &size);
   
   // Explicitly allocate aray
   int* my_list = malloc(size * sizeof(int));
@@ -174,7 +174,7 @@ We are building unmanaged, fully compiled, functional-style language. But we wil
 
 **Why functional language?**
 
-Functional languages are harder to learn for most people, and it’s type of language that lots of programmers aren’t familiar with. But, why are we building it functional-style? First, from the perspective of a language designer, it is easier and clearer to define. Secondly, because most programmer s aren’t familiar with functional programming, I wanted to give you taste of how functional programming looks like. We will see how it behaves different with imperative style languages, and see what advantages and disadvantages it has. However, if you want to build imperative language yourself, you can still use concepts and skills described here.
+Functional languages are harder to learn for most people, and it’s type of language that lots of programmers aren’t familiar with. But, why are we building it functional-style? First, from the perspective of a language designer, it is easier and clearer to define. Secondly, because most programmers aren’t familiar with functional programming, I wanted to give you taste of how functional programming looks like. We will see how it behaves differently from imperative style languages, and see what advantages and disadvantages it has. However, if you want to build imperative language yourself, you can still use concepts and skills described here.
 
 ---
 
