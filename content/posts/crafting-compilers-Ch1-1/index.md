@@ -12,7 +12,7 @@ cover:
 authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]
 categories: [compiler]
-summary: [프로그래밍 언어를 만드는 것에 대한 첫 번째 글]
+summary: [프로그래밍 언어를 만드는 방법에 대한 첫 번째 글]
 comments: true
 ---
 
@@ -28,7 +28,8 @@ comments: true
 
 프로그래밍 언어는 이러한 복잡성을 단순화합니다. 그것은 아이디어를 표현하는 인간 친화적인 방법을 제공하면서, 그것들을 작동하게 만드는 low-level 메커니즘을 숨깁니다. 이런 의미에서, programming language는 **computing을 위한 UI**로 기능합니다—하드웨어를 수동으로 조작하는 대신, 로직, 애플리케이션, 그리고 시스템을 구축하는 데 집중할 수 있게 해주는 계층입니다.
 
-Python, Rust, C++, Go, 또는 완전히 새로운 언어를 선택하든 목적은 동일합니다: 인간의 의도를 기계의 행동으로 바꾸는 것입니다.
+Python, Rust, C++, Go, 또는 완전히 새로운 언어를 선택하든 목적은 동일합니다: 인간의 명령을 기계의 행동으로 바꾸는 것입니다.
+먼저 프로그래밍 언어가 어떤 방식으로 디자인될 수 있는지 함께 살펴봅시다.
 
 ---
 
@@ -47,18 +48,18 @@ Programming language 구현은 종종 코드를 실행하는 방식에 따라 �
 
 > 프랑스어로 작성된 요리책이 있다고 상상해보세요.
 > 
-- **Interpreter**를 사용하면, 읽으면서 각 문장을 번역하고 즉시 요리합니다.
-- **Compiler**를 사용하면, 먼저 전체 요리책을 당신의 언어로 번역한 다음 멈추지 않고 원활하게 요리합니다.
+- **인터프리터**를 사용하면, 읽으면서 각 문장을 번역하고 즉시 요리합니다.
+- **컴파일러**를 사용하면, 먼저 전체 요리책을 당신의 언어로 번역한 다음 멈추지 않고 원활하게 요리합니다.
 
 컴파일 언어(C, C++, 또는 Rust 같은)는 일반적으로 속도, 안전성 분석, 그리고 최적화를 제공하지만, 코드가 변경되면 다시 컴파일 해야합니다. 인터프리터 언어(Python, Ruby, 또는 Perl 같은)는 편의성, 상호작용성, 그리고 유연성을 우선시합니다 (특히 초기 개발 단계에서 유용하지요) 하지만 "일반적으로" 더 느리게 실행됩니다. 이것이 C가 일반적으로 Python보다 빠른 이유입니다. C도 REPL과 같은 환경을 가질 수 있지만, 잘 쓰이지 않고 표준 toolchain의 일부가 아닙니다.
 
-**Language는 동시에 컴파일(Compiled) 되거나 인터프리팅(Interpreted) 될 수 있습니다**
+**Language는 동시에 컴파일(Compiled) 되거나 인터프리트(Interpreted) 될 수 있습니다**
 
 실제로, "컴파일 언어" 또는 "인터프리터 언어" 라는 것은 언어 자체의 속성이 아니며, 이러한 구분을 언어 자체보다는 언어 구현의 속성으로 보는 것이 더 정확합니다.
 
-한 가지 예로, JVM(Java Virtual Machine 자바 가상머신) 기반 언어는 "compiled"와 "interpreted" 둘 다 될 수 있습니다. 즉, runtime에 Just-In-Time compiler를 사용하여 즉석에서 machine code로 compile되거나, interpret될 수 있습니다. 일반적으로 Java(또는 다른 JVM 기반 언어) 프로그램은 먼저 "bytecode"라고 불리는 것으로 compile됩니다. 이것은 JVM을 위한 instruction이지만, 하드웨어의 종류에 영향을 받지 않습니다. 이 bytecode는 JVM이 실행되는 어디든 배포될 수 있으며, target 특정 코드로 compile하거나 bytecode를 interpret하는 것은 JVM의 구현 방식에 따라 달라집니다.
+한 가지 예로, JVM(Java Virtual Machine 자바 가상머신) 기반 언어는 "compiled"와 "interpreted" 둘 다 될 수 있습니다. 즉, runtime에 Just-In-Time compiler를 사용하여 즉석에서 기계어로 컴파일되거나, 실행 (interpret) 될 수 있습니다. 일반적으로 Java(또는 다른 JVM 기반 언어) 프로그램은 먼저 "bytecode"라고 불리는 것으로 compile됩니다. 이것은 JVM을 위한 instruction이지만, 하드웨어의 종류에 영향을 받지 않습니다. 이 bytecode는 JVM이 실행되는 어디든 배포될 수 있으며, target 특정 코드로 컴파일하거나 bytecode를 실행하는 것은 JVM의 구현 방식에 따라 달라집니다.
 
-Python 또한 종종 interpreted language로 설명되지만, 실제로는 소스 코드가 먼저 Python bytecode(.pyc 파일)로 compile된 다음, Python virtual machine에 의해 실행됩니다. PyPy와 같은 일부 파이썬 구현은 JVM이 하는 것처럼 Python을 기계어로 컴파일할 수도 있습니다.
+Python 또한 종종 인터프리터 언어로 설명되지만, 실제로는 소스 코드가 먼저 Python bytecode(.pyc 파일)로 컴파일된 다음, PVM(Python Virtual Machine)에 의해 실행됩니다. PyPy와 같은 일부 파이썬 구현은 JVM이 하는 것처럼 Python을 기계어로 컴파일할 수도 있습니다.
 
 ---
 
@@ -86,7 +87,7 @@ my_list = [x for x in range(0, int(size))]
 # my_list is automatically deallocated after use
 ```
 
-**Unmanaged language** (C/C++)는 개발자에게 직접적인 제어권을 줍니다. 그들은 malloc과 free와 같은 API를 제공하며, 이것은 궁극적으로 lower-level system call을 통해 운영 체제로부터 메모리를 요청합니다. 프로그래머는 메모리가 올바르게 할당되고 해제되는지 확인하고, 잘못되지 않도록 직접 관리해야 합니다. Unmanaged language는 garbage collector에 의존하지 않기 때문에, stop-the-world event(GC를 돌리기 위해 프로그램을 일시정지 하는 것) 와 같은 GC 관련 일시 중지를 피하지만, 정확성과 안전성의 책임을 프로그래머에게로 넘깁니다. 프로그래머가 언제 메모리를 할당하고 해제할지 수동으로 최적화할 수 있기 때문에 더 많은 최적화를 진행할 수도 있죠. 하지만 이것을 프로그래머가 직접 관리해야 하므로, 프로그램을 더 복잡하게 만들고, 깨지기 쉽게 만듭니다. (Rust는 garbage collection 없이 메모리 안전성을 달성하기 위해 compiler가 강제하는 정적 ownership 및 borrowing 시스템을 사용합니다.)
+**Unmanaged language** (C/C++)는 개발자에게 직접적인 제어권을 줍니다. 그들은 malloc과 free와 같은 API를 제공하며, 이것은 궁극적으로 lower-level system call을 통해 운영 체제로부터 메모리를 요청합니다. 프로그래머는 메모리가 올바르게 할당되고 해제되는지 확인하고, 잘못되지 않도록 직접 관리해야 합니다. Unmanaged language는 garbage collector에 의존하지 않기 때문에, stop-the-world event(GC를 돌리기 위해 프로그램을 일시정지 하는 것) 와 같은 GC 관련 일시 중지를 피하지만, 정확성과 안전성의 책임을 프로그래머에게로 넘깁니다. 프로그래머가 언제 메모리를 할당하고 해제할지 수동으로 최적화할 수 있기 때문에 더 많은 최적화를 진행할 수도 있죠. 하지만 이것을 프로그래머가 직접 관리해야 하므로, 프로그램을 더 복잡하게 만들고, 깨지기 쉽게 만듭니다. (Rust는 garbage collection 없이 메모리 안전성을 달성하기 위해 컴파일러가 강제하는 정적 ownership 및 borrowing 시스템을 사용합니다.)
 
 Unmanaged programming language 예시 (C)
 
@@ -116,7 +117,7 @@ int main(){
 
 ## 함수형 프로그래밍
 
-마지막으로, 함수형 프로그래밍에 관해 간단히 소개하고자 합니다. 함수형 프로그래밍 언어는 프로그램을 수학적인 함수로 구성함으로써 함수의 순수성, 값의 불변성, 그리고 함수들이 합성되는 방식을 강조하는 프로그래밍 언어입니다. Functional language에서는 computation이 종종 statement의 실행보다는 expression의 평가로 표현됩니다. 우리가 수학에서 정의하는 함수는, 입력이 같을 경우 결과가 절대 달라질 수 없지요? 함수형 프로그래밍에서는 이 사고방식을 따릅니다.
+마지막으로, 함수형 프로그래밍에 관해 간단히 소개하고자 합니다. 함수형 프로그래밍 언어는 프로그램을 수학적인 함수로 구성함으로써 함수의 순수성, 값의 불변성, 그리고 함수들이 합성되는 방식을 강조하는 프로그래밍 언어입니다. 함수형 언어는 computation이 표현식(expression)의 평가(evaluation)로 표현됩니다. 우리가 수학에서 정의하는 함수는, 입력이 같을 경우 결과가 절대 달라질 수 없지요? 함수형 프로그래밍에서는 이 사고방식을 따릅니다.
 
 다음은 list의 모든 숫자를 더하는 간단한 예시입니다
 
@@ -145,16 +146,16 @@ Pure functional language는 다른 언어들이 갖지 않는 제약사항이 �
 1. 모든 값(let binding)은 불변 (immutable) 입니다.
 2. for loop가 없습니다 (모든 iteration은 recursion으로 수행됩니다)
     1. 그러나, compiler는 함수가 "tail-recursive"이면 최적화를 위해 recursion을 loop로 변환할 수 있습니다 (이것에 대해서는 나중에 더 설명하겠습니다)
-    2. Pure functional 언어가 아닌 functional 을 지향하는 multi-paradigm 언어들은, for loop을 제공하기도 합니다.
-3. Function은 "Pure"합니다
-    1. "Pure"하다는 것은 함수가 프로그래머가 모르는 side-effect가 들어있는 동작을 하지 않는다는 것을 의미합니다.
+    2. 순수 함수형 언어가 아닌 함수형을 지향하는 멀티 패러다임(multi-paradigm) 언어들은, for loop을 제공하기도 합니다.
+3. 함수가 "순수(Pure)" 합니다
+    1. "순수(Pure)"하다는 것은 함수가 프로그래머가 모르는 side-effect가 들어있는 동작을 하지 않는다는 것을 의미합니다.
         - Side-effect라 함은, 겉으로 들어나지 않는 내부적인 동작을 의미합니다 예를 들면 파일 입출력 등이 있지요.
-    2. Side-effect가 없으므로, 결과가 사용되지 않으면 함수를 제거해도 안전합니다 (Compiler는 공격적인 dead code elimination을 할 수 있습니다)
+    2. Side-effect가 없으므로, 결과가 사용되지 않으면 함수를 제거해도 안전합니다 (Compiler는 더 공격적으로 dead code elimination을 할 수 있습니다)
     3. Function은 동일한 입력이 주어지면 항상 같은 결과를 제공합니다
 
 Functional programming language는 일반적으로 더 가파른 학습 곡선을 가지며, 많은 프로그래머들이 functional language에 익숙하지 않습니다. 그러나 몇 가지 명확한 장점이 있습니다.
 
-**Functional programming의 장점**
+**함수형 프로그래밍의 장점**
 
 1. Side-effect가 없기 때문에, 프로그램이 더 안전하고, 안정성 분석이 쉽습니다.
 2. 컴파일러가 잠재적인 오류를 감지하기 쉽게 만듭니다.
@@ -172,7 +173,7 @@ Functional programming language는 일반적으로 더 가파른 학습 곡선�
 
 우리는 GC를 사용하지 않는 (즉 컴파일러나 사용자가 메모리를 관리하는), 함수형 스타일 (100% 함수형으로는 만들지 않을 것입니다) 언어와, 컴파일러를 만들 것입니다. 하지만 우리는 ownership control(Rust처럼!)을 구현할 것이므로 프로그래머가 데이터의 lifetime을 수동으로 관리할 필요가 없습니다. 왜 이렇게 하냐고요? Compiler 자체에 집중하기 더욱 쉽고(interpreter나 garbage collector를 만들 필요가 없습니다!), 그리고 이미 interpreter를 구현하는 것에 대해서는 좋은 글들이 많기 때문에, 여기서는 컴파일러에 더 집중해 보고자 합니다.
 
-**왜 functional language인가?**
+**왜 함수형 언어인가?**
 
 함수형 언어는 대부분의 사람들에게 배우기 더 어렵고, 많은 프로그래머들이 익숙하지 않은 유형의 언어입니다. 그런데 왜 함수형 언어를 만들고자 할까요? 첫째, language designer의 관점에서, 정의하기 더 쉽고 명확합니다. 둘째, 대부분의 프로그래머들이 함수형 프로그래밍에 익숙하지 않기 때문에, 함수형 프로그래밍에 대해 소개해주고 싶었습니다. 우리는 그것이 일반적인 프로그래밍 언어와 어떻게 다르게 행동하는지 보고, 어떤 장점과 단점이 있는지 볼 것입니다. 그러나, 함수형 언어를 만들지 않더라도 여기서 설명된 개념들을 이용하면 도움이 될 것입니다.
 
@@ -195,7 +196,7 @@ func main(){
 
 이 프로그램은 간단한 트리(tree) 형태로 표현해볼 수 있습니다.
 
-![CraftingCompilers.drawio.png](ast.png)
+![AST](ast.png)
 
 이것은 우리의 프로그램이 어떻게 보이는지입니다 (접미사 "E"는 "Expression"을 나타냅니다).
 

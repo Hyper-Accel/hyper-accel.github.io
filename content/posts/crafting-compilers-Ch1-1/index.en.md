@@ -29,6 +29,7 @@ Abstraction is one of the core ideas in computer science. Without abstraction, i
 A programming language simplifies this complexity. It provides a human-friendly way to express ideas while hiding the low-level mechanisms that make them work. In this sense, a programming language functions as a **UI for computing**—a layer that lets us focus on building logic, applications, and systems, rather than manually manipulating hardware.
 
 Whatever language you choose—Python, Rust, C++, Go, or something entirely new—its purpose is the same: turn human intention into machine behavior.
+First, let's see what options we've got for designin our own programming language.
 
 ---
 
@@ -195,7 +196,7 @@ func main(){
 
 Although many languages can be represented as a single AST, functional-style languages often emphasize expression-based program structure, which naturally maps well to tree representations.
 
-![CraftingCompilers.drawio.png](ast.png)
+![AST](ast.png)
 
 This is what our program looks like (where the suffix “E” stands for “Expression”).
 
