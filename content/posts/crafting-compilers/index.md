@@ -34,11 +34,15 @@ comments: true
 
 ## 목차 (Table of contents)
 
-### Chapter 1. Programming language
+### Chapter 1. Programming Language
 
-- Syntax와 semantics
-- Functional programming vs imperative programming
-- Toy functional language 설계하기
+#### 1.1 프로그래밍 언어 만들기 (Building a Programming Language)
+
+- 프로그래밍 언어란 무엇인가?
+- 컴파일러(Compiled) vs 인터프리터(Interpreter)
+- Managed vs. Unmanaged
+- 함수형 프로그래밍 (Functional Programming)
+- Hoya Language 소개
 
 ### Chapter 2. Parsers
 
@@ -73,3 +77,6 @@ comments: true
 
 - GPU compiler 구조
 - AI accelerator 전용 compiler
+
+이번 글에서는 컴파일러의 전체적인 개념과 흐름을 먼저 살펴보았습니다.
+다음 글부터는 본격적으로 프로그래밍 언어의 개념부터, 설계 및 구현하는 방법을 다루고자 합니다.

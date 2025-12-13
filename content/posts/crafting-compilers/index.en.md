@@ -36,9 +36,13 @@ So these are what compilers do. What I am going to tell you from now on is how c
 
 ### Chapter 1. Programming Language
 
-- Syntax and semantics
-- Functional programming vs. imperative programming
-- Designing a toy functional language
+#### 1.1 Building a Programming Language
+
+- What is a programming language?
+- Compiled vs. Interpreted
+- Managed vs. Unmanaged
+- Functional vs. Imperative
+- Introducing the Hoya Language
 
 ### Chapter 2. Parsers
 
