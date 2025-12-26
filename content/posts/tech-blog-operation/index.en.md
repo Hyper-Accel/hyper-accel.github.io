@@ -39,7 +39,7 @@ However, having a lot of content to post and actually building and operating a b
 
 Months had passed since Jaewoo suggested operating a tech blog, but no one had taken the initiative. That's because no one had experience operating one!
 
-![안해봤는데](./I_havent_did.png)
+![안해봤는데](./I_havent_done.png)
 
 But **I actually had experience**... I had been posting on my [personal blog](https://mino-park7.github.io/blog/categories/) for several years.
 
