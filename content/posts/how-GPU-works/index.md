@@ -181,7 +181,7 @@ Hopper 아키텍처에서 도입된 상위 계층으로, 여러 개의 스레드
 
 ![Thread 묶음 예시](images/16-thread-group.png)
 
-만들어진 총 96개의 thread는 3개의 `warp`로 나뉘고, 1개의 `block`에 배정되어 있으므로 1개의 `SM`에 할당됩니다. 이때 scheduling 예시 편의를 위해 모두 같은 `SMSP`에 할당된다고 가정합시다.
+만들어진 총 96개의 스레드는 3개의 `warp`로 나뉘고, 1개의 `block`에 배정되어 있으므로 1개의 `SM`에 할당됩니다. 이때 scheduling 예시 편의를 위해 모두 같은 `SMSP`에 할당된다고 가정합시다.
 
 ### Hopper에서의 Warp 스케줄링 하드웨어
 
