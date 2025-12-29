@@ -201,7 +201,7 @@ LD/ST·INT·FP 같은 서로 다른 타입의 파이프라인에 적절히 섞�
 
 ### Single Warp Scheduling
 
-먼저 Warp A는 Warp scheduler(WS)에서 issue되면서 PC값에 따라 첫 번째 Instruction인 `LD R1, [A+tid]`를 Dispatch unit으로 가져옵니다. Dispatch unit은 현재 SMSP상에 가용 가능한 자원을 스캔하여 8개의 LD/ST unit이 사용 가능한 것을 확인한 후 issue된 32개의 thread를 8개씩 4cycle에 걸쳐 LD/ST unit에 할당합니다. 각 유닛은 할당받은 명령어를 기반으로 메모리 관리 장치에 메모리 주소를 호출하며, 이 load 명령은 비동기적으로 처리됩니다. 마지막 5번째 사이클에 LD/ST 유닛 동작이 끝날 때 WS는 Warp A를 Release하면서 warp A의 PC값을 4 증가시킵니다 (32bit OP code이기 때문). 그 다음 사이클에 WS는 release된 warp A를 다시 issue하고 같은 방식으로 두 번째 LD 명령을 수행합니다.
+먼저 Warp A는 Warp scheduler(WS)에서 issue되면서 PC값에 따라 첫 번째 Instruction인 `LD R1, [A+tid]`를 Dispatch unit으로 가져옵니다. Dispatch unit은 현재 SMSP상에 가용 가능한 자원을 스캔하여 8개의 LD/ST unit이 사용 가능한 것을 확인한 후 issue된 32개의 thread를 8개씩 4cycle에 걸쳐 LD/ST unit에 할당합니다. 각 유닛은 할당받은 명령어를 기반으로 메모리 관리 장치에 메모리 주소를 호출하며, 이 load 명령은 비동기적으로 처리됩니다. 마지막 5번째 사이클에 LD/ST 유닛 동작이 끝날 때 WS는 Warp A를 Release하면서 Warp A의 PC값을 4 증가시킵니다 (32bit OP code이기 때문). 그다음 사이클에 WS는 release된 Warp A를 다시 issue하고 같은 방식으로 두 번째 LD 명령을 수행합니다.
 
 LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메모리 로드가 완료되는 것을 기다려야 합니다. 명령어를 보면 `FADD R3, R1, R2`로 되어있는데, 이때 `R1`과 `R2`는 앞선 LD 동작을 통해 비동기적으로 RF에 쓰이고 있는 중입니다. 즉, 연산을 수행하기 위해서는 두 데이터가 모두 패치되기를 기다려야 합니다. 따라서 이 기다리는 시간 동안 Stall이 발생하여 연산기들은 유휴 상태가 됩니다. 메모리 로드 시간은 대략적으로 L1 cache 20 cycle, L2 cache 100 cycle, HBM 300~800 cycle로 추산됩니다.
 
@@ -211,11 +211,11 @@ LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메
 
 ### Double Warp Scheduling
 
-이제 Warp B까지 포함해서 스케쥴링을 해봅시다.
+이제 Warp B까지 포함해서 스케줄링을 해봅시다.
 
-이전 Warp A 스케쥴링 중 첫번째 LD 동작이 릴리즈될때, 릴리즈되는 사이클에는 Warp A의 PC가 아직 완전히 이동하지 않은 상태이므로 바로 A를 다시 issue할 수 없어 한 사이클의 유휴상태가 있었습니다. 하지만 이번에는 Warp B가 있죠. Warp B의 첫번째 명령은 같은 명령인 LD명령입니다. Warp A 수행중에는 모든 LD/ST 유닛이 점거되고있어 Warp B를 수행할 수 없고, Warp A의 동작이 모두 dispatch되면 B가 이슈되어 LD/ST 를 수행하게 됩니다. 이렇게 번갈아가며 2번씩 총 4번의 LD 명령을 수행한 이후, 다음 연산인 FADD의 dependency 해결을 기다려야 합니다. 이때 single warp일때와 다른점은 Warp A의 두번째 LD 이후 B의 LD 수행이 잇따라 오기때문에, Warp A 비동기 메모리 로드 시간이 Overlap되어 stall 시간이 줄었다는 것입니다.
+이전 Warp A 스케줄링 중 첫 번째 LD 동작이 릴리즈될 때, 릴리즈되는 사이클에는 Warp A의 PC가 아직 완전히 이동하지 않은 상태이므로 바로 A를 다시 issue할 수 없어 한 사이클의 유휴 상태가 있었습니다. 하지만 이번에는 Warp B가 있죠. Warp B의 첫 번째 명령은 같은 명령인 LD명령입니다. Warp A 수행 중에는 모든 LD/ST 유닛이 점거되고 있어 Warp B를 수행할 수 없고, Warp A의 동작이 모두 dispatch되면 B가 이슈되어 LD/ST를 수행하게 됩니다. 이렇게 번갈아가며 두 번씩 총 네 번의 LD 명령을 수행한 이후, 다음 연산인 FADD의 dependency 해결을 기다려야 합니다. 이때 single warp일 때와 다른 점은 Warp A의 두 번째 LD 이후 B의 LD 수행이 잇따라 오기 때문에, Warp A 비동기 메모리 로드 시간이 overlap되어 stall 시간이 줄었다는 것입니다.
 
-먼저 수행한 Warp A의 메모리 로드가 끝나면 끝난 즉시 FADD가 issue 및 dispatch 됩니다. 예시에서는 B의 의존성도 바로 해결되면서 바로 다음사이클에 FADD가 연달아 수행되는데요, 이때 연산기가 파이프라인 구조로 되어있기 때문에 각 스테이지별 유휴상태가 따로 관리되면서 레이턴시를 많이 감출 수 있습니다.
+먼저 수행한 Warp A의 메모리 로드가 끝나면 끝난 즉시 FADD가 issue 및 dispatch됩니다. 예시에서는 B의 의존성도 바로 해결되면서 바로 다음 사이클에 FADD가 연달아 수행되는데요, 이때 연산기가 파이프라인 구조로 되어 있기 때문에 각 스테이지별 유휴 상태가 따로 관리되면서 레이턴시를 많이 감출 수 있습니다.
 
 
 ![Scheduling Warp A, B and C](images/19-schd-triple.png)
@@ -252,10 +252,10 @@ TPU의 역사와 최신 TPU 아키텍처인 Ironwood에 대한 분석을 진행�
 
 ---
 
-## 추신: HyperAccel은 채용 중 입니다!
+## 추신: HyperAccel은 채용 중입니다!
 
 지피지기면 백전불태라지만 백전백승을 위해서는 훌륭한 인재가 많이 필요합니다!
 
-저희가 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해주세요!
+저희가 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
 
 HyperAccel에는 정말 훌륭하고 똑똑한 엔지니어분들이 많습니다. 여러분의 지원을 기다립니다.
