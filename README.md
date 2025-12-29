@@ -42,7 +42,7 @@ scoop install hugo
 ```
 
 ### Linux
-- 현재 apt에서 제공되는 hugo 버전이 낮아 레포와 호환되지 않습니다. mac 작업을 권장합니다.
+- `apt` 등 일부 Linux 패키지 매니저로 설치한 Hugo 버전이 낮아 호환성 문제가 발생할 수 있습니다. 자세한 해결 방법은 [리눅스 환경에서의 Hugo 버전 문제](#리눅스-환경에서의-hugo-버전-문제) 섹션을 참고해주세요.
 ```bash
 # Ubuntu/Debian
 sudo apt-get install hugo
