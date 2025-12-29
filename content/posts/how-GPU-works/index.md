@@ -40,7 +40,7 @@ keywords: [
 하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아 엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
 
 ![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png)
-2012년도에 GPU를 사용하여 훈련시킨 Convolution Neural Network(CNN)인 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에 우승하면서 본격적으로 AI와 떼어놓을 수 없는 존재가 되었고, 2022년도에 ChatGPT가 출시되면서 대중에게 AI의 편의성이 확산되면서 AI HW Device 시장을 사실상 장악한 Nvidia는 이후 세계 시총 1위를 달성하게 됩니다.
+2012년, GPU로 훈련한 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에서 우승하며 GPU는 AI와 떼려야 뗄 수 없는 관계가 되었습니다. 이후 2022년 ChatGPT가 출시되어 AI가 대중화되면서, AI 하드웨어 시장을 사실상 장악한 Nvidia는 세계 시가총액 1위 기업으로 올라섰습니다.
 
 즉, 오늘날의 Nvidia GPU는 단순한 그래픽 가속기가 아니라 AI 인프라 레이어를 사실상 독점한 범용 병렬 컴퓨팅 플랫폼이며,  
 우리가 설계하는 하드웨어가 반드시 넘어야 할 기준점(baseline)이기도 합니다.
