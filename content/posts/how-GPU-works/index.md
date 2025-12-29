@@ -205,7 +205,7 @@ LD/ST·INT·FP 같은 서로 다른 타입의 파이프라인에 적절히 섞�
 
 LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메모리 로드가 완료되는 것을 기다려야 합니다. 명령어를 보면 `FADD R3, R1, R2`로 되어있는데, 이때 `R1`과 `R2`는 앞선 LD 동작을 통해 비동기적으로 RF에 쓰이고 있는 중입니다. 즉, 연산을 수행하기 위해서는 두 데이터가 모두 패치되기를 기다려야 합니다. 따라서 이 기다리는 시간 동안 Stall이 발생하여 연산기들은 유휴 상태가 됩니다. 메모리 로드 시간은 대략적으로 L1 cache 20 cycle, L2 cache 100 cycle, HBM 300~800 cycle로 추산됩니다.
 
-메모리 로드가 끝난 후 Dependency가 해결된 Warp A는 다시 eligible 상태가 되어 WS에 의해 다시 배정됩니다. FADD 연산은 FP 32 Pipeline을 통해 동작하는데, 이때 Hopper GPU에는 총 32개의 FP 32 유닛이 존재하므로 한번에 패치되게 됩니다. 연산이 모두 끝난 후 마찬가지로 release됩니다. 다음 연산인 ST연산은 LD와 마찬가지으로 방식으로 동작합니다.
+메모리 로드가 끝난 후 Dependency가 해결된 Warp A는 다시 eligible 상태가 되어 WS에 의해 다시 배정됩니다. FADD 연산은 FP 32 Pipeline을 통해 동작하는데, 이때 Hopper GPU에는 총 32개의 FP 32 유닛이 존재하므로 한번에 패치되게 됩니다. 연산이 모두 끝난 후 마찬가지로 release됩니다. 다음 연산인 ST연산은 LD와 마찬가지로 방식으로 동작합니다.
 
 ![Scheduling Warp A and B](images/18-schd-double.png)
 
