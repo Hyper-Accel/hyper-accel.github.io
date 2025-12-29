@@ -531,12 +531,10 @@ hugo mod get -u github.com/adityatelange/hugo-PaperMod
 hugo mod tidy
 ```
 
-### kubernetes pod에서 hugo serve
-현재 리눅스 환경에서 hugo serve가 안되는 문제가 있습니다.
-linux(apt)에서 지원하는 hugo version : v0.92.2
-mac(brew)에서 지원하는 hugo version : v0.153.4
-현재 레포지토리가 mac에 맞추어 제작되어 있기에 linux에서는 PaperMod 호환이 안되는 상황이며
-필요시 추후 지원범위를 늘리는 방향으로 작업 예정입니다.
+### 리눅스 환경에서의 Hugo 버전 문제
+`apt` 등 일부 Linux 패키지 매니저로 설치한 Hugo 버전(`v0.92.2`)이 낮아 `hugo server` 실행 시 오류가 발생할 수 있습니다.
+이 문제를 해결하려면, `snap`을 사용하거나 [Hugo Releases](https://github.com/gohugoio/hugo/releases)에서 최신 바이너리를 직접 설치하는 것을 권장합니다.
+이 레포지토리는 `v0.125.4` 이상의 Hugo 버전에 최적화되어 있습니다.
 
 ## 📚 추가 자료
 
