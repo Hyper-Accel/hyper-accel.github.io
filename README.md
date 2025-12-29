@@ -117,7 +117,7 @@ bio: "ML Engineering Lead"
 - `bio` — 간단한 한 줄 소개 (언어별로 다를 수 있음)
 
 **선택 사항:**
-- `image` — 프로필 사진 URL
+- `image` — 프로필 사진 URL (추천: 깃허브 프로필사진 "이미지 주소 복사")
 - `linkedin`/`github` — 소셜 미디어 링크
 
 ### 4. 포스트에 author 지정하기
@@ -154,10 +154,10 @@ authors: ["Minho Park"]
 mkdir -p content/posts/포스트-제목
 
 # 기본 버전 (한국어) 생성
-hugo new content/posts/포스트-제목/index.md
+hugo new content/posts/포스트-제목/index.md --config hugo.yaml
 
 # 영어 버전 생성
-hugo new content/posts/포스트-제목/index.en.md
+hugo new content/posts/포스트-제목/index.en.md --config hugo.yaml
 ```
 
 **파일 구조:**
@@ -529,6 +529,13 @@ hugo --gc
 hugo mod get -u github.com/adityatelange/hugo-PaperMod
 hugo mod tidy
 ```
+
+### 팟에서 hugo serve
+현재 리눅스 환경에서 hugo serve가 안되는 문제가 있습니다.
+linux(apt)에서 지원하는 hugo version : v0.92.2
+mac(brew)에서 지원하는 hugo version : v0.153.4
+현재 레포지토리가 mac에 맞추어 제작되어 있기에 linux에서는 PaperMode 호환이 안되는 상황이며
+필요시 추후 지원범위를 늘리는 방향으로 작업 예정입니다.
 
 ## 📚 추가 자료
 
