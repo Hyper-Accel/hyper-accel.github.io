@@ -213,7 +213,7 @@ On top of this hardware, the CUDA execution model groups work into five main lev
   Threads in the same block share **shared memory** and can synchronize with `__syncthreads()`.  
   For that reason, a block is always scheduled entirely on a single SM for its lifetime.  
   Register and shared memory limits on an SM constrain the maximum block size.  
-  Blocks can be 1D, 2D or 3D (`blockDim.x/y/z`), which maps naturally to images and volume data.
+Blocks can be 1D, 2D or 3D (`blockDim.x/y/z`), which maps naturally to images and volume data.
 
 * **Thread Block Cluster**  
   Introduced in Hopper, a cluster is a group of blocks that can communicate more efficiently.  
