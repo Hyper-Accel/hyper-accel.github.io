@@ -149,7 +149,7 @@ CUDA 연산의 가장 작은 논리적 단위입니다. 개발자가 작성한 �
 
 #### - 워프 (Warp) - 하드웨어 실행의 최소 단위
 
-32개의 연속된 스레드를 묶은 집합이자, 실질적인 명령어 실행(Instruction Issue) 단위입니다. 워프 내 32개 스레드는 하나의 명령어를 공유하며 물리적으로 동시에 실행됩니다. Warp마다 Instruction Cache 내의 명령줄을 가리키는 pointer인 Program Counter(PC)를 가지고 있으며 Issue되면 이 PC에 해당하는 명령줄이 Dispatch Unit으로 전송되고, 해당 명령에 대한 동작이 종료되면 Release되면서 PC가 증가됩니다. 만약 워프 내 스레드들이 if-else문 등으로 서로 다른 실행 경로로 갈라진다면(Branch Divergence), 하드웨어는 모든 경로를 순차적으로 처리(Serialization)한 뒤 다시 합류시킵니다. 따라서 동일 워프 내 스레드들의 실행 경로를 일치시키는 것이 성능의 핵심입니다. SM 내부의 Warp Scheduler는 실행 가능한 상태의 워프를 매우 빠르게 교체(Context Switching)하며 메모리 대기 시간(Latency)을 숨깁니다.
+32개의 연속된 스레드를 묶은 집합이자, 실질적인 명령어 실행(Instruction Issue) 단위입니다. 워프 내 32개 스레드는 하나의 명령어를 공유하며 물리적으로 동시에 실행됩니다. Warp마다 Instruction Cache 내의 명령줄을 가리키는 pointer인 Program Counter(PC)를 가지고 있으며 명령이 전달되면 이 PC에 해당하는 명령줄이 Dispatch Unit으로 전송되고, 해당 명령에 대한 동작이 종료되면 Release되면서 PC가 증가됩니다. 만약 워프 내 스레드들이 if-else문 등으로 서로 다른 실행 경로로 갈라진다면(Branch Divergence), 하드웨어는 모든 경로를 순차적으로 처리(Serialization)한 뒤 다시 합류시킵니다. 따라서 동일 워프 내 스레드들의 실행 경로를 일치시키는 것이 성능의 핵심입니다. SM 내부의 Warp Scheduler는 실행 가능한 상태의 워프를 매우 빠르게 교체(Context Switching)하며 메모리 대기 시간(Latency)을 숨깁니다.
 
 ![이미지: CUDA 프로그래밍 모델의 Thread Block 할당 방식 그림](images/14-thdblk-alloc.png)
 
