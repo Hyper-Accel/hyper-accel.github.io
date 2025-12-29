@@ -126,7 +126,7 @@ This kicked off the first wave of interest in GPGPU.
 
 To understand the context: DirectX 8 (2000) introduced programmable shaders,  
 allowing developers to write custom shader programs that run on dedicated shader hardware.  
-DirectX 9 (2002) added HLSL, making programmable shaders truly practical.  
+DirectX 9 (2002) added `HLSL`, making programmable shaders truly practical.  
 
 At the same time, the fundamental nature of the GPU workload – **the same operation on many pixels** –  
 looked a lot like linear algebra problems such as matrix multiplication – **the same operation on many data elements**.  
@@ -135,7 +135,7 @@ That is how the concept of a “general‑purpose GPU” took shape.
 
 However, as mentioned earlier, the hardware of that era was still built as a graphics pipeline.  
 Doing GPGPU back then was effectively a hack: you had to reinterpret your linear algebra problem as a graphics problem,  
-fit it into the graphics pipeline, and rewrite existing C code in shader languages like HLSL or GLSL.  
+fit it into the graphics pipeline, and rewrite existing `C` code in shader languages like `HLSL` or `GLSL`.  
 This was powerful but very cumbersome.
 
 ![Shader languages vs CUDA](images/10-SL-CUDA.png)
@@ -145,9 +145,9 @@ CUDA was designed not for graphics but for **general‑purpose parallel computat
 and it mapped naturally onto the unified shader architecture.
 
 Conceptually:
-- work on a single data element becomes a **thread**,  
-- a group of threads that run together on one SM becomes a **block**,  
-- and all the threads launched by a kernel form a **grid**.
+- work on a single data element becomes a **`thread`**,  
+- a group of threads that run together on one `SM` becomes a **`block`**,  
+- and all the threads launched by a kernel form a **`grid`**.
 
 CUDA lets you express kernels in a C‑like language instead of in shader languages,  
 and the Tesla architecture executes them efficiently. This is where the GPU truly became a GPGPU platform.
@@ -235,21 +235,21 @@ Now let’s walk through a concrete scheduling example to see what happens when 
 
 ![Example kernel and execution explanation](images/15-code-ex.png)
 
-Consider a simple fp32 add kernel. We launch a grid with a single block of 96 threads.  
+Consider a simple `fp32 add` kernel. We launch a grid with a single block of 96 threads.  
 In practice, the kernel is compiled down to machine code (SASS), but we can think of it as four logical steps:
 
-1. Load operand A from memory (SMEM / L1 / L2 / global) into register file (LD)  
-2. Load operand B into registers (LD)  
+1. Load operand `A` from memory (`SMEM` / `L1` / `L2` / global) into register file (`LD`)  
+2. Load operand `B` into registers (`LD`)  
 3. Perform the floating‑point add `FADD R3, R1, R2` and store the result in a register  
-4. Store the result back to memory (SMEM / L1 / L2 / global) (ST)
+4. Store the result back to memory (`SMEM` / `L1` / `L2` / global) (`ST`)
 
 The load and store operations are asynchronous from the perspective of the compute pipelines:  
-LD/ST units compute addresses and send memory requests to the memory subsystem, which completes them later.
+`LD/ST` units compute addresses and send memory requests to the memory subsystem, which completes them later.
 
 ![Thread grouping example](images/16-thread-group.png)
 
-Our 96 threads are split into three warps (A, B, C) of 32 threads each, and all belong to one block.  
-For simplicity, assume that this block is mapped entirely onto a single SMSP.
+Our 96 threads are split into three `warps` (A, B, C) of 32 threads each, and all belong to one `block`.  
+For simplicity, assume that this block is mapped entirely onto a single `SMSP`.
 
 ### Warp Scheduling Hardware on Hopper
 
@@ -342,5 +342,5 @@ See you again in **Know Your Enemy, Know Yourself, Part 2: TPU History and Funda
 ## P.S.: HyperAccel is Hiring!
 
 Knowing your enemy and yourself is important, but to truly win we also need great people on the team.  
-If you’re interested in the kinds of technologies we work on, please apply via [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide).  
+If you’re interested in the kinds of technologies we work on, please apply via [HyperAccel Career](https://hyperaccel.career.greetinghr.com/en/guide).  
 We’re looking forward to hearing from talented engineers like you.
