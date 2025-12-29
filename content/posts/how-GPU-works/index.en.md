@@ -176,9 +176,9 @@ Now let’s look more closely at the CUDA programming model on top of a modern G
 * The main compute building block of the GPU – the place where thread blocks actually run.  
   It is analogous to a CPU core but designed to keep **many more threads in flight**.
 * Key components:
-  * 4 SM sub‑partitions (SMSPs): groups of execution units.
-  * Unified shared memory / L1 cache (256 KB on Hopper): fast on‑chip storage for data sharing and caching.
-  * TMA (Tensor Memory Accelerator): an async copy engine introduced with Hopper to offload memory movement from compute units.
+    * 4 SM sub-partitions (SMSPs): groups of execution units.
+    * Unified shared memory / L1 cache (256 KB on Hopper): fast on-chip storage for data sharing and caching.
+    * TMA (Tensor Memory Accelerator): an async copy engine introduced with Hopper to offload memory movement from compute units.
 * A single SM can have tens of warps active at the same time.  
   When one warp stalls on memory, the scheduler quickly swaps in another to keep the pipelines busy (latency hiding).
 
