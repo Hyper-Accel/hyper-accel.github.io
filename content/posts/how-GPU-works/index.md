@@ -28,7 +28,7 @@ keywords: [
 2020년대의 AI 인프라 시장을 이야기할 때 Nvidia GPU를 빼놓고 말하긴 어렵습니다.  
 상대를 알고 나를 알면 위태로울 일이 없으니, AI 반도체 설계 회사로서 가장 강력한 경쟁자인 Nvidia에 대해서도 잘 알아봐야겠죠.
 
-이 글은 그 첫번째 순서로, Nvidia GPU가 어떻게 탄생했고 어떤 설계 철학을 통해 오늘의 위치에 왔는지,
+이 글은 그 첫 번째 순서로, Nvidia GPU가 어떻게 탄생했고 어떤 설계 철학을 통해 오늘의 위치에 왔는지,
 그리고 그 과정에서 드러나는 **강점과 구조적 특성**을 기술적 관점에서 정리하는 것을 목표로 합니다.
 
 ![GPU 및 연대기 개념 다이어그램](images/02-rise-of-nvidia.png)
@@ -37,7 +37,7 @@ keywords: [
 
 1997년 RIVA128과 1999년 GeForce 256으로 그래픽 카드 시장에 성공적으로 자리를 잡았지만, GeForce FX 시리즈가 실패하면서 큰 위기를 맞게 됩니다.
 
-하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아 엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장 뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
+하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아 엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
 
 ![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png)
 2012년도에 GPU를 사용하여 훈련시킨 Convolution Neural Network(CNN)인 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에 우승하면서 본격적으로 AI와 떼어놓을 수 없는 존재가 되었고, 2022년도에 ChatGPT가 출시되면서 대중에게 AI의 편의성이 확산되면서 AI HW Device 시장을 사실상 장악한 Nvidia는 이후 세계 시총 1위를 달성하게 됩니다.
@@ -45,7 +45,7 @@ keywords: [
 즉, 오늘날의 Nvidia GPU는 단순한 그래픽 가속기가 아니라 AI 인프라 레이어를 사실상 독점한 범용 병렬 컴퓨팅 플랫폼이며,  
 우리가 설계하는 하드웨어가 반드시 넘어야 할 기준점(baseline)이기도 합니다.
 
-그렇다면 GPU는 어쩌다 탄생했고, 확산되면서 AI시장까지도 들어오게 되었을까요?
+그렇다면 GPU는 어쩌다 탄생했고, 확산되면서 AI 시장까지도 들어오게 되었을까요?
 
 
 ---
@@ -74,7 +74,7 @@ Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 이러한 상황에서 Nvidia는 혁신적인 한 수를 둡니다. 바로 Unified Shader를 도입하여 모든 쉐이더 연산을 하나의 코어에서 처리할 수 있도록 하는 새로운 아키텍처를 제안한 것이죠. Nvidia의 G80 GPU로 출시된 Tesla 아키텍처는 태생부터 병렬 처리에 목적을 두고 설계되었습니다. 기존 몇 픽셀씩 벡터로 묶어서 처리되던 연산 방식에서 개별 픽셀에 대한 쉐이더 연산을 진행하는 방식으로 분해하고, 여러 픽셀에 대한 연산을 묶어서 스케줄링하는 방식으로 패러다임을 전환했습니다. 이러한 아키텍처 전환을 통해 특정 쉐이더 연산이 오래 걸린다고 해도 코어 내의 다른 쉐이더 연산기에서는 작업을 시행할 수 있었기 때문에 기존의 일방향 파이프라인에서 발생하던 병목현상이 혁신적으로 개선되었습니다.
 
-이러한 아키텍처의 변화는 또다른 인식의 전환으로 이어졌는데, 바로 High Performance Computing(HPC)를 위한 General Purpose GPU(GPGPU)입니다.
+이러한 아키텍처의 변화는 또 다른 인식의 전환으로 이어졌는데, 바로 High Performance Computing(HPC)를 위한 General Purpose GPU(GPGPU)입니다.
 
 ---
 
@@ -84,9 +84,9 @@ Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 그래픽 처리 장치로서 발전을 거듭해 나아간 GPU는 연구자들의 눈에 띄게 됩니다. 2003년 두 연구팀이 각자 독자적으로 실행한 연구에서 GPU를 사용한 일반 선형대수학 문제 해결이 기존 CPU보다 빠르게 처리될 수 있음이 밝혀지면서 본격적으로 GPGPU 바람이 불게 됩니다. 
 
-> *<u>GPU는 초당 연산량이 높다. 그럼 다른데 쓰면 어떨까?</u>*
+> *<u>GPU는 초당 연산량이 높다. 그럼 다른 데 쓰면 어떨까?</u>*
 
-컨택스트를 살펴보자면, 그래픽 발전을 지원하기 위해 DirectX 8(2000)은 Programmable Shader 개념을 도입하여 Shader 회로에서 어떤 동작을 하게 할지 사용자가 직접 짤 수 있도록 하였고 DirectX 9(2002)에서는 셰이더 언어 `HLSL`을 개발하여 본격적으로 Programmable Shader를 지원합니다. 이러한 상황에서 다수 픽셀에 대한 동일 그래픽 작업이라는 GPU의 특성은 다중 데이터에 대한 동일 연산 실행이라는 행렬 곱 등의 일반적인 선형 대수학 문제의 특성과 겹치면서 input vertex를 function input, frame buffer를 function output으로 해석하는 방식의 General Purpose GPU의 개념이 정립되게 됩니다. 다만 이 당시의 그래픽 하드웨어는 앞서 말했듯 그래픽 처리에 주안점을 두고 하드웨어 상에 그래픽 파이프라인을 가지고 있었기 때문에 GPGPU는 장치의 본 의도의 벗어난 사용법, 즉, 일종의 해킹 방식이었습니다. 이 방식의 문제는 선형 대수학 문제를 그래픽 파이프라인에 맞추어 그래픽 관점으로 다시 정의해야하며, 따라서 기존 `C`로 정의된 문제 해결 코드를 `HLSL`, `GLSL` 등 셰이더 언어로 다시 작성해야 한다는 것입니다.
+컨택스트를 살펴보자면, 그래픽 발전을 지원하기 위해 DirectX 8(2000)은 Programmable Shader 개념을 도입하여 Shader 회로에서 어떤 동작을 하게 할지 사용자가 직접 짤 수 있도록 하였고 DirectX 9(2002)에서는 셰이더 언어 `HLSL`을 개발하여 본격적으로 Programmable Shader를 지원합니다. 이러한 상황에서 다수 픽셀에 대한 동일 그래픽 작업이라는 GPU의 특성은 다중 데이터에 대한 동일 연산 실행이라는 행렬 곱 등의 일반적인 선형 대수학 문제의 특성과 겹치면서 input vertex를 function input, frame buffer를 function output으로 해석하는 방식의 General Purpose GPU의 개념이 정립되게 됩니다. 다만 이 당시의 그래픽 하드웨어는 앞서 말했듯 그래픽 처리에 주안점을 두고 하드웨어 상에 그래픽 파이프라인을 가지고 있었기 때문에 GPGPU는 장치의 본 의도의 벗어난 사용법, 즉, 일종의 해킹 방식이었습니다. 이 방식의 문제는 선형 대수학 문제를 그래픽 파이프라인에 맞추어 그래픽 관점으로 다시 정의해야 하며, 따라서 기존 `C`로 정의된 문제 해결 코드를 `HLSL`, `GLSL` 등 셰이더 언어로 다시 작성해야 한다는 것입니다.
 
 ![셰이더 언어와 CUDA 접근 방식 비교](images/10-SL-CUDA.png)
 
@@ -115,13 +115,12 @@ Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 #### - SM (Streaming Multiprocessor)
 
 * GPU의 핵심 연산 블록(Building Block)이자, 스레드 블록(Block)이 실행되는 물리적 공간입니다. CPU의 코어(Core)와 유사한 개념이지만 훨씬 더 많은 스레드를 동시에 처리합니다.
+* 하나의 SM은 동시에 수십 개의 워프(Warp)를 활성화 상태로 유지하며(Active Warps), 메모리 대기 시간이 발생하면 즉시 다른 워프로 전환하여 파이프라인을 꽉 채웁니다(Latency Hiding).
 * 주요 구성 요소:
 
     * 4개의 SM Sub-partition: 연산 유닛들의 집합.
     * Unified Shared Memory / L1 Cache: 데이터 공유와 캐싱을 위한 고속 메모리. (Hopper 기준 256KB)
-    * TMA (Tensor Memory Accelerator): Hopper 아키텍처에서 도입된 메모리 복사를 전담하여 연산 유닛의 부하를 덜어주는 비동기 복사 엔진.
-    
-* 하나의 SM은 동시에 수십 개의 워프(Warp)를 활성화 상태로 유지하며(Active Warps), 메모리 대기 시간이 발생하면 즉시 다른 워프로 전환하여 파이프라인을 꽉 채웁니다(Latency Hiding).
+    * TMA (Tensor Memory Accelerator): Hopper 아키텍처에서 도입된 연속된 메모리(주로 텐서) 복사를 전담하는 비동기 복사 엔진.
 
 #### - SM Sub-partition (Processing Block / SMSP)
 
@@ -168,7 +167,7 @@ Hopper 아키텍처에서 도입된 상위 계층으로, 여러 개의 스레드
 
 ![예시 코드와 동작 설명 다이어그램](images/15-code-ex.png)
 
-먼저 예시로 가져온 코드를 살펴봅시다. 예시 코드는 간단한 `fp32 add` 연산인데요, 그리드를 한 개의 블록으로 구성하고 있고, 각 블록은 96개로 하여 커널이 호출되고 있는 것을 확인할 수 있습니다. 이 코드를 컴파일하면 바이너리로 변환되겠지만 편의를 위해 어셈블리 단계로 살펴보도록 합시다. 예시 커널 코드는 총 4단계의 instruction으로 구성되는데, 먼저 Operand인 `A`와 `B`를 Shared Memory(`SMEM`), `L1 Cache`, `L2 Cache`, Global Memory(`GMEM`)등에서 Register File(`RF`)로 불러오는 두번의 Data load request(`LD`) 동작과 RF상에 불러온 operand를 계산하여 결과값을 RF에 저장하는 Float 32 add (`FADD`) 연산, 그리고 RF에 있는 계산 결과를 다시 `SMEM`, `L1/L2 Cache`, `GMEM`에 저장하는 Data store request(`ST`)연산으로 구성되어있습니다. 이때, `LD`와 `ST`의 경우 메모리 동작이 비동기적으로 진행되기 때문에, 코어상에서 `LD/ST` 유닛은 메모리 주소를 계산해서 메모리 컨트롤러에 전송하는 동작을 실행합니다. 
+먼저 예시로 가져온 코드를 살펴봅시다. 예시 코드는 간단한 `fp32 add` 연산인데요, 그리드를 한 개의 블록으로 구성하고 있고, 각 블록은 96개로 하여 커널이 호출되고 있는 것을 확인할 수 있습니다. 이 코드를 컴파일하면 바이너리로 변환되겠지만 편의를 위해 어셈블리 단계로 살펴보도록 합시다. 예시 커널 코드는 총 4단계의 instruction으로 구성되는데, 먼저 Operand인 `A`와 `B`를 Shared Memory(`SMEM`), `L1 Cache`, `L2 Cache`, Global Memory(`GMEM`) 등에서 Register File(`RF`)로 불러오는 두 번의 Data load request(`LD`) 동작과 RF상에 불러온 operand를 계산하여 결과값을 RF에 저장하는 Float 32 add (`FADD`) 연산, 그리고 RF에 있는 계산 결과를 다시 `SMEM`, `L1/L2 Cache`, `GMEM`에 저장하는 Data store request(`ST`) 연산으로 구성되어 있습니다. 이때, `LD`와 `ST`의 경우 메모리 동작이 비동기적으로 진행되기 때문에, 코어상에서 `LD/ST` 유닛은 메모리 주소를 계산해서 메모리 컨트롤러에 전송하는 동작을 실행합니다. 
 
 ![Thread 묶음 예시](images/16-thread-group.png)
 
@@ -192,9 +191,9 @@ LD/ST·INT·FP 같은 서로 다른 타입의 파이프라인에 적절히 섞�
 
 ### Single Warp Scheduling
 
-먼저 Warp A는 Warp scheduler(WS)에서 issue되면서 PC값에 따라 첫번째 Instruction인 `LD R1, [A+tid]`를 Dispatch unit으로 가져옵니다. Dispatch unit은 현재 SMSP상에 가용 가능한 자원을 스캔하여 8개의 LD/ST unit이 사용 가능한 것을 확인한 후 issue된 32개의 thread를 8개씩 4cycle에 걸쳐 LD/ST unit에 할당합니다. 각 유닛은 할당받은 명령어를 기반으로 메모리관리 장치에 메모리 주소를 호출하며, 이 load 명령은 비동기적으로 처리됩니다. 마지막 5번째 사이클에 LD/ST 유닛 동작이 끝날때 WS는 Warp A를 Release하면서 warp A의 PC값을 4 증가시킵니다 (32bit OP code이기 때문). 그 다음 사이클에 WS는 release된 warp A를 다시 issue하고 같은 방식으로 두번째 LD 명령을 수행합니다.
+먼저 Warp A는 Warp scheduler(WS)에서 issue되면서 PC값에 따라 첫 번째 Instruction인 `LD R1, [A+tid]`를 Dispatch unit으로 가져옵니다. Dispatch unit은 현재 SMSP상에 가용 가능한 자원을 스캔하여 8개의 LD/ST unit이 사용 가능한 것을 확인한 후 issue된 32개의 thread를 8개씩 4cycle에 걸쳐 LD/ST unit에 할당합니다. 각 유닛은 할당받은 명령어를 기반으로 메모리 관리 장치에 메모리 주소를 호출하며, 이 load 명령은 비동기적으로 처리됩니다. 마지막 5번째 사이클에 LD/ST 유닛 동작이 끝날 때 WS는 Warp A를 Release하면서 warp A의 PC값을 4 증가시킵니다 (32bit OP code이기 때문). 그 다음 사이클에 WS는 release된 warp A를 다시 issue하고 같은 방식으로 두 번째 LD 명령을 수행합니다.
 
-LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메모리 로드가 완료되는 것을 기다려야합니다. 명령어를 보면 `FADD R3, R1, R2`로 되어있는데, 이때 `R1`과 `R2`는 앞선 LD 동작을 통해 비동기적으로 RF에 써지고 있는 중입니다. 즉, 연산을 수행하기 위해선 두 데이터가 모두 패치되기를 기다려야합니다. 따라서 이 기다리는 시간동안 Stall이 발생하여 연산기들은 유휴상태가 됩니다. 메모리 로드 시간은 대략적으로 L1 cache 20 cycle, L2 cache 100 cycle, HBM 300-800 cycle로 추산됩니다.
+LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메모리 로드가 완료되는 것을 기다려야 합니다. 명령어를 보면 `FADD R3, R1, R2`로 되어있는데, 이때 `R1`과 `R2`는 앞선 LD 동작을 통해 비동기적으로 RF에 쓰이고 있는 중입니다. 즉, 연산을 수행하기 위해서는 두 데이터가 모두 패치되기를 기다려야 합니다. 따라서 이 기다리는 시간 동안 Stall이 발생하여 연산기들은 유휴 상태가 됩니다. 메모리 로드 시간은 대략적으로 L1 cache 20 cycle, L2 cache 100 cycle, HBM 300~800 cycle로 추산됩니다.
 
 메모리 로드가 끝난 후 Dependency가 해결된 Warp A는 다시 eligible 상태가 되어 WS에 의해 다시 배정됩니다. FADD 연산은 FP 32 Pipeline을 통해 동작하는데, 이때 Hopper GPU에는 총 32개의 FP 32 유닛이 존재하므로 한번에 패치되게 됩니다. 연산이 모두 끝난 후 마찬가지로 release됩니다. 다음 연산인 ST연산은 LD와 마찬가지으로 방식으로 동작합니다.
 
@@ -221,18 +220,18 @@ LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메
  
 ## 정리하자면…
 
-이 글에서는 
+이 글에서는  
 
-① 그래픽 카드에서 출발한 Nvidia의 역사, 
+① 그래픽 카드에서 출발한 Nvidia의 역사,  
+② Tesla·CUDA를 거치며 GPGPU 플랫폼으로 확장된 과정,  
+③ Hopper 세대 기준의 하드웨어 구조와 스케줄링 예시를 살펴보며,
 
-② Tesla·CUDA를 거치며 GPGPU 플랫폼으로 확장된 과정, 
+궁극적으로  
 
-③ Hopper 세대 기준의 하드웨어 구조와 스케줄링 예시를 살펴보며 
+>*"GPU는 느린 메모리를, 많은 워프 간의 빠른 컨텍스트 전환과 여러 연산의 동시 실행으로 가리는 장치"*  
 
->*"GPU는 느린 메모리를 많은 Warp간 빠른 context change와 여러 operation 동시실행으로 가리는 장치"* 
-
-라는 것을 확인했습니다.  
-결국 메모리 계층, 스케줄러 정책, 실행 파이프라인이 모두 이 목표를 향해 설계되어 있다는 점이 핵심입니다.
+라는 결론에 도달했습니다.  
+결국 메모리 계층, 스케줄러 정책, 실행 파이프라인까지 GPU의 모든 설계 요소가 이 목표를 중심으로 짜여 있다는 점이 핵심입니다.
 
 
 
