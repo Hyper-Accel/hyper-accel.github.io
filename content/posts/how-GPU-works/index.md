@@ -37,7 +37,7 @@ keywords: [
 
 1997년 RIVA128과 1999년 GeForce 256으로 그래픽 카드 시장에 성공적으로 자리를 잡았지만, GeForce FX 시리즈가 실패하면서 큰 위기를 맞게 됩니다.
 
-하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아 엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
+하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
 
 ![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png)
 2012년, GPU로 훈련한 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에서 우승하며 GPU는 AI와 떼려야 뗄 수 없는 관계가 되었습니다. 이후 2022년 ChatGPT가 출시되어 AI가 대중화되면서, AI 하드웨어 시장을 사실상 장악한 Nvidia는 세계 시가총액 1위 기업으로 올라섰습니다.
