@@ -14,6 +14,7 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 ## Repository clone 받기
 ```bash
 git clone git@github.com:Hyper-Accel/hyper-accel.github.io.git
+cd hyper-accel.github.io
 git submodule update --init --recursive
 ```
 Repository를 clone받고, submodule을 초기화합니다. (recursive 옵션을 붙여 주십시오)
@@ -41,7 +42,7 @@ scoop install hugo
 ```
 
 ### Linux
-
+- 현재 apt에서 제공되는 hugo 버전이 낮아 레포와 호환되지 않습니다. mac 작업을 권장합니다.
 ```bash
 # Ubuntu/Debian
 sudo apt-get install hugo
