@@ -6,17 +6,17 @@ cover:
   image: "images/01-gpu-hopper.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "Nvidia Hopper GPU image"
+  alt: "NVIDIA Hopper GPU image"
   caption: "엔비디아 Hopper GPU 이미지"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
 categories: ["AI Hardware", "Architecture"]
-summary: "Nvidia GPU의 역사와 Hopper 아키텍처를 통해, 어떻게 GPU가 메모리 레이턴시를 숨기는지 정리한 글입니다."
+summary: "NVIDIA GPU의 역사와 Hopper 아키텍처를 통해, 어떻게 GPU가 메모리 레이턴시를 숨기는지 정리한 글입니다."
 comments: true
-description: "1990년대 그래픽 카드 시절부터 Tesla·CUDA를 거쳐 Hopper에 이르기까지 Nvidia GPU의 진화 과정을 따라가며, GPU가 어떻게 대규모 병렬성과 스케줄링으로 메모리 레이턴시를 숨기는지 정리한 글입니다."
+description: "1990년대 그래픽 카드 시절부터 Tesla·CUDA를 거쳐 Hopper에 이르기까지 NVIDIA GPU의 진화 과정을 따라가며, GPU가 어떻게 대규모 병렬성과 스케줄링으로 메모리 레이턴시를 숨기는지 정리한 글입니다."
 keywords: [
-  "GPU", "Nvidia", "Hopper", "CUDA", "GPGPU",
+  "GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU",
   "AI Hardware", "Parallel Computing", "Tensor Core",
   "Warp", "SM", "H100", "GPU Architecture",
   "메모리 레이턴시", "CUDA 프로그래밍", "AI 가속기"
@@ -25,24 +25,24 @@ keywords: [
 
 # 지피지기면 백전불태 1편: GPU의 역사와 기초
 
-2020년대의 AI 인프라 시장을 이야기할 때 Nvidia GPU를 빼놓고 말하긴 어렵습니다.  
-상대를 알고 나를 알면 위태로울 일이 없으니, AI 반도체 설계 회사로서 가장 강력한 경쟁자인 Nvidia에 대해서도 잘 알아봐야겠죠.
+2020년대의 AI 인프라 시장을 이야기할 때 NVIDIA GPU를 빼놓고 말하긴 어렵습니다.  
+상대를 알고 나를 알면 위태로울 일이 없으니, AI 반도체 설계 회사로서 가장 강력한 경쟁자인 NVIDIA에 대해서도 잘 알아봐야겠죠.
 
-이 글은 그 첫 번째 순서로, Nvidia GPU가 어떻게 탄생했고 어떤 설계 철학을 통해 오늘의 위치에 왔는지,
+이 글은 그 첫 번째 순서로, NVIDIA GPU가 어떻게 탄생했고 어떤 설계 철학을 통해 오늘의 위치에 왔는지,
 그리고 그 과정에서 드러나는 **강점과 구조적 특성**을 기술적 관점에서 정리하는 것을 목표로 합니다.
 
 ![GPU 및 연대기 개념 다이어그램](images/02-rise-of-nvidia.png)
 
-간략하게 Nvidia의 역사를 살펴보자면, Nvidia는 1993년 설립되어 1995년에 NV1을 내놓으면서 그래픽 처리장치 시장에 발을 들입니다.
+간략하게 NVIDIA의 역사를 살펴보자면, NVIDIA는 1993년 설립되어 1995년에 NV1을 내놓으면서 그래픽 처리장치 시장에 발을 들입니다.
 
 1997년 RIVA128과 1999년 GeForce 256으로 그래픽 카드 시장에 성공적으로 자리를 잡았지만, GeForce FX 시리즈가 실패하면서 큰 위기를 맞게 됩니다.
 
 하지만 FX의 실패를 딛고 일어나 아키텍처를 갈아엎으면서 G80 Tesla와 CUDA를 만들어내면서 그래픽 시장뿐만 아니라 HPC, GPGPU 시장까지도 선도하는 기업이 되게 됩니다.
 
 ![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png)
-2012년, GPU로 훈련한 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에서 우승하며 GPU는 AI와 떼려야 뗄 수 없는 관계가 되었습니다. 이후 2022년 ChatGPT가 출시되어 AI가 대중화되면서, AI 하드웨어 시장을 사실상 장악한 Nvidia는 세계 시가총액 1위 기업으로 올라섰습니다.
+2012년, GPU로 훈련한 AlexNet이 ImageNet Visual Recognition Challenge(ILSVRC)에서 우승하며 GPU는 AI와 떼려야 뗄 수 없는 관계가 되었습니다. 이후 2022년 ChatGPT가 출시되어 AI가 대중화되면서, AI 하드웨어 시장을 사실상 장악한 NVIDIA는 세계 시가총액 1위 기업으로 올라섰습니다.
 
-즉, 오늘날의 Nvidia GPU는 단순한 그래픽 가속기가 아니라 AI 인프라 레이어를 사실상 독점한 범용 병렬 컴퓨팅 플랫폼이며,  
+즉, 오늘날의 NVIDIA GPU는 단순한 그래픽 가속기가 아니라 AI 인프라 레이어를 사실상 독점한 범용 병렬 컴퓨팅 플랫폼이며,  
 우리가 설계하는 하드웨어가 반드시 넘어야 할 기준점(baseline)이기도 합니다.
 
 그렇다면 GPU는 어쩌다 탄생했고, 확산되면서 AI 시장까지도 들어오게 되었을까요?
@@ -68,13 +68,13 @@ keywords: [
 
 여기서 말하는 그래픽 연산은 CPU가 던져준 점을 Vertex Shader 연산을 통해 좌표상에 위치시키고 Primitive Generation 및 Rasterization을 통해 픽셀에 매핑하고 각 픽셀마다 Fragment Shader 등을 통해 알맞은 색을 입히는 과정을 통해 화면에 표시하기 위한 Framebuffer에 저장되는 방식으로 진행됩니다. 여기에 그래픽이 발전하면서 anti-aliasing, Blending, Transparency, Shadow Mapping 등 추가적인 연산이 추가되었습니다.
 
-![Nvidia FX Architecture 다이어그램](images/07-fx-arch.png)
+![NVIDIA FX Architecture 다이어그램](images/07-fx-arch.png)
 
-Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파이프라인을 하드웨어로 그대로 옮겨놓았습니다. Vertex shading 단계를 위한 Vertex shader 회로가 따로 있고, Fragment Shader를 위한 회로가 따로 있는, 그야말로 그래픽을 위해 고정된 가속장치라고 볼 수 있겠습니다. 일방향성 파이프라인의 성격을 띤 이러한 구조의 GPU는 중간 단계가 오래 걸리면 그 앞단계는 stall이 걸려 아무런 동작도 되지 않는 상태가 되는 병목 현상이 나타나게 되는데 이러한 문제는 그래픽 발전을 따라가기 위한 Programmable Shader의 등장으로 두드러지게 됩니다. Custom된 shader 함수는 연산에 더 오랜 시간이 걸리는 경우가 많았고 이는 곧 전체 하드웨어 유틸리티를 저해하는 결과로 이어졌습니다. 또한 그래픽 파이프라인의 스테이지가 길어지면서 전체 작업에서 병목이 어디인지를 파악하기 힘들어졌습니다.
+NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파이프라인을 하드웨어로 그대로 옮겨놓았습니다. Vertex shading 단계를 위한 Vertex shader 회로가 따로 있고, Fragment Shader를 위한 회로가 따로 있는, 그야말로 그래픽을 위해 고정된 가속장치라고 볼 수 있겠습니다. 일방향성 파이프라인의 성격을 띤 이러한 구조의 GPU는 중간 단계가 오래 걸리면 그 앞단계는 stall이 걸려 아무런 동작도 되지 않는 상태가 되는 병목 현상이 나타나게 되는데 이러한 문제는 그래픽 발전을 따라가기 위한 Programmable Shader의 등장으로 두드러지게 됩니다. Custom된 shader 함수는 연산에 더 오랜 시간이 걸리는 경우가 많았고 이는 곧 전체 하드웨어 유틸리티를 저해하는 결과로 이어졌습니다. 또한 그래픽 파이프라인의 스테이지가 길어지면서 전체 작업에서 병목이 어디인지를 파악하기 힘들어졌습니다.
 
-![Nvidia Tesla Architecture (G80) 다이어그램](images/08-tesla-arch.png)
+![NVIDIA Tesla Architecture (G80) 다이어그램](images/08-tesla-arch.png)
 
-이러한 상황에서 Nvidia는 혁신적인 한 수를 둡니다. 바로 Unified Shader를 도입하여 모든 쉐이더 연산을 하나의 코어에서 처리할 수 있도록 하는 새로운 아키텍처를 제안한 것이죠. Nvidia의 G80 GPU로 출시된 Tesla 아키텍처는 태생부터 병렬 처리에 목적을 두고 설계되었습니다. 기존 몇 픽셀씩 벡터로 묶어서 처리되던 연산 방식에서 개별 픽셀에 대한 쉐이더 연산을 진행하는 방식으로 분해하고, 여러 픽셀에 대한 연산을 묶어서 스케줄링하는 방식으로 패러다임을 전환했습니다. 이러한 아키텍처 전환을 통해 특정 쉐이더 연산이 오래 걸린다고 해도 코어 내의 다른 쉐이더 연산기에서는 작업을 시행할 수 있었기 때문에 기존의 일방향 파이프라인에서 발생하던 병목현상이 혁신적으로 개선되었습니다.
+이러한 상황에서 NVIDIA는 혁신적인 한 수를 둡니다. 바로 Unified Shader를 도입하여 모든 쉐이더 연산을 하나의 코어에서 처리할 수 있도록 하는 새로운 아키텍처를 제안한 것이죠. NVIDIA의 G80 GPU로 출시된 Tesla 아키텍처는 태생부터 병렬 처리에 목적을 두고 설계되었습니다. 기존 몇 픽셀씩 벡터로 묶어서 처리되던 연산 방식에서 개별 픽셀에 대한 쉐이더 연산을 진행하는 방식으로 분해하고, 여러 픽셀에 대한 연산을 묶어서 스케줄링하는 방식으로 패러다임을 전환했습니다. 이러한 아키텍처 전환을 통해 특정 쉐이더 연산이 오래 걸린다고 해도 코어 내의 다른 쉐이더 연산기에서는 작업을 시행할 수 있었기 때문에 기존의 일방향 파이프라인에서 발생하던 병목현상이 혁신적으로 개선되었습니다.
 
 이러한 아키텍처의 변화는 또 다른 인식의 전환으로 이어졌는데, 바로 High Performance Computing(HPC)를 위한 General Purpose GPU(GPGPU)입니다.
 
@@ -96,7 +96,7 @@ Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 ![셰이더 언어와 CUDA 접근 방식 비교](images/10-SL-CUDA.png)
 
-이 문제는 2006년에 나온 Tesla 아키텍처와 2007년에 뒤이어 나온 CUDA 프로그램을 통해 완벽히 해결되게 됩니다. CUDA는 그래픽이 아닌 병렬 연산에 초점을 맞추어 설계되었고, Unified Shader 구조에 맞추어 하나의 데이터 포인트에 대한 작업을  `Thread`로 정의하고 한 하드웨어 `SM`에 배정되는 thread 묶음을 `Block`, 함수 실행 시 생성되는 전체 thread를 `Grid`로 정의하여 `C`의 개념체계를 그대로 사용하여 커널 함수를 구현할 수 있도록 하였습니다. Tesla 아키텍처와 CUDA 프로그래밍 모델을 통해 GPU는 진정한 GPGPU의 세계로 들어갈 수 있었습니다.
+이 문제는 2006년에 나온 Tesla 아키텍처와 2007년에 뒤이어 나온 CUDA 프로그램을 통해 완벽히 해결되게 됩니다. CUDA는 그래픽이 아닌 병렬 연산에 초점을 맞추어 설계되었고, Unified Shader 구조에 맞추어 하나의 데이터 포인트에 대한 작업을  `thread`로 정의하고 한 하드웨어 `SM`에 배정되는 thread 묶음을 `block`, 함수 실행 시 생성되는 전체 thread를 `grid`로 정의하여 `C`언어의 개념체계를 그대로 사용하여 커널 함수를 구현할 수 있도록 하였습니다. Tesla 아키텍처와 CUDA 프로그래밍 모델을 통해 GPU는 진정한 GPGPU의 세계로 들어갈 수 있었습니다.
 
 이제 현대 GPU인 Hopper 아키텍처를 기준으로 과연 GPU는 어떤 식으로 만들어졌는지 살펴봅시다.
 
@@ -139,19 +139,19 @@ Nvidia FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 ---
 
 ## CUDA 프로그래밍 모델의 구조
-![CUDA 프로그래밍 모델의 Thread 제어 단계](images/13-cuda-pm.png)
+![CUDA 프로그래밍 모델의 thread 제어 단계](images/13-cuda-pm.png)
 
 이러한 하드웨어 아키텍처 상에서 GPU는 병렬 작업을 총 5단계로 Thread를 묶어서 관리합니다.
 
 #### - 스레드 (Thread) - 병렬 처리의 최소 단위
 
-CUDA 연산의 가장 작은 논리적 단위입니다. 개발자가 작성한 커널(Kernel) 코드는 SPMD (Single Program Multiple Data) 방식에 따라 모든 스레드에 복제되어 실행됩니다. 하지만 각 스레드는 고유한 Thread ID를 부여받으므로, 이를 이용해 서로 다른 메모리 주소에 접근하거나 각기 다른 제어 흐름을 가질 수 있습니다. 물리적으로는 CUDA Core(ALU) 파이프라인을 점유하며 실행됩니다.
+CUDA 연산의 가장 작은 논리적 단위입니다. 개발자가 작성한 커널(Kernel) 코드는 SPMD (Single Program Multiple Data) 방식에 따라 모든 스레드에 복제되어 실행됩니다. 하지만 각 스레드는 고유한 thread ID를 부여받으므로, 이를 이용해 서로 다른 메모리 주소에 접근하거나 각기 다른 제어 흐름을 가질 수 있습니다. 물리적으로는 CUDA Core(ALU) 파이프라인을 점유하며 실행됩니다.
 
 #### - 워프 (Warp) - 하드웨어 실행의 최소 단위
 
 32개의 연속된 스레드를 묶은 집합이자, 실질적인 명령어 실행(Instruction Issue) 단위입니다. 워프 내 32개 스레드는 하나의 명령어를 공유하며 물리적으로 동시에 실행됩니다. Warp마다 Instruction Cache 내의 명령줄을 가리키는 pointer인 Program Counter(PC)를 가지고 있으며 명령이 전달되면 이 PC에 해당하는 명령줄이 Dispatch Unit으로 전송되고, 해당 명령에 대한 동작이 종료되면 Release되면서 PC가 증가됩니다. 만약 워프 내 스레드들이 if-else문 등으로 서로 다른 실행 경로로 갈라진다면(Branch Divergence), 하드웨어는 모든 경로를 순차적으로 처리(Serialization)한 뒤 다시 합류시킵니다. 따라서 동일 워프 내 스레드들의 실행 경로를 일치시키는 것이 성능의 핵심입니다. SM 내부의 Warp Scheduler는 실행 가능한 상태의 워프를 매우 빠르게 교체(Context Switching)하며 메모리 대기 시간(Latency)을 숨깁니다.
 
-![이미지: CUDA 프로그래밍 모델의 Thread Block 할당 방식 그림](images/14-thdblk-alloc.png)
+![이미지: CUDA 프로그래밍 모델의 thread block 할당 방식 그림](images/14-thdblk-alloc.png)
 
 #### - 스레드 블록 (Thread Block / CTA) - 협력과 공유의 단위
 
@@ -179,7 +179,7 @@ Hopper 아키텍처에서 도입된 상위 계층으로, 여러 개의 스레드
 
 이때 `LD`와 `ST`는 비동기적으로 동작하므로, 코어의 `LD/ST` 유닛은 메모리 주소를 계산하여 메모리 컨트롤러에 요청을 보내는 역할만 수행합니다.
 
-![Thread 묶음 예시](images/16-thread-group.png)
+![thread 묶음 예시](images/16-thread-group.png)
 
 만들어진 총 96개의 스레드는 3개의 `warp`로 나뉘고, 1개의 `block`에 배정되어 있으므로 1개의 `SM`에 할당됩니다. 이때 scheduling 예시 편의를 위해 모두 같은 `SMSP`에 할당된다고 가정합시다.
 
@@ -232,7 +232,7 @@ LD가 모두 끝난 후에 Warp A는 바로 실행되지 못하고 비동기 메
 
 이 글에서는  
 
-① 그래픽 카드에서 출발한 Nvidia의 역사,  
+① 그래픽 카드에서 출발한 NVIDIA의 역사,  
 ② Tesla·CUDA를 거치며 GPGPU 플랫폼으로 확장된 과정,  
 ③ Hopper 세대 기준의 하드웨어 구조와 스케줄링 예시를 살펴보며,
 
