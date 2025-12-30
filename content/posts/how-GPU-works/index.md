@@ -31,7 +31,7 @@ keywords: [
 이 글은 그 첫 번째 순서로, NVIDIA GPU가 어떻게 탄생했고 어떤 설계 철학을 통해 오늘의 위치에 왔는지,
 그리고 그 과정에서 드러나는 **강점과 구조적 특성**을 기술적 관점에서 정리하는 것을 목표로 합니다.
 
-![GPU 및 연대기 개념 다이어그램](images/02-rise-of-nvidia.png)
+![GPU 및 연대기 개념](images/02-rise-of-nvidia.png)
 
 간략하게 NVIDIA의 역사를 살펴보자면, NVIDIA는 1993년 설립되어 1995년에 NV1을 내놓으면서 그래픽 처리장치 시장에 발을 들입니다.
 
@@ -68,11 +68,11 @@ keywords: [
 
 여기서 말하는 그래픽 연산은 CPU가 던져준 점을 Vertex Shader 연산을 통해 좌표상에 위치시키고 Primitive Generation 및 Rasterization을 통해 픽셀에 매핑하고 각 픽셀마다 Fragment Shader 등을 통해 알맞은 색을 입히는 과정을 통해 화면에 표시하기 위한 Framebuffer에 저장되는 방식으로 진행됩니다. 여기에 그래픽이 발전하면서 anti-aliasing, Blending, Transparency, Shadow Mapping 등 추가적인 연산이 추가되었습니다.
 
-![NVIDIA FX Architecture 다이어그램](images/07-fx-arch.png)
+![NVIDIA FX Architecture](images/07-fx-arch.png)
 
 NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파이프라인을 하드웨어로 그대로 옮겨놓았습니다. Vertex shading 단계를 위한 Vertex shader 회로가 따로 있고, Fragment Shader를 위한 회로가 따로 있는, 그야말로 그래픽을 위해 고정된 가속장치라고 볼 수 있겠습니다. 일방향성 파이프라인의 성격을 띤 이러한 구조의 GPU는 중간 단계가 오래 걸리면 그 앞단계는 stall이 걸려 아무런 동작도 되지 않는 상태가 되는 병목 현상이 나타나게 되는데 이러한 문제는 그래픽 발전을 따라가기 위한 Programmable Shader의 등장으로 두드러지게 됩니다. Custom된 shader 함수는 연산에 더 오랜 시간이 걸리는 경우가 많았고 이는 곧 전체 하드웨어 유틸리티를 저해하는 결과로 이어졌습니다. 또한 그래픽 파이프라인의 스테이지가 길어지면서 전체 작업에서 병목이 어디인지를 파악하기 힘들어졌습니다.
 
-![NVIDIA Tesla Architecture (G80) 다이어그램](images/08-tesla-arch.png)
+![NVIDIA Tesla Architecture (G80)](images/08-tesla-arch.png)
 
 이러한 상황에서 NVIDIA는 혁신적인 한 수를 둡니다. 바로 Unified Shader를 도입하여 모든 쉐이더 연산을 하나의 코어에서 처리할 수 있도록 하는 새로운 아키텍처를 제안한 것이죠. NVIDIA의 G80 GPU로 출시된 Tesla 아키텍처는 태생부터 병렬 처리에 목적을 두고 설계되었습니다. 기존 몇 픽셀씩 벡터로 묶어서 처리되던 연산 방식에서 개별 픽셀에 대한 쉐이더 연산을 진행하는 방식으로 분해하고, 여러 픽셀에 대한 연산을 묶어서 스케줄링하는 방식으로 패러다임을 전환했습니다. 이러한 아키텍처 전환을 통해 특정 쉐이더 연산이 오래 걸린다고 해도 코어 내의 다른 쉐이더 연산기에서는 작업을 시행할 수 있었기 때문에 기존의 일방향 파이프라인에서 발생하던 병목현상이 혁신적으로 개선되었습니다.
 
@@ -82,7 +82,7 @@ NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 ## GPGPU와 CUDA의 등장
 
-![초기 GPGPU 사용 방식 다이어그램](images/09-pre-gpgpu.png)
+![초기 GPGPU 사용 방식](images/09-pre-gpgpu.png)
 
 그래픽 처리 장치로서 발전을 거듭해 나아간 GPU는 연구자들의 눈에 띄게 됩니다. 2003년 두 연구팀이 각자 독자적으로 실행한 연구에서 GPU를 사용한 일반 선형대수학 문제 해결이 기존 CPU보다 빠르게 처리될 수 있음이 밝혀지면서 본격적으로 GPGPU 바람이 불게 됩니다. 
 
@@ -104,21 +104,21 @@ NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 ## 현대 GPU 구조
 
-![Hopper GH100 Full Architecture 다이어그램](images/11-hopper-full.png)
+![Hopper GH100 Full Architecture](images/11-hopper-full.png)
 
-#### - GPU (Device)
+### GPU (Device)
 
 * GPC, 메모리 컨트롤러(HBM/GDDR), L2 캐시, PCIe/NVLink 인터페이스 등을 포함하는 전체 칩(Chip)입니다.
 * GigaThread Engine: GPU 최상단에서 커널 실행 요청을 받아, 수천 개의 스레드 블록을 각 GPC와 SM으로 분배하는 전역 스케줄러 역할을 수행합니다.
 
-#### - GPC (Graphics Processing Cluster)
+### GPC (Graphics Processing Cluster)
 
 * 여러 개의 SM을 묶어 관리하는 상위 하드웨어 단위입니다.
 * 래스터화 엔진(Raster Engine) 등 그래픽 처리를 위한 공통 자원을 공유하며, Hopper 아키텍처에서는 스레드 블록 클러스터(Cluster)가 실행되는 경계가 됩니다. GPC 내부에는 SM 간의 초고속 연결망이 있어 Distributed Shared Memory(DSMEM) 접근이 가능합니다.
 
-![Hopper GH100 단일 SM 아키텍처 그림](images/12-hopper-sm.png)
+![Hopper GH100 단일 SM 아키텍처](images/12-hopper-sm.png)
 
-#### - SM (Streaming Multiprocessor)
+### SM (Streaming Multiprocessor)
 
 * GPU의 핵심 연산 블록(Building Block)이자, 스레드 블록(Block)이 실행되는 물리적 공간입니다. CPU의 코어(Core)와 유사한 개념이지만 훨씬 더 많은 스레드를 동시에 처리합니다.
 * 하나의 SM은 동시에 수십 개의 워프(Warp)를 활성화 상태로 유지하며(Active Warps), 메모리 대기 시간이 발생하면 즉시 다른 워프로 전환하여 파이프라인을 꽉 채웁니다(Latency Hiding).
@@ -128,7 +128,7 @@ NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
     * Unified Shared Memory / L1 Cache: 데이터 공유와 캐싱을 위한 고속 메모리. (Hopper 기준 256KB)
     * TMA (Tensor Memory Accelerator): Hopper 아키텍처에서 도입된 연속된 메모리(주로 텐서) 복사를 전담하는 비동기 복사 엔진.
 
-#### - SM Sub-partition (Processing Block / SMSP)
+### SM Sub-partition (Processing Block / SMSP)
 
 * SM 내부를 4개로 쪼갠 구획입니다. (현대 NVIDIA GPU의 표준 구조)
 * 각 파티션은 자체적인 Warp Scheduler (1개), Dispatch Unit, Register File (64KB), 그리고 할당된 CUDA Cores 및 Tensor Cores 세트를 가집니다.
@@ -143,25 +143,33 @@ NVIDIA FX 그래픽 카드의 예시를 보면 초기 GPU는 이 그래픽 파�
 
 이러한 하드웨어 아키텍처 상에서 GPU는 병렬 작업을 총 5단계로 Thread를 묶어서 관리합니다.
 
-#### - 스레드 (Thread) - 병렬 처리의 최소 단위
+### 스레드 (Thread)
+
+- 병렬 처리의 최소 단위
 
 CUDA 연산의 가장 작은 논리적 단위입니다. 개발자가 작성한 커널(Kernel) 코드는 SPMD (Single Program Multiple Data) 방식에 따라 모든 스레드에 복제되어 실행됩니다. 하지만 각 스레드는 고유한 thread ID를 부여받으므로, 이를 이용해 서로 다른 메모리 주소에 접근하거나 각기 다른 제어 흐름을 가질 수 있습니다. 물리적으로는 CUDA Core(ALU) 파이프라인을 점유하며 실행됩니다.
 
-#### - 워프 (Warp) - 하드웨어 실행의 최소 단위
+### 워프 (Warp)
+
+- 하드웨어 실행의 최소 단위
 
 32개의 연속된 스레드를 묶은 집합이자, 실질적인 명령어 실행(Instruction Issue) 단위입니다. 워프 내 32개 스레드는 하나의 명령어를 공유하며 물리적으로 동시에 실행됩니다. Warp마다 Instruction Cache 내의 명령줄을 가리키는 pointer인 Program Counter(PC)를 가지고 있으며 명령이 전달되면 이 PC에 해당하는 명령줄이 Dispatch Unit으로 전송되고, 해당 명령에 대한 동작이 종료되면 Release되면서 PC가 증가됩니다. 만약 워프 내 스레드들이 if-else문 등으로 서로 다른 실행 경로로 갈라진다면(Branch Divergence), 하드웨어는 모든 경로를 순차적으로 처리(Serialization)한 뒤 다시 합류시킵니다. 따라서 동일 워프 내 스레드들의 실행 경로를 일치시키는 것이 성능의 핵심입니다. SM 내부의 Warp Scheduler는 실행 가능한 상태의 워프를 매우 빠르게 교체(Context Switching)하며 메모리 대기 시간(Latency)을 숨깁니다.
 
-![이미지: CUDA 프로그래밍 모델의 thread block 할당 방식 그림](images/14-thdblk-alloc.png)
+![CUDA 프로그래밍 모델의 thread block 할당 방식](images/14-thdblk-alloc.png)
 
-#### - 스레드 블록 (Thread Block / CTA) - 협력과 공유의 단위
+### 스레드 블록 (Thread Block / CTA)
+
+- 협력과 공유의 단위
 
 서로 긴밀하게 협력할 수 있는 스레드들의 그룹(최대 1024 스레드) 입니다. 같은 블록 내의 스레드들은 Shared Memory를 공유하고, `__syncthreads()` 배리어(Barrier)를 통해 실행 단계를 동기화할 수 있습니다. 이러한 자원 공유를 위해 하나의 블록은 물리적으로 반드시 하나의 SM (Streaming Multiprocessor)에 할당되어 생애주기를 마칩니다. SM의 자원(Register, Shared Memory 용량) 한계가 곧 블록 크기의 제약이 됩니다. 1차원~3차원(`Block(x,y,z)`)으로 구성 가능하여, 이미지나 볼륨 데이터 같은 다차원 문제를 직관적으로 맵핑할 수 있습니다.
 
-#### - 스레드 블록 클러스터 (Thread Block Cluster)
+### 스레드 블록 클러스터 (Thread Block Cluster)
 
 Hopper 아키텍처에서 도입된 상위 계층으로, 여러 개의 스레드 블록을 묶은 단위입니다. 기존에는 블록 간 통신이 매우 제한적(Global Memory 경유)이었습니다. 이를 해결하기 위해 하드웨어적으로 인접한 블록끼리 더 빠르게 소통할 수 있는 계층이 필요해졌습니다. 클러스터는 물리적으로 GPC (Graphics Processing Cluster)에 매핑됩니다. 클러스터 내의 블록들은 Distributed Shared Memory (DSMEM) 기술을 통해, L2 캐시를 거치지 않고 서로의 Shared Memory에 직접 접근(P2P)할 수 있습니다.
 
-#### - 그리드 (Grid) - 커널 실행의 전체 단위
+### 그리드 (Grid)
+
+- 커널 실행의 전체 단위
 
 커널이 호출(Launch)될 때 생성되는 모든 스레드 블록의 집합입니다. 커널 호출 한 번이 곧 하나의 그리드입니다. 그리드 내의 블록들은 서로 독립적입니다. 실행 순서가 보장되지 않으며, 서로 다른 SM에서 병렬로 실행될 수도, 하나의 SM에서 순차적으로 실행될 수도 있습니다. 이 독립성 덕분에 동일한 코드가 SM이 10개인 보급형 GPU에서도, SM이 144개인 H100에서도 수정 없이 동작하는 확장성(Scalability)이 보장됩니다.
 
@@ -171,7 +179,7 @@ Hopper 아키텍처에서 도입된 상위 계층으로, 여러 개의 스레드
 
 그렇다면 코드를 넣었을 때 GPU는 도대체 어떻게 동작하는 것일까요? Scheduling 예시를 통해 차근차근 알아보겠습니다. 
 
-![예시 코드와 동작 설명 다이어그램](images/15-code-ex.png)
+![예시 코드와 동작 설명](images/15-code-ex.png)
 
 먼저 예시로 가져온 코드를 살펴봅시다. 예시 코드는 간단한 `fp32 add` 연산으로, 그리드를 한 개의 블록으로, 각 블록은 96개의 스레드로 구성하여 커널을 호출하고 있습니다. 이 코드를 컴파일하면 바이너리로 변환되겠지만 편의를 위해 어셈블리 단계로 살펴보겠습니다.
 

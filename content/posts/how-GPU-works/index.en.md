@@ -152,18 +152,20 @@ Conceptually:
 CUDA lets you express kernels in a C‑like language instead of in shader languages,  
 and the Tesla architecture executes them efficiently. This is where the GPU truly became a GPGPU platform.
 
-Now let’s look more closely at the CUDA programming model on top of a modern GPU like Hopper.
+Now let's look more closely at the CUDA programming model on top of a modern GPU like Hopper.
 
-### Hopper Architecture Overview
+---
+
+## Modern GPU Architecture
 
 ![Hopper GH100 full architecture](images/11-hopper-full.png)
 
-#### GPU (Device)
+### GPU (Device)
 
 * The full chip, including GPCs, memory controllers (HBM/GDDR), L2 cache, PCIe/NVLink interfaces, etc.
 * The GigaThread Engine at the top receives kernel launch requests and distributes thousands of thread blocks across GPCs and SMs.
 
-#### GPC (Graphics Processing Cluster)
+### GPC (Graphics Processing Cluster)
 
 * A higher‑level grouping of multiple SMs.
 * Shares common resources for graphics (e.g., raster engines) and, in Hopper, forms the boundary for thread‑block clusters.  
@@ -171,7 +173,7 @@ Now let’s look more closely at the CUDA programming model on top of a modern G
 
 ![Hopper GH100 single SM](images/12-hopper-sm.png)
 
-#### SM (Streaming Multiprocessor)
+### SM (Streaming Multiprocessor)
 
 * The main compute building block of the GPU – the place where thread blocks actually run.  
   It is analogous to a CPU core but designed to keep **many more threads in flight**.
@@ -182,50 +184,70 @@ Now let’s look more closely at the CUDA programming model on top of a modern G
 * A single SM can have tens of warps active at the same time.  
   When one warp stalls on memory, the scheduler quickly swaps in another to keep the pipelines busy (latency hiding).
 
-#### SM Sub‑partition (Processing Block / SMSP)
+### SM Sub‑partition (Processing Block / SMSP)
 
 * Each SM is split into 4 SMSPs in modern NVIDIA GPUs.
 * Each SMSP has its own warp scheduler, dispatch unit, register file (64 KB), and a set of CUDA Cores and Tensor Cores.
 * This partitioning makes the scheduling problem more tractable and allows each SMSP to independently issue work, improving parallelism.
 
+So how is work structured on top of this hardware? Let's take a closer look at the CUDA programming model.
+
+---
+
+## CUDA Programming Model Structure
+
 ![Thread hierarchy in the CUDA programming model](images/13-cuda-pm.png)
 
-On top of this hardware, the CUDA execution model groups work into five main levels:
+On top of this hardware architecture, the GPU groups parallel work into five main levels:
 
-* **Thread** – the smallest unit of parallel work  
-  A CUDA thread runs the kernel function on one piece of data.  
-  All threads execute the same program (SPMD: Single Program, Multiple Data),  
-  but each has its own thread ID and can follow slightly different control flow and access different memory.
+### Thread
 
-* **Warp** – the minimum unit of execution in hardware  
-  A warp is a group of 32 consecutive threads. The warp is the unit at which instructions are issued:  
-  all 32 threads in a warp execute the same instruction at the same time.  
-  Each warp has a program counter in the instruction cache. When the warp is issued,  
-  the instruction at that PC is sent to the dispatch unit, executed, and then the PC advances.  
-  If threads in a warp branch in different directions (branch divergence), the hardware serializes the different paths and reconverges later.  
-  To get good performance, you want threads within a warp to follow the same control path.  
-  The warp scheduler rapidly context‑switches between warps to hide memory latency.
+- The smallest unit of parallel work
+
+A CUDA thread runs the kernel function on one piece of data.  
+All threads execute the same program (SPMD: Single Program, Multiple Data),  
+but each has its own thread ID and can follow slightly different control flow and access different memory.  
+Physically, threads execute by occupying CUDA Core (ALU) pipelines.
+
+### Warp
+
+- The minimum unit of execution in hardware
+
+A warp is a group of 32 consecutive threads. The warp is the unit at which instructions are issued:  
+all 32 threads in a warp execute the same instruction at the same time.  
+Each warp has a program counter in the instruction cache. When the warp is issued,  
+the instruction at that PC is sent to the dispatch unit, executed, and then the PC advances.  
+If threads in a warp branch in different directions (branch divergence), the hardware serializes the different paths and reconverges later.  
+To get good performance, you want threads within a warp to follow the same control path.  
+The warp scheduler rapidly context‑switches between warps to hide memory latency.
 
 ![Thread block allocation in the CUDA model](images/14-thdblk-alloc.png)
 
-* **Thread Block (CTA)** – the unit of cooperation and shared memory  
-  A block is a group of threads (up to 1024) that can cooperate closely.  
-  Threads in the same block share **shared memory** and can synchronize with `__syncthreads()`.  
-  For that reason, a block is always scheduled entirely on a single SM for its lifetime.  
-  Register and shared memory limits on an SM constrain the maximum block size.  
+### Thread Block (CTA)
+
+- The unit of cooperation and shared memory
+
+A block is a group of threads (up to 1024) that can cooperate closely.  
+Threads in the same block share **shared memory** and can synchronize with `__syncthreads()`.  
+For that reason, a block is always scheduled entirely on a single SM for its lifetime.  
+Register and shared memory limits on an SM constrain the maximum block size.  
 Blocks can be 1D, 2D or 3D (`blockDim.x/y/z`), which maps naturally to images and volume data.
 
-* **Thread Block Cluster**  
-  Introduced in Hopper, a cluster is a group of blocks that can communicate more efficiently.  
-  Traditionally, blocks could communicate only via global memory, which is slow.  
-  In a cluster, blocks mapped to the same GPC can access each other’s shared memory via DSMEM without going through L2,  
-  enabling faster inter‑block cooperation.
+### Thread Block Cluster
 
-* **Grid** – the whole kernel launch  
-  All the blocks created by one kernel launch together form a grid.  
-  Blocks in a grid are independent: their execution order is not guaranteed,  
-  and they may run in parallel across many SMs or sequentially on a smaller number of SMs.  
-  This independence is what gives CUDA its scalability: the same kernel can run on a GPU with 10 SMs or 144 SMs without code changes.
+Introduced in Hopper, a cluster is a group of blocks that can communicate more efficiently.  
+Traditionally, blocks could communicate only via global memory, which is slow.  
+In a cluster, blocks mapped to the same GPC can access each other's shared memory via DSMEM without going through L2,  
+enabling faster inter‑block cooperation.
+
+### Grid
+
+- The whole kernel launch
+
+All the blocks created by one kernel launch together form a grid.  
+Blocks in a grid are independent: their execution order is not guaranteed,  
+and they may run in parallel across many SMs or sequentially on a smaller number of SMs.  
+This independence is what gives CUDA its scalability: the same kernel can run on a GPU with 10 SMs or 144 SMs without code changes.
 
 ---
 
