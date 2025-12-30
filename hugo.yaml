@@ -118,6 +118,9 @@ params:
     apple_touch_icon: "/apple-touch-icon.png"
     safari_pinned_tab: "/safari-pinned-tab.svg"
     customCSS: ["css/extended/custom.css"]
+  author:
+    name: HyperAccel
+    email: contact@hyperaccel.ai
 
   label:
     text: "Home"
@@ -214,6 +217,11 @@ outputs:
     - HTML
     - RSS
     - JSON
+  section:
+    - HTML
+    - RSS
+  term:
+    - HTML
 
 taxonomies:
   tag: tags
@@ -221,7 +229,7 @@ taxonomies:
   author: authors
 
 sitemap:
-  changefreq: daily
+  changefreq: ""
   disable: false
   filename: sitemap.xml
-  priority: 0.5
+  priority: -1
