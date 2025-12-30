@@ -31,7 +31,7 @@ This series aims to deeply understand competitors' hardware for designing AI acc
 This first post covers NVIDIA GPUs, our most formidable competitor.
 
 When we talk about hot topics in the 2020s, it is almost impossible to avoid talking about NVIDIA GPUs.  
-If we are building AI accelerators that will compete with NVIDIA, we first need to understand **how NVIDIA got here and what kind of machine a GPU really is.**
+If we are building AI accelerators that will compete with NVIDIA, we first need to understand **how NVIDIA got here and what kind of device a GPU is.**
 
 This first post in the series looks at how the NVIDIA GPU was born, which architectural choices brought it to its current position,  
 and summarizes the **strengths and structural characteristics** of this design from a hardware engineer's point of view.
@@ -94,11 +94,17 @@ In just 30 years, compute requirements increased by roughly 3–4 million times.
 
 ![Graphics pipeline](images/06-graphics-pipeline.png)
 
-What are these “graphics operations” in practice?  
-The CPU first sends a set of vertices. The GPU runs a vertex shader to place them in screen space,  
-then primitive generation and rasterization map them to pixels.  
-For each pixel, fragment shaders compute the final color, and the results are written into the framebuffer.  
-As graphics quality improved, additional effects like anti‑aliasing, blending, transparency and shadow mapping were added on top.
+What are these "graphics operations" in practice?  
+The CPU first sends geometric information from 3D space – a set of vertices.  
+To transform these vertices into final pixel colors on the screen, the GPU runs small programs called **shaders**.  
+Shaders provide programmable control over each stage of the rendering pipeline,  
+performing operations such as transformations, lighting, and color calculations on vertices or pixels.
+
+First, a **vertex shader** places the vertices in screen space.  
+Then primitive generation and rasterization map them to pixels.  
+For each pixel, **fragment shaders** compute the final color.  
+These computed pixel colors are written into the framebuffer for display.  
+On top of this basic graphics pipeline, additional effects like anti‑aliasing, blending, transparency and shadow mapping were applied for more realistic rendering.
 
 ![NVIDIA FX Architecture diagram](images/07-fx-arch.png)
 
@@ -319,7 +325,7 @@ It then dispatches the 32 threads of Warp A across these 8 LD/ST units over 4 cy
 Each LD/ST unit computes addresses and sends load requests to the memory subsystem;  
 these loads complete asynchronously.
 
-On the fifth cycle, the LD/ST activity finishes and the WS releases Warp A, advancing its PC by 4 bytes (32‑bit opcode).  
+On the fifth cycle, the LD/ST activity finishes and the WS releases Warp A, advancing its PC.  
 On the next cycle, the WS can issue Warp A again for the second LD, which proceeds in the same way.
 
 Once both loads are issued, Warp A cannot immediately execute `FADD R3, R1, R2`,  
@@ -383,7 +389,7 @@ The memory hierarchy, scheduling policies and execution pipelines are all design
 In the next post, we’ll turn our attention to **Google’s TPU**, which has been rapidly gaining share in the AI hardware market.  
 We’ll walk through the history of TPU and analyze the latest TPU architecture, Ironwood, from a hardware engineer’s perspective.
 
-See you again in **Know Your Enemy, Know Yourself, Part 2: TPU History and Fundamentals**.
+See you again in **Know Your Enemy, Know Yourself, Part 2: TPU Emergence and Rise**.
 
 ---
 

@@ -96,10 +96,18 @@ VGA(Video Graphics Array)에 이르러서는 그래픽이 PC의 **핵심 구성 
 ![그래픽 연산 파이프라인](images/06-graphics-pipeline.png)
 
 여기서 말하는 그래픽 연산은 어떻게 진행될까요?  
-CPU가 먼저 정점(vertex)들을 던져줍니다. GPU는 vertex shader를 통해 이를 화면 좌표에 배치하고,  
-primitive generation과 rasterization을 거쳐 픽셀로 매핑합니다.  
-각 픽셀마다 fragment shader가 최종 색상을 계산하고, 결과를 framebuffer에 저장합니다.  
-그래픽이 발전하면서 anti-aliasing, blending, transparency, shadow mapping 같은 추가 효과가 더해졌습니다.
+CPU가 먼저 가상 3D 공간의 기하학적 정보인 정점(vertex)들을 전송합니다.  
+GPU는 이 정점들을 화면상의 최종 픽셀 색상으로 변환하기 위해 **셰이더(shader)** 를 실행합니다.  
+셰이더는 렌더링 파이프라인의 각 단계를 프로그래밍 가능하게 제어하는 작은 프로그램으로,  
+정점이나 픽셀에 대한 변환, 조명, 색상 계산 등의 연산을 수행합니다.
+
+먼저 **vertex shader** 가 정점들을 화면 좌표에 배치합니다.  
+이어서 primitive generation과 rasterization을 거쳐 픽셀로 매핑되고,  
+각 픽셀마다 **fragment shader** 가 최종 색상을 계산합니다.  
+이렇게 계산된 픽셀 색상들이 framebuffer에 저장되어 화면에 표시됩니다.  
+
+이러한 기본 그래픽 파이프라인 위에,  
+더 현실적인 표현을 위해 anti-aliasing, blending, transparency, shadow mapping 같은 추가 효과가 적용되었습니다.
 
 ![NVIDIA FX Architecture](images/07-fx-arch.png)
 
@@ -324,7 +332,7 @@ Dispatch Unit은 현재 SMSP에서 사용 가능한 자원을 스캔하여 8개�
 각 유닛은 할당받은 명령어를 기반으로 메모리 주소를 계산하여 메모리 서브시스템에 로드 요청을 보냅니다.  
 이러한 로드 명령은 **비동기적으로 처리**됩니다.
 
-5번째 사이클에 LD/ST 동작이 끝나면, WS는 Warp A를 release하면서 PC 값을 4바이트 증가시킵니다 (32비트 opcode이기 때문).  
+5번째 사이클에 LD/ST 동작이 끝나면, WS는 Warp A를 release하면서 PC 값을 증가시킵니다.  
 다음 사이클에 WS는 release된 Warp A를 다시 issue하여 같은 방식으로 두 번째 LD 명령을 수행합니다.
 
 두 번의 LD가 모두 issue된 후, Warp A는 바로 `FADD R3, R1, R2`를 실행할 수 없습니다.  
@@ -399,7 +407,7 @@ Warp A의 메모리 로드가 완료되면 즉시 FADD가 issue 및 dispatch됩�
 다음 글에서는 최근 무섭게 AI 하드웨어 시장을 뺏어가고 있는 Google의 TPU에 대해서 살펴보겠습니다.
 TPU의 역사와 최신 TPU 아키텍처인 Ironwood에 대한 분석을 진행할 예정이니 많은 관심 부탁드립니다.
 
-그럼 **지피지기면 백전불태 2편: TPU의 역사와 기초**에서 다시 뵙겠습니다.
+그럼 **지피지기면 백전불태 2편: TPU의 등장과 부상** 에서 다시 뵙겠습니다.
 
 ---
 
