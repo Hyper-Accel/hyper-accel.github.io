@@ -14,6 +14,7 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 ## Repository clone 받기
 ```bash
 git clone git@github.com:Hyper-Accel/hyper-accel.github.io.git
+cd hyper-accel.github.io
 git submodule update --init --recursive
 ```
 Repository를 clone받고, submodule을 초기화합니다. (recursive 옵션을 붙여 주십시오)
@@ -41,7 +42,7 @@ scoop install hugo
 ```
 
 ### Linux
-
+- `apt` 등 일부 Linux 패키지 매니저로 설치한 Hugo 버전이 낮아 호환성 문제가 발생할 수 있습니다. 자세한 해결 방법은 [리눅스 환경에서의 Hugo 버전 문제](#리눅스-환경에서의-hugo-버전-문제) 섹션을 참고해주세요.
 ```bash
 # Ubuntu/Debian
 sudo apt-get install hugo
@@ -117,7 +118,7 @@ bio: "ML Engineering Lead"
 - `bio` — 간단한 한 줄 소개 (언어별로 다를 수 있음)
 
 **선택 사항:**
-- `image` — 프로필 사진 URL
+- `image` — 프로필 사진 URL (추천: 깃허브 프로필사진 "이미지 주소 복사")
 - `linkedin`/`github` — 소셜 미디어 링크
 
 ### 4. 포스트에 author 지정하기
@@ -154,10 +155,10 @@ authors: ["Minho Park"]
 mkdir -p content/posts/포스트-제목
 
 # 기본 버전 (한국어) 생성
-hugo new content/posts/포스트-제목/index.md
+hugo new content/posts/포스트-제목/index.md --config hugo.yaml
 
 # 영어 버전 생성
-hugo new content/posts/포스트-제목/index.en.md
+hugo new content/posts/포스트-제목/index.en.md --config hugo.yaml
 ```
 
 **파일 구조:**
@@ -529,6 +530,11 @@ hugo --gc
 hugo mod get -u github.com/adityatelange/hugo-PaperMod
 hugo mod tidy
 ```
+
+### 리눅스 환경에서의 Hugo 버전 문제
+`apt` 등 일부 Linux 패키지 매니저로 설치한 Hugo 버전(`v0.92.2`)이 낮아 `hugo server` 실행 시 오류가 발생할 수 있습니다.
+이 문제를 해결하려면, `snap`을 사용하거나 [Hugo Releases](https://github.com/gohugoio/hugo/releases)에서 최신 바이너리를 직접 설치하는 것을 권장합니다.
+이 레포지토리는 `v0.125.4` 이상의 Hugo 버전에 최적화되어 있습니다.
 
 ## 📚 추가 자료
 

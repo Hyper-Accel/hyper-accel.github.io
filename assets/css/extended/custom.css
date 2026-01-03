@@ -159,3 +159,10 @@ body .posts-grid-container .post-entry {
 .posts-grid-container .post-entry:hover .entry-cover img {
     transform: scale(1.05);
 }
+
+/* Post 본문 이미지 중앙 정렬 */
+.post-content img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
