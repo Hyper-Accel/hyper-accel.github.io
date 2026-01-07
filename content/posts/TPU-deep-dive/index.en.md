@@ -33,7 +33,7 @@ In this second article, we cover Google's **TPU** (Tensor Processing Unit), whic
 **TPU** has become one of the hottest keywords in the AI accelerator market. Last November, Google introduced Ironwood, the 7th-generation TPU architecture, announcing improved training and inference performance, cluster scalability, and collaboration with AI startup Anthropic. Both domestic and international media have covered this extensively, making TPU a known term to the general public, and this news has significantly impacted the stock prices of both Google and NVIDIA.
 
 
-![alphago](tpu2.webp)
+![Photo of a Google TPU](tpu2.webp)
 
 
 However, TPU is not a product that suddenly appeared. The recently announced TPU is the 7th generation. Google has been releasing new generations of TPU every year since 2016. Initially used only for internal model development and research, including AlphaGo, Google has also sold services through Google Cloud that allow other companies and research institutions to use TPU.
