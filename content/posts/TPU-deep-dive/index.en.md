@@ -46,7 +46,7 @@ But when you think about it, it's strange. Google is clearly a software company,
 
 To understand the TPU structure, we must first understand the background of TPU development. This is detailed in the [TPU 1st generation paper](https://arxiv.org/pdf/1704.04760).
 
-![Paper screenshot](tpu3.png)
+![Paper screenshot](tpu3.webp)
 
 In the 2000s, Google's services could handle even tasks requiring special types of computation using idle resources in existing data centers without needing custom ASICs. However, as AI technology was fully integrated into Google services in the 2010s, the situation changed. When assuming people use voice search for just 3 minutes per day, predictions showed that running deep neural networks (DNN) for voice recognition would require doubling the scale of existing data centers. As general CPUs could no longer handle this, Google internally started a custom ASIC project, the TPU project. The remarkable thing is that design, verification, manufacturing, and deployment were completed in just **15 months**. The TPU produced at that time was used only internally at Google until 2016, when it was revealed that TPU was used in the match between Lee Sedol and AlphaGo, making TPU known to the outside world for the first time.
 
