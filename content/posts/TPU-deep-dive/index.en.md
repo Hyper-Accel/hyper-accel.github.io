@@ -1,6 +1,6 @@
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: true
+draft: false
 title: 'Know Your Enemy, Know Yourself, Part 2 : TPU Emergence and Rise'
 cover:
   image: "tpu-deep-dive.webp"
