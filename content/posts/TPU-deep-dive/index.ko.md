@@ -1,6 +1,6 @@
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: true
+draft: false
 title: '지피지기면 백전불태 2편: TPU의 등장과 부상'
 cover:
   image: "tpu-deep-dive.webp"
