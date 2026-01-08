@@ -109,7 +109,7 @@ Systolic array는 이 과정을 생략할 수 있는 대안 중 하나인데요.
 
 ![TensorCore diagram](tensorcore2.webp)
 
-TensorCore는 Systolic array와 DMA(direct memory access) 유닛 등을 통해 전달된 데이터에 대한 연산을 수행하는 유닛입니다. 앞서 말씀드린 행렬 연산을 위한 MXU(Matrix Multiplication Unit)이 가장 대표적이고, 행렬 연산 뿐만 아니라 스칼라, 벡터 연산을 위한 연산기도 포함되어 있습니다. 세대에 따라 다르지만 칩별로 1개나 2개의 TensorCore가 탑재됩니다.
+TensorCore는 Systolic array와 DMA(Direct Memory Access) 유닛 등을 통해 전달된 데이터에 대한 연산을 수행하는 유닛입니다. 앞서 말씀드린 행렬 연산을 위한 MXU(Matrix Multiplication Unit)이 가장 대표적이고, 행렬 연산 뿐만 아니라 스칼라, 벡터 연산을 위한 연산기도 포함되어 있습니다. 세대에 따라 다르지만 칩별로 1개나 2개의 TensorCore가 탑재됩니다.
 
 **SparseCore**
 
