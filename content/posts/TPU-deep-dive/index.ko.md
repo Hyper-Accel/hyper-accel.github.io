@@ -129,7 +129,7 @@ TPU는 칩별로 1~2개의 적은 수의 거대한 코어로 연산을 수행합
 
 여러 개의 칩을 연결하여 하나의 거대한 서버를 구축하는 scale-up을 위해 TPU는 torus topology를 사용합니다. 여러 개의 칩을 연결한 모습을 떠올려보면 일반적으로 첫번째 그림과 같은 바둑판 모양의 격자 구조 (mesh topology)를 생각해볼 수 있는데요. 이 구조의 단점은 양끝에 있는 노드들끼리 연결이 안되어 있기 때문에 노드간 최대 거리가 길어진다는 점입니다. torus 구조에서는 양 끝에 있는 node들을 wrap-around link로 연결하여 배선 복잡도는 높아지지만 노드간 최대 거리를 N → N/2로 줄일 수 있습니다. 4세대 TPU에서는 이 torus 구조를 3D로 확장하여 노드간 통신 범위와 하나로 묶이는 TPU 개수를 확장하였습니다. 4 * 4 * 4(=64)개의 TPU 묶음을 **cube**라고 부르고 이 cube가 여러 개 모인 클러스터를 **pod**이라고 부릅니다. 
 
-**Optical circuit switch(OCS)**
+**Optical Circuit Switch(OCS)**
 
 ![twisted torus example](twisted_torus.webp)
 
