@@ -19,25 +19,20 @@ keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI 가속기", "TensorFlow", "JAX"
 ]
 ---
-
->**지피지기면 백전불태(知彼知己 百戰不殆)**
-
-상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다는 뜻입니다.
-
-이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.
-
+# 지피지기면 백전불태 2편: TPU의 등장과 부상
+>**지피지기면 백전불태(知彼知己 百戰不殆)**  
+상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다는 뜻입니다.  
+이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.  
 두 번째 글에서는 최근 AI 가속기 시장에 참전을 선언한 Google의 **TPU**(Tensor Processing Unit)에 대해 다룹니다.
 
-## TPU?
-
-최근 AI 가속기 시장에서 가장 핫하게 떠오른 키워드 중 하나는 바로 **TPU**일 것입니다. 지난 11월 구글은 7세대 TPU 아키텍쳐인 아이언우드(ironwood)를 소개하면서 이전 세대에 비해 향상된 학습 및 추론 성능과 클러스터 확장성, 그리고 AI 스타트업인 앤트로픽(Anthropic)과의 협업 등을 발표하였습니다. 국내/외 언론에서도 이를 관심있게 다루면서 일반 대중들에게도 TPU라는 용어가 알려지게 되었고, 이 뉴스 이후 구글과 엔비디아의 주가에도 적지 않은 영향을 주었습니다.
-
+## TPU?  
+최근 AI 가속기 시장에서 가장 핫하게 떠오른 키워드 중 하나는 바로 **TPU**일 것입니다. 지난 11월 구글은 7세대 TPU 아키텍쳐인 아이언우드(Ironwood)를 소개하면서 이전 세대에 비해 향상된 학습 및 추론 성능과 클러스터 확장성, 그리고 AI 스타트업인 앤트로픽(Anthropic)과의 협업 등을 발표하였습니다. 국내/외 언론에서도 이를 관심있게 다루면서 일반 대중들에게도 TPU라는 용어가 알려지게 되었고, 이 뉴스 이후 구글과 엔비디아의 주가에도 적지 않은 영향을 주었습니다.
 
 ![TPU 실제 사진](tpu2.webp)
 
 하지만 TPU는 갑자기 등장한 제품은 아닙니다. 이번에 발표된 무려 TPU는 7세대 TPU입니다. 구글은 2016년부터 지금까지 매년 새로운 세대의 TPU를 발표하였습니다. 초기에는 AlphaGo 등 내부 모델 개발 및 연구용으로만 사용하였지만, 구글 클라우드를 통해 다른 기업이나 연구기관에서 TPU를 사용할 수 있는 서비스도 판매해왔습니다. 
 
-그런데 생각해보면 이상합니다. 구글은 분명 소프트웨어 기업인데 왜 GPU 대신 본인들만의 칩을 만들게 되었을까요? 거기에 더해 하드웨어 시장까지 진출하려고 하는 자신감은 어디서 나온 것일까요? 오늘은 TPU의 기원과 최신 세대 TPU인 ironwood에 대해 파헤쳐보며 구글의 AI 반도체 시장에 대한 '근거 있는 자신감'에 대해 알아보고자 합니다.
+그런데 생각해보면 이상합니다. 구글은 분명 소프트웨어 기업인데 왜 GPU 대신 본인들만의 칩을 만들게 되었을까요? 거기에 더해 하드웨어 시장까지 진출하려고 하는 자신감은 어디서 나온 것일까요? 오늘은 TPU의 기원과 최신 세대 TPU인 Ironwood에 대해 파헤쳐보며 구글의 AI 반도체 시장에 대한 '근거 있는 자신감'에 대해 알아보고자 합니다.
 
 ---
 
@@ -61,43 +56,36 @@ TPU 구조를 이해하기 위해서는 먼저 TPU가 개발된 배경에 대해
 
 ![행렬 곱셈](matmul.webp)
 
-TPU에서는 이 행렬 곱셈을 효율적으로 실행할 수 있도록 일반적인 프로세서(CPU)에서는 볼 수 없는 Systolic array라는 특별한 유닛을 사용합니다.
+TPU에서는 이 행렬 곱셈을 효율적으로 실행할 수 있도록 일반적인 프로세서(CPU)에서는 볼 수 없는 Systolic array라는 특별한 유닛을 사용합니다. "Systolic"은 심장의 수축 운동인 '수축기(systole)'에서 유래한 단어입니다. 마치 심장이 규칙적으로 박동하며 혈액을 신체의 각 부분으로 보내는 것처럼, 배열 구조 내에서 데이터가 연산 유닛 사이를 리듬감 있고 규칙적으로 이동하며 연산이 수행되는 모습에서 착안된 이름입니다. Systolic array는 데이터 흐름을 최적화하고 병렬 처리를 극대화하여 행렬 곱셈과 같은 대규모 연산에 효율적입니다. Systolic array가 행렬곱셈을 진행하는 과정을 애니메이션으로 나타내보면 아래와 같습니다.
 
-Systolic array의 효과를 설명을 위해 이를 위해 일반적인 프로세서의 연산 방식과 TPU의 systolic array를 사용한 연산 방식을 비교해보겠습니다.
+![Systolic array visualization](systolic_array.gif)
+다음으로는 Systolic array의 효과를 더 구체적으로 설명하기 위해 일반적인 프로세서의 연산 방식과 TPU의 systolic array를 사용한 연산 방식을 비교해보겠습니다.
 
 ![CPU VS TPU](cpuvstpu.webp)
 
 일반적인 프로세서에서 덧셈이나 곱셈과 같은 산술 연산을 수행하는 과정은 아래와 같습니다.
 
-① register에 데이터를 로드
-
-② 컨트롤러에서 ALU(Arithmetic Logic Unit)에 명령을 전송
-
-③ ALU가 register에서 데이터를 읽어가서 연산을 수행한 후 결과값을 register에 다시 씀
+1. register에 데이터를 로드  
+2. 컨트롤러에서 ALU(Arithmetic Logic Unit)에 명령을 전송  
+3. ALU가 register에서 데이터를 읽어가서 연산을 수행한 후 결과값을 register에 다시 씀
 
 즉, ALU가 개별 연산을 수행할 때마다 register에 데이터를 읽고 수행하는 과정이 필요한 것입니다. AI 연산에서 사용되는 대규모 행렬연산은 일반적인 연산보다 월등히 많은 연산량을 필요로 합니다. 때문에 이 과정을 생략할 수 있다면 
 
-① 필요한 register의 용량을 줄임으로써 면적 효율을 증대시키고
-
-② register ↔ ALU간 데이터 이동횟수를 줄임으로써 전력 소모를 줄일 수 있을 것입니다.
+1. 필요한 register의 용량을 줄임으로써 면적 효율을 증대시키고  
+2. register ↔ ALU간 데이터 이동횟수를 줄임으로써 전력 소모를 줄일 수 있을 것입니다.
 
 Systolic array는 이 과정을 생략할 수 있는 대안 중 하나인데요. 개별 ALU에서 연산된 결과를 register에 저장하는 것이 아니라 다른 ALU로 넘겨주는 것입니다. 이를 통해 앞서 말한 효과를 얻을 수 있는 것이죠.
 
 하지만 Systolic array를 효과적으로 사용하기 위해서는 몇가지 조건을 충족해야 합니다. 
 
-① ALU → ALU 간에 데이터를 넘겨주는 타이밍을 정확히 맞춰줘야 하고
+1. ALU → ALU 간에 데이터를 넘겨주는 타이밍을 정확히 맞춰줘야 하고  
+2. 개별 ALU에서 연산된 결과가 다음 ALU에서 사용되어야 하는 보장이 필요합니다.
 
-② 개별 ALU에서 연산된 결과가 다음 ALU에서 사용되어야 하는 보장이 필요합니다.
-
-첫번째 조건은 하드웨어적으로 적절히 조절한다 치더라고, 두번째 조건은 연산 자체의 특성이 이를 만족해야 합니다. 흥미롭게도 행렬 곱셈이 이 조건을 만족하기 때문에 Systolic array를 가장 효율적으로 사용할 수 있습니다.
+첫번째 조건은 하드웨어적으로 적절히 조절한다 치더라고, 두번째 조건은 연산 자체의 특성이 이를 만족해야 합니다. 행렬 곱셈은 이 두번째 조건을 만족하기 때문에 Systolic array를 가장 효율적으로 사용할 수 있습니다.
 
 ![Matrix Multiplication](matmul_math.jpg)
 
 행렬 곱셈을 작은 단위로 분해하면 여러 개의 벡터 내적으로 나타낼 수 있습니다. 벡터 내적은 개별 element의 곱셈결과의 누산값인데요. 개별 ALU에 입력으로 들어가는 element들의 타이밍을 정확하게 맞춰주고 element의 곱셈 값을 다음 ALU로 넘기면서 순차적으로 누산하게 되면 register와의 통신 없이 행렬 곱셈을 수행할 수 있게 됩니다. 
-
-이를 애니메이션으로 나타내보면 아래와 같습니다.
-
-![Systolic array visualization](systolic_array.gif)
 
 이러한 Systolic array는 TPU에서 사용한 대표적인 특징으로 AI 연산을 수행하는 GPU나 다른 AI 가속기(NPU, LPU) 아키텍쳐에도 큰 영향을 미치게 됩니다.
 
@@ -115,7 +103,7 @@ TensorCore는 Systolic array와 DMA(Direct Memory Access) 유닛 등을 통해 �
 
 ![SparseCore diagram](sparsecore.webp)
 
-Sparse core는 4세대 TPU부터 적용된 core 아키텍쳐입니다. Sparse core는  AI에서 행렬 연산 이외에 사용되는 연산 중 하나인 **임베딩 연산**에 특화된 유닛입니다. LLM 등에서 사용하는 임베딩 연산은 테이블 크기가 비교적 작기 때문에 연산 오버헤드가 과하지 않지만,  DLRM(Deep Learning Recommendation Model)과 같은 추천 시스템에서는 임베딩 테이블 크기가 전체 파라미터의 대부분에 달할 정도로 오버헤드가 크기 때문에 임베딩 연산에서 연산 병목이 발생할 확률이 매우 높습니다. 
+SparseCore는 4세대 TPU부터 적용된 core 아키텍쳐입니다. SparseCore는  AI에서 행렬 연산 이외에 사용되는 연산 중 하나인 **임베딩 연산**에 특화된 유닛입니다. LLM 등에서 사용하는 임베딩 연산은 테이블 크기가 비교적 작기 때문에 연산 오버헤드가 과하지 않지만,  DLRM(Deep Learning Recommendation Model)과 같은 추천 시스템에서는 임베딩 테이블 크기가 전체 파라미터의 대부분에 달할 정도로 오버헤드가 크기 때문에 임베딩 연산에서 연산 병목이 발생할 확률이 매우 높습니다. 
 
 TPU에서 SparseCore가 차지하는 비중은 (4세대 기준) 5%정도로 Tensor core에 비해 작지만, 이 유닛으로 기존 대비 5~7배의 성능 향상을 이루어냈습니다. 세대에 따라 다르지만 칩별로 2개 혹은 4개의 SparseCore가 탑재됩니다.
 
@@ -147,16 +135,14 @@ TPU는 칩별로 1~2개의 적은 수의 거대한 코어로 연산을 수행합
 
 ![TensorFlow](tensorflow.png)
 
-지난 포스팅에서 GPU는 CUDA라는 프로그래밍 모델로 제어할 수 있다고 말씀드린 바가 있는데요. 구글은 TPU를 컨트롤하기 위해 **TensorFlow**라는 소프트웨어 프레임워크를 개발했습니다.
-
-
-CUDA와는 달리 개발자 입장에서 하드웨어 관련 정보 없이 코드만 짜도 TPU에서 바로 코드를 돌릴 수 있는 것이 특징입니다. ML에서 많이 사용되는 pytorch와 비슷한 방식이라고 이해하시면 좋습니다. 이는 CUDA와 같은 소프트웨어 생태계를 구축하기 위한 구글의 전략이었습니다. 구글은 생태계 확장을 위해 동일한 TensorFlow 소스코드를 사용하더라도 CPU, GPU, TPU 등 다양한 하드웨어 플랫폼에서 동작하고 모바일 기기부터 대규모 분산 시스템까지 어디에나 배포할 수 수 있도록 강력한 유연성을 제공했습니다. 이로 인해 산업/배포용으로는 **TensorFlow**가 강력한 도구로 자리잡게 되었습니다. 하지만 하드웨어에 대한 정밀한 제어가 어렵다보니 최적화 입장에서 한계가 있습니다.  
+지난 포스팅에서 GPU는 CUDA라는 프로그래밍 모델로 제어할 수 있다고 말씀드린 바가 있는데요. 구글은 CUDA와 같은 kernel language를 개발하는 대신, GPU와 TPU 상관없이 사용할 수 있는 **TensorFlow**라는 딥러닝 프레임워크를 개발해왔습니다.
+TensorFlow와 PyTorch와 같은 프레임워크의 특징은, CUDA와 달리 개발자가 하드웨어의 세부 구조를 이해하지 않아도 동일한 코드로 GPU와 TPU 같은 다양한 가속기에서 바로 실행할 수 있다는 점입니다. 구글은 생태계 확장을 위해 동일한 TensorFlow 소스코드를 사용하더라도 CPU, GPU, TPU 등 다양한 하드웨어 플랫폼에서 동작하고 모바일 기기부터 대규모 분산 시스템까지 어디에나 배포할 수 있도록 강력한 유연성을 제공했습니다. 이로 인해 산업/배포용으로는 **TensorFlow**가 강력한 도구로 자리잡게 되었습니다. 하지만 하드웨어에 대한 정밀한 제어가 어렵다보니 최적화 입장에서 한계가 있습니다.  
 
 ### JAX
 
 ![JAX](jax.png)
 
-하지만 TPU 하드웨어를 소프트웨어 단에서 최적화 할 수 있는 방법이 없는 것은 아닙니다. JAX라는 python library를 활용하면 가능한데요. 이는 TPU를 적극적으로 활용하는 구글 내부 개발자들이 TPU를 보다 더 효율적으로 사용하기 위해 개발한 python library입니다. TPU에서는 직후에 설명할 머신러닝 가속형 컴파일러인 XLA를 사용할 수 있는데요. JAX는 이 XLA를 소프트웨어 개발자들이 사용하기 위해 만들어진 일종의 python interface입니다. GPU/TPU 구분 없이 사용가능하기 때문에 구글 AI 팀에서는 연구와 모델 학습에 적극적으로 이를 활용하고 있지만, 소프트웨어 레벨에서 연산 최적화를 진행해야 하기 때문에 진입장벽이 다소 높다는 것이 특징입니다.
+하지만 TPU 하드웨어를 소프트웨어 단에서 최적화 할 수 있는 방법이 없는 것은 아닙니다. JAX라는 python library를 활용하면 가능한데요. 이는 TPU를 적극적으로 활용하는 구글 내부 개발자들이 TPU를 보다 더 효율적으로 사용하기 위해 개발한 python library입니다. TPU에서는 직후에 설명할 머신러닝 가속형 컴파일러인 XLA를 사용할 수 있는데요. XLA는 TensorFlow와 JAX 모두에서 사용할 수 있는 컴파일러입니다. JAX는 이 XLA를 소프트웨어 개발자들이 더 직접적이고 유연하게 활용할 수 있도록 만들어진 일종의 python interface입니다. GPU/TPU 구분 없이 사용가능하며, 함수형 프로그래밍 패러다임과 자동 미분 기능을 제공하여 연구와 실험에 더 적합한 설계를 가지고 있습니다. 구글 AI 팀에서는 연구와 모델 학습에 적극적으로 이를 활용하고 있지만, 소프트웨어 레벨에서 연산 최적화를 진행해야 하기 때문에 진입장벽이 다소 높다는 것이 특징입니다.
 
 ### XLA(Accelerated Linear Algebra)
 
@@ -164,13 +150,12 @@ CUDA와는 달리 개발자 입장에서 하드웨어 관련 정보 없이 코�
 
 구글은 앞서 설명한 TensorFlow의 한계를 극복하고 머신러닝에서 TensorFlow의 성능을 한단계 더 향상시키기 위한 방법을 고민하게 됩니다. 구글에게는 크게 두가지 방향의 선택지가 있었을 것으로 생각됩니다.
 
-① CUDA와 비슷하게 하드웨어를 직접적으로 제어할 수 있는 별도의 low-level 언어(가령, TPU-C)를 만들고, 최적화된 커널을 만들어 TensorFlow와 같은 high-level language에서 해당 커널을 호출
+1. CUDA와 비슷하게 하드웨어를 직접적으로 제어할 수 있는 별도의 low-level 언어(가령, TPU-C)를 만들고, 최적화된 커널을 만들어 TensorFlow와 같은 high-level language에서 해당 커널을 호출  
+2. 머신러닝에 특화된 컴파일러를 사용하여 컴파일러가 해당 하드웨어에 최적화된 기계어를 생성
 
-② 머신러닝에 특화된 컴파일러를 사용하여 컴파일러가 해당 하드웨어에 최적화된 기계어를 생성
+전자의 방식은 개발자들이 직접 하드웨어를 제어할 수 있기 때문에 높은 자유도를 가집니다. 아울러 하드웨어에 새로운 기능이 추가되거나 새로운 알고리즘(FlashAttention, Mixture-of-Expert(MoE))이 개발될 때마다 개발자들은 최적화를 위해 새로운 CUDA kernel을 짜게 됩니다. 최적화의 요구는 항상 존재하며, 그럴때 마다 CUDA 생태계는 확장됩니다. 이는 다른 하드웨어 회사들의 시장진입을 어렵게 하는 CUDA 생태계의 거대한 기술적 해자로 작용하고 있습니다. 
 
-전자의 방식은 개발자들이 직접 하드웨어를 제어할 수 있어 자유도는 높지만, 소프트웨어 개발자들이 하드웨어를 직접 이해해야 할 뿐만 아니라, 하드웨어에 새로운 기능이 추가될 때마다 새로운 커널을 개발해야 하는 상당한 기술 부채를 유발하기도 합니다. 이는 CUDA 생태계의 거대한 기술적 해자로 작용하고 있기도 합니다. 
-
-머신러닝 연산의 핵심이 되는 선형 대수 연산에 특화된 **XLA** 컴파일러를 만드는 후자의 방식을 선택해왔습니다. 새로운 언어를 배워야 하는 개발자들의 짐을 컴파일러에게 넘겨줬다고 볼 수 있는 것이죠. AI 연산 중 일부를 통해 XLA 컴파일러의 연산 최적화 방식에 대해 알아보겠습니다.
+구글은 머신러닝 연산의 핵심이 되는 선형 대수 연산에 특화된 **XLA** 컴파일러를 만드는 후자의 방식을 선택해왔습니다. CUDA 생태계에 전면적으로 도전하는 것은 우회했지만, 어떻게 보면 새로운 언어를 배워야 하는 개발자들의 짐을 컴파일러에게 넘겨줬다고 볼 수 있습니다. AI 연산 중 일부를 통해 XLA 컴파일러의 연산 최적화 방식에 대해 알아보겠습니다.
 
 (* 본 설명은 XLA 컴파일러의 최적 방식을 설명하기 위한 예시로 실제 동작과 일치하지 않습니다.)
 
@@ -203,11 +188,11 @@ def softmax_op(a):
 
 GPU에서도 kernel fusion을 통해 여러 개의 연산 kernel을 통합할 수 있습니다. GPU에서는 통합된 CUDA kernel 수동으로 만드는 방법과 PyTorch나 TensorRT 내부 기능을 이용하여 커널을 자동으로 융합시키는 두가지 방법이 있다면, XLA는 컴파일 단계에서 개별 operation을 분석하여 각 하드웨어(CPU/GPU/TPU)에 최적화된 기계어를 만들어낸다는 것에서 차이가 있습니다. 
 
-XLA는 TensorFlow와 JAX에서 지원되다가 최근에는 PyTorch에서도 pytorch/xla를 통해 XLA를 사용할 수 있도록 지원되면서 그 저변을 확대하고 있습니다.  
+XLA는 TensorFlow와 JAX에서 지원되다가 최근에는 PyTorch에서도 `pytorch/xla`를 통해 XLA를 사용할 수 있도록 지원되면서 그 저변을 확대하고 있습니다.  
 
 ### Pallas
 
-XLA는 강력한 최적화 컴파일러로 동작하지만 한계도 존재합니다. 새로운 연산 알고리즘 (FlashAttention, Mixture-of-Expert 등)이 등장할 경우 컴파일러가 이를 최적화할 수 있는 버전으로 업데이트 되기 전까지 수동으로 생성한 custom kernel의 성능을 따라잡기 힘들다는 것입니다.
+XLA는 강력한 최적화 컴파일러로 동작하지만 한계도 존재합니다. 새로운 연산 알고리즘이 등장할 경우 컴파일러가 이를 최적화할 수 있는 버전으로 업데이트 되기 전까지 수동으로 생성한 custom kernel의 성능을 따라잡기 힘들다는 것입니다.
 
 이를 위해 구글은 2023년 무렵부터 JAX의 실험적인 확장 기능으로 **Pallas**(`jax.experimental.pallas`)라는 kernel language API를 제공해왔습니다. 이는 앞서 언급한 성능 향상을 위한 두가지 방법 중 첫번째 방법에 해당합니다. Pallas는 2021년 탄생한 GPU용 고수준 kernel language인 Triton과 비교해볼 수 있습니다.
 
@@ -225,13 +210,19 @@ JAX에서도 Triton 언어를 사용할 수 있도록 통합이 진행되었지�
 
 **chiplet architecture**
 
-![ironwood hardware architecture](ironwood_diagram.webp)
+![Ironwood hardware architecture](Ironwood_diagram.webp)
 
-Ironwood는 TPU 아키텍쳐 중 최초로 chiplet 구조를 채택하였습니다. chiplet 구조는 레티클 한계라고 불리는 반도체 제조 공정의 한계를 극복하기 위해 도입된 공정 기술입니다. 개별 die 사이즈가 일정 수준(858mm^2)을 넘어가게 되면 불량률이 급격히 상승하여 제조 비용이 증가하기 때문에 기존 칩들은 프로세서 영역(메모리 이외의 영역)이 이 크기를 넘어가지 않도록 제작되었습니다. 하지만 데이터센터에서 사용되는 칩들의 수요 스펙이 증가하게 되면서 더 큰 칩들이 필요하게 되었고, 단일 칩 사이즈를 키우는 대신 이를 동일한 구조의 칩으로 여러개로 쪼개어서 만든 뒤 패키징 단계에서 이를 연결하는 chiplet 구조가 도입되었습니다. 이렇게 되면 개별 칩의 크기를 키울 수 있게 되면서 개별 제품들의 성능이 증가할 수 있습니다.
+Ironwood는 TPU 아키텍쳐 중 최초로 chiplet 구조를 채택하였습니다. chiplet 구조는 레티클 한계라고 불리는 반도체 제조 공정의 한계를 극복하기 위해 도입된 공정 기술입니다. 
 
-Nvidia GPU는 2024년에 출시한 Blackwell 아키텍쳐인 B100/B200 제품군부터 이 기술을 도입하였고 데이터센터향 가속기를 만드는 다른 가속기 회사들도 이 구조를 도입하고 있습니다. TPU는 이번세대 제품군부터 chiplet 구조를 적용하였고, 이로 인해 이전 제품군 단일 제품 성능이 월등히 높은 것을 볼 수 있습니다.
+![reticle limit](reticle_limit.png)
 
-![ironwood spec](ironwood_spec.webp)
+> 레티클 한계: 반도체 업계 표준으로 고정되어 사용하는 포토마스크(reticle)의 크기 회로를 그릴 때 사용되는 노광기의 렌즈의 축소 배율로 인해 단일 노광으로 찍어낼 수 있는 개별 다이의 크기를 레티클 한계라고 부릅니다. 이 한계 (현재는 약 858mm²)을 넘어가게 되면 단일 노광이 불가능하기 때문에 불량률이 급격히 상승하여 제조 비용이 증가합니다. 이런 경제적인 이유로 기존 칩들은 프로세서 영역(메모리 이외의 영역)이 이 크기를 넘어가지 않도록 제작되었습니다.
+
+하지만 데이터센터에서 사용되는 칩들의 수요 스펙이 증가하게 되면서 더 큰 칩들이 필요하게 되었고, 단일 칩 사이즈를 키우는 대신 이를 동일한 구조의 칩으로 여러개로 쪼개어서 만든 뒤 패키징 단계에서 이를 연결하는 chiplet 구조가 도입되었습니다. 이렇게 되면 개별 칩의 크기를 키울 수 있게 되면서 개별 제품들의 성능이 증가할 수 있습니다.
+
+Nvidia GPU는 2024년에 출시한 Blackwell 아키텍쳐인 B100/B200 제품군부터 이 기술을 도입하였고 데이터센터향 가속기를 만드는 다른 가속기 회사들도 이 구조를 도입하고 있습니다. TPU는 이번세대 제품군부터 chiplet 구조를 적용하였고, 이로 인해 이전 제품군 단일 제품 성능(peak Compute, memory bandwidth 등)이 월등히 높은 것을 볼 수 있습니다.
+
+![Ironwood spec](Ironwood_spec.png)
 
 이 chiplet 구조에서 2개의 개별 die는 이전 제품의 개별 chip 이상의 성능을 보이기 때문에 Ironwood에서는 개별 die를 torus topology의 하나의 node로 보고 개별 제어가 가능하도록 합니다. 이를 위해 3D torus에서 축을 하나 더 추가한 4D torus topology를 도입하였습니다. 
 
@@ -275,7 +266,7 @@ JAX 공식문서에는 아직 pallas가 experimental 기능으로 기술되어 �
 
 1. TPU의 등장 배경
 2. TPU의 하드웨어/소프트웨어 아키텍쳐 
-3. 최신 TPU 제품인 ironwood의 특징
+3. 최신 TPU 제품인 Ironwood의 특징
 4. 구글의 반도체 시장 전략에 대해 알아보았습니다.
 
 이를 통해 내릴 수 있는 결론을 요약하면 아래와 같습니다.
@@ -286,13 +277,13 @@ JAX 공식문서에는 아직 pallas가 experimental 기능으로 기술되어 �
 
 ---
 
-그런데, 최초 TPU 프로젝트에 참여했던 인원이 또다른 **반도체 스타트업**을 설립했다는 사실, 알고 계셨나요? 얼마 전 엔비디아와 한화 약 30조원 규모의 계약을 체결한 AI 반도체 스타트업 **Groq**이 바로 그 주인공인데요. 엔비디아가 어마어마한 규모의 돈을 주고 구매한 Groq의 기술은 무엇일까요? 다음 글에서는 저희와 같은 용어를 사용하는 **Groq의 LPU**에 대해 알아보겠습니다. 
+그런데, 최초 TPU 프로젝트에 참여했던 인원이 또다른 **반도체 스타트업**을 설립했었다는 사실, 알고 계셨나요? 얼마 전 엔비디아와 한화 약 30조원 규모의 계약을 체결한 AI 반도체 스타트업 **Groq**이 바로 그 주인공인데요. 엔비디아가 어마어마한 규모의 돈을 주고 구매한 Groq의 기술은 무엇일까요? 다음 글에서는 저희와 같은 용어를 사용하는 **Groq의 LPU**에 대해 알아보겠습니다. 
 
 ## Reference
 
 - [An in-depth look at Google’s first Tensor Processing Unit (TPU)](https://cloud.google.com/blog/products/ai-machine-learning/an-in-depth-look-at-googles-first-tensor-processing-unit-tpu?hl=en)
-- [From silicon to softmax: Inside the Ironwood AI stack](https://cloud.google.com/blog/products/compute/inside-the-ironwood-tpu-codesigned-ai-stack?hl=en)
-- [Announcing Ironwood TPUs General Availability and new Axion VMs to power the age of inference](https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads?hl=en)
+- [From silicon to softmax: Inside the Ironwood AI stack](https://cloud.google.com/blog/products/compute/inside-the-Ironwood-tpu-codesigned-ai-stack?hl=en)
+- [Announcing Ironwood TPUs General Availability and new Axion VMs to power the age of inference](https://cloud.google.com/blog/products/compute/Ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads?hl=en)
 - [In-Datacenter Performance Analysis of a Tensor Processing Unit](https://arxiv.org/pdf/1704.04760)
 - [TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with Hardware Support for Embeddings](https://arxiv.org/pdf/2304.01433)
 

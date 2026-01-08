@@ -19,7 +19,7 @@ keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI Accelerator", "TensorFlow", "JAX"
 ]
 ---
-
+# Know Your Enemy, Know Yourself, Part 2 : TPU Emergence and Rise
 >**Know Your Enemy, Know Yourself**
 
 This means that if you know your enemy and know yourself, you will not be imperiled in a hundred battles.
@@ -58,43 +58,41 @@ Now let's examine the TPU architecture in detail.
 
 ### Systolic Array
 
-As mentioned earlier, TPU was designed specifically for AI operations. The biggest characteristic of AI operations is performing large-scale matrix multiplication. This is a common feature seen in the process of using artificial neural network weights and computing other values during training and inference, regardless of model type (CNN, RNN, Transformer). TPU uses a special unit called Systolic array, which cannot be found in general processors (CPUs), to efficiently execute this matrix multiplication.
+As mentioned earlier, TPU was designed specifically for AI operations. The biggest characteristic of AI operations is performing large-scale matrix multiplication. This is a common feature seen in the process of using artificial neural network weights and computing other values during training and inference, regardless of model type (CNN, RNN, Transformer).
 
-To explain the effectiveness of Systolic array, let's compare the operation method of general processors with TPU's systolic array operation method.
+![Matrix Multiplication](matmul.webp)
+
+TPU uses a special unit called Systolic array, which cannot be found in general processors (CPUs), to efficiently execute this matrix multiplication. The term "Systolic" is derived from "systole," the contraction phase of the heart. Just as the heart rhythmically beats and sends blood to various parts of the body, data moves rhythmically and regularly between computational units within the array structure, performing operations - hence the name. Systolic array optimizes data flow and maximizes parallel processing, making it efficient for large-scale operations like matrix multiplication. The process of Systolic array performing matrix multiplication can be visualized as an animation below.
+
+![Systolic array visualization](systolic_array.gif)
+
+Next, to explain the effectiveness of Systolic array in more detail, let's compare the operation method of general processors with TPU's systolic array operation method.
 
 ![CPU VS TPU](cpuvstpu.webp)
 
 The process of performing arithmetic operations such as addition or multiplication in a general processor is as follows:
 
-① Load data into register
-
-② Controller sends commands to ALU (Arithmetic Logic Unit)
-
-③ ALU reads data from register, performs operation, and writes result back to register
+1. Load data into register
+2. Controller sends commands to ALU (Arithmetic Logic Unit)
+3. ALU reads data from register, performs operation, and writes result back to register
 
 In other words, every time an ALU performs an individual operation, it needs to read data from and write to registers. Large-scale matrix operations used in AI require significantly more computation than general operations. If we could eliminate this process:
 
-① We could increase area efficiency by reducing required register capacity
-
-② We could reduce power consumption by decreasing data movement between register ↔ ALU
+1. We could increase area efficiency by reducing required register capacity
+2. We could reduce power consumption by decreasing data movement between register ↔ ALU
 
 Systolic array is one alternative that can eliminate this process. Instead of storing the results computed by individual ALUs in registers, it passes them to other ALUs. This achieves the effects mentioned above.
 
 However, to effectively use Systolic array, several conditions must be met:
 
-① The timing for passing data between ALU → ALU must be precisely synchronized
-
-② It must be guaranteed that results computed by individual ALUs are used in the next ALU
+1. The timing for passing data between ALU → ALU must be precisely synchronized
+2. It must be guaranteed that results computed by individual ALUs are used in the next ALU
 
 While the first condition can be controlled appropriately at the hardware level, the second condition must be satisfied by the nature of the operation itself. Interestingly, matrix multiplication satisfies this condition, making Systolic array the most efficient for this purpose.
 
 ![Matrix Multiplication](matmul_math.jpg)
 
 Matrix multiplication can be decomposed into multiple vector dot products. A vector dot product is the accumulated sum of individual element multiplications. By precisely synchronizing the timing of elements entering individual ALUs as input and passing the multiplication values to the next ALU while sequentially accumulating, matrix multiplication can be performed without communication with registers.
-
-This can be visualized as an animation below.
-
-![Systolic array visualization](systolic_array.gif)
 
 This Systolic array is a representative feature used in TPU and has had a significant impact on GPUs and other AI accelerators (NPU, LPU) that perform AI operations.
 
@@ -144,15 +142,15 @@ Next, let's examine the software used in TPU.
 
 ![TensorFlow](tensorflow.png)
 
-As mentioned in the previous post, GPUs can be controlled through CUDA, a programming model. Google developed a software framework called **TensorFlow** to control TPU.
+As mentioned in the previous post, GPUs can be controlled through CUDA, a programming model. Instead of developing a kernel language like CUDA, Google developed a deep learning framework called **TensorFlow** that can be used regardless of GPU or TPU.
 
-Unlike CUDA, developers can write code and run it directly on TPU without hardware-related information. It's similar to PyTorch, which is widely used in ML. This was Google's strategy to build a software ecosystem similar to CUDA. Google provided strong flexibility so that the same TensorFlow source code could run on various hardware platforms (CPU, GPU, TPU) and be deployed anywhere from mobile devices to large-scale distributed systems for ecosystem expansion. This made **TensorFlow** a powerful tool for industry/deployment. However, precise hardware control is difficult, so there are limitations from an optimization perspective.
+The characteristic of frameworks like TensorFlow and PyTorch is that, unlike CUDA, developers can execute the same code on various accelerators like GPU and TPU immediately without understanding the detailed structure of the hardware. Google provided strong flexibility so that the same TensorFlow source code could run on various hardware platforms (CPU, GPU, TPU) and be deployed anywhere from mobile devices to large-scale distributed systems for ecosystem expansion. This made **TensorFlow** a powerful tool for industry/deployment. However, precise hardware control is difficult, so there are limitations from an optimization perspective.
 
 ### JAX
 
 ![JAX](jax.png)
 
-However, there is a way to optimize TPU hardware at the software level. This is possible using JAX, a Python library. This is a Python library developed by Google internal developers who actively use TPU to use TPU more efficiently. TPU can use XLA, a machine learning acceleration compiler that will be explained shortly. JAX is a kind of Python interface created for software developers to use this XLA. It can be used regardless of GPU/TPU, so Google's AI team actively uses it for research and model training, but it has a somewhat high barrier to entry because operations must be optimized at the software level.
+However, there is a way to optimize TPU hardware at the software level. This is possible using JAX, a Python library. This is a Python library developed by Google internal developers who actively use TPU to use TPU more efficiently. TPU can use XLA, a machine learning acceleration compiler that will be explained shortly. XLA is a compiler that can be used in both TensorFlow and JAX. JAX is a kind of Python interface created for software developers to use this XLA more directly and flexibly. It can be used regardless of GPU/TPU, and provides functional programming paradigms and automatic differentiation capabilities, making it more suitable for research and experimentation. Google's AI team actively uses it for research and model training, but it has a somewhat high barrier to entry because operations must be optimized at the software level.
 
 ### XLA (Accelerated Linear Algebra)
 
@@ -160,13 +158,12 @@ However, there is a way to optimize TPU hardware at the software level. This is 
 
 Google began to consider ways to overcome the limitations of TensorFlow mentioned earlier and further improve TensorFlow's performance in machine learning. Google likely had two main directions to choose from:
 
-① Create a separate low-level language (e.g., TPU-C) that can directly control hardware similar to CUDA, and create optimized kernels that can be called from high-level languages like TensorFlow
+1. Create a separate low-level language (e.g., TPU-C) that can directly control hardware similar to CUDA, and create optimized kernels that can be called from high-level languages like TensorFlow
+2. Use a compiler specialized for machine learning to generate machine code optimized for that hardware
 
-② Use a compiler specialized for machine learning to generate machine code optimized for that hardware
+The former approach gives developers direct hardware control, providing high freedom. Additionally, whenever new features are added to hardware or new algorithms (FlashAttention, Mixture-of-Expert (MoE)) are developed, developers must write new CUDA kernels for optimization. The demand for optimization always exists, and each time, the CUDA ecosystem expands. This acts as a huge technical moat in the CUDA ecosystem that makes it difficult for other hardware companies to enter the market.
 
-The former approach gives developers direct hardware control with high freedom, but software developers must understand hardware directly, and it creates significant technical debt as new kernels must be developed whenever new features are added to hardware. This also acts as a huge technical moat in the CUDA ecosystem.
-
-Google chose the latter approach, creating the **XLA** compiler specialized for linear algebra operations, which are central to machine learning operations. You could say they shifted the burden of developers having to learn new languages to the compiler. Let's examine how the XLA compiler optimizes operations through some AI operations.
+Google chose the latter approach, creating the **XLA** compiler specialized for linear algebra operations, which are central to machine learning operations. While they avoided directly challenging the CUDA ecosystem, you could say they shifted the burden of developers having to learn new languages to the compiler. Let's examine how the XLA compiler optimizes operations through some AI operations.
 
 (* This explanation is an example to illustrate the optimal approach of the XLA compiler and does not match actual operation.)
 
@@ -199,11 +196,11 @@ Simply executing the above 3 functions sequentially requires writing intermediat
 
 GPUs can also integrate multiple operation kernels through kernel fusion. While GPUs have two methods - manually creating integrated CUDA kernels and automatically fusing kernels using PyTorch or TensorRT internal features - XLA differs in that it analyzes individual operations at compile time and generates machine code optimized for each hardware (CPU/GPU/TPU).
 
-XLA was supported in TensorFlow and JAX, and recently its base has expanded as PyTorch also supports XLA through pytorch/xla.
+XLA was supported in TensorFlow and JAX, and recently its base has expanded as PyTorch also supports XLA through `pytorch/xla`.
 
 ### Pallas
 
-XLA is a powerful optimization compiler, but it has limitations. When new operation algorithms (FlashAttention, Mixture-of-Expert, etc.) emerge, it's difficult for manually created custom kernels to match performance until the compiler is updated to a version that can optimize them.
+XLA is a powerful optimization compiler, but it has limitations. When new operation algorithms emerge, it's difficult for manually created custom kernels to match performance until the compiler is updated to a version that can optimize them.
 
 To address this, Google has been providing a kernel language API called **Pallas** (`jax.experimental.pallas`) as an experimental extension of JAX since around 2023. This corresponds to the first of the two methods mentioned earlier for performance improvement. Pallas can be compared to Triton, a high-level kernel language for GPUs born in 2021.
 
@@ -221,13 +218,19 @@ After the 4th generation TPU, there isn't much detailed technical documentation,
 
 **Chiplet Architecture**
 
-![ironwood hardware architecture](ironwood_diagram.webp)
+![Ironwood hardware architecture](Ironwood_diagram.webp)
 
-Ironwood is the first TPU architecture to adopt chiplet structure. Chiplet structure is a process technology introduced to overcome the limitations of semiconductor manufacturing processes called the reticle limit. When individual die sizes exceed a certain level (858mm²), defect rates increase rapidly, increasing manufacturing costs, so existing chips were manufactured so that the processor area (area other than memory) did not exceed this size. However, as the demand specifications for chips used in data centers increased, larger chips became necessary, and instead of increasing single chip size, chiplet structure was introduced, where chips are split into multiple chips of the same structure and connected at the packaging stage. This allows individual chip sizes to increase, enabling individual product performance to increase.
+Ironwood is the first TPU architecture to adopt chiplet structure. Chiplet structure is a process technology introduced to overcome the limitations of semiconductor manufacturing processes called the reticle limit.
 
-NVIDIA GPUs introduced this technology starting with the Blackwell architecture B100/B200 product line released in 2024, and other accelerator companies making data center accelerators are also adopting this structure. TPU applied chiplet structure starting with this generation's product line, and we can see that single product performance is significantly higher than previous generations.
+![reticle limit](reticle_limit.png)
 
-![ironwood spec](ironwood_spec.webp)
+> **Reticle Limit**: The reticle limit refers to the maximum size of an individual die that can be produced in a single exposure, determined by the reduction ratio of the lens in the lithography equipment used to draw circuits on the photomask (reticle), which is standardized and fixed in the semiconductor industry. When this limit (currently approximately 858mm²) is exceeded, single exposure becomes impossible, causing defect rates to increase rapidly and manufacturing costs to rise. For these economic reasons, existing chips were manufactured so that the processor area (area other than memory) did not exceed this size.
+
+However, as the demand specifications for chips used in data centers increased, larger chips became necessary, and instead of increasing single chip size, chiplet structure was introduced, where chips are split into multiple chips of the same structure and connected at the packaging stage. This allows individual chip sizes to increase, enabling individual product performance to increase.
+
+NVIDIA GPUs introduced this technology starting with the Blackwell architecture B100/B200 product line released in 2024, and other accelerator companies making data center accelerators are also adopting this structure. TPU applied chiplet structure starting with this generation's product line, and we can see that single product performance (peak compute, memory bandwidth, etc.) is significantly higher than previous generations.
+
+![Ironwood spec](Ironwood_spec.png)
 
 In this chiplet structure, since 2 individual dies show performance beyond individual chips of previous products, Ironwood treats individual dies as one node in torus topology, enabling individual control. For this, 4D torus topology was introduced by adding one more axis to 3D torus.
 
@@ -280,13 +283,13 @@ The conclusions we can draw from this are summarized below:
 
 ...
 
-Did you know that members who participated in the original TPU project founded another **semiconductor startup**? **Groq**, an AI semiconductor startup that recently signed a contract worth approximately $20 billion (30 trillion KRW) with NVIDIA, is that company. What technology did NVIDIA pay such an enormous amount for? In the next article, we'll explore **Groq's LPU**, which uses the same terminology as us.
+Did you know that members who participated in the original TPU project had founded another **semiconductor startup**? **Groq**, an AI semiconductor startup that recently signed a contract worth approximately $20 billion (30 trillion KRW) with NVIDIA, is that company. What technology did NVIDIA pay such an enormous amount for? In the next article, we'll explore **Groq's LPU**, which uses the same terminology as us.
 
 ## Reference
 
 - [An in-depth look at Google's first Tensor Processing Unit (TPU)](https://cloud.google.com/blog/products/ai-machine-learning/an-in-depth-look-at-googles-first-tensor-processing-unit-tpu?hl=en)
-- [From silicon to softmax: Inside the Ironwood AI stack](https://cloud.google.com/blog/products/compute/inside-the-ironwood-tpu-codesigned-ai-stack?hl=en)
-- [Announcing Ironwood TPUs General Availability and new Axion VMs to power the age of inference](https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads?hl=en)
+- [From silicon to softmax: Inside the Ironwood AI stack](https://cloud.google.com/blog/products/compute/inside-the-Ironwood-tpu-codesigned-ai-stack?hl=en)
+- [Announcing Ironwood TPUs General Availability and new Axion VMs to power the age of inference](https://cloud.google.com/blog/products/compute/Ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads?hl=en)
 - [In-Datacenter Performance Analysis of a Tensor Processing Unit](https://arxiv.org/pdf/1704.04760)
 - [TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with Hardware Support for Embeddings](https://arxiv.org/pdf/2304.01433)
 
