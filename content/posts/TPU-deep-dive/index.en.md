@@ -20,12 +20,11 @@ keywords: [
 ]
 ---
 # Know Your Enemy, Know Yourself, Part 2 : TPU Emergence and Rise
->**Know Your Enemy, Know Yourself**
+[Know Your Enemy, Know Yourself, Part 1: GPU History and Fundamentals](https://hyper-accel.github.io/en/posts/how-gpu-works/)
 
-This means that if you know your enemy and know yourself, you will not be imperiled in a hundred battles.
-
-This series aims to deeply understand competitors' hardware for AI accelerator design.
-
+>**Know Your Enemy, Know Yourself**  
+This means that if you know your enemy and know yourself, you will not be imperiled in a hundred battles.  
+This series aims to deeply understand competitors' hardware for AI accelerator design.  
 In this second article, we cover Google's **TPU** (Tensor Processing Unit), which has recently declared its entry into the AI accelerator market.
 
 ## What is TPU?
@@ -96,15 +95,19 @@ Matrix multiplication can be decomposed into multiple vector dot products. A vec
 
 This Systolic array is a representative feature used in TPU and has had a significant impact on GPUs and other AI accelerators (NPU, LPU) that perform AI operations.
 
-### TPU Core Architecture
+### TPU Building Block
 
-Next, let's examine the core architecture used in individual TPU chips. As introduced in the previous article, GPUs have hundreds to thousands of individual cores on a single chip, controlled by multiple threads in software. However, TPU performs operations with a small number of massive cores, around 3-6.
+Next, let's examine the computation units used in individual TPU chips. As introduced in the previous article, GPUs have hundreds of individual SMs (Streaming Multiprocessors) on a single chip. Each data point's program is defined as a thread, grouped into warps (32 threads), and executable warps are executed in any order. At the CUDA kernel level, only the number of threads per block and number of blocks are specified, and lower-level components (compiler, hardware scheduler, etc.) determine which hardware will execute those threads (in warp units). GPU's instruction execution mechanism operates at the warp level (32 data points), executing individual operations (single operations or data load/store, etc.), with the warp scheduler dynamically selecting warps for execution.
+
+However, TPU performs operations with 1-2 massive cores per individual chip. Instead of dividing large data into threads or warps, TPU uses a method that **directly maps dataflow optimized at compile time** to hardware. TPU views computations not at the individual thread or warp level, but at the tensor level. To achieve this, TPU operates by pushing higher-level instructions (VLIW, Very Long Instruction Word) that combine multiple instructions into the computation pipeline at once for larger amounts of data, and unlike GPUs, statically pre-determines the computation order.
+
+The cores used in individual TPU chips are divided into TensorCore, specialized for linear algebra operations, and SparseCore, specialized for embedding operations. (Note: While the terminology is the same as GPU's Tensor Core, their roles differ.)
 
 **TensorCore**
 
 ![TensorCore diagram](tensorcore2.webp)
 
-TensorCore is a unit that performs operations on data delivered through Systolic array and DMA (direct memory access) units. The MXU (Matrix Multiplication Unit) for matrix operations mentioned earlier is the most representative, and it also includes operators for scalar and vector operations, not just matrix operations. Depending on the generation, 1 or 2 TensorCores are mounted per chip.
+TensorCore is a computation pipeline that performs operations on data delivered through Systolic array and DMA (direct memory access) units. Similar to GPU's CUDA cores or Tensor cores, while GPUs cannot specify exactly which core to use at which time (automatically filling available execution units), TPU's TensorCore is statically allocated according to dataflow optimized at compile time. The MXU (Matrix Multiplication Unit) for matrix operations mentioned earlier is the most representative, and it also includes operators for scalar and vector operations, not just matrix operations. Depending on the generation, 1 or 2 TensorCores are mounted per chip.
 
 **SparseCore**
 
@@ -266,6 +269,8 @@ NVIDIA's strength comes not only from hardware but also from the CUDA software e
 
 Furthermore, Google is the only company that has vertically integrated the entire AI stack: models (Gemini), frameworks (JAX), compilers (XLA), and hardware (TPU). In the AI semiconductor market where software and hardware integration is essential, Google has secured an advantageous position through this vertical integration.
 
+---
+
 ## Summary
 
 In this article, we explored:
@@ -281,7 +286,7 @@ The conclusions we can draw from this are summarized below:
 2. They continue their technical efforts to break down the technical moat of GPU and CUDA and build a software ecosystem that is not hardware-dependent.
 3. Beyond simple cloud business, they aim to directly enter the AI semiconductor market and establish equal status with NVIDIA.
 
-...
+---
 
 Did you know that members who participated in the original TPU project had founded another **semiconductor startup**? **Groq**, an AI semiconductor startup that recently signed a contract worth approximately $20 billion (30 trillion KRW) with NVIDIA, is that company. What technology did NVIDIA pay such an enormous amount for? In the next article, we'll explore **Groq's LPU**, which uses the same terminology as us.
 
