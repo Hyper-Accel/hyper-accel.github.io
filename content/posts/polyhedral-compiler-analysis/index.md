@@ -15,9 +15,10 @@ categories: [compiler]
 summary: [Polyhedral compiler explanation]
 comments: true
 ---
----
 
 오늘은 조금은 색다른 주제를 가지고 왔습니다. 컴파일러를 사용하다가, 자동으로 컴파일러가 loop을 변형하여 최적화해주거나, 병렬화를 해 주면 좋겠다고 생각한 적이 있지 않은가요? 컴파일러 엔지니어들도 이러한 고민들을 해왔습니다. 그 중 하나의 방법으로 등장한 것이 polyhedral compiler 인데요, LLVM 의 polly 프로젝트, MLIR의 affine dialect가 사용하는 방법이기도 합니다. 오늘은 이 방법에 대해 소개해 보겠습니다. 
+
+---
 
 ## 기본 개념
 
@@ -33,7 +34,7 @@ M은 행렬을 의미하며 $\vec{f}_0$ 는 상수 행렬을 의미합니다.
 
 ### Affine hyperplane (아핀 초평면)
 
-n 차원 공간에서 n-1 차원인 affine subspace를 affine hyperplane 이라고 하니다.
+n 차원 공간에서 n-1 차원인 affine subspace를 affine hyperplane 이라고 합니다.
 
 hyperplane은 다음을 만족하는 벡터 ( $\vec{v}$) 의 집합입니다.
 
@@ -66,6 +67,8 @@ $\psi(\vec{x}) = \lambda_0 + \sum_{k=1}^{p}\lambda_k(a_k\vec{x} + b_k)\   where 
 
 이 Lemma를 이용하여 Affine 함수로 정의된 schedule을 변환할 때, half-space들의 선형 결합으로 변환하여 ILP를 이용해 문제를 더 쉽게 풀 수 있도록 해 준다.
 
+---
+
 ## 프로그램의 구성 요소의 해석
 
 이제 기본이 되는 개념들을 소개했으니, 어떻게 우리가 프로그램을 표현할 수 있는지 살펴보도록 합시다. 
@@ -95,14 +98,14 @@ Schedule vector란 각 statement가 언제 실행될지 나타내는 vector입�
 
 Schedule vector는 statement의 실행 시점을 나타내며, polyhedral analysis에서는 이를 이용하여 statement의 조건을 검사하거나, transformation을 수행하게 됩니다.
 
-위 예시에서, S0의 schedule vector는 `(i, 0, j)` 가, s1 은 `(i, 1, k)` 가 됩니다.
+위 예시에서, Statement 1의 schedule vector는 `(i, 0, j)` 가, Statement 2는 `(i, 1, k)` 가 됩니다.
 
 Schedule vector를 설정하는 방법은 다음과 같습니다.
 
 1. Outermost scope부터 기술
 2. Loop이 존재한다면, 그 loop의 induction variable을 넣는다
 3. 한 scope안에 여러 statement (loop 포함) 이 존재한다면, scalar 값을 넣어 분리합니다 (이를 scalar dimension이라 부릅니다)
-    1. 위 예시에서는 loop i 안데 loop이 2개가 있으므로, 이를 scalar dimension으로 분리했습니다.
+    1. 위 예시에서는 loop i 내부에 loop이 2개가 있으므로, 이를 scalar dimension으로 분리했습니다.
 4. 1,2,3 에 의해, 가능한 schedule vector의 최대 길이는 nested loop이 m개 있다 할 때, 2m + 1개가 됩니다.
     1. `<가장 바깥쪽 scope의 scalar dimension> + <각 loop의 iteration vector>*m + <각 loop 내부의 scalar dimension> = 2m + 1`
     2. 일반적으로, scalar dimension이 필요 없는 경우 (즉, scope내부에 statement가 1개인 경우) 는 scalar dimension을 생략합니다.
@@ -132,6 +135,8 @@ S0 : $\begin{pmatrix}0&i&0&j\end{pmatrix}$  → 0 번째 loop i 내부 0번째 l
 S1 : $\begin{pmatrix}0&i&1\end{pmatrix}$ → 0번째 loop i 내부 1번째 statement
 
 S2 :  $\begin{pmatrix}1&k&l\end{pmatrix}$ → 1번째 loop k의 내부 유일한 loop l 의 유일한 statement
+
+---
 
 ## Polyhedral analysis
 
@@ -181,7 +186,7 @@ $$
 
 자 이제, $\vec{s} = (i, j), \vec{t} = (i' ,j')$ 으로 표현하여 그대로 대입해보겠습니다.
 
-$W(\vec{s}) = R(\vec{t})$ 를 풀어 쓰면, $(i', j') = (j, i)$ 이고, 이를 Read시의 조건에 대입하면,,  $i' > j' \implies j > i$ 이며, Write시 조건은 $i > j$ 가 되지요. 
+$W(\vec{s}) = R(\vec{t})$ 를 풀어 쓰면, $(i', j') = (j, i)$ 이고, 이를 Read시의 조건에 대입하면,  $i' > j' \implies j > i$ 이며, Write시 조건은 $i > j$ 가 되지요. 
 
 그런데, $i > j$ 과 $j > i$ 는 당연히 동시에 만족될 수 없겠지요?
 
@@ -192,7 +197,7 @@ $W(\vec{s}) = R(\vec{t})$ 를 풀어 쓰면, $(i', j') = (j, i)$ 이고, 이를 
 ```c
 for(int i = 0; i < N; ++i){
   for(int j = 0; j < M; ++j){
-    a[i][j] = a[i][j-1]; # S0
+    a[i][j] = a[i][j-1]; // S0
   }
 }
 ```
@@ -227,6 +232,8 @@ $$
 
 이렇게 schedule vector를 만들어서 병렬성을 분석하는 예시도 만들어 보았습니다.
 
+---
+
 ## Polyhedral transformation
 
 이제, polyhedral transformation에 대해 알아봅시다. polyhedral transformation은 분석한 code를 더 효율적으로 바꾸는 과정인데요, llvm-polly같은 라이브러리에서 최적화를 위해 실행합니다.
@@ -256,15 +263,15 @@ Transformation parameter는 일반적으로는 ILP를 통해 cost function을 �
 ```c
 for(i = 0; i < N; ++i){
   for(j = 0; j < N; ++j){
-    for(k = 0; k < n; ++k){
+    for(k = 0; k < N; ++k){
       c[i][j] = c[i][j] + a[i][k] * b[k][j]; // S1
     }
   }
 }
 for(i = 0; i < N; ++i){
   for(j = 0; j < N; ++j){
-    for(k = 0; k > n; ++k){
-      d[i][j] = d[i][j] + e[i][j]*c[k][j]; // S2
+    for(k = 0; k < N; ++k){
+      d[i][j] = d[i][j] + e[i][k]*c[k][j]; // S2
     }
   }
 }
@@ -303,12 +310,12 @@ for(t0 = 0; t0 < N; ++t0){
   for(t1 = 0; t1 < N; ++t1){
     for(t3 = 0; t3 < N; ++t3){
       // i -> t1, j -> t0, k -> t3
-      c[t1][t0] = c[t1][t0] + a[t1][t2]*b[t3][t0]; 
+      c[t1][t0] = c[t1][t0] + a[t1][t3]*b[t3][t0]; // S0
     }
-	  for(t3=0; t3<N; ++t3){
-	    // i -> t3, j -> t0, k -> t1
-	    d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0];
-	  }
+    for(t3=0; t3 < N; ++t3){
+      // i -> t3, j -> t0, k -> t1
+      d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0]; // S1
+    }
   }
 }
 ```
