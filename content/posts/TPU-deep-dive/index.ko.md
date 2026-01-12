@@ -203,7 +203,7 @@ XLA는 강력한 최적화 컴파일러로 동작하지만 한계도 존재합�
 
 이를 위해 구글은 2023년 무렵부터 JAX의 실험적인 확장 기능으로 **Pallas**(`jax.experimental.pallas`)라는 kernel language API를 제공해왔습니다. 이는 앞서 언급한 성능 향상을 위한 두가지 방법 중 첫번째 방법에 해당합니다. Pallas는 2021년 탄생한 GPU용 고수준 kernel language인 Triton과 비교해볼 수 있습니다.
 
-[Triton](https://openai.com/index/triton/)은 2021년에 OpenAI에서 제작된 오픈소스 GPU 프로그래밍 언어입니다. 강력하지만 진입장벽이 높고 하드웨어 구조를 이해해야 한다는 CUDA의 한계점을 극복하기 위해 CUDA 보다 한단계 더 추상화된 인터페이스를 제공하여 머신러닝 개발자들이 다양한 연산과 알고리즘을 GPU에서 더 쉽게 최적화할 수 있도록 한 것이 특징입니다. Hopper/Blackwell 등 아키텍쳐의 구애 받지 않도록 추상화를 진행하여 개발자 편의성을 증대시켰으며, 높은 추상화 단계에도 불구하고 triton으로 만들어진 프로그램들이 수동으로 만들어진 CUDA kernel과 성능 면에서 비슷한 수준에 도달한 [벤치마크](https://arxiv.org/pdf/2511.11581v1)도 존재합니다. 
+[Triton](https://openai.com/index/triton/)은 2021년에 OpenAI에서 제작된 오픈소스 GPU 프로그래밍 언어입니다. 강력하지만 진입장벽이 높고 하드웨어 구조를 이해해야 한다는 CUDA의 한계점을 극복하기 위해 CUDA 보다 한단계 더 추상화된 인터페이스를 제공하여 머신러닝 개발자들이 다양한 연산과 알고리즘을 GPU에서 더 쉽게 최적화할 수 있도록 한 것이 특징입니다. Hopper/Blackwell 등 아키텍쳐의 구애 받지 않도록 추상화를 진행하여 개발자 편의성을 증대시켰으며, 높은 추상화 단계에도 불구하고 Triton으로 만들어진 프로그램들이 수동으로 만들어진 CUDA kernel과 성능 면에서 비슷한 수준에 도달한 [벤치마크](https://arxiv.org/pdf/2511.11581v1)도 존재합니다. 
 
 JAX에서도 Triton 언어를 사용할 수 있도록 통합이 진행되었지만 Triton은 GPU에서만 작동하기 때문에 TPU에서는 이러한 최적화를 진행하기가 힘든 부분이 있었습니다. Pallas는 이를 극복하기 위한 TPU용 kernel-language API로 Triton과 달리 GPU와 TPU를 모두 지원하는 공통 커널 언어를 제공하는 것이 큰 특징입니다. Pallas는 JAX뿐만아니라 [PyTorch/XLA](https://cloud.google.com/blog/products/ai-machine-learning/introducing-pytorch-xla-2-3?hl=en)에서도 사용가능하도록 통합이 진행되었습니다.
 
