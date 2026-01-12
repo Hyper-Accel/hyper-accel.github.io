@@ -1,9 +1,9 @@
 ---
-date: '2026-01-15T10:00:00+09:00'
-draft: false
+date: '2026-01-12T10:00:00+09:00'
+draft: true
 title: '2025년에 바라보는 CES 2026 핵심 정리 (feat. SAMSUNG, SK, LG)'
 cover:
-  image: "ces2026-cover.jpg"
+  image: "images/ces2026-cover.jpg"
   alt: "CES 2026"
   caption: "CES 2026"
   relative: false
@@ -47,7 +47,7 @@ CES는 1995년을 시작으로 LA에서 매년 열리는 세계 최대 규모의
 
 저는 다행히도 K-STARTUP 통합관에서 운영해준 부스 투어를 현장 신청하여 핫한 글로벌 기업들의 부스를 최적화된 동선으로 볼 수 있었지만, 한편으로는 제가 보고싶은 부스를 집중해서 보지 못했다는 아쉬움도 남았습니다. 따라서 저는 만약 특별한 리즈가 없으시다면 부스 투어를 찾아서 이용하는 방식을 추천드리지만, 특별한 리즈가 있으시다면 가보고 싶은 부스 뿐만 아니라 동선까지 짜두고 오시는 편을 추천드립니다.
 
-![CES 전시회 안내도](./ces-map.png)
+![CES 전시회 안내도](./images/ces-map.png)
 
 [1. CES 전시회 안내도]
 
@@ -63,27 +63,27 @@ CES 2026 가이드: https://dl.kotra.or.kr/pyxis-api/2/digital-files/719ffe16-6e
 
 중소벤처기업부에서는 스타트업 육성을 위한 "초격차 스타트업 1000+" 프로젝트를 진행하고 있습니다. 중기부는 CES에서 "K-STARTUP 한국통합관"이라는 이름의 전시존을 운영하고 있으며, 규모가 작은 스타트업도 편하게 참여할 수 있도록 적극적으로 지원해주고 있습니다. 
 
-![참가 지원 계획 공문](./kstartup-announcement.png)
+![참가 지원 계획 공문](./images/kstartup-announcement.png)
 
 [2. 참가 지원 계획 공문]
 
-![안내 PPT 중 일부. CES 타임 테이블](./ces-timetable.png)
+![안내 PPT 중 일부. CES 타임 테이블](./images/ces-timetable.png)
 
 [3. 안내 PPT 중 일부. CES 타임 테이블]
 
 CES 진입장벽을 낮춰주신 덕분에 올해 K-STARTUP 통합관에는 무려 38개 기관에서 470개 사가 참여하였고, 한국에서는 CES에 올해 1000여 개의 회사가 참가하였습니다. 덕분에 CES에서 수상한 367개의 혁신상 중 무려 222개의 상을 한국 기업이 휩쓸었다고 하니 혁신상도 휩쓰는 쾌거도 이루었습니다.
 
-![안내 PPT 중 일부. 전시회 지도 및 부스 위치](./kstartup-booth-map.png)
+![안내 PPT 중 일부. 전시회 지도 및 부스 위치](./images/kstartup-booth-map.png)
 
 [4. 안내 PPT 중 일부. 전시회 지도 및 부스 위치]
 
-![안내 PPT 중 일부. 제공되는 물품 리스트](./kstartup-supplies.png)
+![안내 PPT 중 일부. 제공되는 물품 리스트](./images/kstartup-supplies.png)
 
 [5. 안내 PPT 중 일부. 제공되는 물품 리스트]
 
 K-STARTUP 문구 덕분인지 다양한 국적, 다양한 분야의 분들께서 부스를 방문해주셨는데요, 고객사/투자자/협업사 등 수많은 분들과 이야기를 나눠보며 개인적으로는 insight를 키울 수 있었을 뿐만 아니라 회사 차원에서는 파트너들과 관계를 쌓을 수 있고 고객사에게 브랜딩을 할 수 있는 소중한 자리였습니다.
 
-![1세대 서버인 Orion가 전시된 하이퍼엑셀 부스](./hyperaccel-booth-orion.jpeg)
+![1세대 서버인 Orion가 전시된 하이퍼엑셀 부스](./images/hyperaccel-booth-orion.jpeg)
 
 [6. 1세대 서버인 Orion가 전시된 하이퍼엑셀 부스]
 
@@ -110,13 +110,13 @@ K-STARTUP 문구 덕분인지 다양한 국적, 다양한 분야의 분들께서
 
 LG는 관객에게 시각적인 인상을 주기위해 노력한다고 느꼈습니다. 작년에는 제가 본 전시 통틀어 LG의 전시가 가장 인상깊었는데요,
 
-![LG OLED TV 구조물](./lg-oled-structure-1.jpeg)
+![LG OLED TV 구조물](./images/lg-oled-structure-1.jpeg)
 
 [7. LG OLED TV 구조물]
 
 투명/무선 OLED 28대를 둥글게 전시하여 하나의 구조물을 형성하여 기술력을 뽐냈습니다. 이러한 LG의 차력쇼는 주변 공간을 압도하는 것을 넘어 CES 공식 메거진 1면까지 장식하였습니다.
 
-![LG OLED TV 구조물 내부](./lg-oled-structure-2.jpeg)
+![LG OLED TV 구조물 내부](./images/lg-oled-structure-2.jpeg)
 
 [8. LG OLED TV 구조물 내부]
 
@@ -124,7 +124,7 @@ LG는 관객에게 시각적인 인상을 주기위해 노력한다고 느꼈습
 
 올해 LG는 가사 도우미 클로이드를 출시하며 또 한번 메스컴을 뜨겁게 달궜습니다.
 
-![LG 클로이드 홈 로봇](./lg-cloi-robot.png)
+![LG 클로이드 홈 로봇](./images/lg-cloi-robot.png)
 
 [9. LG 클로이드 홈 로봇]
 
@@ -134,11 +134,11 @@ LG는 관객에게 시각적인 인상을 주기위해 노력한다고 느꼈습
 
 삼성은 CES에서 박물관 컨셉으로 스마트홈에 대한 이야기를 풀어냈습니다.
 
-![삼성 스마트홈 부스 1](./samsung-smarthome-1.jpeg)
+![삼성 스마트홈 부스 1](./images/samsung-smarthome-1.jpeg)
 
 [10. 삼성 스마트홈 부스 1]
 
-![삼성 스마트홈 부스 2](./samsung-smarthome-2.jpeg)
+![삼성 스마트홈 부스 2](./images/samsung-smarthome-2.jpeg)
 
 [11. 삼성 스마트홈 부스 2]
 
@@ -146,11 +146,11 @@ LG는 관객에게 시각적인 인상을 주기위해 노력한다고 느꼈습
 
 2026년에는 AI 동반자라는 컨셉으로 전시를 진행하였습니다. 
 
-![삼성 130형 마이크로 RGB TV](./samsung-micro-rgb-tv-1.png)
+![삼성 130형 마이크로 RGB TV](./images/samsung-micro-rgb-tv-1.png)
 
 [12. 삼성 130형 마이크로 RGB TV]
 
-![삼성 스마트홈 부스 2026](./samsung-smarthome-2026.png)
+![삼성 스마트홈 부스 2026](./images/samsung-smarthome-2026.png)
 
 [13. 삼성 스마트홈 부스 2026]
 
@@ -160,17 +160,17 @@ LG는 관객에게 시각적인 인상을 주기위해 노력한다고 느꼈습
 
 SK는 작년에도 올해도 HBM을 주력 기술로 선보였습니다. 개인적인 생각을 조심히 말씀드리면 SK는 상대적으로 데모에 불리(?)합니다. 왜냐하면 메모리 반도체 특성상 핵심 기술을 시각적으로 보여주기가 쉽지 않기 때문입니다. 
 
-![SK 부스 입구](./sk-booth-entrance.png)
+![SK 부스 입구](./images/sk-booth-entrance.png)
 
 [14. SK 부스 입구]
 
 하지만 대규모 부스와 주변을 압도하는 입구는 사람들의 이목을 끌기에 충분하였습니다. 이는 폭포 속 동굴에 들어가는 듯한 느낌을 주었는데, 찾아보니 bit를 파도처럼 형상화한 그래픽을 구현하여 메모리 회사임을 나타내었다고 합니다. 그리고 HBM 존재만으로도 이미 세계에서 가장 핫한 주제이기에 정말 많은 사람이 방문하였습니다.
 
-![SK HBM 전시 1](./sk-hbm-display-1.jpeg)
+![SK HBM 전시 1](./images/sk-hbm-display-1.jpeg)
 
 [15. SK HBM 전시 1]
 
-![SK HBM 전시 2](./sk-hbm-display-2.png)
+![SK HBM 전시 2](./images/sk-hbm-display-2.png)
 
 [16. SK HBM 전시 2]
 
@@ -178,11 +178,11 @@ SK는 작년에도 올해도 HBM을 주력 기술로 선보였습니다. 개인�
 
 2026년에는 HBM4 16단을 최초로 공개하였습니다. HBM4는 단순 성능 개선을 넘어 전체적인 아키텍쳐를 변경하였습니다. 대역폭을 2배로 넓혔고, 메모리 맨 아랫층에 로직 공정을 넣어 메모리 근처에서 연산 기능까지 수행할 수 있다고 합니다. 
 
-![SK HBM4 1](./sk-hbm4-1.png)
+![SK HBM4 1](./images/sk-hbm4-1.png)
 
 [17. SK HBM4 1]
 
-![SK HBM4 2](./sk-hbm4-2.png)
+![SK HBM4 2](./images/sk-hbm4-2.png)
 
 [18. SK HBM4 2]
 
