@@ -1,7 +1,7 @@
 ---
 date: '2026-01-12T10:00:00+09:00'
 draft: true
-title: 'CES 2026 Review from a 2025 Participant (feat. SAMSUNG, SK, LG)'
+title: 'CES 2026 Key Highlights from a 2025 Participant (feat. SAMSUNG, SK, LG)'
 cover:
   image: "images/ces2026-cover.jpg"
   alt: "CES 2026"
@@ -10,29 +10,29 @@ cover:
 authors: [Hyunjun Park]
 tags: [conference, CES, report, SAMSUNG, SK, LG]
 categories: [report]
-summary: ['A review of CES 2026 based on participation experience in CES 2025. Covers CES statistics and first-hand impressions, K-STARTUP integrated pavilion booth operation experience, and booth visits of Korean conglomerates (LG, SAMSUNG, SK), exploring the scale and technology trends of CES.']
+summary: ['A review of CES 2026 based on CES 2025 participation experience. Exploring the scale and technology trends of CES through statistics, first-hand impressions, K-STARTUP integrated pavilion booth operation experience, and Korean conglomerate (LG, SAMSUNG, SK) booth reviews.']
 comments: true
 ---
 
-# CES 2026 Review from a 2025 Participant (feat. SAMSUNG, SK, LG)
+# CES 2026 Key Highlights from a 2025 Participant (feat. SAMSUNG, SK, LG)
 
-Hello, I'm Hyunjun Park from the HyperAccel ML Team.
+Hello! I'm Hyunjun Park from the HyperAccel ML Team.
 
-CES, which started in Las Vegas on January 6th, successfully concluded on January 9th. I participated in last year's (2025) CES, not this year's (2026), where I not only viewed exhibitions from global companies but also directly operated HyperAccel's company booth. In this blog post, I'd like to review this year's CES from the perspective of someone who participated last year. You might be wondering why I'm posting this now instead of last year.
+CES, which started in Las Vegas on January 6th, successfully concluded on January 9th. I participated in last year's (2025) CES and operated the HyperAccel booth, and based on that experience, I'd like to review this year's (2026) CES. Some might wonder why I'm posting this now instead of last year.
 
-The reason is simple: we didn't have a tech blog last year. As someone who participated last year, I became curious about how this year's CES would be after reading articles about CES 2026, and I took time to learn about this year's CES as an excuse to write for our tech blog.
+{{< figure src="./images/back_book.png" alt="Better Late Than Never" caption="" align="center" >}}
 
-After researching CES 2026 content, I found that there were already many articles about CES, and I spent a lot of time thinking about how to create a differentiated article and deliver meaningful content. After much consideration, I decided to write for readers who fall into the following categories. If you have these questions, I think my article will be helpful:
+The reason is simple: we didn't have a tech blog last year. As someone who participated last year, reading articles about CES 2026 made me curious about how this year went, and the excuse of writing for our tech blog gave me the opportunity to learn about this year's CES. This post will be helpful for those who:
 
-1. CES statistics and first-hand impressions
-2. CES booth preparation and operation experience
-3. Booth visits of Korean conglomerates (LG, SAMSUNG, SK)
+1. Want to know CES statistics and key highlights
+2. Are curious about CES booth preparation and operation experience
+3. Want to learn about Korean conglomerates' (LG, SAMSUNG, SK) exhibits and concepts
 
 ---
 
-## CES Statistics and First-Hand Impressions
+## CES Statistics and Key Highlights
 
-CES is the world's largest technology exhibition held annually in Las Vegas since 1995. From a company's perspective, it's an opportunity to showcase their technology for marketing and branding, while from a visitor's perspective, it's a chance to understand the latest technology trends. South Korea actively participates, ranking third in the number of participating companies after the United States and China, and Korean companies receive the most innovation awards at CES, demonstrating the country's technological capabilities to the world.
+CES is the world's largest consumer electronics exhibition held annually since 1967. From a company's perspective, it's an opportunity to showcase technology for marketing and branding, while visitors can understand the latest technology trends. South Korea ranks third in company participation after the United States and China, and holds the world record for the most innovation awards, demonstrating Korean technological capabilities to the world.
 
 |  | 2025 | 2026 |
 | --- | --- | --- |
@@ -43,15 +43,13 @@ CES is the world's largest technology exhibition held annually in Las Vegas sinc
 | Korean Best of Innovation Awards | 15 out of 34 (44%) | 15 out of 30 (50%) |
 | Korean Innovation Awards | 219 out of 458 (47.8%) | 222 out of 367 (60.5%) |
 
-My first impression was that the CES exhibition was much, much larger than I had expected. Even though I had organized the booths I wanted to visit beforehand, I found it extremely difficult to locate the booths I wanted to see. To move between different campuses, I had to take shuttle buses, and the lines for shuttle buses were so long that it was difficult to optimize my route.
+My first impression of CES was that it was much larger than I expected. It felt like walking around a university campus. Even though I had organized the booths I wanted to visit beforehand, it was difficult to find the booths I wanted, and moving to different campuses required shuttle buses with long waiting lines, making route planning challenging.
 
-Fortunately, I was able to apply on-site for a booth tour organized by the K-STARTUP integrated pavilion, which allowed me to see hot global companies' booths with an optimized route. However, on the other hand, I was disappointed that I couldn't focus on seeing the booths I wanted to see. Therefore, I recommend using booth tours if you don't have specific reasons to visit particular booths, but if you have specific reasons, I recommend planning not only the booths you want to visit but also your route in advance.
+While pondering this, I applied on-site for a booth tour organized by the K-STARTUP integrated pavilion, which allowed me to see notable global companies' booths with an optimized route. It was great to easily get an overview of global company booths, but on the other hand, I was disappointed that I couldn't focus on the booths I wanted to see. I recommend using booth tours if you don't have specific needs, but if you have specific needs, I recommend planning your route thoroughly in advance.
 
-![CES Exhibition Map](./images/ces-map.png)
+{{< figure src="./images/ces-map.png" alt="CES Exhibition Map" width="60%" caption="CES Exhibition Map" align="center" >}}
 
-[1. CES Exhibition Map]
-
-KOTRA, a company, provides expert analysis on viewing points and routes every year. Although it's not our article, I think it's very well-written and would like to recommend and share it.
+KOTRA provides annual analysis on viewing points and routes. Although I didn't write it, I think it's well-written and would like to recommend and share it.
 
 CES 2025 Guide: https://dl.kotra.or.kr/pyxis-api/2/digital-files/51efe51a-718d-4f3a-9182-12c424384f7b
 
@@ -59,144 +57,116 @@ CES 2026 Guide: https://dl.kotra.or.kr/pyxis-api/2/digital-files/719ffe16-6ece-4
 
 ---
 
-## Experience Participating in CES as Part of K-STARTUP Integrated Pavilion
+## CES 2025 Participation Experience
 
-The Ministry of SMEs and Startups is conducting the "Super Gap Startup 1000+" project to foster startups. The ministry operates an exhibition zone called "K-STARTUP Korean Integrated Pavilion" at CES and actively supports small startups to participate comfortably.
+The Ministry of SMEs and Startups is conducting the "Super Gap Startup 1000+" project to foster startups, and as part of this project, they gather Korean startups to operate a CES exhibition pavilion annually. It was well-organized so that even small startups could participate comfortably.
 
-![Participation Support Plan Announcement](./images/kstartup-announcement.png)
+{{< figure src="./images/kstartup-announcement.png" alt="Participation Support Plan Announcement" width="60%" caption="Participation Support Plan Announcement" align="center" >}}
 
-[2. Participation Support Plan Announcement]
+{{< figure src="./images/ces-timetable.png" alt="Part of Guide PPT: CES Timetable" width="60%" caption="Part of Guide PPT: CES Timetable" align="center" >}}
 
-![Part of Guide PPT. CES Timetable](./images/ces-timetable.png)
+Thanks to lowering the barrier to entry for CES, many companies have been participating in the K-STARTUP integrated pavilion both last year and this year. This year, 470 companies from 38 organizations participated. Looking at Korea as a whole, about 1,000 companies participated. I believe this support is one of the key driving forces behind Korea receiving the most CES innovation awards.
 
-[3. Part of Guide PPT. CES Timetable]
+{{< figure src="./images/kstartup-booth-map.png" alt="Part of Guide PPT: Exhibition Map and Booth Locations" width="60%" caption="Part of Guide PPT: Exhibition Map and Booth Locations" align="center" >}}
 
-Thanks to lowering the barrier to entry for CES, this year's K-STARTUP integrated pavilion had 470 companies from 38 organizations participating, and about 1,000 Korean companies participated in CES this year. As a result, Korean companies swept 222 out of 367 innovation awards at CES, achieving a remarkable feat.
+{{< figure src="./images/kstartup-supplies.png" alt="Part of Guide PPT: List of Provided Supplies" width="60%" caption="Part of Guide PPT: List of Provided Supplies" align="center" >}}
 
-![Part of Guide PPT. Exhibition Map and Booth Locations](./images/kstartup-booth-map.png)
+From an exhibitor's perspective, thanks to the K-STARTUP branding, visitors of various nationalities and fields came to our booth. We were able to talk with numerous clients, investors, and partners. From a company standpoint, it was a valuable opportunity to build relationships with partners and brand ourselves to clients, and personally, it was a great opportunity to gain insights.
 
-[4. Part of Guide PPT. Exhibition Map and Booth Locations]
+{{< figure src="./images/hyperaccel-booth-orion.jpeg" alt="HyperAccel Booth with First-Generation Orion Server" width="60%" caption="HyperAccel Booth with First-Generation Orion Server" align="center" >}}
 
-![Part of Guide PPT. List of Provided Supplies](./images/kstartup-supplies.png)
-
-[5. Part of Guide PPT. List of Provided Supplies]
-
-Thanks to the K-STARTUP branding, visitors of various nationalities and fields visited our booth. Through conversations with numerous clients, investors, and partners, I was able to gain personal insights, and from a company perspective, it was a valuable opportunity to build relationships with partners and brand to clients.
-
-![HyperAccel Booth with First-Generation Orion Server](./images/hyperaccel-booth-orion.jpeg)
-
-[6. HyperAccel Booth with First-Generation Orion Server]
-
-We also benefited from this project, and thanks to it, we were able to prepare easily and successfully complete it despite it being our first time. In 2025, we exhibited the first-generation Orion server. This accelerator is implemented by porting HyperAccel's proprietary LPU architecture to AMD's U55C FPGA chip.
-
-We plan to release Bertha, the second-generation ASIC chip, in the first half of this year, so I look forward to exhibiting the Bertha server at CES 2027.
+Thanks to their great support, despite being our first time, we were able to focus on "exhibiting" rather than just "participating" and successfully completed our CES booth operation. To briefly introduce the product in the photo, HyperAccel is a company developing next-generation AI chips for LLM inference. We have already completed FPGA verification and plan to release an ASIC chip in the first half of this year. The server shown in the photo is our first-generation FPGA-based server.
 
 ---
 
-## Technology Comparison: 2025 vs 2026
+## Korean Conglomerates' CES Exhibition Trends
 
-There were many global companies that surprised everyone with new technologies, but when I was actually at the venue, I was more excited to see Korean companies standing shoulder to shoulder with global companies on the world stage. (National pride!) Therefore, in this article, I'd like to explore how the exhibitions of Korean conglomerates Samsung, LG, and SK differed between 2025 and 2026.
+There were many global companies that surprised everyone with new technologies, but when I was actually at the venue, I was more excited to see Korean companies standing shoulder to shoulder with global companies on the world stage. (National pride!) Therefore, in this section, I'd like to explore how Korean conglomerates Samsung, LG, and SK operated their CES exhibitions by comparing 2025 and 2026.
 
 |  | 2025 | 2026 |
 | --- | --- | --- |
 | Samsung Innovation Awards | 29 products including Galaxy Buds3 Pro | 27 products including quantum security chip |
 | Samsung Highlights | Smart home with all appliances connected | World's first 130-inch Micro RGB TV |
 | LG Innovation Awards | 24 products including LG OLED TV | 18 products including webOS platform |
-| LG Highlights | Massive structure made of 28 OLED TVs | Home robot Cloi that helps with housework |
+| LG Highlights | Massive structure made of 28 OLED TVs | Home robot CLOi that helps with housework |
 | SK Innovation Awards | HBM3E, etc. | HBM4, etc. |
-| SK Highlights | Unique Best of Innovation Award in memory category | World's first HBM4 16-layer 48GB reveal |
+| SK Highlights | Sole Best of Innovation Award in memory category | World's first HBM4 16-layer 48GB reveal |
 
 ### LG in CES
 
-I felt that LG strives to make a visual impression on the audience. Last year, LG's exhibition was the most impressive of all the exhibitions I saw,
+I felt that LG strives to make a visual impression on the audience. Among all the exhibitions I saw last year, LG's exhibition was the most impressive.
 
-![LG OLED TV Structure](./images/lg-oled-structure-1.jpeg)
-
-[7. LG OLED TV Structure]
+{{< figure src="./images/lg-oled-structure-1.jpeg" alt="LG OLED TV Structure" width="60%" caption="(2025) LG OLED TV Structure" align="center" >}}
 
 They displayed 28 transparent/wireless OLED TVs in a circular formation to create a single structure showcasing their technological prowess. This LG showcase not only overwhelmed the surrounding space but also graced the cover of the official CES magazine.
 
-![LG OLED TV Structure Interior](./images/lg-oled-structure-2.jpeg)
+{{< figure src="./images/lg-oled-structure-2.jpeg" alt="LG OLED TV Structure Interior" width="60%" caption="(2025) LG OLED TV Structure Interior" align="center" >}}
 
-[8. LG OLED TV Structure Interior]
+When you entered the booth, you could see the actual products up close, and they looked as if images were appearing on windows rather than TVs, making them aesthetically excellent. For reference, LG Signature OLED TV has won the Best of Innovation Award for four consecutive years from 2023 to 2026.
 
-When you entered the booth, you could see the actual products up close, and they looked as if images were appearing on windows rather than TVs, making them aesthetically excellent. For reference, LG signature OLED TV has won the Best of Innovation Award for four consecutive years from 2023 to 2026.
+This year, LG launched the home assistant CLOi and once again made headlines.
 
-This year, LG launched the home assistant Cloi and once again heated up the media.
+{{< figure src="./images/lg-cloi-robot.png" alt="LG CLOi Home Robot" width="60%" caption="(2026) LG CLOi Home Robot" align="center" >}}
 
-![LG Cloi Home Robot](./images/lg-cloi-robot.png)
-
-[9. LG Cloi Home Robot]
-
-In the actual demo, they showcased various demonstrations such as taking milk out of the refrigerator, folding towels, and putting in laundry. Although it wasn't at a high enough level of completion for actual commercialization, it was meaningful as an early version of a home robot, and given the speed of AI development, I'm looking forward to seeing how much more complete it will be next year.
+In the actual demo, they showcased various demonstrations such as taking milk out of the refrigerator, folding towels, and putting in laundry. Personally, I thought it wasn't yet at a level of completion for actual commercialization, but it was meaningful as an early version of a home robot. Given the speed of AI development, I'm really looking forward to seeing how much more complete it will be next year.
 
 ### SAMSUNG in CES
 
-Samsung presented the story of smart homes with a museum concept at CES.
+Samsung presented the story of smart homes with a museum concept at CES both last year and this year.
 
-![Samsung Smart Home Booth 1](./images/samsung-smarthome-1.jpeg)
+{{< figure src="./images/samsung-smarthome-1.jpeg" alt="Samsung Smart Home Booth 1" width="60%" caption="(2025) Samsung Booth Entrance" align="center" >}}
 
-[10. Samsung Smart Home Booth 1]
+{{< figure src="./images/samsung-smarthome-2.jpeg" alt="Samsung Smart Home Booth 2" width="60%" caption="(2025) Samsung Smart Appliances" align="center" >}}
 
-![Samsung Smart Home Booth 2](./images/samsung-smarthome-2.jpeg)
+As befitting a global company, they operated an enormous booth and simply displayed how AI connects appliances, increases productivity, and enables efficient energy use. They particularly emphasized the smart home ecosystem where refrigerators, washing machines, air conditioners, and all appliances are connected through the SmartThings platform.
 
-[11. Samsung Smart Home Booth 2]
+In 2026, they exhibited how AI can provide enjoyment, convenience, and care in daily life.
 
-As befitting a global company, they operated an enormous booth and simply displayed how AI connects appliances, increases productivity, and enables efficient energy use.
+{{< figure src="./images/samsung-micro-rgb-tv-1.png" alt="Samsung 130-inch Micro RGB TV" width="60%" caption="(2026) Samsung 130-inch Micro RGB TV" align="center" >}}
 
-In 2026, they proceeded with the exhibition under the concept of "AI Companion."
+{{< figure src="./images/samsung-smarthome-2026.png" alt="Samsung Smart Home Booth 2026" width="60%" caption="(2026) Samsung Smart TV" align="center" >}}
 
-![Samsung 130-inch Micro RGB TV](./images/samsung-micro-rgb-tv-1.png)
+The world's first 130-inch Micro RGB TV displayed in the main hall was enough to capture the audience's attention. Additionally, they showcased their vision of AI permeating daily life through the Bespoke AI refrigerator with Google Gemini and wearable-based health management solutions. Samsung's approach of integrating AI across all areas from displays to home appliances to healthcare was impressive.
 
-[12. Samsung 130-inch Micro RGB TV]
+### SK in CES
 
-![Samsung Smart Home Booth 2026](./images/samsung-smarthome-2026.png)
+SK showcased HBM as their main technology both last year and this year. I'd like to carefully share my personal opinion: SK is relatively at a disadvantage (?) when it comes to demos because it's difficult to visually showcase core technologies due to the nature of memory semiconductors.
 
-[13. Samsung Smart Home Booth 2026]
+{{< figure src="./images/sk-booth-entrance.png" alt="SK Booth Entrance" width="60%" caption="(2025) SK Booth Entrance" align="center" >}}
 
-The 130-inch Micro RGB TV displayed in the main hall attracted the attention of passersby, and 2026 also presented Samsung's core smart home values in a museum format.
+However, the large-scale booth and overwhelming entrance from last year were sufficient to attract people's attention. It gave the feeling of entering a cave behind a waterfall, and I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
 
-### SK
+{{< figure src="./images/sk-hbm-display-1.png" alt="SK HBM Display 1" width="60%" caption="(2025) SK HBM3E" align="center" >}}
 
-SK showcased HBM as their main technology both last year and this year. I'd like to carefully share my personal opinion: SK is relatively at a disadvantage (?) when it comes to demos. This is because it's difficult to visually showcase core technologies due to the nature of memory semiconductors.
+{{< figure src="./images/sk-hbm-display-2.png" alt="SK HBM Display 2" width="60%" caption="(2025) SK Memory Lineup" align="center" >}}
 
-![SK Booth Entrance](./images/sk-booth-entrance.png)
+Since I work at a semiconductor company, I was naturally more interested. I was able to see the actual products and specifications of various memory semiconductors including HBM, which was great. To briefly explain HBM, which has captured Jensen Huang's love: HBM (High Bandwidth Memory) is a product that vertically connects multiple DRAMs to revolutionize data processing speed compared to conventional DRAM. HBM3E, displayed at the top, means the Extension version of HBM3, and it's such a hot model that more than half of HBM shipments in 2026 are expected to be HBM3E.
 
-[14. SK Booth Entrance]
+This year, they first revealed HBM4 16-layer. HBM4 goes beyond simple performance improvements and changed the entire architecture. They doubled the bandwidth and added logic processes to the bottom layer of memory, enabling computation functions near the memory.
 
-However, the large-scale booth and overwhelming entrance were sufficient to attract people's attention. It gave the feeling of entering a cave behind a waterfall, and I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
+{{< figure src="./images/sk-hbm4-1.png" alt="SK HBM4 1" width="60%" caption="(2026) SK Exhibition Hall Overview" align="center" >}}
 
-![SK HBM Display 1](./images/sk-hbm-display-1.jpeg)
+{{< figure src="./images/sk-hbm4-2.png" alt="SK HBM4 2" width="60%" caption="(2026) SK HBM4" align="center" >}}
 
-[15. SK HBM Display 1]
-
-![SK HBM Display 2](./images/sk-hbm-display-2.png)
-
-[16. SK HBM Display 2]
-
-Since I work for a semiconductor company, I was naturally more interested. I was able to see the actual products and specifications of various memory semiconductors including HBM, which was great. To briefly explain HBM, which has captured Jensen Huang's love, HBM (High Bandwidth Memory) is a product that vertically connects multiple DRAMs to revolutionize data processing speed compared to conventional DRAM. HBM3E means the Extension version of HBM3, and it's such a hot model that more than half of HBM shipments in 2026 are expected to be HBM3E.
-
-In 2026, they first revealed HBM4 16-layer. HBM4 goes beyond simple performance improvements and changed the entire architecture. They doubled the bandwidth and added logic processes to the bottom layer of memory, enabling computation functions near the memory.
-
-![SK HBM4 1](./images/sk-hbm4-1.png)
-
-[17. SK HBM4 1]
-
-![SK HBM4 2](./images/sk-hbm4-2.png)
-
-[18. SK HBM4 2]
-
-Globally, there are fewer than 10 companies that generate over 100 trillion won in revenue, and Samsung and SK's expected revenue for 2026 exceeds 100 trillion won. As proven by the world's attention at CES, I look forward to Samsung and SK Hynix's activities in 2026 and beyond. (~~Please make memory cheaper~~)
+It was impressive to see SK Hynix, which is leading HBM—a key component in the AI era—receive global attention at CES. I look forward to SK Hynix's continued success in the memory semiconductor field. (~~Please make memory cheaper~~)
 
 ---
 
 ## Conclusion
 
-CES has been one of the most successful exhibitions in the world since its start in 1995, and this year once again proved it with its scale, the efforts of numerous companies, and the tremendous attention from around the world.
+CES once again proved it's the World's Best Show through its scale, the efforts of many companies, and tremendous attention from around the world.
 
-Generally, when you go to academic conferences, there are often too many deep contents that are difficult to understand unless you're an expert. However, CES targets the general public, so participating companies presented their technologies more intuitively and visually, making it a visually enjoyable conference.
+At CES 2025, Jensen Huang said that the next frontier for AI is Physical AI. Now, one year later, looking at CES 2026, what stood out most was that AI is no longer confined to software but is expanding into the physical world. As a prime example, LG's CLOi demonstrated its use in actual homes, and although not covered in this post, dancing and working robots were easily found at various booths.
 
-It was an honor to be able to participate in an exhibition watched by the world, and it was a time to respect the many companies that achieved remarkable technological advances in just one year. It was once again a motivation for us to quickly release better products.
+And at CES 2026, Lisa Su said that a world is coming where billions of AI agents will run 24/7 in the background for all of humanity. As such, AI is increasingly penetrating human life, and to support this demand, hardware development is rapidly progressing—not only NVIDIA GPUs but also SAMSUNG and SK's HBM4. This trend will accelerate further.
+
+{{< figure src="./images/insight_about_future.jpg" alt="The Future of AI" width="60%" caption="The Future of AI as Described by Jensen Huang and Lisa Su" align="center" >}}
+
+I believe that for a startup to succeed, three elements are needed: "clear market," "innovative product," and "great team." When applying these three elements to HyperAccel, the "clear market" couldn't be better, and the "innovative product" LPU has already completed functionality and performance verification through FPGA and is waiting for ASIC chip release. We are waiting for you to join us in building the final element—a "great team."
+
+{{< figure src="./images/startup.jpg" alt="Startup Success Factors" width="60%" caption="Startup Success Factors" align="center" >}}
+
+Sending respect to the many companies that achieved remarkable technological advances in just one year, I'll conclude this post with the motivation to make CES 2027 HyperAccel's stage.
 
 ---
 
@@ -209,4 +179,5 @@ HyperAccel is developing next-generation AI chips for LLM inference. We have com
 **Career Site**: https://hyperaccel.career.greetinghr.com/ko/guide
 
 If you're interested, please feel free to contact us anytime!
+
 
