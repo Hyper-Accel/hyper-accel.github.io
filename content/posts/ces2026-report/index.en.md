@@ -1,12 +1,12 @@
 ---
 date: '2026-01-12T10:00:00+09:00'
-draft: true
+draft: false
 title: 'CES 2026 Key Highlights from a 2025 Participant (feat. SAMSUNG, SK, LG)'
 cover:
   image: "images/ces2026-cover.jpg"
   alt: "CES 2026"
   caption: "CES 2026"
-  relative: false
+  relative: true
 authors: [Hyunjun Park]
 tags: [conference, CES, report, SAMSUNG, SK, LG]
 categories: [report]

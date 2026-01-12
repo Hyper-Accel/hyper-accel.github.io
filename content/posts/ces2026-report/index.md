@@ -1,6 +1,6 @@
 ---
 date: '2026-01-12T10:00:00+09:00'
-draft: true
+draft: false
 title: '2025년에 바라보는 CES 2026 핵심 정리 (feat. SAMSUNG, SK, LG)'
 cover:
   image: "images/ces2026-cover.jpg"
@@ -59,7 +59,7 @@ CES 2026 가이드: https://dl.kotra.or.kr/pyxis-api/2/digital-files/719ffe16-6e
 
 ## CES 2025 참가 후기
 
-중소벤처기업부에서는 스타트업 육성을 위한 "초격차 스타트업 1000+" 프로젝트를 진행하고 있고, 프로젝트 중 일부로 한국 스타트업들을 모아 매년 CES 전시관을 운영하고 있습니다. 규모가 작은 스타트업도 편하게 참여할 수 있도록 잘 짜여져 있었습니다. 
+중소벤처기업부에서는 스타트업 육성을 위한 "초격차 스타트업 1000+" 프로젝트를 진행하고 있고, 프로젝트 중 일부로 한국 스타트업들을 모아 매년 CES 전시관을 운영하고 있습니다. 규모가 작은 스타트업도 편하게 참여할 수 있도록 잘 짜여 있었습니다. 
 
 {{< figure src="./images/kstartup-announcement.png" alt="참가 지원 계획 공문" width="60%" caption="참가 지원 계획 공문" align="center" >}}
 
