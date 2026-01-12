@@ -12,6 +12,7 @@ cover:
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
 categories: ["AI Hardware", "Architecture"]
+series: ["Know Your Enemy, Know Yourself"]
 summary: "An overview of how NVIDIA GPUs evolved and how the Hopper architecture hides memory latency with massive parallelism."
 comments: true
 description: "From 1990s graphics cards through Tesla and CUDA to Hopper, this post walks through the evolution of NVIDIA GPUs and explains how modern GPUs use warps, scheduling and memory hierarchy to hide memory latency and deliver massive parallel performance."

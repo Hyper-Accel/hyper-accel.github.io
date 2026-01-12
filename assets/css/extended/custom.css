@@ -166,3 +166,56 @@ body .posts-grid-container .post-entry {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* Series list styling */
+.post-series {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--code-bg);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+}
+
+.series-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.series-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.series-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.series-item:last-child {
+    border-bottom: none;
+}
+
+.series-item.current {
+    font-weight: 600;
+}
+
+.series-item.current a {
+    color: var(--primary);
+    pointer-events: none;
+    cursor: default;
+}
+
+.series-item a {
+    text-decoration: none;
+    color: var(--content);
+    transition: color 0.2s ease;
+}
+
+.series-item a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
