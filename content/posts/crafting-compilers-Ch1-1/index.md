@@ -12,6 +12,7 @@ cover:
 authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]
 categories: [compiler]
+series: ["Crafting Compilers"]
 summary: [프로그래밍 언어를 만드는 방법에 대한 첫 번째 글]
 comments: true
 ---

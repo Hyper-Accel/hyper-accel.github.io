@@ -35,3 +35,5 @@
 - id: all_categories
   translation: "전체"
 
+- id: series
+  translation: "시리즈"

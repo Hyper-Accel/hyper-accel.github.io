@@ -12,6 +12,7 @@ cover:
 authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]
 categories: [compiler]
+series: ["Crafting Compilers"]
 summary: [First article about building a programming language]
 comments: true
 ---
