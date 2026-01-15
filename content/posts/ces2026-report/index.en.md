@@ -75,7 +75,7 @@ From an exhibitor's perspective, thanks to the K-STARTUP branding, visitors of v
 
 {{< figure src="./images/hyperaccel-booth-orion.jpg" alt="HyperAccel Booth with First-Generation Orion Server" width="60%" caption="HyperAccel Booth with First-Generation Orion Server" align="center" >}}
 
-Thanks to their great support, despite being our first time, we were able to focus on "exhibiting" rather than just "participating" and successfully completed our CES booth operation. To briefly introduce the product in the photo, HyperAccel is a company developing next-generation AI chips for LLM inference. We have already completed FPGA verification and plan to release an ASIC chip in the first half of this year. The server shown in the photo is our first-generation FPGA-based server.
+Thanks to their great support, despite being our first time, we were able to focus on "exhibiting" rather than just "participating" and successfully completed our CES booth operation. This is a photo of our booth from last year. The server shown in the photo is our first-generation FPGA-based server, which was the first step in developing next-generation AI chips for LLM inference.
 
 ---
 
@@ -162,11 +162,7 @@ And at CES 2026, Lisa Su said that a world is coming where billions of AI agents
 
 {{< figure src="./images/insight_about_future.jpg" alt="The Future of AI" width="60%" caption="The Future of AI as Described by Jensen Huang and Lisa Su" align="center" >}}
 
-I believe that for a startup to succeed, three elements are needed: "clear market," "innovative product," and "great team." When applying these three elements to HyperAccel, the "clear market" couldn't be better, and the "innovative product" LPU has already completed functionality and performance verification through FPGA and is waiting for ASIC chip release. We are waiting for you to join us in building the final element—a "great team."
-
-{{< figure src="./images/startup.jpg" alt="Startup Success Factors" width="60%" caption="Startup Success Factors" align="center" >}}
-
-Sending respect to the many companies that achieved remarkable technological advances in just one year, I'll conclude this post with the motivation to make CES 2027 HyperAccel's stage.
+I believe that for a company to succeed (=achieve large revenue), three elements are needed: "clear market," "innovative product," and "great team." And looking at this year's CES, I felt that the current AI market is growing at an unprecedented pace, and many Korean companies are receiving global attention in this environment. Sending respect to the many companies that achieved remarkable technological advances in just one year, I look forward to Korean companies' activities at CES 2027.
 
 ---
 
@@ -174,7 +170,7 @@ Sending respect to the many companies that achieved remarkable technological adv
 
 ### HyperAccel Hiring Notice
 
-HyperAccel is developing next-generation AI chips for LLM inference. We have completed FPGA verification and will soon release ASIC chips and server solutions. We are creating solutions that developers can easily use through integration with the PyTorch ecosystem.
+This opportunity also served as a moment to reflect on HyperAccel. For us, an NPU company, the "clear market" couldn't be better, and the "innovative product" LPU has already completed functionality and performance verification through FPGA and is waiting for ASIC chip release. We are waiting for you to join us in building the final element—a "great team."
 
 **Career Site**: https://hyperaccel.career.greetinghr.com/ko/guide
 
