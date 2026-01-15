@@ -98,7 +98,7 @@ I felt that LG strives to make a visual impression on the audience. Among all th
 
 ![LG OLED TV Structure](./images/lg-oled-structure-1.jpg)
 
-They displayed 28 transparent/wireless OLED TVs in a circular formation to create a single structure showcasing their technological prowess. This LG showcase not only overwhelmed the surrounding space but also graced the cover of the official CES magazine.
+Last year, LG displayed 28 transparent/wireless OLED TVs in a circular formation to create a single structure showcasing their technological prowess. This LG showcase not only overwhelmed the surrounding space but also graced the cover of the official CES magazine.
 
 ![LG OLED TV Structure Interior](./images/lg-oled-structure-2.jpg)
 
@@ -118,9 +118,9 @@ Samsung presented the story of smart homes with a museum concept at CES both las
 
 ![Samsung Smart Home Booth 2](./images/samsung-smarthome-2.jpg)
 
-As befitting a global company, they operated an enormous booth and simply displayed how AI connects appliances, increases productivity, and enables efficient energy use. They particularly emphasized the smart home ecosystem where refrigerators, washing machines, air conditioners, and all appliances are connected through the SmartThings platform.
+Last year, they displayed how AI connects appliances, increases productivity, and enables efficient energy use. They particularly emphasized the smart home ecosystem where refrigerators, washing machines, air conditioners, and all appliances are connected through the SmartThings platform.
 
-In 2026, they exhibited how AI can provide enjoyment, convenience, and care in daily life.
+This year, they exhibited how AI can provide enjoyment, convenience, and care in daily life.
 
 ![Samsung 130-inch Micro RGB TV](./images/samsung-micro-rgb-tv-1.jpg)
 
@@ -134,7 +134,7 @@ SK showcased HBM as their main technology both last year and this year. I'd like
 
 ![SK Booth Entrance](./images/sk-booth-entrance.jpg)
 
-However, the large-scale booth and overwhelming entrance from last year were sufficient to attract people's attention. It gave the feeling of entering a cave behind a waterfall, and I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
+The photo above shows last year's SK exhibition hall entrance. The entrance, which felt like entering a cave behind a waterfall, was sufficient to overwhelm the surroundings and attract people's attention. I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
 
 ![SK HBM Display 1](./images/sk-hbm-display-1.jpg)
 
