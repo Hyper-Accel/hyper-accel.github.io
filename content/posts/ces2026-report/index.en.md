@@ -83,14 +83,14 @@ Thanks to their great support, despite being our first time, we were able to foc
 
 There were many global companies that surprised everyone with new technologies, but when I was actually at the venue, I was more excited to see Korean companies standing shoulder to shoulder with global companies on the world stage. (National pride!) Therefore, in this section, I'd like to explore how Korean conglomerates Samsung, LG, and SK operated their CES exhibitions by comparing 2025 and 2026.
 
-|  | 2025 | 2026 |
-| --- | --- | --- |
-| Samsung Innovation Awards | 29 products including Galaxy Buds3 Pro | 27 products including quantum security chip |
-| Samsung Highlights | Smart home with all appliances connected | World's first 130-inch Micro RGB TV |
-| LG Innovation Awards | 24 products including LG OLED TV | 18 products including webOS platform |
-| LG Highlights | Massive structure made of 28 OLED TVs | Home robot CLOi that helps with housework |
-| SK Innovation Awards | HBM3E, etc. | HBM4, etc. |
-| SK Highlights | Sole Best of Innovation Award in memory category | World's first HBM4 16-layer 48GB reveal |
+| **Company** | **Category** | **2025** | **2026** |
+| --- | --- | --- | --- |
+| **LG** | **Innovation Awards** | 24 products including LG OLED TV | 18 products including webOS platform |
+| | **Highlights** | Structure made of 28 OLED TVs | Home robot CLOi that helps with housework |
+| **Samsung** | **Innovation Awards** | 29 products including Galaxy Buds3 Pro | 27 products including quantum security chip |
+| | **Highlights** | Smart home with all appliances connected | World's first 130-inch Micro RGB TV |
+| **SK** | **Innovation Awards** | HBM3E, etc. | HBM4, etc. |
+| | **Highlights** | Sole Best of Innovation Award in memory category | World's first HBM4 16-layer 48GB reveal |
 
 ### LG in CES
 
@@ -134,7 +134,7 @@ SK showcased HBM as their main technology both last year and this year. I'd like
 
 ![SK Booth Entrance](./images/sk-booth-entrance.jpg)
 
-The photo above shows last year's SK exhibition hall entrance. The entrance, which felt like entering a cave behind a waterfall, was sufficient to overwhelm the surroundings and attract people's attention. I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
+However, last year's SK exhibition hall entrance gave a feeling of entering a cave behind a waterfall, which was sufficient to make people stop and attract their attention. I found out that they implemented graphics that visualized bits like waves to represent that it's a memory company. And the mere existence of HBM is already the hottest topic in the world, so many people visited.
 
 ![SK HBM Display 1](./images/sk-hbm-display-1.jpg)
 
