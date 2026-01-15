@@ -20,7 +20,7 @@ comments: true
 
 1월 6일에 라스베가스에서 시작한 CES가 1월 9일 성황리에 종료되었습니다. 우선 저는 작년(2025년) CES에 참여하여 하이퍼엑셀 부스를 운영했었고, 해당 경험을 바탕으로 올해(2026년) CES를 리뷰해보려고 합니다. 혹자는 왜 작년에 안 올리고 이제서야 올리는지 의문을 가질 수 있는데요,
 
-{{< figure src="./images/back_book.jpg" alt="뒷북" caption="" align="center" >}}
+![뒷북](./images/back_book.jpg)
 
 이유는 간단합니다. 작년에는 테크 블로그가 없었기 때문입니다. 작년에 참여한 입장으로서 CES 2026에 대한 기사를 보니 올해는 어땠을지 궁금해졌고, 테크 블로그에 글을 쓰겠다는 명분 덕분에 올해 CES에 대해 알아보는 시간을 가질 수 있었습니다. 아래 목록에 해당되는 분들께는 이번 포스트가 도움이 될 것 같습니다:
 
@@ -47,7 +47,7 @@ CES는 1967년을 시작으로 매년 열리는 세계 최대 규모의 소비�
 
 저는 이러한 고민을 하던 찰나에 K-STARTUP 통합관에서 운영하는 부스 투어를 현장 신청하여 주목받는 글로벌 기업들의 부스를 최적화된 동선으로 볼 수 있었습니다. 편하게 글로벌 기업의 부스를 전체적으로 둘러볼 수 있어서 좋았지만, 한편으로는 제가 보고 싶은 부스를 집중해서 보지 못했다는 아쉬움도 남았습니다. 저는 만약 특별한 니즈가 없으시다면 부스 투어를 찾아서 이용하는 방식을 추천드리고, 특별한 니즈가 있으시다면 동선까지 꼼꼼하게 짜오시기를 추천드립니다.
 
-{{< figure src="./images/ces-map.jpg" alt="CES 전시회 안내도" width="60%" caption="CES 전시회 안내도" align="center" >}}
+![CES 전시회 안내도](./images/ces-map.jpg)
 
 관람 포인트나 동선 관련 분석은 KOTRA라는 기업에서 매년 작성해주고 있는데요, 제가 쓴 글은 아니지만 잘 쓰여진 글이라고 생각되어 추천하고 공유드립니다.
 
@@ -61,19 +61,19 @@ CES 2026 가이드: https://dl.kotra.or.kr/pyxis-api/2/digital-files/719ffe16-6e
 
 중소벤처기업부에서는 스타트업 육성을 위한 "초격차 스타트업 1000+" 프로젝트를 진행하고 있고, 프로젝트 중 일부로 한국 스타트업들을 모아 매년 CES 전시관을 운영하고 있습니다. 규모가 작은 스타트업도 편하게 참여할 수 있도록 잘 짜여 있었습니다. 
 
-{{< figure src="./images/kstartup-announcement.jpg" alt="참가 지원 계획 공문" width="60%" caption="참가 지원 계획 공문" align="center" >}}
+![참가 지원 계획 공문](./images/kstartup-announcement.jpg)
 
-{{< figure src="./images/ces-timetable.jpg" alt="안내 PPT 중 일부. CES 타임 테이블" width="60%" caption="안내 PPT 중 일부. CES 타임 테이블" align="center" >}}
+![안내 PPT 중 일부. CES 타임 테이블](./images/ces-timetable.jpg)
 
 이렇게 CES 진입장벽을 낮춰주신 덕분에 작년에도 올해도 K-STARTUP 통합관에 많은 기업이 참여하고 있고, 올해 기준으로는 무려 38개 기관에서 470개 사가 참여하였습니다. 한국 전체로 봤을 때는 1000여 개의 회사가 참가하였습니다. 이러한 지원이 한국이 CES 혁신상을 가장 많이 받도록 하는 강력한 원동력 중 하나가 아닐까 생각이 들었습니다.
 
-{{< figure src="./images/kstartup-booth-map.jpg" alt="안내 PPT 중 일부. 전시회 지도 및 부스 위치" width="60%" caption="안내 PPT 중 일부. 전시회 지도 및 부스 위치" align="center" >}}
+![안내 PPT 중 일부. 전시회 지도 및 부스 위치](./images/kstartup-booth-map.jpg)
 
-{{< figure src="./images/kstartup-supplies.jpg" alt="안내 PPT 중 일부. 제공되는 물품 리스트" width="60%" caption="안내 PPT 중 일부. 제공되는 물품 리스트" align="center" >}}
+![안내 PPT 중 일부. 제공되는 물품 리스트](./images/kstartup-supplies.jpg)
 
 참가사 입장에서도 K-STARTUP 문구 덕분에 다양한 국적, 다양한 분야의 분들께서 부스를 방문해주셨는데요, 고객사/투자자/협업사 등 수많은 분들과 이야기를 나눌 수 있었습니다. 회사 차원에서는 파트너들과 관계를 쌓을 수 있을 뿐만 아니라 고객사에게 브랜딩을 할 수 있는 소중한 자리였고, 개인 입장에서도 인사이트를 키울 수 있는 좋은 기회였습니다.
 
-{{< figure src="./images/hyperaccel-booth-orion.jpg" alt="1세대 서버인 Orion가 전시된 하이퍼엑셀 부스" width="60%" caption="1세대 서버인 Orion가 전시된 하이퍼엑셀 부스" align="center" >}}
+![1세대 서버인 Orion가 전시된 하이퍼엑셀 부스](./images/hyperaccel-booth-orion.jpg)
 
 잘 도와주신 덕분에 저희도 처음임에도 불구하고 "참여"보다 "전시"에 집중할 수 있었고, 성공적으로 CES 부스 운영을 마칠 수 있었습니다. 작년에 전시했던 저희 부스 모습입니다. 사진에 보이는 서버는 FPGA 기반 1세대 서버로, LLM 추론을 위한 차세대 AI 칩 개발의 첫 단계였습니다.
 
@@ -96,17 +96,17 @@ CES 2026 가이드: https://dl.kotra.or.kr/pyxis-api/2/digital-files/719ffe16-6e
 
 LG는 관객에게 시각적인 인상을 주기 위해 노력한다고 느꼈습니다. 작년에 제가 본 전시 통틀어서도 LG의 전시가 가장 인상 깊었는데요,
 
-{{< figure src="./images/lg-oled-structure-1.jpg" alt="LG OLED TV 구조물" width="60%" caption="(2025) LG OLED TV 구조물" align="center" >}}
+![LG OLED TV 구조물](./images/lg-oled-structure-1.jpg)
 
 투명/무선 OLED 28대를 둥글게 전시하여 하나의 구조물을 형성하여 기술력을 뽐냈습니다. 이러한 LG의 차력쇼는 주변 공간을 압도하는 것을 넘어 CES 공식 매거진 1면까지 장식하였습니다.
 
-{{< figure src="./images/lg-oled-structure-2.jpg" alt="LG OLED TV 구조물 내부" width="60%" caption="(2025) LG OLED TV 구조물 내부" align="center" >}}
+![LG OLED TV 구조물 내부](./images/lg-oled-structure-2.jpg)
 
 부스 안으로 들어가면 실물을 가까이서 볼 수 있었으며, 마치 TV가 아니라 창문에 상이 맺히는 것처럼 보여 미적으로도 뛰어났습니다. 참고로 LG signature OLED TV는 2023년부터 2026년까지 총 4년 연속 최고혁신상을 수상하고 있습니다.
 
 올해 LG는 가사 도우미 클로이드를 출시하며 또 한번 언론을 뜨겁게 달궜습니다.
 
-{{< figure src="./images/lg-cloi-robot.jpg" alt="LG 클로이드 홈 로봇" width="60%" caption="(2026) LG 클로이드 홈 로봇" align="center" >}}
+![LG 클로이드 홈 로봇](./images/lg-cloi-robot.jpg)
 
 실제 데모에서 냉장고에서 우유를 꺼내고, 수건을 접고, 세탁물을 넣는 등 다양한 데모를 선보였습니다. 개인적으로 아직 실제로 상용화할 만큼 높은 완성도는 아니었지만 가정 로봇의 초기 버전이라는 점에서 큰 의미가 있고, AI의 발전 속도를 봤을 때 내년에는 얼마나 더 완성도 있는 모습을 보여줄지 정말 기대가 되는 데모였습니다.
 
@@ -114,17 +114,17 @@ LG는 관객에게 시각적인 인상을 주기 위해 노력한다고 느꼈�
 
 삼성은 작년과 올해 모두 CES에서 박물관 컨셉으로 스마트홈에 대한 이야기를 풀어냈습니다.
 
-{{< figure src="./images/samsung-smarthome-1.jpg" alt="삼성 스마트홈 부스 1" width="60%" caption="(2025) 삼성 부스 입구" align="center" >}}
+![삼성 스마트홈 부스 1](./images/samsung-smarthome-1.jpg)
 
-{{< figure src="./images/samsung-smarthome-2.jpg" alt="삼성 스마트홈 부스 2" width="60%" caption="(2025) 삼성 스마트 가전" align="center" >}}
+![삼성 스마트홈 부스 2](./images/samsung-smarthome-2.jpg)
 
 글로벌 기업답게 엄청 큰 부스를 운영하였고, 그 안에서 AI가 어떻게 가전을 서로 연결하고 생산성을 높여주고 에너지를 효율적으로 사용할 수 있는지를 담백하게 전시하였습니다. 특히 SmartThings 플랫폼을 중심으로 냉장고, 세탁기, 에어컨 등 모든 가전이 하나로 연결되는 스마트홈 생태계를 강조하였습니다.
 
 2026년에는 AI가 일상에서 어떻게 즐거움, 편리함, 돌봄을 제공할 수 있는지를 전시하였습니다.
 
-{{< figure src="./images/samsung-micro-rgb-tv-1.jpg" alt="삼성 130형 마이크로 RGB TV" width="60%" caption="(2026) 삼성 130형 마이크로 RGB TV" align="center" >}}
+![삼성 130형 마이크로 RGB TV](./images/samsung-micro-rgb-tv-1.jpg)
 
-{{< figure src="./images/samsung-smarthome-2026.jpg" alt="삼성 스마트홈 부스 2026" width="60%" caption="(2026) 삼성 스마트 TV" align="center" >}}
+![삼성 스마트홈 부스 2026](./images/samsung-smarthome-2026.jpg)
 
 메인홀에 전시된 세계 최초 130형 마이크로 RGB TV는 관객의 이목을 잡기에 충분하였으며, 이 밖에도 구글 제미나이가 탑재된 비스포크 AI 냉장고, 웨어러블 기반 건강 관리 솔루션 등 AI가 일상에 스며드는 비전을 선보였습니다. 디스플레이부터 가전, 헬스케어까지 전 영역에서 AI를 접목하는 삼성의 행보가 인상적이었습니다.
 
@@ -132,21 +132,21 @@ LG는 관객에게 시각적인 인상을 주기 위해 노력한다고 느꼈�
 
 SK는 작년에도 올해도 HBM을 주력 기술로 선보였습니다. 개인적인 생각을 조심히 말씀드리면 SK의 HBM은 전시회 환경에서 데모를 통해 보여주기 어려운 기술이라고 생각합니다. 왜냐하면 메모리 반도체 특성상 핵심 기술을 시각적으로 보여주기가 쉽지 않기 때문입니다. 
 
-{{< figure src="./images/sk-booth-entrance.jpg" alt="SK 부스 입구" width="60%" caption="(2025) SK 부스 입구" align="center" >}}
+![SK 부스 입구](./images/sk-booth-entrance.jpg)
 
 하지만 작년에 진행한 대규모 부스와 주변을 압도하는 입구는 사람들의 이목을 끌기에 충분하였습니다. 이는 폭포 속 동굴에 들어가는 듯한 느낌을 주었는데, 찾아보니 bit를 파도처럼 형상화한 그래픽을 구현하여 메모리 회사임을 나타내었다고 합니다. 그리고 HBM 존재만으로도 이미 세계에서 가장 핫한 주제이기에 정말 많은 사람이 방문하였습니다.
 
-{{< figure src="./images/sk-hbm-display-1.jpg" alt="SK HBM 전시 1" width="60%" caption="(2025) SK HBM3E" align="center" >}}
+![SK HBM 전시 1](./images/sk-hbm-display-1.jpg)
 
-{{< figure src="./images/sk-hbm-display-2.jpg" alt="SK HBM 전시 2" width="60%" caption="(2025) SK 메모리 라인업" align="center" >}}
+![SK HBM 전시 2](./images/sk-hbm-display-2.jpg)
 
 저는 아무래도 반도체 회사에 종사하고 있는 만큼 더 많은 관심이 갔는데요, HBM을 비롯한 다양한 메모리 반도체들의 실물 및 스펙을 볼 수 있어서 좋았습니다. 젠슨 황의 사랑을 독차지하고 있는 HBM에 대한 설명을 간단히 드리자면, HBM(High Bandwidth Memory)은 여러 개의 DRAM을 수직으로 연결해 기존 D램보다 데이터 처리 속도를 혁신적으로 끌어올린 제품입니다. 그중 상단에 전시된 HBM3E는 HBM3의 Extension 버전이라는 뜻으로 2026년 기준 HBM 출하량의 절반 이상이 HBM3E로 예상될 만큼 핫한 모델입니다.
 
 올해는 HBM4 16단을 최초로 공개하였습니다. HBM4는 단순 성능 개선을 넘어 전체적인 아키텍처를 변경하였습니다. 대역폭을 2배로 넓혔고, 메모리 맨 아랫층에 로직 공정을 넣어 메모리 근처에서 연산 기능까지 수행할 수 있다고 합니다. 
 
-{{< figure src="./images/sk-hbm4-1.jpg" alt="SK HBM4 1" width="60%" caption="(2026) SK 전시관 전경" align="center" >}}
+![SK HBM4 1](./images/sk-hbm4-1.jpg)
 
-{{< figure src="./images/sk-hbm4-2.jpg" alt="SK HBM4 2" width="60%" caption="(2026) SK HBM4" align="center" >}}
+![SK HBM4 2](./images/sk-hbm4-2.jpg)
 
 AI 시대의 핵심 부품인 HBM을 선도하고 있는 SK하이닉스가 CES에서도 세계의 주목을 받는 모습이 인상적이었습니다. 앞으로도 메모리 반도체 분야에서 SK하이닉스의 활약을 기대해봅니다. (~~메모리 싸게 주세요 흑흑~~)
 
@@ -160,7 +160,7 @@ CES 2025에서 NVIDIA의 CEO, 젠슨황이 말했습니다. AI의 다음 개척 
 
 그리고 CES 2026에서 AMD의 CEO, 리사 수가 말했습니다. 전 인류를 위해 수십억 개의 AI 에이전트가 24시간 백그라운드에서 돌아가는 세상이 올 것이라고. 이처럼 AI는 점점 더 인류의 삶에 깊숙이 침투하고 있고, 이러한 수요를 뒷받침하기 위해 NVIDIA의 GPU는 물론이고 SAMSUNG, SK의 HBM4 같은 하드웨어의 발전도 빠르게 이루어지고 있습니다. 이러한 흐름은 앞으로 더 가속화될 것으로 보입니다.
 
-{{< figure src="./images/insight_about_future.jpg" alt="AI의 미래" width="60%" caption="젠슨 황과 리사 수가 말하는 AI의 미래" align="center" >}}
+![AI의 미래](./images/insight_about_future.jpg)
 
 회사가 성공하기(=큰 매출을 올리기) 위해서는 "명확한 시장", "혁신적인 아이템", "훌륭한 팀" 3가지 요소가 필요하다고 생각합니다. 그리고 이번 CES를 보면서 현재 AI 시장은 전례 없이 빠르게 성장하고 있고, 한국의 많은 회사들이 이러한 환경 속에서 세계의 주목을 받고 있다고 느꼈습니다. 1년 사이에 눈부신 기술 발전을 이루어낸 많은 회사들에 대한 리스펙을 보내며, CES 2027에서의 한국 기업들의 활약을 기대해봅니다.
 
