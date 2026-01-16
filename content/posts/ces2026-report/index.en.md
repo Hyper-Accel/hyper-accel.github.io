@@ -140,7 +140,7 @@ However, last year's SK exhibition hall entrance gave a feeling of entering a ca
 
 ![SK HBM Display 2](./images/sk-hbm-display-2.jpg)
 
-Since I work at a semiconductor company, I was naturally more interested. I was able to see the actual products and specifications of various memory semiconductors including HBM, which was great. To briefly explain HBM, which has captured Jensen Huang's love: HBM (High Bandwidth Memory) is a product that vertically connects multiple DRAMs to revolutionize data processing speed compared to conventional DRAM. HBM3E, displayed at the top, means the Extension version of HBM3, and it's such a hot model that more than half of HBM shipments in 2026 are expected to be HBM3E.
+Since I work at a semiconductor company, I was naturally more interested. I was able to see the actual products and specifications of various memory semiconductors including HBM, which was great. To briefly explain HBM, which has captured Jensen Huang's love: HBM (High Bandwidth Memory) is a product that vertically connects multiple DRAMs to increase bandwidth, and its key feature is that it has a revolutionary faster data transfer speed compared to conventional DRAM. HBM3E, displayed at the top, means the Extension version of HBM3, and it's such a hot model that more than half of HBM shipments in 2026 are expected to be HBM3E.
 
 This year, they first revealed HBM4 16-layer. HBM4 goes beyond simple performance improvements and changed the entire architecture. They doubled the bandwidth and added logic processes to the bottom layer of memory, enabling computation functions near the memory.
 
