@@ -219,3 +219,34 @@ body .posts-grid-container .post-entry {
     color: var(--primary);
     text-decoration: underline;
 }
+
+/* Table styling with borders */
+.post-content table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1.5rem 0 !important;
+}
+
+.post-content table thead th,
+.post-content table tbody th {
+    border: 1px solid var(--border) !important;
+    padding: 16px 24px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.post-content table tbody td {
+    border: 1px solid var(--border) !important;
+    padding: 16px 24px !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+}
+
+.post-content table thead th {
+    background-color: var(--code-bg) !important;
+    font-weight: 600 !important;
+}
+
+.post-content table tbody tr:hover {
+    background-color: var(--code-bg) !important;
+}
