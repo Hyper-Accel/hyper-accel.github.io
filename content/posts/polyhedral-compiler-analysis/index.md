@@ -3,7 +3,7 @@ date: '2026-01-11T15:10:28+09:00'
 draft: false
 title: 'Polyhedral compilation'
 cover:
-  image: "Polyhedron.png"
+  image: "title.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "<alt text>"
