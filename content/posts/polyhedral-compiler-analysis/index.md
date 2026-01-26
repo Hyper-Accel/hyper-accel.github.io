@@ -47,6 +47,13 @@ $k = h\vec{v}$ (k는 상수)
 
 Polyhedron이란, 유한 개의 Affine hyperplane으로 인해 나눠진 공간 (half-space) 의 교집합입니다. 그리고, bounded된 polyhedron을 polytope이라고 부릅니다. (닫힌 공간이라는 의미입니다)
 
+아래 그림에서는, 4개의 1D hyperplane (2D space 이므로 hyperplane은 1D) 가 존재하며, 이로 인해 polytope를 정의할 수 있습니다. 즉, 다음 식에서 정의한 $\vec{x}$의 집합이라 할 수 있지요.
+
+$\{\vec{x} \in \mathbb{R} | A\vec{x} + \vec{b} \ge 0 \}$
+
+$A \in \mathbb{R}^{m \times n}, \vec{b} \in \mathbb{R}^m$ (n 차원에서 m개의 hyperplane으로 인해 bound된 polyhedron일 때)
+
+
 ![polytope](polytope.png)
 
 ### Farkas Lemma
