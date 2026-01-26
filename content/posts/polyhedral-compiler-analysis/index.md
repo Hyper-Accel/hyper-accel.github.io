@@ -4,12 +4,10 @@ draft: false
 title: 'Polyhedral compilation'
 cover:
   image: "title.png"
-  # can also paste direct link from external site
-  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "<alt text>"
   caption: "<text>"
-  relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [Jaewoo Kim] # must match with content/authors
+  relative: false 
+authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
 summary: [Polyhedral compiler explanation]
