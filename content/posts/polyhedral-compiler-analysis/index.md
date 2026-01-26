@@ -26,7 +26,7 @@ comments: true
 
 ### Affine function (아핀 함수)
 
-Affine 함수는 선형 변환 + 평행이동 으로 정의 가능한 함수를 의미합니다.
+Affine 함수는 선형 변환 + 평행이동 으로 정의 가능한 함수를 의미합니다. Affine 변환을 하게 되면, 원래 선을 이루던 점들은 같은 선으로 이동하고, 두 선분의 중앙에 있던 점은 변환 후에도 여전히 중앙에 있지요. 즉, 일차 변환에서 상수합을 가능하도록 한 것을 affine 변환이라고 생각하시면 됩니다.
 
 $f(\vec{v})=M_f\vec{v}+\vec{f_o}$
 
@@ -103,7 +103,7 @@ Schedule vector는 statement의 실행 시점을 나타내며, polyhedral analys
 Schedule vector를 설정하는 방법은 다음과 같습니다.
 
 1. Outermost scope부터 기술
-2. Loop이 존재한다면, 그 loop의 induction variable을 넣는다
+2. loop이 존재한다면, 그 loop의 induction variable을 넣는다
 3. 한 scope안에 여러 statement (loop 포함) 이 존재한다면, scalar 값을 넣어 분리합니다 (이를 scalar dimension이라 부릅니다)
     1. 위 예시에서는 loop i 내부에 loop이 2개가 있으므로, 이를 scalar dimension으로 분리했습니다.
 4. 1,2,3 에 의해, 가능한 schedule vector의 최대 길이는 nested loop이 m개 있다 할 때, 2m + 1개가 됩니다.
@@ -140,14 +140,14 @@ S2 :  $\begin{pmatrix}1&k&l\end{pmatrix}$ → 1번째 loop k의 내부 유일한
 
 ## Polyhedral analysis
 
-이제 Polyhedral analysis를 수행해 봅시다. 가장 먼저, Loop이 병렬화가 가능한지 분석을 해 보겠습니다.
+이제 Polyhedral analysis를 수행해 봅시다. 가장 먼저, loop이 병렬화가 가능한지 분석을 해 보겠습니다.
 
 ### Parallelism analysis
 
 다음 코드를 생각해보죠. 아래 코드는 병렬화가 가능할까요?
 
 ```c
-// Q. Loop i 와 Loop j 는 병렬화가 가능한가?
+// Q. loop i 와 loop j 는 병렬화가 가능한가?
 for(int i = 0; i < N; ++i){
   for(int j = 0; j < N; ++j){
     if(i > j)
@@ -156,11 +156,16 @@ for(int i = 0; i < N; ++i){
 }
 ```
 
-우선 병렬화가 가능하려면 어떤 조건이 필요할까요? Loop i 혹은 Loop j를 병렬화 하려면, 각 iteration사이에 아무런 연관성이 없어야 합니다. 각 iteration이 독립적으로 실행된다면 상관 없지만, 한 Iteration에서 쓴 것을 이후의 다른 iteration에서 읽어야 한다면 (혹은 그 반대가 된다면) Loop을 병렬화할 수 없겠지요. 그렇다면 위의 예시 코드는 어떤가요?
+우선 병렬화가 가능하려면 어떤 조건이 필요할까요? loop i 혹은 loop j를 병렬화 하려면, 각 iteration사이에 아무런 연관성이 없어야 합니다. 각 iteration이 독립적으로 실행된다면 상관 없지만, 한 iteration에서 쓴 것을 이후의 다른 iteration에서 읽어야 한다면 (혹은 그 반대가 된다면) loop을 병렬화할 수 없겠지요. 그렇다면 위의 예시 코드는 어떤가요?
 
-이 코드를 Matrix B를 transpose하고 있습니다. 상삼각 matrix (upper-triangular matrix)를 하삼각 matrix(lower-triangular matrix) 로 옮겨 쓰고 있지요. 따라서, 각 loop iteration 사이에 아무런 관계가 없으므로 (dependency가 없으므로) 병렬화가 가능합니다.
+이 코드는 matrix B를 transpose하고 있습니다. 상삼각 matrix (upper-triangular matrix)를 하삼각 matrix(lower-triangular matrix) 로 옮겨 쓰고 있지요. 따라서, 각 loop iteration 사이에 아무런 관계가 없으므로 (dependency가 없으므로) 병렬화가 가능합니다.
 
 그러면 이것을 Polyhedral analysis로 어떻게 알 수 있을까요?
+우리는 몇 가지 과정을 거쳐서 이를 알아낼 수 있습니다.
+  
+1. 각 statement의 iteration vector를 구합니다.
+2. iteration vector를 바탕으로, Domain을 나타냅니다.
+3. Domain이 비어있는지 확인합니다.
 
 S0의 iteration vector는 (i, j)가 됩니다. 그리고, S0에는 읽기와 쓰기, 두 개의 동작이 있지요.
 
@@ -204,7 +209,7 @@ for(int i = 0; i < N; ++i){
 
 이 경우 코드는 어떻게 병렬화가 가능할까요?
 
-1. Iteration domain
+1. iteration domain
     1. i ≥ 0 && i < N
     2. j ≥ 0 && j < M
 2. iteration vector
@@ -255,6 +260,9 @@ $$
 $$
 
 이때 $\vec{t}$는 iteration vector를 의미합니다.
+
+Transformation matrix 내부의 parameter들을 정하게 되면, 새로운 schedule vector가 나오겠지요? 그럼 우리가 이전에 정한 constraint들을 유지한 채로, transformation matrix를 적용해서 나온 schedule vector대로 프로그램을 만들면,
+그 프로그램은 모습이 조금 바뀌겠지만, (Loop 의 구조나 statement들의 index가 바뀌겠지만) 변환 이후에도 정상적인 동작을 할 것입니다. 어쩌면 새로운 구조에서는 병렬화가 가능해지거나, temporary variable이 필요하지 않을수도 있지요.
 
 Transformation parameter는 일반적으로는 ILP를 통해 cost function을 최소화시키는 방향으로 찾으나 genetic algorithm, bayesian optimization, RL 등등의 다양한 방법을 생각해볼 수 있습니다.
 
@@ -319,6 +327,8 @@ for(t0 = 0; t0 < N; ++t0){
   }
 }
 ```
+
+이 코드느 원래 코드와 같은 동작을 하지만, loop의 구조가 조금 달라졌습니다 (맨 바깥쪽 loop이 하나로 합쳐졌지요). 이 프로그램이 기존과 똑같은 결과를 낸다는 것은 우리가 transformation matrix의 파라미터를 이전 프로그램의 constraint (dependency 등) 를 만족한다는 가정을 미리 넣고 찾았기 때문에 보장된다고 할 수 있습니다.
 
 결국 핵심은, domain constraint들을 모두 만족하면서 가장 cost function을 작게 만드는 transformation matrix $\tau_s$를 찾는 것인데요, 보통은 ILP를 통해 찾습니다. 예를 들어, 위 예시에서는 statement `S2` 에서 C를 read하는 부분이 statement `S1` 에서 C를 write하는 부분보다 나중에 실행되어야 한다는 constraint와, i, j, k의 loop 범위에 관한 constraint들을 추가할 수 있겠지요? 이러한 constraint를 추가한 다음 ILP를 푸는 식이지요.
 
