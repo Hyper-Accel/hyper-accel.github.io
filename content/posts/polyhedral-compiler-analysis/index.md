@@ -45,7 +45,7 @@ $k = h\vec{v}$ (k는 상수)
 
 ### Polyhedron
 
-Polyhedron이란, 유한 개의 Affine hyperplane으로 인해 나눠진 공간 (half-space) 의 교집합입니다. 그리고, bounded된 polyhedron을 polytope이라고 부릅니다. (닫힌 공간이라는 의미이지요)
+Polyhedron이란, 유한 개의 Affine hyperplane으로 인해 나눠진 공간 (half-space) 의 교집합입니다. 그리고, bounded된 polyhedron을 polytope이라고 부릅니다. (닫힌 공간이라는 의미입니다)
 
 ![polytope](polytope.png)
 
@@ -53,19 +53,19 @@ Polyhedron이란, 유한 개의 Affine hyperplane으로 인해 나눠진 공간 
 
 도메인 D를 half-space들로 정의되는 polyhedron이라고 할 때,
 
-Farkas lemma는 도메인 D 안에서 affine form (아핀 함수)을 도메인 D를 정의하는 half-space 들의 선형 식으로 표현 가능함을 의미한다.
+Farkas lemma는 도메인 D 안에서 affine form (아핀 함수)을 도메인 D를 정의하는 half-space 들의 선형 식으로 표현 가능함을 의미합니다.
 
 다시 말해, half space들이 다음과 같이 정의될 때,
 
 $a_k\vec{x} + b_k ≥ 0, k = 1,p$
 
-affine function (아핀 함수) $\psi(\vec{x})$ 가 D 안에서 non-negative인 것과 $\psi(\vec{x})$ 가 non-negative인 half space들의 선형 결합으로 표현 가능하다는것은 동치이다.
+affine function (아핀 함수) $\psi(\vec{x})$ 가 D 안에서 non-negative인 것과 $\psi(\vec{x})$ 가 non-negative인 half space들의 선형 결합으로 표현 가능하다는것은 동치입니다.
 
 $\psi(\vec{x}) = \lambda_0 + \sum_{k=1}^{p}\lambda_k(a_k\vec{x} + b_k)\   where \ \lambda_0, \lambda_1, ..., \lambda_p \ge 0$ 
 
-조금 더 풀어서 설명하자면 우리가 어떤 아핀 함수를 정의했고, 이것이 domain D 안에 있다고 하자. 만약 이 함수가 비음수 (non-negative)라면, 그 함수는 domain D를 정의하는 half-space들의 선형 식으로 표현이 가능하며, 또한 그 반대(역) 도 성립한다.
+조금 더 풀어서 설명하자면 우리가 어떤 아핀 함수를 정의했고, 이것이 domain D 안에 있다고 하겠습니다. 만약 이 함수가 비음수 (non-negative)라면, 그 함수는 domain D를 정의하는 half-space들의 선형 식으로 표현이 가능하며, 또한 그 반대(역) 도 성립합니다.
 
-이 Lemma를 이용하여 Affine 함수로 정의된 schedule을 변환할 때, half-space들의 선형 결합으로 변환하여 ILP를 이용해 문제를 더 쉽게 풀 수 있도록 해 준다.
+이 Lemma를 이용하여 Affine 함수로 정의된 schedule을 변환할 때, half-space들의 선형 결합으로 변환하여 ILP를 이용해 문제를 더 쉽게 풀 수 있도록 해 줍니다.
 
 ---
 
