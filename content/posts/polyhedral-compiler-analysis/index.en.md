@@ -26,7 +26,7 @@ Before going into detail, let's go over some basic concepts. Most of these are e
 
 An affine function is a function that can be defined as a linear transformation plus a translation. When you apply an affine transformation, points that formed a line move to the same line, and the midpoint of a line segment remains the midpoint after the transformation. In other words, you can think of an affine transformation as allowing a constant term in a linear transformation.
 
-$f(\vec{v})=M_f\vec{v}+\vec{f_o}$
+$f(\vec{v})=M_f\vec{v}+\vec{f}_0$
 
 Here, $M$ is a matrix and $\vec{f}_0$ is a constant vector.
 
@@ -94,7 +94,7 @@ for(int i = 0; i < N; ++i){
 This program consists of three loops and two statements. Each statement has an **iteration vector**, which is a vector representation of the loop induction variables (iterator variables) that affect that statement.
 
 That is, the iteration vector for Statement 1 `x[i] = x[j]*2 + y[j]` is `(i, j)`,
-and the iteration vector for Statement 2 `y[k] = y[k]*2` is `(i, k)`.
+and the iteration vector for Statement 2 `y[i] = y[i]*2` is `(i, k)`.
 
 ### Schedule vector
 
@@ -321,11 +321,11 @@ for(t0 = 0; t0 < N; ++t0){
   for(t1 = 0; t1 < N; ++t1){
     for(t3 = 0; t3 < N; ++t3){
       // i -> t1, j -> t0, k -> t3
-      c[t1][t0] = c[t1][t0] + a[t1][t3]*b[t3][t0]; // S0
+      c[t1][t0] = c[t1][t0] + a[t1][t3]*b[t3][t0]; // S1
     }
     for(t3=0; t3 < N; ++t3){
       // i -> t3, j -> t0, k -> t1
-      d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0]; // S1
+      d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0]; // S2
     }
   }
 }

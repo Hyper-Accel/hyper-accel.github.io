@@ -6,7 +6,7 @@ cover:
   image: "title.png"
   alt: "<alt text>"
   caption: "<text>"
-  relative: false 
+  relative: false
 authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
@@ -26,7 +26,7 @@ comments: true
 
 Affine 함수는 선형 변환 + 평행이동 으로 정의 가능한 함수를 의미합니다. Affine 변환을 하게 되면, 원래 선을 이루던 점들은 같은 선으로 이동하고, 두 선분의 중앙에 있던 점은 변환 후에도 여전히 중앙에 있지요. 즉, 일차 변환에서 상수합을 가능하도록 한 것을 affine 변환이라고 생각하시면 됩니다.
 
-$f(\vec{v})=M_f\vec{v}+\vec{f_o}$
+$f(\vec{v})=M_f\vec{v}+\vec{f}_0$
 
 M은 행렬을 의미하며 $\vec{f}_0$ 는 상수 행렬을 의미합니다.
 
@@ -95,7 +95,7 @@ for(int i = 0; i < N; ++i){
 
 즉, Statement 1 `x[i] = x[j]*2 + y[j]` 의 iteration vector는 `(i, j)` 가,
 
-Statement2 `y[k] = y[k]*2` 의 iteration vector는 `(i, k)` 가 됩니다.
+Statement2 `y[i] = y[i]*2` 의 iteration vector는 `(i, k)` 가 됩니다.
 
 ### Schedule vector
 
@@ -163,7 +163,7 @@ for(int i = 0; i < N; ++i){
 
 우선 병렬화가 가능하려면 어떤 조건이 필요할까요? loop i 혹은 loop j를 병렬화 하려면, 각 iteration사이에 아무런 연관성이 없어야 합니다. 각 iteration이 독립적으로 실행된다면 상관 없지만, 한 iteration에서 쓴 것을 이후의 다른 iteration에서 읽어야 한다면 (혹은 그 반대가 된다면) loop을 병렬화할 수 없겠지요. 그렇다면 위의 예시 코드는 어떤가요?
 
-이 코드는 matrix B를 transpose하고 있습니다. 상삼각 matrix (upper-triangular matrix)를 하삼각 matrix(lower-triangular matrix) 로 옮겨 쓰고 있지요. 따라서, 각 loop iteration 사이에 아무런 관계가 없으므로 (dependency가 없으므로) 병렬화가 가능합니다.
+이 코드는 matrix B를 transpose하고 있습니다. 상삼각 matrix (upper-triangular matrix)를 하삼각 matrix (lower-triangular matrix) 로 옮겨 쓰고 있지요. 따라서, 각 loop iteration 사이에 아무런 관계가 없으므로 (dependency가 없으므로) 병렬화가 가능합니다.
 
 그러면 이것을 Polyhedral analysis로 어떻게 알 수 있을까요?
 우리는 몇 가지 과정을 거쳐서 이를 알아낼 수 있습니다.
@@ -323,17 +323,17 @@ for(t0 = 0; t0 < N; ++t0){
   for(t1 = 0; t1 < N; ++t1){
     for(t3 = 0; t3 < N; ++t3){
       // i -> t1, j -> t0, k -> t3
-      c[t1][t0] = c[t1][t0] + a[t1][t3]*b[t3][t0]; // S0
+      c[t1][t0] = c[t1][t0] + a[t1][t3]*b[t3][t0]; // S1
     }
     for(t3=0; t3 < N; ++t3){
       // i -> t3, j -> t0, k -> t1
-      d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0]; // S1
+      d[t3][t0] = d[t3][t0] + e[t3][t1]*c[t1][t0]; // S2
     }
   }
 }
 ```
 
-이 코드느 원래 코드와 같은 동작을 하지만, loop의 구조가 조금 달라졌습니다 (맨 바깥쪽 loop이 하나로 합쳐졌지요). 이 프로그램이 기존과 똑같은 결과를 낸다는 것은 우리가 transformation matrix의 파라미터를 이전 프로그램의 constraint (dependency 등) 를 만족한다는 가정을 미리 넣고 찾았기 때문에 보장된다고 할 수 있습니다.
+이 코드는 원래 코드와 같은 동작을 하지만, loop의 구조가 조금 달라졌습니다 (맨 바깥쪽 loop이 하나로 합쳐졌지요). 이 프로그램이 기존과 똑같은 결과를 낸다는 것은 우리가 transformation matrix의 파라미터를 이전 프로그램의 constraint (dependency 등) 를 만족한다는 가정을 미리 넣고 찾았기 때문에 보장된다고 할 수 있습니다.
 
 결국 핵심은, domain constraint들을 모두 만족하면서 가장 cost function을 작게 만드는 transformation matrix $\tau_s$를 찾는 것인데요, 보통은 ILP를 통해 찾습니다. 예를 들어, 위 예시에서는 statement `S2` 에서 C를 read하는 부분이 statement `S1` 에서 C를 write하는 부분보다 나중에 실행되어야 한다는 constraint와, i, j, k의 loop 범위에 관한 constraint들을 추가할 수 있겠지요? 이러한 constraint를 추가한 다음 ILP를 푸는 식이지요.
 
