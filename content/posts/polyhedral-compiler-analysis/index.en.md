@@ -11,8 +11,14 @@ authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
 summary: [Introduction to polyhedral analysis. Which gives simplified guide for understanding polyhedral compiler analysis & optimization.]
-series : ["Polyhedral Compiler"]
+series: ["Polyhedral Compiler"]
 comments: true
+description: "A concise walk-through of polyhedral compiler basics, covering affine concepts, polyhedra and Farkas lemma, iteration/schedule vectors, parallelism analysis, and polyhedral transformation."
+keywords: [
+  "Polyhedral Analysis", "Polyhedral Compiler", "Affine Function",
+  "Polyhedron", "Farkas Lemma", "Schedule Vector",
+  "Parallelism", "ILP"
+]
 ---
 
 Today I brought a somewhat different topic. Have you ever thought it would be great if a compiler could automatically transform loops for optimization or parallelization while using it? Compiler engineers have had the same concerns. One approach that emerged is the **polyhedral compiler**, which is used by **LLVM's Polly** project and **MLIR's affine dialect**. Today I'll introduce this approach.

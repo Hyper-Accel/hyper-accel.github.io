@@ -10,9 +10,15 @@ cover:
 authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
-series : ["Polyhedral Compiler"]
+series: ["Polyhedral Compiler"]
 summary: [Polyhedral compiler에서 사용되는 기법들에 대해 간단히 소개한 글입니다.]
+description: "Polyhedral compiler를 이해하기 위한 Affine 함수/초평면, polyhedron, Farkas lemma 같은 기본 개념부터 iteration/schedule vector, 병렬성 분석, polyhedral transformation까지 핵심 흐름을 간단히 정리한 글입니다."
 comments: true
+keywords: [
+  "Polyhedral Analysis", "Polyhedral Compiler", "Affine Function",
+  "Polyhedron", "Farkas Lemma", "Schedule Vector",
+  "Parallelism", "ILP"
+]
 ---
 
 오늘은 조금은 색다른 주제를 가지고 왔습니다. 컴파일러를 사용하다가, 자동으로 컴파일러가 loop을 변형하여 최적화해주거나, 병렬화를 해 주면 좋겠다고 생각한 적이 있지 않은가요? 컴파일러 엔지니어들도 이러한 고민들을 해왔습니다. 그 중 하나의 방법으로 등장한 것이 **polyhedral compiler** 인데요, **LLVM Polly** 프로젝트, **MLIR affine dialect**가 사용하는 방법이기도 합니다. 오늘은 이 방법에 대해 소개해 보겠습니다. 
