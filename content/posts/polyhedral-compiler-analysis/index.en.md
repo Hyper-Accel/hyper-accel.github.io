@@ -1,20 +1,21 @@
 ---
-date: '2026-01-11T15:10:28+09:00'
+date: '2026-01-29T15:10:28+09:00'
 draft: false
-title: 'Polyhedral compilation'
+title: 'Polyhedral Analysis'
 cover:
   image: "title.png"
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "Polyhedral Analysis"
+  caption: "Polyhedral Analysis"
   relative: false
 authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
-summary: [Polyhedral compiler explanation]
+summary: [Introduction to polyhedral analysis. Which gives simplified guide for understanding polyhedral compiler analysis & optimization.]
+series : ["Polyhedral Compiler"]
 comments: true
 ---
 
-Today I brought a somewhat different topic. Have you ever thought it would be great if a compiler could automatically transform loops for optimization or parallelization while using it? Compiler engineers have had the same concerns. One approach that emerged is the polyhedral compiler, which is used by LLVM's Polly project and MLIR's affine dialect. Today I'll introduce this approach.
+Today I brought a somewhat different topic. Have you ever thought it would be great if a compiler could automatically transform loops for optimization or parallelization while using it? Compiler engineers have had the same concerns. One approach that emerged is the **polyhedral compiler**, which is used by **LLVM's Polly** project and **MLIR's affine dialect**. Today I'll introduce this approach.
 
 ---
 
@@ -22,7 +23,7 @@ Today I brought a somewhat different topic. Have you ever thought it would be gr
 
 Before going into detail, let's go over some basic concepts. Most of these are easy to encounter with a little linear algebra.
 
-### Affine function
+### **Affine function**
 
 An affine function is a function that can be defined as a linear transformation plus a translation. When you apply an affine transformation, points that formed a line move to the same line, and the midpoint of a line segment remains the midpoint after the transformation. In other words, you can think of an affine transformation as allowing a constant term in a linear transformation.
 
@@ -30,7 +31,7 @@ $f(\vec{v})=M_f\vec{v}+\vec{f}_0$
 
 Here, $M$ is a matrix and $\vec{f}_0$ is a constant vector.
 
-### Affine hyperplane
+### **Affine hyperplane**
 
 In an n-dimensional space, an affine subspace of dimension n-1 is called an affine hyperplane.
 
@@ -39,11 +40,12 @@ A hyperplane is the set of vectors ($\vec{v}$) that satisfy:
 $k = h\vec{v}$ (k is a constant)
 
 So if n is 3, the hyperplane is a 2D plane.
+
 ![hyperplane](hyperplane.png)
 
-### Polyhedron
+### **Polyhedron**
 
-A polyhedron is the intersection of half-spaces split by a finite number of affine hyperplanes. A bounded polyhedron is called a polytope (meaning it is a closed region).
+A **polyhedron** is the intersection of half-spaces split by a finite number of **affine hyperplanes**. A bounded polyhedron is called a **polytope** (meaning it is a closed region).
 
 In the figure below, there are four 1D hyperplanes (since it is a 2D space, the hyperplanes are 1D), and they define a polytope. That is, it is the set of $\vec{x}$ defined by:
 
@@ -54,9 +56,9 @@ $A \in \mathbb{R}^{m \times n}, \vec{b} \in \mathbb{R}^m$ (when the polyhedron i
 
 ![polytope](polytope.png)
 
-### Farkas Lemma
+### **Farkas Lemma**
 
-Let the domain D be a polyhedron defined by half-spaces.
+Let the domain $D$ be a polyhedron defined by half-spaces.
 
 Farkas's lemma states that an affine form (affine function) inside domain D can be expressed as a linear combination of the half-spaces that define D.
 
@@ -91,14 +93,14 @@ for(int i = 0; i < N; ++i){
 }
 ```
 
-This program consists of three loops and two statements. Each statement has an **iteration vector**, which is a vector representation of the loop induction variables (iterator variables) that affect that statement.
+This program consists of three loops and two statements. Each statement has an **iteration vector**, which is a vector representation of the loop induction variables (iterator variables. i, j and k in the above example.) that affect that statement.
 
 That is, the iteration vector for Statement 1 `x[i] = x[j]*2 + y[j]` is `(i, j)`,
 and the iteration vector for Statement 2 `y[i] = y[i]*2` is `(i, k)`.
 
-### Schedule vector
+### **Schedule vector**
 
-A schedule vector indicates when each statement is executed. The schedule vector contains information about the statement's position and the loops that enclose it.
+A **schedule vector** indicates when each statement is executed. The schedule vector contains information about the statement's position and the loops that enclose it.
 
 The schedule vector represents the execution time of a statement, and in polyhedral analysis it is used to check statement conditions or perform transformations.
 
@@ -142,11 +144,11 @@ S2 :  $\begin{pmatrix}1&k&l\end{pmatrix}$ → the only statement in loop l insid
 
 ---
 
-## Polyhedral analysis
+## **Polyhedral analysis**
 
 Now let's perform polyhedral analysis. First, let's analyze whether loops can be parallelized.
 
-### Parallelism analysis
+### **Parallelism analysis**
 
 Consider the following code. Can it be parallelized?
 
@@ -199,7 +201,7 @@ Expanding $W(\vec{s}) = R(\vec{t})$ gives $(i', j') = (j, i)$. Substituting this
 
 But $i > j$ and $j > i$ clearly cannot be satisfied at the same time.
 
-Therefore, the dependence polyhedron is empty, so there is no dependency between iterations, and both loop i and loop j can be parallelized. (Since the domain is empty in the first place, there's no need to build a schedule vector.)
+Therefore, the **dependence polyhedron** is empty, so there is no dependency between iterations, and both loop i and loop j can be parallelized. (Since the domain is empty in the first place, there's no need to build a schedule vector.)
 
 Let's look at one more example.
 
@@ -243,11 +245,11 @@ We also created an example of analyzing parallelism by constructing schedule vec
 
 ---
 
-## Polyhedral transformation
+## **Polyhedral transformation**
 
-Now let's learn about polyhedral transformation. Polyhedral transformation is the process of changing analyzed code into a more efficient form, and it is executed by libraries like llvm-polly for optimization.
+Now let's learn about **polyhedral transformation**. Polyhedral transformation is the process of changing analyzed code into a more efficient form, and it is executed by libraries like llvm-polly for optimization.
 
-The key is to transform the code in a direction that minimizes cost by defining a cost function while preserving correctness.
+The key is to transform the code in a direction that minimizes cost by defining a **cost function** while preserving correctness.
 
 For the i-th dimension of the schedule vector of statement $S^k$, we can write part of the schedule vector as follows:
 
@@ -265,9 +267,9 @@ $$
 
 Here, $\vec{t}$ is the iteration vector.
 
-Once we determine the parameters in the transformation matrix, we get a new schedule vector. If we then build the program according to the new schedule vector while keeping the previously defined constraints, the program will look a bit different (the loop structure or statement indices may change), but it will still execute correctly after the transformation. In a new structure, it might become parallelizable or might not require temporary variables.
+Once we determine the parameters in the **transformation matrix**, we get a new schedule vector. If we then build the program according to the new schedule vector while keeping the previously defined constraints, the program will look a bit different (the loop structure or statement indices may change), but it will still execute correctly after the transformation. In a new structure, it might become parallelizable or might not require temporary variables.
 
-Transformation parameters are typically found by minimizing a cost function via ILP, but we can also consider other methods such as genetic algorithms, Bayesian optimization, and RL.
+Transformation parameters are typically found by minimizing a **cost function** via **ILP**, but we can also consider other methods such as genetic algorithms, Bayesian optimization, and RL.
 
 Let's think through this in more detail with an example.
 
@@ -333,7 +335,7 @@ for(t0 = 0; t0 < N; ++t0){
 
 This code behaves the same as the original, but the loop structure is slightly different (the outermost loop has been merged). The fact that it produces the same result is guaranteed because we find the transformation matrix parameters with the assumption that they satisfy the constraints (dependencies, etc.) of the original program.
 
-In the end, the core is to find the transformation matrix $\tau_s$ that satisfies all domain constraints while minimizing the cost function, and usually we do this via ILP. For example, in the above example, we can add constraints that the part reading C in statement `S2` must execute after the part writing C in statement `S1`, and constraints on the loop ranges of i, j, k. We then solve the ILP with these constraints.
+In the end, the core is to find the **transformation matrix** $\tau_s$ that satisfies all domain constraints while minimizing the **cost function**, and usually we do this via **ILP**. For example, in the above example, we can add constraints that the part reading C in statement `S2` must execute after the part writing C in statement `S1`, and constraints on the loop ranges of i, j, k. We then solve the ILP with these constraints.
 
 A more concrete algorithm for finding the optimal transformation matrix will be explained in a later post.
 

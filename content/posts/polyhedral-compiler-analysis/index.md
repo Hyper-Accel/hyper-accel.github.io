@@ -1,20 +1,21 @@
 ---
-date: '2026-01-11T15:10:28+09:00'
+date: '2026-01-29T15:10:28+09:00'
 draft: false
-title: 'Polyhedral compilation'
+title: 'Polyhedral Analysis'
 cover:
   image: "title.png"
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "Polyhedral Analysis"
+  caption: "Polyhedral Analysis"
   relative: false
 authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
-summary: [Polyhedral compiler explanation]
+series : ["Polyhedral Compiler"]
+summary: [Polyhedral compiler에서 사용되는 기법들에 대해 간단히 소개한 글입니다.]
 comments: true
 ---
 
-오늘은 조금은 색다른 주제를 가지고 왔습니다. 컴파일러를 사용하다가, 자동으로 컴파일러가 loop을 변형하여 최적화해주거나, 병렬화를 해 주면 좋겠다고 생각한 적이 있지 않은가요? 컴파일러 엔지니어들도 이러한 고민들을 해왔습니다. 그 중 하나의 방법으로 등장한 것이 polyhedral compiler 인데요, LLVM 의 polly 프로젝트, MLIR의 affine dialect가 사용하는 방법이기도 합니다. 오늘은 이 방법에 대해 소개해 보겠습니다. 
+오늘은 조금은 색다른 주제를 가지고 왔습니다. 컴파일러를 사용하다가, 자동으로 컴파일러가 loop을 변형하여 최적화해주거나, 병렬화를 해 주면 좋겠다고 생각한 적이 있지 않은가요? 컴파일러 엔지니어들도 이러한 고민들을 해왔습니다. 그 중 하나의 방법으로 등장한 것이 **polyhedral compiler** 인데요, **LLVM Polly** 프로젝트, **MLIR affine dialect**가 사용하는 방법이기도 합니다. 오늘은 이 방법에 대해 소개해 보겠습니다. 
 
 ---
 
@@ -22,7 +23,7 @@ comments: true
 
 먼저, 자세히 설명하기 전에 기본적인 개념을 짚고 넘어가고자 합니다. 대부분의 개념들은 선형대수학을 조금만 알고 있다면 쉽게 접할 수 있는 것들입니다.
 
-### Affine function (아핀 함수)
+### **Affine function** (아핀 함수)
 
 Affine 함수는 선형 변환 + 평행이동 으로 정의 가능한 함수를 의미합니다. Affine 변환을 하게 되면, 원래 선을 이루던 점들은 같은 선으로 이동하고, 두 선분의 중앙에 있던 점은 변환 후에도 여전히 중앙에 있지요. 즉, 일차 변환에서 상수합을 가능하도록 한 것을 affine 변환이라고 생각하시면 됩니다.
 
@@ -30,7 +31,7 @@ $f(\vec{v})=M_f\vec{v}+\vec{f}_0$
 
 M은 행렬을 의미하며 $\vec{f}_0$ 는 상수 행렬을 의미합니다.
 
-### Affine hyperplane (아핀 초평면)
+### **Affine hyperplane** (아핀 초평면)
 
 n 차원 공간에서 n-1 차원인 affine subspace를 affine hyperplane 이라고 합니다.
 
@@ -39,11 +40,12 @@ hyperplane은 다음을 만족하는 벡터 ( $\vec{v}$) 의 집합입니다.
 $k = h\vec{v}$ (k는 상수)
 
 즉, n이 3차원이라면, hyperplane은 2차원 면이 됩니다.
+
 ![hyperplane](hyperplane.png)
 
-### Polyhedron
+### **Polyhedron**
 
-Polyhedron이란, 유한 개의 Affine hyperplane으로 인해 나눠진 공간 (half-space) 의 교집합입니다. 그리고, bounded된 polyhedron을 polytope이라고 부릅니다. (닫힌 공간이라는 의미입니다)
+**Polyhedron**이란, 유한 개의 **Affine hyperplane**으로 인해 나눠진 공간 (half-space) 의 교집합입니다. 그리고, bounded된 polyhedron을 **polytope**이라고 부릅니다. (닫힌 공간이라는 의미입니다)
 
 아래 그림에서는, 4개의 1D hyperplane (2D space 이므로 hyperplane은 1D) 가 존재하며, 이로 인해 polytope를 정의할 수 있습니다. 즉, 다음 식에서 정의한 $\vec{x}$의 집합이라 할 수 있지요.
 
@@ -54,9 +56,9 @@ $A \in \mathbb{R}^{m \times n}, \vec{b} \in \mathbb{R}^m$ (n 차원에서 m개�
 
 ![polytope](polytope.png)
 
-### Farkas Lemma
+### **Farkas Lemma**
 
-도메인 D를 half-space들로 정의되는 polyhedron이라고 할 때,
+도메인 $D$ 를 half-space들로 정의되는 polyhedron이라고 할 때,
 
 Farkas lemma는 도메인 D 안에서 affine form (아핀 함수)을 도메인 D를 정의하는 half-space 들의 선형 식으로 표현 가능함을 의미합니다.
 
@@ -91,15 +93,15 @@ for(int i = 0; i < N; ++i){
 }
 ```
 
-이 프로그램은 3개의 loop과 2개의 statement로 이루어져 있습니다. 각 statement 는 **iteration vector**를 가지는데, iteration vector란, 각 statement가 영향을 받는 loop induction variable (iterator variable)들을 벡터 형태로 표현한 것입니다.
+이 프로그램은 3개의 loop과 2개의 statement로 이루어져 있습니다. 각 statement 는 **iteration vector**를 가지는데, **iteration vector**란, 각 statement가 영향을 받는 loop induction variable (Loop에서 변하는 index variable. 위 예시에서는 i, j, k)들을 벡터 형태로 표현한 것입니다.
 
 즉, Statement 1 `x[i] = x[j]*2 + y[j]` 의 iteration vector는 `(i, j)` 가,
 
 Statement2 `y[i] = y[i]*2` 의 iteration vector는 `(i, k)` 가 됩니다.
 
-### Schedule vector
+### **Schedule vector**
 
-Schedule vector란 각 statement가 언제 실행될지 나타내는 vector입니다. schedule vector에는 statement가 속한 위치와 감싸고 있는 loop들에 대한 정보가 들어 있습니다.
+**Schedule vector**란 각 statement가 언제 실행될지 나타내는 vector입니다. schedule vector에는 statement가 속한 위치와 감싸고 있는 loop들에 대한 정보가 들어 있습니다.
 
 Schedule vector는 statement의 실행 시점을 나타내며, polyhedral analysis에서는 이를 이용하여 statement의 조건을 검사하거나, transformation을 수행하게 됩니다.
 
@@ -143,11 +145,11 @@ S2 :  $\begin{pmatrix}1&k&l\end{pmatrix}$ → 1번째 loop k의 내부 유일한
 
 ---
 
-## Polyhedral analysis
+## **Polyhedral analysis**
 
 이제 Polyhedral analysis를 수행해 봅시다. 가장 먼저, loop이 병렬화가 가능한지 분석을 해 보겠습니다.
 
-### Parallelism analysis
+### **Parallelism analysis**
 
 다음 코드를 생각해보죠. 아래 코드는 병렬화가 가능할까요?
 
@@ -200,7 +202,7 @@ $W(\vec{s}) = R(\vec{t})$ 를 풀어 쓰면, $(i', j') = (j, i)$ 이고, 이를 
 
 그런데, $i > j$ 과 $j > i$ 는 당연히 동시에 만족될 수 없겠지요?
 
-따라서, dependence polyhedron은 공집합이 되어 아무런 iteration간 아무런 dependency가 없으므로, loop i 및 loop j가 모두 병렬화 가능하다는 결론에 이르게 됩니다. (애초에 domain이 공집합이니, Schedule vector를 만들 필요가 없지요)
+따라서, **dependence polyhedron**은 공집합이 되어 아무런 iteration간 아무런 dependency가 없으므로, loop i 및 loop j가 모두 병렬화 가능하다는 결론에 이르게 됩니다. (애초에 domain이 공집합이니, Schedule vector를 만들 필요가 없지요)
 
 하나의 예시를 더 들어 보겠습니다.
 
@@ -244,11 +246,11 @@ $$
 
 ---
 
-## Polyhedral transformation
+## **Polyhedral transformation**
 
-이제, polyhedral transformation에 대해 알아봅시다. polyhedral transformation은 분석한 code를 더 효율적으로 바꾸는 과정인데요, llvm-polly같은 라이브러리에서 최적화를 위해 실행합니다.
+이제, **polyhedral transformation**에 대해 알아봅시다. polyhedral transformation은 분석한 code를 더 효율적으로 바꾸는 과정인데요, llvm-polly같은 라이브러리에서 최적화를 위해 실행합니다.
 
-핵심은, 코드의 correctness를 유지하면서, cost function을 만들어, cost를 줄이는 방향으로 코드를 변환하는 것입니다.
+핵심은, 코드의 correctness를 유지하면서, **cost function**을 만들어, cost를 줄이는 방향으로 코드를 변환하는 것입니다.
 
 Statement $S^k$의 $i$ 번째 dimension에 관하여 schedule vector의 일부를 다음과 같이 쓸 수 있습니다.
 
@@ -266,10 +268,10 @@ $$
 
 이때 $\vec{t}$는 iteration vector를 의미합니다.
 
-Transformation matrix 내부의 parameter들을 정하게 되면, 새로운 schedule vector가 나오겠지요? 그럼 우리가 이전에 정한 constraint들을 유지한 채로, transformation matrix를 적용해서 나온 schedule vector대로 프로그램을 만들면,
+**Transformation matrix** 내부의 parameter들을 정하게 되면, 새로운 schedule vector가 나오겠지요? 그럼 우리가 이전에 정한 constraint들을 유지한 채로, **transformation matrix**를 적용해서 나온 schedule vector대로 프로그램을 만들면,
 그 프로그램은 모습이 조금 바뀌겠지만, (Loop 의 구조나 statement들의 index가 바뀌겠지만) 변환 이후에도 정상적인 동작을 할 것입니다. 어쩌면 새로운 구조에서는 병렬화가 가능해지거나, temporary variable이 필요하지 않을수도 있지요.
 
-Transformation parameter는 일반적으로는 ILP를 통해 cost function을 최소화시키는 방향으로 찾으나 genetic algorithm, bayesian optimization, RL 등등의 다양한 방법을 생각해볼 수 있습니다.
+Transformation parameter는 일반적으로는 **ILP**를 통해 cost function을 최소화시키는 방향으로 찾으나 genetic algorithm, bayesian optimization, RL 등등의 다양한 방법을 생각해볼 수 있습니다.
 
 이 역시 예시를 통해 자세히 생각해 봅시다.
 
@@ -335,7 +337,7 @@ for(t0 = 0; t0 < N; ++t0){
 
 이 코드는 원래 코드와 같은 동작을 하지만, loop의 구조가 조금 달라졌습니다 (맨 바깥쪽 loop이 하나로 합쳐졌지요). 이 프로그램이 기존과 똑같은 결과를 낸다는 것은 우리가 transformation matrix의 파라미터를 이전 프로그램의 constraint (dependency 등) 를 만족한다는 가정을 미리 넣고 찾았기 때문에 보장된다고 할 수 있습니다.
 
-결국 핵심은, domain constraint들을 모두 만족하면서 가장 cost function을 작게 만드는 transformation matrix $\tau_s$를 찾는 것인데요, 보통은 ILP를 통해 찾습니다. 예를 들어, 위 예시에서는 statement `S2` 에서 C를 read하는 부분이 statement `S1` 에서 C를 write하는 부분보다 나중에 실행되어야 한다는 constraint와, i, j, k의 loop 범위에 관한 constraint들을 추가할 수 있겠지요? 이러한 constraint를 추가한 다음 ILP를 푸는 식이지요.
+결국 핵심은, domain constraint들을 모두 만족하면서 가장 **cost function**을 작게 만드는 **transformation matrix** $\tau_s$를 찾는 것인데요, 보통은 **ILP**를 통해 찾습니다. 예를 들어, 위 예시에서는 statement `S2` 에서 C를 read하는 부분이 statement `S1` 에서 C를 write하는 부분보다 나중에 실행되어야 한다는 constraint와, i, j, k의 loop 범위에 관한 constraint들을 추가할 수 있겠지요? 이러한 constraint를 추가한 다음 ILP를 푸는 식이지요.
 
 보다 구체적으로 optimal transformation matrix를 어떻게 찾는지에 관한 알고리즘은 다음 글에서 설명드리도록 하겠습니다.
 
