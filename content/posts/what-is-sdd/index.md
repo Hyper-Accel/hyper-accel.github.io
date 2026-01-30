@@ -74,7 +74,7 @@ BDD(Behavior-Driven Development)는 사용자의 행위(Behavior)를 자연어�
 ### TDD(Test-Driven Development)
 TDD(Test-Driven Development)는 최소한의 테스트부터 작성하고, 이를 통과하는 코드를 작성하며 끊임없이 리팩토링하며 개발하는 방법론입니다. 마찬가지로 로그인 기능을 구현해야 했다면, "아이디가 비어있을 때 false를 뱉는 함수", "비밀번호가 틀리면 예외처리를 하는 함수" 부터 시작하여 점차 복잡한 기능을 구현해 나가는 방향으로 개발이 진행됩니다.
 
-### RDD(README Driven Developement)
+### RDD(README Driven Development)
 RDD(README Driven Developement)는 코드를 짜기 전에, 소프트웨어 설명서를 가장 완벽하게 작성하고, 사용자가 어떻게 설치하고 사용할지를 상상하며 개발합니다. 특히 오픈소스 프로젝트에서 중요한데, 이 기능을 가져다 쓸 다른 개발자를 위한 안내서를 쓴 다음에 구현이 이루어진다는 점이 포인트입니다.
 
 앞서 설명한 3가지 방법론과, SDD(Spec-Driven Development)의 가장 큰 차이점은 "누구를 위한 약속인가"에 있습니다. 
