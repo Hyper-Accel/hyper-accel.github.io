@@ -133,7 +133,7 @@ Even if the window mentioned above became really wide and infinite, there is ano
 
 When we have ten friends, we can remember their faces, names, personalities, and maybe even birthdays and phone numbers.
 
-And all ten friends are precious. But what if there are ten thousand friends? A hundred thousand? It would be difficult to even distinguish their voices.
+And all ten friends are precious. But what if there are ten thousand friends? A hundred thousand? It becomes difficult to even remember their names.
 
 You've heard of the Cocktail Party Effect, right?
 
