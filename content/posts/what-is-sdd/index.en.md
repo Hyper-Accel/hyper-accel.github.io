@@ -153,7 +153,7 @@ Once we know this technical background, it becomes clear why we suffered when wr
 
 **Lost in the Middle Phenomenon**: According to research, LLMs remember the beginning and end of text well, but amazingly forget the content in the middle. If data structures or utility functions defined early in the chat are buried in the middle of the conversation, the AI starts creating already existing functions anew (duplicate code) or creating random variables to use.
 
-**Attention Dilution**: As the conversation gets longer, the 'concentration' that AI can pour into each piece of information decreases. Important requirements get diluted mixed between small talk or error logs. Simply typing "No, not that" was make our LLM harder. Emotionally and memory-wise...
+**Attention Dilution**: As the conversation gets longer, the 'concentration' that AI can pour into each piece of information decreases. Important requirements get diluted mixed between small talk or error logs. Simply typing "No, not that" made things harder for our LLM. Emotionally and memory-wise...
 
 **Doom Loop**: When an error occurs and you give the log, usually AI gives correction code. But the same error occurs again. The AI's context window becomes filled with 'failed attempts' and 'error logs', becoming a state where it has learned wrong answer patterns rather than finding the right answer. It's rare that it actually learns and gives that answer forever, but finding the question itself becomes difficult in a window filled with wrong answers that aren't even correct.
 
