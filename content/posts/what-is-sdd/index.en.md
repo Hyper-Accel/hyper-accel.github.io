@@ -139,6 +139,7 @@ You've heard of the Cocktail Party Effect, right?
 
 ![alt text](cocktail_party.png)
 
+The Attention Mechanism is quite similar to the Cocktail Party Effect.
 We've all had the experience of hearing a specific friend's voice well in a noisy bar.
 
 LLMs also have a mathematical mechanism to find important content, that is, key requirements, in tens of thousands of lines of code and chat logs, and that is the **Attention Mechanism**. It is also the concept presented in the famous paper "Attention is all you need" that you might have heard of or read.
