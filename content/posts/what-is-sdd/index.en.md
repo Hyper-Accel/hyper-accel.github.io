@@ -209,7 +209,7 @@ Furthermore, since the majority of LLMs are trained more on English input, it se
 
 Some say that the foundation for the birth of a '1-Person Unicorn' company has been laid. A future where one person operates planning, design, development, and deployment by delegating to dozens of AI agents. Of course, it's a future that can absolutely not be achieved with vibe coding alone, and we must ponder how to achieve the best efficiency and the goal I want without too much paperwork in spec writing.
 
-Perhaps we are passing through a period. A new protocol where humans and AI learn each other's languages and create systems together. SDD is at that starting point. What features or services are you developing right now? The moment you open a markdown file and define the content you are imagining as a spec, a new engineering will begin.
+Perhaps we are passing through a period. A new protocol where humans and AI create systems together, SDD is at that starting point. What features or services are you developing right now? The moment you open a markdown file and define the content you are imagining as a spec, a new engineering will begin.
 
 ---
 
