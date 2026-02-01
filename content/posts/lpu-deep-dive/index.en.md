@@ -35,8 +35,8 @@ To understand the background of Groq's founding, we need to learn about its foun
 
 The market they targeted is very similar to what we at HyperAccel are pursuing.
 
-- **GPU / TPU:** Cover both training and inference, but are inherently optimized for **training (large-scale parallel operations)**.
-- **LPU:** Boldly abandons training and goes all-in on optimizing **inference for Large Language Models (LLMs)**.
+- **GPU / TPU:** Support both training and inference, but are inherently optimized for large-scale computation-intensive **training**
+- **LPU:** Boldly abandons training and goes all-in on optimizing **inference for Large Language Models (LLMs)**
 
 Those unfamiliar with the concepts of training and inference may have this question:
 
@@ -67,8 +67,8 @@ The fundamental characteristic of the Transformer architecture, which forms the 
 
 In computer architecture, we use a measurement technique called the **Roofline Model** to diagnose hardware performance limits. This checks the maximum possible performance of an operation through the computational characteristics of software used on hardware and hardware specifications. The value on the x-axis is **computational intensity**. This is an indicator of how much computation is performed with data fetched once, and it increases as data reusability increases. When computational intensity is sufficiently high to reach the non-differentiable point in the graph above, the performance of that operation equals the maximum computational performance the hardware can deliver (**Compute bound**). On the other hand, when computational intensity is low, no matter how good the hardware performance is, we can only extract performance equal to memory bandwidth (**Memory bound**). 
 
-- **Compute Bound :** The chip's computation speed is the bottleneck because the required computation is too much compared to hardware specs
-- **Memory Bound :** Computation units are sufficient, but the speed of fetching data from memory is slow relative to that, causing a bottleneck
+- **Compute Bound** : The required computation is too much compared to hardware specs, causing a bottleneck due to the physical limits of the chip's computation speed
+- **Memory Bound** : Computation units are sufficient, but the speed of fetching data from memory is slow relative to that, causing a bottleneck
 
 The training process is close to **compute bound** because it requires a lot of computation and can be parallelized. However, in the LLM inference process, especially after calculating the first output token for the initial input tokens (**Prefill Stage**), the process of extracting output tokens one by one (**Decoding Stage**) requires reading past data from memory every time to output individual tokens. Moreover, the size of this data increases as the output token length increases. This lowers computational intensity, so inference operations are close to **memory bound**.  
 
@@ -117,8 +117,8 @@ Groq solved this problem with **Scale-out**. If one chip can't hold a model, the
 
 ![tp & pp](images/tp&pp.jpg)
 
-- **Tensor Parallelism (TP):** Multiple chips divide and process one matrix operation. Weights needed for partial matrix operations are distributed and stored in the main memory of multiple chips
-- **Pipeline Parallelism (PP):** Divide the model's layers into groups for processing. In computation order, each chip receives computation results from the previous chip and performs computation for the next layer.
+- **Tensor Parallelism (TP)** : Decomposes one large matrix operation into multiple smaller matrix operations. Weights needed for partial matrix operations are distributed and stored in the main memory of multiple chips, and each chip performs partial matrix operations
+- **Pipeline Parallelism (PP)** : Divide the model's layers into groups for processing. In computation order, each chip receives computation results from the previous chip and performs computation for the next layer
 
 Groq likens the system they built by applying these parallelization techniques to a giant **conveyor belt**. When input data enters the first chip (the start of the belt), each chip only performs its assigned computation and passes data to the next chip. The final token pops out from the last chip. This can be visualized in the animation below.
 
@@ -193,8 +193,8 @@ One recent trend in AI inference operations is the separation of Prefill and Dec
 
 ![prefill decoding disaggregation](images/gpu_disaggregation.png)
 
-- **Prefill(Context) phase:** Input prompt is inserted at once, requiring much computation → Compute Bound
-- **Decoding(Generation) phase :** After the first token is generated, generated tokens are input sequentially one by one → Memory Bound
+- **Prefill(Context) phase** : Input prompt is inserted at once, requiring much computation → Compute Bound
+- **Decoding(Generation) phase** : After the first token is generated, generated tokens are input sequentially one by one → Memory Bound
 
 ![rubin cpx platform](images/rubin_cpx_platform.png)
 
@@ -225,7 +225,7 @@ If we expand the heterogeneous computing mentioned earlier from server or node l
 
 Then what tasks can LPU proceed faster with? From the perspective of LLM inference operations mentioned earlier, we can think of separating **Prefill/Decoding** tasks between GPU and LPU clusters. This time, let me introduce a few workloads where LPU can show strengths from a task-level perspective.  
 
-**(This section reflects my personal views and Groq's position significantly.)**
+**(From here on, my personal views are heavily reflected.)**
 
 **Speculative Decoding**
 
