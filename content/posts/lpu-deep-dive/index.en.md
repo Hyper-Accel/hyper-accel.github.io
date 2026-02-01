@@ -22,7 +22,7 @@ description: We explore the background of Groq and LPU, their hardware/software 
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**  
 > This series aims to deeply understand competitors' hardware for AI accelerator design.  
-> In this third article, we cover the **LPU** (Language Processing Unit) from Groq, an American startup acquired by NVIDIA for approximately $2 billion in late last year.
+> In this third article, we cover the **LPU** (Language Processing Unit) from Groq, an American startup acquired by NVIDIA for approximately $20 billion in late last year.
 
 ---
 
@@ -48,7 +48,7 @@ For those readers, let's briefly touch on the difference between training and in
 
 ## Training and Inference: The Limits of General-Purpose Chips and the Opportunity for Dedicated Chips
 
-![training vs inference](images/traning_vs_inference.png)
+![training vs inference](images/training_vs_inference.png)
 
 AI workloads can be broadly divided into **training**, which updates weights, and **inference**, which uses fixed weights.  
 Let's assume we're developing an AI model that identifies what an image is from a given image. To do this, we first need to train the model with a large amount of image data. During the training process, the model looks at the image and outputs an answer based on the current weights (**Forward path**), then compares the error with the actual answer according to a defined learning mechanism and updates the current weights (**Backward path**). Repeating this process continuously updates the model's weights, and after sufficient time, the model's error decreases and it becomes able to identify images well. Once training has progressed to some extent, we need to actually use this model, right? Unlike training, the inference process does not require weight updates. This is because updating the weights of an already-trained model is unnecessary computation in the actual usage stage. Therefore, the inference process only involves the **Forward path**.
@@ -82,7 +82,7 @@ Next, let's explore the bold attempts Groq has shown in the hardware market thro
 
 ---
 
-## Groq's Bold Gamble: Collapse the Memory Hierarchy
+## Groq's Bold Gamble: Shatter the Conventional Wisdom of Memory Hierarchy
 
 The biggest feature of Groq's LPU is its memory structure. As I mentioned earlier, memory bandwidth is very important. Looking at the A100 GPU's memory structure, it looks like the diagram below. 
 
@@ -115,22 +115,24 @@ Latest LLM models basically have parameters in the billions. Even with a simple 
 
 Groq solved this problem with **Scale-out**. If one chip can't hold a model, they split (Shard) the model's weights and store them across hundreds of chips. This is where AI parallelization techniques come in.
 
-![tp & pp](images/tp&pp.png)
+![tp & pp](images/tp&pp.jpg)
 
 - **Tensor Parallelism (TP):** Multiple chips divide and process one matrix operation. Weights needed for partial matrix operations are distributed and stored in the main memory of multiple chips
 - **Pipeline Parallelism (PP):** Divide the model's layers into groups for processing. In computation order, each chip receives computation results from the previous chip and performs computation for the next layer.
 
-![gpu example](gifs/gpu_example.gif)
+Groq likens the system they built by applying these parallelization techniques to a giant **conveyor belt**. When input data enters the first chip (the start of the belt), each chip only performs its assigned computation and passes data to the next chip. The final token pops out from the last chip. This can be visualized in the animation below.
 
 ![lpu example](gifs/lpu_example.gif)
 
-Groq likens the system they built this way to a giant **conveyor belt**. When input data enters the first chip (the start of the belt), each chip only performs its assigned computation and passes data to the next chip. The final token pops out from the last chip. If a GPU's single chip were to perform the same task,
+On the other hand, if a GPU's single chip were to perform the same task,
 
 > Memory load from HBM -> computation -> memory load from HBM again -> computation
 
-This process would need to be repeated. This is because while HBM stores data needed for computation, there are still limits to the amount of data that can be loaded near the compute units (SRAM). Groq's claim is that bottlenecks occur in this process of repeated memory loads.
+This process would need to be repeated. This is because while HBM stores data needed for computation, there are still limits to the amount of data that can be loaded near the compute units (SRAM). Groq's claim is that bottlenecks occur in this process of repeated memory loads. This can be visualized in the animation below.
 
-For this structure to succeed, **Chip-to-Chip (C2C) communication** speed is critical. If the middle of the conveyor belt breaks, the entire factory stops. Groq tied 8 or more chips together like one giant node through their proprietary **C2C interconnect** technology and **Dragonfly Topology**. They made multiple chips share each other's SRAM, appearing like one giant single chip, converging communication overhead to almost zero.
+![gpu example](gifs/gpu_example.gif)
+
+For Groq's system to operate successfully, **Chip-to-Chip (C2C) communication** speed is critical. If the middle of the conveyor belt breaks, the entire factory stops. Groq tied 8 or more chips together like one giant node through their proprietary **C2C interconnect** technology (**RealScale**) and **Dragonfly Topology**. They made multiple chips share each other's SRAM, appearing like one giant single chip, converging communication overhead to almost zero.
 
 GPUs are not incapable of using this method. The TP and PP explained earlier are parallelization methods widely used in distributed training with GPUs. However, when GPUs use these techniques (especially TP), work is needed to synchronize data between devices. GPUs support inter-GPU communication through the runtime library NCCL (Nvidia collective communication library). In the process of using TP mentioned earlier, **all-reduce** is needed, where matrix multiplication results computed on each GPU are shared with other GPUs to obtain summation.
 
@@ -181,7 +183,7 @@ For this reason, Groq minimized the **scheduling** function, which corresponds t
 
 ## Why Did NVIDIA Acquire Groq?
 
-Groq's LPU was innovative and had clear strengths technically, but faced business challenges. From a customer's perspective, even running just one LLM model on LPU requires hundreds of chips (rack-level), so initial adoption costs reach **tens to hundreds of billions of won**. Perhaps due to this problem, Groq initially sold chips (**GroqChip**) but later diversified their business to provide cloud API rental services through **GroqCloud**. They provide APIs that allow use of servers or racks they directly built with Groq chips.
+Groq's LPU was innovative and had clear strengths technically, but faced business challenges. From a customer's perspective, even running just one LLM model on LPU requires hundreds of chips (rack-level), so initial adoption costs reach **a tens to hundreds of millions of USD**. Perhaps due to this problem, Groq initially sold chips (**GroqChip**) but later diversified their business to provide cloud API rental services through **GroqCloud**. They provide APIs that allow use of servers or racks they directly built with Groq chips.
 
 So what is the background behind NVIDIA's acquisition of Groq? I think it's difficult to see this as simply purchasing inference-specific chip technology. Let me share a few thoughts on the background of Groq's acquisition and conclude this article. 
 
@@ -261,7 +263,7 @@ In this article, we explored:
 
 Personally, this acquisition seemed like NVIDIA's move to maintain a monopolistic position in the hardware market with capital, which was both intimidating, while also feeling ambivalent because the term LPU, which our company also uses, seemed to become more known to the market and public. I also felt anticipation that if we prove our products in the market, great opportunities would open up for our company as well.
 
-### P.S.: HyperAccel is Hiring
+### P.S. : HyperAccel is Hiring
 
 We at HyperAccel are on the verge of launching our first LPU product. Not only for this product but also for other products to come, HyperAccel needs more excellent engineers. 
 
