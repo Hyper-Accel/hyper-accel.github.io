@@ -63,16 +63,22 @@ However, this alone is insufficient to justify dedicated chips. If inference sim
 
 The fundamental characteristic of the Transformer architecture, which forms the basis of current LLM models like GPT, Gemini, and Grok, is that it does not generate results as complete sentences at once, but rather **generates words (hereafter tokens) one by one sequentially**. This is expressed as having auto-regressive properties. This is because the Transformer model does not generate results solely from input values, but recalculates the relationships between input tokens and all previously generated output tokens each time an output token is generated to create the next output token. This requires an enormous amount of computation. However, the problem is not just the amount of computation. If we recalculate all values every time we generate a token, computational inefficiency increases, so reusable intermediate values (**KV cache**) are stored in memory and read from memory when computing the next token for recalculation. The problem is that this requires reloading past data from memory every time a token is generated, so the amount of memory movement increases as more tokens are generated.
 
-![roofline concept](images/roofline_concept.png)
+![roofline concept](images/roofline_concept.jpg)
 
-In computer architecture, we use a measurement technique called the **Roofline Model** to diagnose hardware performance limits. This checks the maximum possible performance of an operation through the computational characteristics of software used on hardware and hardware specifications. The value on the x-axis is **computational intensity**. This is an indicator of how much computation is performed with data fetched once, and it increases as data reusability increases. When computational intensity is sufficiently high to reach the non-differentiable point in the graph above, the performance of that operation equals the maximum computational performance the hardware can deliver (**Compute bound**). On the other hand, when computational intensity is low, no matter how good the hardware performance is, we can only extract performance equal to memory bandwidth (**Memory bound**). 
+In computer architecture, we use a measurement technique called the **Roofline Model** to diagnose hardware performance limits. This checks the maximum possible performance of an operation through the computational characteristics of software used on hardware and hardware specifications. 
+
+The Roofline Model graph consists of two axes. The **x-axis** is **computational intensity** (Operational Intensity). This is an indicator of how much computation is performed with data fetched once, and it increases as data reusability increases. The **y-axis** is **performance**, typically expressed as floating-point operations per second (FLOPS/s).
+
+Each line on the graph represents the hardware's performance limit. The **sloped line** represents the performance limit due to memory bandwidth, and when computational intensity is low (left region), the maximum performance is determined along this line. In this region, no matter how excellent the hardware's computational capability is, performance is limited by the speed of fetching data from memory, so only performance proportional to memory bandwidth can be obtained (**Memory bound**). The slope of this line equals performance (FLOPS/s) / computational intensity (FLOPS/BYTE), which is the same as the hardware's memory bandwidth (BYTE/s).
+
+On the other hand, the **horizontal line** represents the hardware's maximum computational performance limit. When computational intensity is sufficiently high (right region) to reach this horizontal line, the performance of that operation equals the maximum computational performance the hardware can deliver (**Compute bound**). The point where the two lines meet is called the **Ridge Point**, where memory and computational performance are balanced. Beyond this point, even if computational intensity increases, maximum performance can no longer increase due to hardware limitations. 
 
 - **Compute Bound** : The required computation is too much compared to hardware specs, causing a bottleneck due to the physical limits of the chip's computation speed
 - **Memory Bound** : Computation units are sufficient, but the speed of fetching data from memory is slow relative to that, causing a bottleneck
 
 The training process is close to **compute bound** because it requires a lot of computation and can be parallelized. However, in the LLM inference process, especially after calculating the first output token for the initial input tokens (**Prefill Stage**), the process of extracting output tokens one by one (**Decoding Stage**) requires reading past data from memory every time to output individual tokens. Moreover, the size of this data increases as the output token length increases. This lowers computational intensity, so inference operations are close to **memory bound**.  
 
-This is exactly why GPUs and other datacenter-oriented chips must use expensive HBM (High Bandwidth Memory). No matter how fast the chip's computation speed is, it's useless if it can't overcome the Memory Wall. Increasing memory bandwidth allows us to extract higher performance at the same computational intensity, as shown in the graph below.
+This is exactly why GPUs and other datacenter-oriented chips must use expensive HBM (High Bandwidth Memory). No matter how fast the chip's computation speed is, it's useless if it can't overcome the Memory Wall. As mentioned earlier, since the slope of the graph in the memory-bound region equals memory bandwidth, using HBM to increase bandwidth allows us to extract higher performance at the same computational intensity, as shown in the graph below.
 
 ![roofline comparison](images/roofline_comparison.png)
 
@@ -107,7 +113,7 @@ However, using only on-chip memory doesn't solve all problems. If using only SRA
 
 ![dram vs sram](images/dram_vs_sram.png)
 
-This is an image that those who majored in electrical engineering may have seen at least once. Simply put in numbers, DRAM requires 1 transistor and 1 capacitor per individual cell that stores one bit, while SRAM requires 6 transistors per cell. This is a 3x difference in just component count, and considering wiring complexity, the area difference can be tens of times. Therefore, increasing SRAM capacity increases chip size, and there are limits to increasing capacity due to the [reticle limit](https://hyper-accel.github.io/posts/tpu-deep-dive/#%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4-%EA%B4%80%EC%A0%90) mentioned in a previous article. Moreover, increasing SRAM capacity means the proportion of SRAM in the chip increases. This means less space for logic needed for computation. No matter how important memory is, you can't compute with just memory. Due to these limitations, the reality is that individual chips can only hold SRAM at most about 1/10 of HBM capacity (hundreds of MB).
+This is an image that those who majored in electrical engineering may have seen at least once. Simply put in numbers, DRAM requires **1 transistor and 1 capacitor per individual cell** that stores one bit, while SRAM requires **6 transistors per cell**. This is a 3x difference in just component count, and considering wiring complexity, the area difference can be tens of times. Therefore, increasing SRAM capacity increases chip size, and there are limits to increasing capacity due to the [reticle limit](https://hyper-accel.github.io/posts/tpu-deep-dive/#%ED%95%98%EB%93%9C%EC%9B%A8%EC%96%B4-%EA%B4%80%EC%A0%90) mentioned in a previous article. Moreover, increasing SRAM capacity means the proportion of SRAM in the chip increases. This means less space for logic needed for computation. No matter how important memory is, you can't compute with just memory. Due to these limitations, the reality is that individual chips can only hold SRAM at most about 1/10 of HBM capacity (hundreds of MB).
 
 Latest LLM models basically have parameters in the billions. Even with a simple calculation assuming no compression, storing weights alone requires tens of GB of memory, so using only SRAM makes it impossible to even load one model on one chip.   
 
@@ -144,7 +150,7 @@ However, in Groq's LPU, runtime libraries like NCCL used by Nvidia are unnecessa
 
 ## Software-defined Hardware: The Compiler Decides Everything
 
-Another characteristic of Groq's LPU is that **software (especially the compiler)** takes precedence over hardware design. In fact, looking at the official documents containing LPU's design philosophy, they say they didn't even touch chip design until the compiler architecture was designed. This is to make the compiler capable of controlling all hardware and make individual hardware operations predictable at the compiler level.
+Another characteristic of Groq's LPU is that software (especially the **compiler**) takes precedence over hardware design. In fact, looking at the official documents containing LPU's design philosophy, they say they didn't even touch chip design until the compiler architecture was designed. This is to make the compiler capable of controlling all hardware and make individual hardware operations predictable at the compiler level.
 
 ![software-defined hardware](images/software_defined_hardware.png)
 
@@ -185,13 +191,13 @@ For this reason, Groq minimized the **scheduling** function, which corresponds t
 
 Groq's LPU was innovative and had clear strengths technically, but faced business challenges. From a customer's perspective, even running just one LLM model on LPU requires hundreds of chips (rack-level), so initial adoption costs reach **a tens to hundreds of millions of USD**. Perhaps due to this problem, Groq initially sold chips (**GroqChip**) but later diversified their business to provide cloud API rental services through **GroqCloud**. They provide APIs that allow use of servers or racks they directly built with Groq chips.
 
-So what is the background behind NVIDIA's acquisition of Groq? I think it's difficult to see this as simply purchasing inference-specific chip technology. Let me share a few thoughts on the background of Groq's acquisition and conclude this article. 
+So what is the background behind NVIDIA's acquisition of Groq? In general economic articles, the prevailing opinion is that it's for technology licensing to expand dominance in the inference market. However, as an engineer, I'll add a bit of technical imagination and conclude this article by discussing several technical scenarios that might unfold after Groq's acquisition. 
 
 ### Hypothesis 1: Building a New Heterogeneous Computing Platform
 
 One recent trend in AI inference operations is the separation of Prefill and Decoding operations (prefill-decode disaggregation). This is because operations with different characteristics coexist even within inference operations.
 
-![prefill decoding disaggregation](images/gpu_disaggregation.png)
+![prefill decoding disaggregation](gifs/Disaggregated-inference.gif)
 
 - **Prefill(Context) phase** : Input prompt is inserted at once, requiring much computation → Compute Bound
 - **Decoding(Generation) phase** : After the first token is generated, generated tokens are input sequentially one by one → Memory Bound
@@ -263,6 +269,8 @@ In this article, we explored:
 
 Personally, this acquisition seemed like NVIDIA's move to maintain a monopolistic position in the hardware market with capital, which was both intimidating, while also feeling ambivalent because the term LPU, which our company also uses, seemed to become more known to the market and public. I also felt anticipation that if we prove our products in the market, great opportunities would open up for our company as well.
 
+Throughout this three-part series, we've explored various AI accelerators, from **GPUs to TPUs and LPUs**. While we've focused on accelerator architectures and computational structures so far, in the next article, we'll expand the topic to **storage**, which plays an equally important role as accelerators outside of computation. In the next installment, we'll examine NVIDIA's **BlueField**, which garnered attention at this year's CES, and explore **storage** and **DPUs** (Data Processing Units) that play crucial roles in AI datacenters.
+
 ### P.S. : HyperAccel is Hiring
 
 We at HyperAccel are on the verge of launching our first LPU product. Not only for this product but also for other products to come, HyperAccel needs more excellent engineers. 
@@ -279,6 +287,8 @@ HyperAccel has many truly excellent and smart engineers. We're waiting for your 
 [What is Language Processing Unit? - groq blog](https://groq.com/blog/the-groq-lpu-explained)  
 [groq whitepapers](https://groq.com/papers)  
 [Speculative Decoding - Nvidia blog](https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/)  
-[Rubin CPX platform for Massive-Context Inference - Nvidia Newsroom](https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference)   
+[Rubin CPX platform - Nvidia blog](https://developer.nvidia.com/blog/nvidia-rubin-cpx-accelerates-inference-performance-and-efficiency-for-1m-token-context-workloads/)   
+[NCCL Collective Operations](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html)
+
 
 
