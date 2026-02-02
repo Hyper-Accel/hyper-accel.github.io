@@ -135,9 +135,7 @@ When we have ten friends, we can remember their faces, names, personalities, and
 
 And all ten friends are precious. But what if there are ten thousand friends? A hundred thousand? It becomes difficult to even remember their names.
 
-You've heard of the Cocktail Party Effect, right?
-
-![alt text](cocktail_party.png)
+> **Cocktail Party Effect** is a phenomenon where party attendees selectively focus on and understand the conversation with their interlocutor despite the surrounding noise. This selective perception or attention, where one ignores the surrounding environment and selectively accepts only meaningful information, refers to the psychological phenomenon that occurs. It is also called 'self-referential effect', 'banquet hall effect', and 'feast house effect'.
 
 The Attention Mechanism is quite similar to the Cocktail Party Effect.
 We've all had the experience of hearing a specific friend's voice well in a noisy bar.
@@ -156,6 +154,8 @@ Once we know this technical background, it becomes clear why we suffered when wr
 
 **Attention Dilution**: As the conversation gets longer, the 'concentration' that AI can pour into each piece of information decreases. Important requirements get diluted mixed between small talk or error logs. Simply typing "No, not that" made things harder for our LLM. Emotionally and memory-wise...
 
+![alt text](doom_loop.jpeg)
+
 **Doom Loop**: When an error occurs and you give the log, usually AI gives correction code. But the same error occurs again. The AI's context window becomes filled with 'failed attempts' and 'error logs', becoming a state where it has learned wrong answer patterns rather than finding the right answer. It's rare that it actually learns and gives that answer forever, but finding the question itself becomes difficult in a window filled with wrong answers that aren't even correct.
 
 Eventually, "using chat logs as specs" itself was a game structurally bound to fail. So we must switch to SDD, providing **refined documents while minimizing chat**. We must minimize chat logs, organize necessary contents into documents, and switch to a method where AI writes code based on documents.
@@ -167,6 +167,8 @@ Eventually, "using chat logs as specs" itself was a game structurally bound to f
 The core of SDD is simple. It's the philosophy that **Code is volatile, Spec is permanent**. Code is treated as an 'Artifact' that can be extracted from the spec at any time, and the 'Source of Truth' we must manage becomes the 'Natural Language Specification'. Especially as the performance of LLM models improves geometrically, rather than worrying about "code quality", we should value "the quality of the spec document" I write more. The literary literacy I lack the most is becoming necessary again...
 
 The general SDD workflow is as follows.
+
+![alt text](sdd_workflow.jpeg)
 
 **Intent**: Define "What do you want to make?".
 
@@ -208,6 +210,14 @@ The era where we have to do **Literature to do Engineering** is blooming.
 Furthermore, since the majority of LLMs are trained more on English input, it seems almost obvious that writing documents in English will bring better results.
 
 Some say that the foundation for the birth of a '1-Person Unicorn' company has been laid. A future where one person operates planning, design, development, and deployment by delegating to dozens of AI agents. Of course, it's a future that can absolutely not be achieved with vibe coding alone, and we must ponder how to achieve the best efficiency and the goal I want without too much paperwork in spec writing.
+
+Recently, Jensen Huang, the CEO of Nvidia, said in many interviews that 'use AI as much as possible'. This interview is in stark contrast to the many concerns about AI bubbles and job losses. 
+
+Personally, I also find it interesting that such an interview is interesting from the perspective of RTL developers who also code. However, I think it's important to interpret it based on one's own perspective, rather than just being optimistic. 
+
+When the calculator first appeared, most people who used to do manual calculations lost their jobs. However, it's not that the concept of "calculation" itself disappeared. In the end, those people were at least one step ahead of others in terms of using calculators. 
+
+I also think that the current situation is not so different. The entry barrier for coding has become much lower. However, can a person who has never coded create a Google, Amazon, or YouTube-like mega-service? Even if we assume infinite time, in the end, there will only be a heap of spaghetti and failure. I can confidently say this. I have many more things I want to say about this, but in summary, I think the world where "people who know well do better" is already here, and we need to take advantage of the advantage we have now, which is one step ahead.
 
 Perhaps we are passing through a period. A new protocol where humans and AI create systems together, SDD is at that starting point. What features or services are you developing right now? The moment you open a markdown file and define the content you are imagining as a spec, a new engineering will begin.
 
