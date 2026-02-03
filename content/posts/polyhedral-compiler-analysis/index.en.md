@@ -11,7 +11,7 @@ authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
 summary: [Introduction to polyhedral analysis. Which gives simplified guide for understanding polyhedral compiler analysis & optimization.]
-series: ["Polyhedral Compiler"]
+series: ["Crafting Compilers"]
 comments: true
 description: "A concise walk-through of polyhedral compiler basics, covering affine concepts, polyhedra and Farkas lemma, iteration/schedule vectors, parallelism analysis, and polyhedral transformation."
 keywords: [

@@ -6,8 +6,8 @@ cover:
   image: "macintosh.jpeg"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "Crafting Compiler Ch1.1"
+  caption: "Crafting Compiler Ch1.1"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]

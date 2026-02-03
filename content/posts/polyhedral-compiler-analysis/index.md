@@ -10,7 +10,7 @@ cover:
 authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
-series: ["Polyhedral Compiler"]
+series: ["Crafting Compilers"]
 summary: [Polyhedral compiler에서 사용되는 기법들에 대해 간단히 소개한 글입니다.]
 description: "Polyhedral compiler를 이해하기 위한 Affine 함수/초평면, polyhedron, Farkas lemma 같은 기본 개념부터 iteration/schedule vector, 병렬성 분석, polyhedral transformation까지 핵심 흐름을 간단히 정리한 글입니다."
 comments: true
