@@ -1,6 +1,6 @@
 ---
 date: '2026-01-30T16:14:38+09:00'
-draft: true
+draft: false
 title: 'Specs are All You Need: Spec-Driven Development (SDD)란 무엇인가?'
 cover:
   image: "sdd.png"
