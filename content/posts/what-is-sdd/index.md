@@ -1,5 +1,5 @@
 ---
-date: '2026-01-30T16:14:38+09:00'
+date: '2026-02-03T10:17:33+09:00'
 draft: false
 title: 'Specs are All You Need: Spec-Driven Development (SDD)란 무엇인가?'
 cover:
