@@ -1,5 +1,5 @@
 ---
-date: '2026-01-31T18:54:57+09:00'
+date: '2026-02-03T11:24:57+09:00'
 draft: false
 title: "Know Your Enemy, Know Yourself, Part 3: Groq's LPU (Acquired by NVIDIA for $20B)"
 cover:
