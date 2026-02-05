@@ -1,156 +1,130 @@
 ---
-date: '2025-12-26T10:38:16+09:00'
+date: '2026-02-04T10:38:13+09:00'
 draft: false
-title: 'Starting Our Tech Blog'
+title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?'
 cover:
-  image: "timeline.png"
+  image: "kubernetes_logo.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "Tech Blog Build Timeline"
-  caption: "Tech Blog Build Timeline"
+  alt: "Kubernetes Logo"
+  caption: "Kubernetes Logo"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: ["Minho Park"] # must match with content/authors
-tags: [tech-blog, hugo, engineering-culture]
-categories: [engineering-culture]
-summary: ["This post shares the journey of starting HyperAccel's tech blog, from the initial motivation to building it with Hugo, operating through an Editor Group, and implementing a Bus Factor-aware operation strategy."]
+authors: ["Younghoon Jun"] # must match with content/authors
+tags: [development-environment, kubernetes, container]
+categories: [kubernetes]
+series: ["Kubernetes 기반 사내 개발 환경 구축기"]
+summary: ['현재 HyperAccel SW group의 개발 환경 ~~~ 전체 여정을 공유합니다.']
 comments: true
+description: ""
+keywords: [
+  "Development Environment", "Container", "Kubernetes",
+  "Server", "FPGA", "GPU"
+]
 ---
 
-## The Motivation Behind Starting Our Tech Blog
+# Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?
 
-In our company's SW group, we have a developer named Jaewoo Kim ([Author](https://hyper-accel.github.io/authors/jaewoo-kim/), [LinkedIn](https://www.linkedin.com/in/jaewoo-kim-b38325237/)). Jaewoo is developing `legato`, a language for our HW kernel development. For several months, Jaewoo has been consistently requesting something from us.
+안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.
 
+이 글을 보시는 분들 중에서 개발자 여러분들은 어떤 환경에서 개발하고 계신가요? Local 환경, 특정 서버에 직접 접속, 클라우드 서비스 활용 등 다양한 환경 위에서 개발을 진행하고 계신다고 생각됩니다.
 
-![jaewoo-teams](./jaewoo-teams.png)
-> **Shouldn't we have a company tech blog?**                   (from Jaewoo)
+HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 devcontainer를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 devcontainer portal을 만들어서 제공하고 있습니다.
 
-Jaewoo mentioned that he had experience posting projects from his previous company on a tech blog, and thanks to those posts, many talented developers became interested in the company and even joined.
+![Devcontainer Portal](./devcontainer_portal_capture.png)
 
-I also had been thinking a lot about wanting to share with external developers the many challenges we face in **building high-performance LLM Inference Chips** and **creating Software Stacks to support those Chips**.
+해당 portal을 통해 devcontainer 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
 
-> **But... who will build and operate it?**
+정말 감사하게도 SW group 개발자분들께서 적극적으로 잘 사용해주시고 계십니다. 하지만, 처음부터 Kubernetes 환경에서 개발을 진행되었던 것은 아닙니다. **Kubernetes 기반 사내 개발 환경 구축기**에서는 사내 개발자들의 불편함을 해소하고 효율적인 개발 프로세스 제공을 위해 어떻게 Kubernetes 기반 개발 환경을 구축하였는지에 대한 여정을 소개하고자 합니다. 해당 시리즈의 첫 번째 글인 이번 포스팅에서는 Kubernetes 도입 이전 기존 개발 환경의 한계점에서부터 Kubernetes를 도입하기까지 과정에 대해 소개합니다.
 
-I knew that we had plenty of content to post on the blog in our company's Wiki (operated on Confluence).
-However, having a lot of content to post and actually building and operating a blog are completely different challenges.
+---
 
-![confluence](./confluence.png)
+## Container 기반 개발 환경이 도입되기 이전
 
-> Open source analysis for HyperAccel's LLM Inference Engine support (**Coming Soon...**)
+HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘을 합쳐 작은 규모에서부터 시작된 스타트업입니다.
 
-Months had passed since Jaewoo suggested operating a tech blog, but no one had taken the initiative. That's because no one had experience operating one!
+![HyperAccel Starting Members](./hyperaccel_starting_member.jpg)
 
-![안해봤는데](./I_havent_done.png)
+초기 스타트업의 특성 상 굉장히 빠른 템포로 개발을 진행했었고, 체계적인 개발 환경을 구축하기 어려운 상황이었습니다. 해당 시점에는 제가 HyperAccel에 합류하기 이전이기 때문에, 초창기 멤버이신 ML팀 박현준([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/))님과 대화를 통해 당시 개발 환경에 대해 전해들을 수 있었습니다.
 
-But **I actually had experience**... I had been posting on my [personal blog](https://mino-park7.github.io/blog/categories/) for several years.
+> 당시 저희는 10명 정도 규모의 굉장히 작은 조직이었고, 타이트한 기간 내에 목표를 달성하기 위해 개발 환경에는 크게 신경쓰지 못했었습니다. 사내 서버에 각자 계정을 만들고 접속해서 사용했고, 누군가 서버의 자원을 많이 사용하고 있다면 직접 자리로 찾아가서 언제 작업이 끝나는지 독촉하곤 했었죠. (웃음)
 
-![사실해봄](./I_did_this_game.png)
+공통된 개발 환경이 없는 경우에 발생하는 어려움에 대해서 조금 더 구체적으로 살펴보겠습니다.
 
-However, I was pretending not to know, with a vague expectation that **"someone else will step up, right?"** and the thought that "I'm already too busy..."
+### 서버 관리의 어려움
+만약 서버가 10대 있고 개발자가 총 10명 있다면, 모든 개발자가 서버 전체에 접근하기 위해서는 총 **100개**의 계정이 필요합니다. 물론 계정 생성 정도는 자동화 스크립트를 사용한다면 크게 어렵지 않다고 생각하실 수 있습니다. 하지만, 이러한 환경에서 개발을 진행한다면 개발자는 서버마다 본인의 작업물이 같은 상태인지 추적하기 굉장히 어렵습니다. (Github을 활용한다고 해도 매우 불편합니다.)
 
-But in October of this year, I had the opportunity to attend PyTorch Conference with Jaewoo ([see previous post](https://hyper-accel.github.io/posts/pytorchcon2025-report/)).
+보안 및 서버 안정성 문제도 함께 고려해야 합니다. 예를 들면, `sudo` 권한 부여에 대해서도 추가로 정책을 정할 필요가 있습니다. 추가로 개발 도중 실수(`sudo rm -rf /`와 같은 폭력적인 예시를 생각해볼 수 있습니다...)로 인해 서버가 망가지게 되면 복구하는데 비용이 들게 됩니다.
 
-Seeing Jaewoo continuously discussing and developing the compiler with team members in Korean time even during his business trip to the US, I thought, **"Is being busy just an excuse for me?"**
+### 패키지 버전 통일의 어려움
+여러 명이서 함께 코드를 구현하는 것에 있어서 각자 코드의 통합은 필수 항목입니다. 개인별로 독립된 환경에서 개발을 진행한다면, 향후에 이를 통합할 때 버전 문제가 발생할 수 있습니다. Torch 버전 충돌, Clang 버전 불일치와 같은 문제가 발생할 수 있는 것이죠. 소위 말하는 **It Works on my Machine**을 서로 주장하게 되는 것입니다.
 
-And there was something I always tell my team members as a team lead. 
-> **"If you think you can do it, just do it"** - that's the mindset.
+### 자원 사용의 어려움
+HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)은 FPGA를 기반으로 제작되었습니다. FPGA 서버는 ring topology 형태로 연결되어 있기 때문에 서버 내부에서 완전 격리로 사용하기 위해서는 1대만 사용하거나 혹은 전부 다 사용하는 방식 중 하나로 활용해야만 했습니다. 개발자 여러 명이 동시에 사용하기 어려운 구조입니다. (현재는 Kubernetes 환경 위에서 원활하게 사용되고 있습니다. 해당 내용에 대해서는 향후 작성될 글에서 Kubernetes Device Plugin이라는 주제로 자세히 알아보도록 하겠습니다.)
 
-So I decided. **I'll do it**
+추가로 GPU 같은 경우에도 점유 여부를 확인하기 위해서는 `nvidia-smi`와 같은 명령어를 통해 실행 중인 프로세스를 확인하거나, dashboard를 직접 참고해야하는 불편한 점이 있습니다.
 
-## Choosing a Tech Blog Platform
+---
 
-When building a tech blog, there are several options.
+## Devcontainer의 도입
 
-- Using blog platforms
-  - Velog
-  - Medium
-  - Tistory
-  - ...
-- Self-hosting (using Static Site Generator + GitHub Pages)
-  - Jekyll
-  - Hugo
-  - ...
+회사의 규모가 커지고 개발자의 수가 늘어남에 따라서 체계적인 개발 환경 구축이 필요한 상황이 되었습니다. 이를 위해 ML팀 Lead이신 박민호([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/))님께서 `HyperAccel-Devcontainer`라는 컨테이너화 된 개발 환경(편의상 이번 글에서는 `devcontainer`라고 지칭하겠습니다)을 구축하셨습니다.
 
-Of course, the simplest approach would be using a blog platform. You can just sign up and create a blog.
+`devcontainer`는 2가지 버전을 제공합니다. 첫 번째는 HyperAccel의 1세대 chip의 개발 및 관리를 위한 container이고, 두 번째는 HyperAccel의 2세대 ASIC chip 개발을 위한 container입니다. 두 가지 버전의 container는 모두 `base-image`를 기반으로 빌드됩니다. `base-image`에는 두 버전의 container가 동일하게 필요로 하는 패키지 및 환경이 제공됩니다. 이를 기반으로 각 버전마다 필요한 패키지와 환경을 기반으로 container 환경이 세팅됩니다.
 
-However, I had several **important factors** in mind for operating a tech blog.
+이렇듯 container 기반으로 개발 환경을 제공하는 경우에는 **개발 인원 모두가 같은 환경 위에서 개발을 진행**할 수 있다는 장점이 있습니다. **It Works on my Machine**을 피할 수 있는 것이죠. 또한 격리된 환경에서 개발을 진행하기 때문에 개인의 실수로 인해 서버가 망가지는 상황을 최대한 피할 수 있습니다.
 
-- Must have comment functionality
-- Must be able to integrate Google Analytics
-- Must have good SEO
-- Must be easy to maintain
-- Multiple users should be able to easily submit their posts
+하지만, 이러한 container 개발 환경에도 명확한 한계점이 있습니다.
 
-While other factors could be sufficiently supported by using blog platforms, **ease of maintenance** and **allowing multiple users to easily submit their posts** seemed difficult to achieve with blog platforms.
+### 개인별 서버 접속 계정의 필요성
 
-> Wait, but shouldn't using a blog platform make maintenance easier?
+개인별로 서버에 접속할 수 있는 계정은 여전히 제공해야 합니다. 개발자의 입장에서는 개발을 위해서는 서버 계정의 존재 여부에 의존해야 하고, 관리자의 입장에서는 개발 팀의 인원이 변동될 때마다 계정 관리를 해주어야 하는 업무 지점이 하나 늘어나게 됩니다. 추가로, 개인에게 서버 접속을 허용해주기 때문에 위에서 말씀드린 실수로 인한 서버 고장의 가능성도 여전히 존재합니다.
 
-Yes. For personal blogs, using a blog platform would be much more convenient. However, there was a critical point we had to consider.
+### 개발 환경에 대한 유연성 부족
 
-"Our tech blog should be operated by an **Editor Group**, not by a single employee."
+우선, 개발자는 서버마다 자신의 디렉토리를 관리해야 하기 때문에 여전히 서버 환경에 종속되어 있습니다. 만약 특정 서버가 다운된다면, 해당 서버를 쓰고 있던 개발자들은 (백업이 없다면) 자신의 결과물에 대한 추적이 어려운 경우 업무에 지장을 받을 수 있습니다. 현재 저희 회사에서는 외부 IDC의 서버도 함께 사용하기 때문에 관리자가 출장을 가서 서버를 고쳐야하는 상황이 된다면 업무가 더 오랜 시간 지연될 수 있습니다.
 
-I really like the book [Software Engineering at Google](https://abseil.io/resources/swe-book), and I apply many things I learned from it in team management. This book introduces the term [Bus Factor](https://en.wikipedia.org/wiki/Bus_factor).
+추가로 개발자 입장에서 container 환경 사용에 대해 익히기까지 시간과 노력이 필요합니다. Container에 대한 기본 지식부터 실행 과정 및 주의사항까지 DevOps에 친숙하지 않은 개발자의 입장에서는 어려운 지점이 될 수 있습니다.
 
-> Bus Factor: An index that represents how many team members working on a project can suddenly leave without proper handover procedures before the project is halted or faces a similarly serious situation.
+### 해결하지 못한 자원 사용의 어려움
 
-**The higher the Bus Factor, the more stable the project becomes**, but if we operate the blog using a blog platform, if the blog operator (probably me?) **falls into a situation where they cannot operate the blog, our tech blog will become a ghost blog.**
+FPGA와 GPU 사용에는 여전히 제약이 발생합니다. 앞서 설명드린 문제점이 container 환경에서도 동일하게 발생할 수 있습니다.
 
-However, if we self-host using GitHub, while I would need to do most of the blog setup, the operation can be handled by the Editor Group.
+이러한 한계점을 극복하고 보다 쾌적한 개발 환경 제공을 위해 Kubernetes를 도입하기로 결정하게 되었습니다.
 
-And so it began. **Building a tech blog with Hugo**
+---
 
-## Building the Tech Blog!
+## Kubernetes 기반 devcontainer 개발 환경 도입
 
-My previous blog was built with **Jekyll**. However, Jekyll was difficult to modify themes, and being Ruby-based, it sometimes caused dependency issues. Since I had never used Ruby, when dependency problems occurred, I would just turn a blind eye and ignore them.
+본격적으로 개발 환경 구축에 대해 설명하기 전에, 왜 하필 Kubernetes를 도입하기로 결정했는지 설명하겠음.
 
-![blurred_eye](./blurred_eye.png)
+### About Kubernetes
 
-But when I looked into modern SSGs (Static Site Generators), I found [Hugo](https://gohugo.io/), built with Go, which had diverse themes and an active community, so I started building the blog based on it.
+기본적으로 어떤건지 설명.
 
-![timeline](./techblog_timeline.png)
+### Kubernetes 기반 개발 환경의 장점
 
-And we also recruited people who wanted to participate in the Editor Group.
+앞서 언급한 한계점들을 어떻게 하면 해결할 수 있을까? 나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
 
-![We need you](./we_need_you.png)
+### Kubernetes 클러스터 구축 및 개발 환경 도입
 
-> As many as 9 applicants!
+ML팀에서 k8s 클러스터 구축. 현재 클러스터에는 어떠한 스택들이 올라가 있는지 간략하게 오버뷰 느낌으로 작성. 
 
-And we completed implementing **comment functionality, multilingual support (Korean, English), search functionality, Google Search registration, Google Analytics registration, Author functionality...** everything!
+## 정리하자면...
 
-## Operating the Tech Blog
+앞에 글에 대한 내용 정리. 다음 편에 어떤 글이 올라올지 홍보(Nexus, ARC, ...). 추가로 ASIC 칩을 지원하기 위해 hyperaccel에서 구현한 k8s 기반 sw stack에 대해서도 글 작성.
 
-If you want to write a post on our tech blog, you can do so through a GitHub Pull Request. Since it operates through GitHub PRs, it's a system where anyone who wants to write can freely submit posts, not just a specific administrator.
+---
 
-![pull request](./pull_request.png)
+## 추신: HyperAccel은 채용 중입니다!
 
-And, **the Editor Group can freely leave comments with their opinions on posts in PRs.**
+ML팀의 DevOps 파트가 하는 일에 대해서 간단하게 소개. 사내 개발자들이 편하게 사용할 수 있도록 노력. 추가로 향후 cloud level로 bertha를 사용하기 위해 여러가지 일을 진행 중임.
 
-![review](./review.png)
+HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루는 회사로 전 방면에 걸쳐 뛰어난 인재들이 모여있고, 이런 환경에서 한 분야에 국한된 것이 아닌 폭넓은 지식을, 심지어 깊게 배우며 지식을 공유하고 함께 성장하고 싶으신 분들은 언제든지 저희 HyperAccel에 지원해주세요!
 
-The Editor Group has one very important role. That is to **encourage developers to write tech blog posts**.
+저희가 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
 
-I once posted a blog post called [BERT 논문정리](https://mino-park7.github.io/nlp/2018/12/12/bert-%EB%85%BC%EB%AC%B8%EC%A0%95%EB%A6%AC/) after reading the BERT paper around 2018. Thankfully, so many people read this post that it appeared at the top of Google search results for a while.
+## Reference
 
-Sharing what you've studied and researched externally is good for promoting the company's technical capabilities, but I believe it should also serve as personal promotion, so I encourage developers to actively blog post content from our internal wiki that can be shared externally.
-
-## Upcoming Posts...
-
-At HyperAccel, we develop everything from HW design for LLM Inference to the entire Software Stack for it.
-
-That's why we deal with a really wide range of technologies within one company. So the posts we'll put on the tech blog will cover really diverse topics.
-
-- How to build a Compiler?
-- GPU characteristics (Know your enemy and know yourself)
-- Open source analysis of LLM Inference Frameworks (vLLM, SGLang, ...)
-- Development of Kubernetes Components for Hardware support in Cluster environments
-- Building an internal development environment based on Kubernetes
-- ...
-
-We're planning to share really diverse and high-quality posts, so please stay tuned!
-
-## HyperAccel is Hiring!
-
-The biggest purpose of operating this tech blog is **talent recruitment**!
-
-If you're interested in the technologies we work with, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
-
-HyperAccel has many excellent and brilliant engineers. We're waiting for your applications.
+- [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
+- [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
+- [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
