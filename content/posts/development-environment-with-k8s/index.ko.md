@@ -28,11 +28,11 @@ keywords: [
 
 이 글을 보시는 분들 중에서 개발자 여러분들은 어떤 환경에서 개발하고 계신가요? Local 환경, 특정 서버에 직접 접속, 클라우드 서비스 활용 등 다양한 환경 위에서 개발을 진행하고 계신다고 생각됩니다.
 
-HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 devcontainer를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 devcontainer portal을 만들어서 제공하고 있습니다.
+HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 `devcontainer`를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 `devcontainer portal`을 만들어서 제공하고 있습니다.
 
 ![Devcontainer Portal](./devcontainer_portal_capture.png)
 
-해당 portal을 통해 devcontainer 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
+해당 portal을 통해 container 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
 
 정말 감사하게도 SW group 개발자분들께서 적극적으로 잘 사용해주시고 계십니다. 하지만, 처음부터 Kubernetes 환경에서 개발을 진행되었던 것은 아닙니다. **Kubernetes 기반 사내 개발 환경 구축기**에서는 사내 개발자들의 불편함을 해소하고 효율적인 개발 프로세스 제공을 위해 어떻게 Kubernetes 기반 개발 환경을 구축하였는지에 대한 여정을 소개하고자 합니다. 해당 시리즈의 첫 번째 글인 이번 포스팅에서는 Kubernetes 도입 이전 기존 개발 환경의 한계점에서부터 Kubernetes를 도입하기까지 과정에 대해 소개합니다.
 
@@ -95,11 +95,19 @@ FPGA와 GPU 사용에는 여전히 제약이 발생합니다. 앞서 설명드�
 
 ## Kubernetes 기반 devcontainer 개발 환경 도입
 
-본격적으로 개발 환경 구축에 대해 설명하기 전에, 왜 하필 Kubernetes를 도입하기로 결정했는지 설명하겠음.
+여기까지 글을 읽으셨을 때 독자분들께서는 이러한 의문점이 생기실 수 있습니다.
+
+> *"Kubernetes는 도대체 어떤 tool이고, 왜 사용해야 하는거지?"*
+
+본격적으로 Kubernetes를 기반으로 한 개발 환경에 대해 설명드리기 전에, Kubernetes란 어떠한 tool이고 이를 기반으로 개발 환경을 구축했을 때 어떠한 이점을 얻을 수 있는지에 대해 소개하도록 하겠습니다.
 
 ### About Kubernetes
 
-기본적으로 어떤건지 설명.
+Kubernetes는 **Container Orchestration Tool**입니다. Container를 쉽고 빠르게 배포 및 확장하고, 관리를 자동화해주는 오픈소스 플랫폼이죠. 단순한 container 플랫폼을 넘어 마이크로서비스 및 클라우드 플랫폼을 지향하고, container로 이루어진 것들을 손쉽게 담고 관리할 수 있는 그릇 역할을 합니다. 이렇게 설명하면 와닿지 않으실 수 있는데, 한 문장으로 정리해보자면 이렇게 표현해볼 수 있겠네요.
+
+> *복잡한 인프라 운영을 코드화 및 자동화하여, 누구나 일관되게 서비스를 배포, 확장, 운영할 수 있게 해주는 도구*
+
+
 
 ### Kubernetes 기반 개발 환경의 장점
 
