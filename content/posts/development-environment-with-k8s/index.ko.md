@@ -107,11 +107,29 @@ Kubernetes는 **Container Orchestration Tool**입니다. Container를 쉽고 빠
 
 > *복잡한 인프라 운영을 코드화 및 자동화하여, 누구나 일관되게 서비스를 배포, 확장, 운영할 수 있게 해주는 도구*
 
+Container Orchestration이라는 개념에 대해서 좀 더 설명해보겠습니다.
 
+간단하게 Kubernetes에 대해서 소개.
+
+![Kubernetes Components](./kubernetes_components.png)
 
 ### Kubernetes 기반 개발 환경의 장점
 
-앞서 언급한 한계점들을 어떻게 하면 해결할 수 있을까? 나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
+내용
+
+#### 완전한 격리 개발 환경 구축
+
+내용
+
+#### 유연한 개발 환경 운용
+
+내용
+
+#### 자원 관리 용이
+
+내용
+
+나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
 
 ### Kubernetes 클러스터 구축 및 개발 환경 도입
 
@@ -133,6 +151,7 @@ HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루�
 
 ## Reference
 
+- [Kubernetes Docs](https://kubernetes.io/ko/docs/home/)
 - [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
 - [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
 - [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
