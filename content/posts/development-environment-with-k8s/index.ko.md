@@ -3,7 +3,7 @@ date: '2026-02-04T10:38:13+09:00'
 draft: false
 title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?'
 cover:
-  image: "kubernetes_logo.png"
+  image: "images/kubernetes_logo.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "Kubernetes Logo"
@@ -30,7 +30,7 @@ keywords: [
 
 HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 `devcontainer`를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 `devcontainer portal`을 만들어서 제공하고 있습니다.
 
-![Devcontainer Portal](./devcontainer_portal_capture.png)
+![Devcontainer Portal](./images/devcontainer_portal_capture.png)
 
 해당 portal을 통해 container 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
 
@@ -42,7 +42,7 @@ HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 
 
 HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘을 합쳐 작은 규모에서부터 시작된 스타트업입니다.
 
-![HyperAccel Starting Members](./hyperaccel_starting_member.jpg)
+![HyperAccel Starting Members](./images/hyperaccel_starting_member.jpg)
 
 초기 스타트업의 특성 상 굉장히 빠른 템포로 개발을 진행했었고, 체계적인 개발 환경을 구축하기 어려운 상황이었습니다. 해당 시점에는 제가 HyperAccel에 합류하기 이전이기 때문에, 초창기 멤버이신 ML팀 박현준([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/))님과 대화를 통해 당시 개발 환경에 대해 전해들을 수 있었습니다.
 
@@ -111,7 +111,7 @@ Container Orchestration이라는 개념에 대해서 좀 더 설명해보겠습�
 
 간단하게 Kubernetes에 대해서 소개.
 
-![Kubernetes Components](./kubernetes_components.png)
+![Kubernetes Components](./images/kubernetes_components.png)
 
 ### Kubernetes 기반 개발 환경의 장점
 
