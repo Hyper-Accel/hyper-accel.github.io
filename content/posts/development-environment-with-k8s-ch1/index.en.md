@@ -30,6 +30,8 @@ For those of you reading this, what kind of environment do you develop in? I ima
 
 The HyperAccel SW group develops on an environment built on top of a Kubernetes cluster. We spin up Pods based on `devcontainers` pre-configured with the packages needed for development, then connect to the container to do our work. To make things easier for our internal developers, we've created and provided a `devcontainer portal`.
 
+<a id="devcontainer-portal-image"></a>
+
 ![Devcontainer Portal](./images/devcontainer_portal_capture.png)
 
 Through this portal, you can easily perform container-related operations such as creating and deleting containers, checking error logs, and monitoring available resources across Kubernetes cluster nodes.
@@ -217,7 +219,7 @@ Let me briefly introduce some of the components currently applied to our Kuberne
 
 - Portal Provision
 
-  - We provide the `Devcontainer Portal` to our developers. This allows developers to easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
+  - We provide the [Devcontainer Portal](#devcontainer-portal-image) to our developers. Before providing the Portal, we used `Makefile` and `.env` files to run pods. This approach caused initial entry barriers and inconvenience for users. To solve this, we applied a GUI approach through the Portal, and the required specifications are provided using `go-template` and `ConfigMap`. Developers can now easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
 
 During my master's program, I researched scheduling for efficient GPU usage in distributed training environments. I modified the Kubernetes scheduler directly for my research, but only used limited Kubernetes features. Through this project, I gained valuable experience going through the entire process from cluster setup to operation.
 
