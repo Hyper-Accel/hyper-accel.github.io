@@ -246,7 +246,7 @@ Thank you for your continued interest in our upcoming articles, and thank you fo
 
 HyperAccel is a company working on HW, SW, and AI to launch an LLM acceleration ASIC chip. We have talented people across all areas, and in this environment, we're learning broadly (and deeply!) beyond just one domain, sharing knowledge, and growing together at a rapid pace!
 
-The **DevOps team within our ML team** provides development environments and management to boost internal developer productivity, and develops software stacks to effectively support LPU chip utilization at the cloud level.
+The **DevOps part within our ML team** provides development environments and management to boost internal developer productivity, and develops software stacks to effectively support LPU chip utilization at the cloud level.
 
 If you're interested in the technologies we work with at HyperAccel, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
 
