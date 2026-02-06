@@ -1,9 +1,9 @@
 ---
-date: '2026-02-04T10:38:13+09:00'
+date: '2026-02-06T10:38:13+09:00'
 draft: false
-title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?'
+title: 'Building an Internal Development Environment with Kubernetes Chapter 0: Why Kubernetes?'
 cover:
-  image: "kubernetes_logo.png"
+  image: "images/kubernetes_logo.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "Kubernetes Logo"
@@ -12,8 +12,8 @@ cover:
 authors: ["Younghoon Jun"] # must match with content/authors
 tags: [development-environment, kubernetes, container]
 categories: [kubernetes]
-series: ["Kubernetes 기반 사내 개발 환경 구축기"]
-summary: ['현재 HyperAccel SW group의 개발 환경 ~~~ 전체 여정을 공유합니다.']
+series: ["Building an Internal Development Environment with Kubernetes"]
+summary: ['We share our journey of building a Kubernetes-based development environment for the HyperAccel SW group.']
 comments: true
 description: ""
 keywords: [
@@ -22,109 +22,238 @@ keywords: [
 ]
 ---
 
-# Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?
+# Building an Internal Development Environment with Kubernetes Chapter 0: Why Kubernetes?
 
-안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.
+Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.
 
-이 글을 보시는 분들 중에서 개발자 여러분들은 어떤 환경에서 개발하고 계신가요? Local 환경, 특정 서버에 직접 접속, 클라우드 서비스 활용 등 다양한 환경 위에서 개발을 진행하고 계신다고 생각됩니다.
+For those of you reading this, what kind of environment do you develop in? I imagine you're working in various environments—local setups, direct server access, cloud services, and more.
 
-HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 devcontainer를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 devcontainer portal을 만들어서 제공하고 있습니다.
+The HyperAccel SW group develops on an environment built on top of a Kubernetes cluster. We spin up Pods based on `devcontainers` pre-configured with the packages needed for development, then connect to the container to do our work. To make things easier for our internal developers, we've created and provided a `devcontainer portal`.
 
-![Devcontainer Portal](./devcontainer_portal_capture.png)
+![Devcontainer Portal](./images/devcontainer_portal_capture.png)
 
-해당 portal을 통해 devcontainer 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
+Through this portal, you can easily perform container-related operations such as creating and deleting containers, checking error logs, and monitoring available resources across Kubernetes cluster nodes.
 
-정말 감사하게도 SW group 개발자분들께서 적극적으로 잘 사용해주시고 계십니다. 하지만, 처음부터 Kubernetes 환경에서 개발을 진행되었던 것은 아닙니다. **Kubernetes 기반 사내 개발 환경 구축기**에서는 사내 개발자들의 불편함을 해소하고 효율적인 개발 프로세스 제공을 위해 어떻게 Kubernetes 기반 개발 환경을 구축하였는지에 대한 여정을 소개하고자 합니다. 해당 시리즈의 첫 번째 글인 이번 포스팅에서는 Kubernetes 도입 이전 기존 개발 환경의 한계점에서부터 Kubernetes를 도입하기까지 과정에 대해 소개합니다.
-
----
-
-## Container 기반 개발 환경이 도입되기 이전
-
-HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘을 합쳐 작은 규모에서부터 시작된 스타트업입니다.
-
-![HyperAccel Starting Members](./hyperaccel_starting_member.jpg)
-
-초기 스타트업의 특성 상 굉장히 빠른 템포로 개발을 진행했었고, 체계적인 개발 환경을 구축하기 어려운 상황이었습니다. 해당 시점에는 제가 HyperAccel에 합류하기 이전이기 때문에, 초창기 멤버이신 ML팀 박현준([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/))님과 대화를 통해 당시 개발 환경에 대해 전해들을 수 있었습니다.
-
-> 당시 저희는 10명 정도 규모의 굉장히 작은 조직이었고, 타이트한 기간 내에 목표를 달성하기 위해 개발 환경에는 크게 신경쓰지 못했었습니다. 사내 서버에 각자 계정을 만들고 접속해서 사용했고, 누군가 서버의 자원을 많이 사용하고 있다면 직접 자리로 찾아가서 언제 작업이 끝나는지 독촉하곤 했었죠. (웃음)
-
-공통된 개발 환경이 없는 경우에 발생하는 어려움에 대해서 조금 더 구체적으로 살펴보겠습니다.
-
-### 서버 관리의 어려움
-만약 서버가 10대 있고 개발자가 총 10명 있다면, 모든 개발자가 서버 전체에 접근하기 위해서는 총 **100개**의 계정이 필요합니다. 물론 계정 생성 정도는 자동화 스크립트를 사용한다면 크게 어렵지 않다고 생각하실 수 있습니다. 하지만, 이러한 환경에서 개발을 진행한다면 개발자는 서버마다 본인의 작업물이 같은 상태인지 추적하기 굉장히 어렵습니다. (Github을 활용한다고 해도 매우 불편합니다.)
-
-보안 및 서버 안정성 문제도 함께 고려해야 합니다. 예를 들면, `sudo` 권한 부여에 대해서도 추가로 정책을 정할 필요가 있습니다. 추가로 개발 도중 실수(`sudo rm -rf /`와 같은 폭력적인 예시를 생각해볼 수 있습니다...)로 인해 서버가 망가지게 되면 복구하는데 비용이 들게 됩니다.
-
-### 패키지 버전 통일의 어려움
-여러 명이서 함께 코드를 구현하는 것에 있어서 각자 코드의 통합은 필수 항목입니다. 개인별로 독립된 환경에서 개발을 진행한다면, 향후에 이를 통합할 때 버전 문제가 발생할 수 있습니다. Torch 버전 충돌, Clang 버전 불일치와 같은 문제가 발생할 수 있는 것이죠. 소위 말하는 **It Works on my Machine**을 서로 주장하게 되는 것입니다.
-
-### 자원 사용의 어려움
-HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)은 FPGA를 기반으로 제작되었습니다. FPGA 서버는 ring topology 형태로 연결되어 있기 때문에 서버 내부에서 완전 격리로 사용하기 위해서는 1대만 사용하거나 혹은 전부 다 사용하는 방식 중 하나로 활용해야만 했습니다. 개발자 여러 명이 동시에 사용하기 어려운 구조입니다. (현재는 Kubernetes 환경 위에서 원활하게 사용되고 있습니다. 해당 내용에 대해서는 향후 작성될 글에서 Kubernetes Device Plugin이라는 주제로 자세히 알아보도록 하겠습니다.)
-
-추가로 GPU 같은 경우에도 점유 여부를 확인하기 위해서는 `nvidia-smi`와 같은 명령어를 통해 실행 중인 프로세스를 확인하거나, dashboard를 직접 참고해야하는 불편한 점이 있습니다.
+We're incredibly grateful that our SW group developers have been actively using it. However, we didn't always develop in a Kubernetes environment. In this **Building an Internal Development Environment with Kubernetes** series, we want to share our journey of building a Kubernetes-based development environment to address developer pain points and provide an efficient development process. In this first post of the series, we'll cover the limitations of our previous development environment before Kubernetes and the path that led us to adopt it.
 
 ---
 
-## Devcontainer의 도입
+## Before Container-Based Development
 
-회사의 규모가 커지고 개발자의 수가 늘어남에 따라서 체계적인 개발 환경 구축이 필요한 상황이 되었습니다. 이를 위해 ML팀 Lead이신 박민호([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/))님께서 `HyperAccel-Devcontainer`라는 컨테이너화 된 개발 환경(편의상 이번 글에서는 `devcontainer`라고 지칭하겠습니다)을 구축하셨습니다.
+HyperAccel is a startup that began small, founded by members of KAIST's [CAST Lab](https://castlab.kaist.ac.kr/).
 
-`devcontainer`는 2가지 버전을 제공합니다. 첫 번째는 HyperAccel의 1세대 chip의 개발 및 관리를 위한 container이고, 두 번째는 HyperAccel의 2세대 ASIC chip 개발을 위한 container입니다. 두 가지 버전의 container는 모두 `base-image`를 기반으로 빌드됩니다. `base-image`에는 두 버전의 container가 동일하게 필요로 하는 패키지 및 환경이 제공됩니다. 이를 기반으로 각 버전마다 필요한 패키지와 환경을 기반으로 container 환경이 세팅됩니다.
+![HyperAccel Starting Members](./images/hyperaccel_starting_member.jpg)
 
-이렇듯 container 기반으로 개발 환경을 제공하는 경우에는 **개발 인원 모두가 같은 환경 위에서 개발을 진행**할 수 있다는 장점이 있습니다. **It Works on my Machine**을 피할 수 있는 것이죠. 또한 격리된 환경에서 개발을 진행하기 때문에 개인의 실수로 인해 서버가 망가지는 상황을 최대한 피할 수 있습니다.
+Given the nature of an early-stage startup, development moved at an incredibly fast pace, making it difficult to establish a systematic development environment. Since this was before I joined HyperAccel, I learned about the development environment at that time through conversations with Hyunjun Park ([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/)), one of our founding members on the ML team.
 
-하지만, 이러한 container 개발 환경에도 명확한 한계점이 있습니다.
+> Back then, we were a really small team of about 10 people, and we couldn't pay much attention to the development environment while trying to meet our goals within tight deadlines. Everyone created their own accounts on the company servers and logged in to use them. If someone was using too many resources, you'd just walk over to their desk and ask when they'd be done. (laughs)
 
-### 개인별 서버 접속 계정의 필요성
+Let's take a closer look at the challenges that arise when there's no shared development environment.
 
-개인별로 서버에 접속할 수 있는 계정은 여전히 제공해야 합니다. 개발자의 입장에서는 개발을 위해서는 서버 계정의 존재 여부에 의존해야 하고, 관리자의 입장에서는 개발 팀의 인원이 변동될 때마다 계정 관리를 해주어야 하는 업무 지점이 하나 늘어나게 됩니다. 추가로, 개인에게 서버 접속을 허용해주기 때문에 위에서 말씀드린 실수로 인한 서버 고장의 가능성도 여전히 존재합니다.
+### Server Management Challenges
+If you have 10 servers and 10 developers, you need a total of **100 accounts** for everyone to access all servers. Of course, you might think account creation isn't that difficult if you use automation scripts. However, developing in this environment makes it extremely hard for developers to track whether their work is in sync across different servers. (Even with GitHub, it's very inconvenient.)
 
-### 개발 환경에 대한 유연성 부족
+Security and server stability are also concerns. For example, you need additional policies for granting `sudo` privileges. Furthermore, if a server gets damaged due to a mistake during development (think of drastic examples like `sudo rm -rf /`...), there's a cost to recovery.
 
-우선, 개발자는 서버마다 자신의 디렉토리를 관리해야 하기 때문에 여전히 서버 환경에 종속되어 있습니다. 만약 특정 서버가 다운된다면, 해당 서버를 쓰고 있던 개발자들은 (백업이 없다면) 자신의 결과물에 대한 추적이 어려운 경우 업무에 지장을 받을 수 있습니다. 현재 저희 회사에서는 외부 IDC의 서버도 함께 사용하기 때문에 관리자가 출장을 가서 서버를 고쳐야하는 상황이 된다면 업무가 더 오랜 시간 지연될 수 있습니다.
+### Package Version Consistency Challenges
+When multiple people are working on code together, integrating everyone's work is essential. If everyone develops in their own isolated environment, version conflicts can arise during integration. You might run into Torch version conflicts, Clang version mismatches, and so on. This is where everyone starts claiming **"It Works on my Machine."**
 
-추가로 개발자 입장에서 container 환경 사용에 대해 익히기까지 시간과 노력이 필요합니다. Container에 대한 기본 지식부터 실행 과정 및 주의사항까지 DevOps에 친숙하지 않은 개발자의 입장에서는 어려운 지점이 될 수 있습니다.
+![It works on my machine](./images/it_works_on_my_machine.jpg)
 
-### 해결하지 못한 자원 사용의 어려움
+### Resource Usage Challenges
+HyperAccel's [first-generation chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/) was built on FPGA. Since FPGA servers are connected in a ring topology, to use them in complete isolation within a server, you had to either use just one server or all of them. This structure made it difficult for multiple developers to use them simultaneously. (Currently, this works smoothly on our Kubernetes environment. We'll cover this in detail in a future post on Kubernetes Device Plugins.)
 
-FPGA와 GPU 사용에는 여전히 제약이 발생합니다. 앞서 설명드린 문제점이 container 환경에서도 동일하게 발생할 수 있습니다.
-
-이러한 한계점을 극복하고 보다 쾌적한 개발 환경 제공을 위해 Kubernetes를 도입하기로 결정하게 되었습니다.
+Additionally, for GPUs, checking availability required running commands like `nvidia-smi` to see running processes or manually checking a dashboard—quite inconvenient.
 
 ---
 
-## Kubernetes 기반 devcontainer 개발 환경 도입
+## Introducing Devcontainers
 
-본격적으로 개발 환경 구축에 대해 설명하기 전에, 왜 하필 Kubernetes를 도입하기로 결정했는지 설명하겠음.
+As the company grew and the number of developers increased, we needed a more systematic development environment. To address this, Minho Park ([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/)), the ML team lead, built `HyperAccel-Devcontainer`, a containerized development environment (which we'll refer to as `devcontainer` in this post for convenience).
+
+The `devcontainer` comes in two versions. The first is for development and management of HyperAccel's first-generation chip, and the second is for developing HyperAccel's second-generation ASIC chip. Both versions are built on top of a `base-image` that provides packages and environments common to both. Each version then adds its own specific packages and configurations on top of this foundation.
+
+Providing a container-based development environment has the advantage that **all developers work in the same environment**. No more **"It Works on my Machine."** Also, since development happens in an isolated environment, we can largely avoid situations where a server gets damaged due to individual mistakes.
+
+However, this container-based development environment still had clear limitations.
+
+### Individual Server Accounts Still Required
+
+We still needed to provide individual server access accounts. From a developer's perspective, development depended on having a server account, and from an administrator's perspective, account management became another task whenever team membership changed. Additionally, since individuals had server access, the possibility of server damage from mistakes still existed.
+
+### Lack of Development Environment Flexibility
+
+First, developers still needed to manage their own directories on each server, so they remained tied to the server environment. If a specific server went down, developers using that server might face work disruptions if they didn't have backups and couldn't track their work. Since we also use servers at external IDCs, if an administrator had to travel to fix a server, work could be delayed even longer.
+
+Additionally, developers need time and effort to learn how to use the container environment. From basic container knowledge to execution procedures and precautions, this can be challenging for developers who aren't familiar with DevOps.
+
+### Unresolved Resource Usage Challenges
+
+FPGA and GPU usage still had constraints. The issues mentioned earlier could still occur in the container environment.
+
+To overcome these limitations and provide a more comfortable development environment, we decided to adopt Kubernetes.
+
+---
+
+## Adopting Kubernetes-Based Devcontainer Development Environment
+
+If you've read this far, you might be wondering:
+
+> *"What exactly is Kubernetes, and why should we use it?"*
+
+Before diving into the Kubernetes-based development environment, let me introduce what Kubernetes is and the benefits of building a development environment on top of it.
+
+### Container Orchestration
+
+Kubernetes is a **Container Orchestration Tool**. It's an open-source platform that makes it easy to deploy and scale containers quickly while automating their management. Beyond being a simple container platform, it aims to be a microservices and cloud platform, serving as a vessel that can easily hold and manage everything built with containers. To put it in one sentence:
+
+> *A tool that codifies and automates complex infrastructure operations, allowing anyone to consistently deploy, scale, and operate services*
+
+Let me explain the concept of **Container Orchestration** a bit more. In a container-based environment, services are delivered to users in the form of containers. If the number of containers to manage is small, one person can handle issues. But as the organization scales, one person handling all issues becomes impossible. Large-scale environments require operational techniques like:
+
+- **Monitoring** systems that continuously check whether all services are running normally
+- **Scheduling**, **load balancing**, and **scaling** to prevent work from piling up on specific clusters or containers
+
+**Container Orchestration** is a system that provides features to make managing and operating numerous containers a bit easier and more automated.
+
+---
 
 ### About Kubernetes
 
-기본적으로 어떤건지 설명.
+So far, we've looked at what Kubernetes and Container Orchestration are. Next, let's briefly explore Kubernetes components. The diagram below shows an overview of the essential components that make up a Kubernetes cluster.
 
-### Kubernetes 기반 개발 환경의 장점
+![Kubernetes Components](./images/kubernetes_components.png)
 
-앞서 언급한 한계점들을 어떻게 하면 해결할 수 있을까? 나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
+A Kubernetes cluster consists of a Control Plane and one or more Worker Nodes.
 
-### Kubernetes 클러스터 구축 및 개발 환경 도입
+#### Control Plane Components
 
-ML팀에서 k8s 클러스터 구축. 현재 클러스터에는 어떠한 스택들이 올라가 있는지 간략하게 오버뷰 느낌으로 작성. 
+These manage the overall state of the Kubernetes cluster.
 
-## 정리하자면...
+- `kube-apiserver`
 
-앞에 글에 대한 내용 정리. 다음 편에 어떤 글이 올라올지 홍보(Nexus, ARC, ...). 추가로 ASIC 칩을 지원하기 위해 hyperaccel에서 구현한 k8s 기반 sw stack에 대해서도 글 작성.
+  - The core server component that exposes the Kubernetes HTTP API
+
+- `etcd`
+
+  - A consistent and highly available key-value store for all API server data
+
+- `kube-scheduler`
+
+  - Finds pods not assigned to nodes and assigns them to appropriate nodes
+
+- `kube-controller-manager`
+
+  - Runs controllers to implement Kubernetes API behavior
+
+#### Worker Node Components
+
+These run on every node, maintaining running pods and providing the Kubernetes runtime environment.
+
+- `kubelet`
+
+  - The node agent that ensures pods and their containers are running
+
+- `kube-proxy` (Optional)
+
+  - Maintains network rules on nodes to implement services
+
+- `container-runtime`
+
+  - Software responsible for running containers
+
+We've now looked at Kubernetes and its role at the cluster level. So why did we choose Kubernetes for our internal development environment? Next, I'll explain our reasoning based on the advantages of managing a development environment as a Kubernetes cluster.
 
 ---
 
-## 추신: HyperAccel은 채용 중입니다!
+### Advantages of a Kubernetes-Based Development Environment
 
-ML팀의 DevOps 파트가 하는 일에 대해서 간단하게 소개. 사내 개발자들이 편하게 사용할 수 있도록 노력. 추가로 향후 cloud level로 bertha를 사용하기 위해 여러가지 일을 진행 중임.
+What advantages do you get from providing a development environment based on Kubernetes? Let me explain, focusing on how we overcame the limitations of the container-based development environment mentioned earlier.
 
-HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루는 회사로 전 방면에 걸쳐 뛰어난 인재들이 모여있고, 이런 환경에서 한 분야에 국한된 것이 아닌 폭넓은 지식을, 심지어 깊게 배우며 지식을 공유하고 함께 성장하고 싶으신 분들은 언제든지 저희 HyperAccel에 지원해주세요!
+#### Fully Isolated Development Environment
 
-저희가 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
+With the Kubernetes cluster in place, developers no longer need to access servers directly. Developers simply run their `devcontainer` in the Kubernetes environment and connect to the container to develop! Infrastructure concerns like node selection and resource management are all handled at the cluster level.
+
+Additionally, you can specify node usage policies at the cluster level to control user access permissions and resource usage. By separating nodes within the cluster by purpose, many pain points for users are eliminated, and abnormal resource usage can be controlled to prevent node downtime.
+
+#### Flexible Development Environment Operations
+
+Development environments are no longer tied to specific nodes! Even if some nodes go down, pods can be scheduled to other nodes within the cluster. Developer home directories are provided via NFS provisioner on NAS, so you can confidently continue development on a pod running on a different node.
+
+Additionally, since we provide a `portal` interface to users (which I'll explain in detail below), once users are granted cluster access, they can start using it with no initial learning curve.
+
+#### Easy Resource Management
+
+Custom resources like FPGAs and GPUs can be used exclusively at the container level. Kubernetes treats any resources beyond CPU and Memory as custom resources. To use these resources in Kubernetes, you need `Device Plugins`.
+
+Our cluster currently has `Device Plugins` configured, and by allocating these resources to containers, you can use them in isolation without interference from other containers.
+
+---
+
+### Building the Kubernetes Cluster and Introducing the Development Environment
+
+> *In the end, we built a Kubernetes cluster and introduced our internal development environment based on it!!*
+
+Let me briefly introduce some of the components currently applied to our Kubernetes cluster that aim to enhance development environment convenience.
+
+- High Availability
+
+  - If you maintain only one Control Plane in Kubernetes, you have a SPOF (Single Point of Failure). If the cluster goes down, all developer work stops—a disaster. To prevent this, we designated 3 nodes as Control Plane and applied `KeepAlived` and `HAProxy` so that even if a specific node goes down, the cluster continues to operate normally.
+
+    ![KeepAlived and HAProxy](./images/keepalived_haproxy.png)
+
+- Storage Management
+
+  - For management convenience and minimizing network latency, we introduced `Rook-Ceph` and `Harbor` to operate an internal OCI Registry.
+  - We introduced `Nexus` to provide an internal PyPi server environment.
+
+- CI/CD Enhancement
+
+  - When running CI/CD in the GitHub environment, we previously ran GitHub Action Runners directly on compute nodes. With the Kubernetes cluster in place, we introduced `ARC (Actions Runner Controller)` for more stable runner execution.
+
+    ![ARC Overview](./images/arc_overview.png)
+
+  - We introduced `Vault` for centralized secret management and to improve developer access to secrets.
+
+- Portal Provision
+
+  - We provide the `Devcontainer Portal` to our developers. This allows developers to easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
+
+During my master's program, I researched scheduling for efficient GPU usage in distributed training environments. I modified the Kubernetes scheduler directly for my research, but only used limited Kubernetes features. Through this project, I gained valuable experience going through the entire process from cluster setup to operation.
+
+Building a Kubernetes cluster for the development environment and figuring out how to increase productivity and convenience for our internal developers was challenging, but it was truly rewarding and enjoyable.
+
+## In Summary...
+
+In this post, we covered the first topic in the **Building an Internal Development Environment with Kubernetes** series: the limitations of our previous development environment and the motivation and process for adopting Kubernetes.
+
+We provided a container-based environment for isolated development under common conditions and adopted Kubernetes to manage it.
+From the *developer's perspective*, infrastructure concerns are minimized, allowing them to focus comfortably on development. From the *administrator's perspective*, the environment can be stably managed and issues addressed even as scale increases, greatly improving work efficiency.
+
+In upcoming posts in this series, we'll introduce what frameworks we've added to the Kubernetes cluster to enhance the development environment and boost productivity!
+
+Furthermore, our ML team is developing a software stack to support using HyperAccel's upcoming ASIC chip on Kubernetes.
+Kubernetes plays an important role as the foundational infrastructure for LLM (Large Language Model) Serving, one of the most prominent technologies today.
+We'll share more about this topic in future posts!
+
+Thank you for your continued interest in our upcoming articles, and thank you for reading to the end!
+
+---
+
+## P.S.: HyperAccel is Hiring!
+
+HyperAccel is a company working on HW, SW, and AI to launch an LLM acceleration ASIC chip. We have talented people across all areas, and in this environment, we're learning broadly (and deeply!) beyond just one domain, sharing knowledge, and growing together at a rapid pace!
+
+The **DevOps team within our ML team** provides development environments and management to boost internal developer productivity, and develops software stacks to effectively support LPU chip utilization at the cloud level.
+
+If you're interested in the technologies we work with at HyperAccel, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
 
 ## Reference
 
+- [Kubernetes Docs](https://kubernetes.io/ko/docs/home/)
 - [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
-- [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
+- [Why Kubernetes?](https://mlops-for-all.github.io/docs/introduction/why_kubernetes/)
+- [HyperAccel Builds High-Efficiency LLM Inference Service with LPU Based on Amazon EC2 F2 Instance](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
 - [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
+- [Actions Runner Controller](https://docs.github.com/ko/actions/concepts/runners/actions-runner-controller)
+
