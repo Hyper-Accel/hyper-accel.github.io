@@ -101,17 +101,52 @@ FPGA와 GPU 사용에는 여전히 제약이 발생합니다. 앞서 설명드�
 
 본격적으로 Kubernetes를 기반으로 한 개발 환경에 대해 설명드리기 전에, Kubernetes란 어떠한 tool이고 이를 기반으로 개발 환경을 구축했을 때 어떠한 이점을 얻을 수 있는지에 대해 소개하도록 하겠습니다.
 
-### About Kubernetes
+### Container Orchestration
 
 Kubernetes는 **Container Orchestration Tool**입니다. Container를 쉽고 빠르게 배포 및 확장하고, 관리를 자동화해주는 오픈소스 플랫폼이죠. 단순한 container 플랫폼을 넘어 마이크로서비스 및 클라우드 플랫폼을 지향하고, container로 이루어진 것들을 손쉽게 담고 관리할 수 있는 그릇 역할을 합니다. 이렇게 설명하면 와닿지 않으실 수 있는데, 한 문장으로 정리해보자면 이렇게 표현해볼 수 있겠네요.
 
 > *복잡한 인프라 운영을 코드화 및 자동화하여, 누구나 일관되게 서비스를 배포, 확장, 운영할 수 있게 해주는 도구*
 
-Container Orchestration이라는 개념에 대해서 좀 더 설명해보겠습니다.
+**Container Orchestration**이라는 개념에 대해서 좀 더 설명해보겠습니다. Container를 기반으로 운영되는 환경에서 서비스는 container의 형태로 사용자들에게 제공됩니다. 이때 관리해야 할 container의 개수가 적다면 담당자 한 명이서도 충분히 문제 상황에 대한 대응이 가능하지만, 조직의 규모가 커진다면 담당자 한 명이 이슈에 대응하는 것은 불가능합니다. 규모가 큰 환경에서는 아래와 같은 운영 기법이 필요합니다.
 
-간단하게 Kubernetes에 대해서 소개.
+- 모든 서비스가 정상적으로 동작하고 있는지를 계속해서 **모니터링**하는 시스템 제공
+- 특정 클러스터나 특정 컨테이너에 작업이 몰리지 않도록 **스케줄링**, **로드 밸런싱**, **스케일링**
+
+수많은 container의 상태를 지속해서 관리하고 운영하는 과정을 조금이나마 쉽게, 자동으로 할 수 있는 기능을 제공해주는 시스템이 바로 **Container Orchestration**입니다.
+
+### About Kubernetes
+
+지금까지 Kubernetes와 Container Orchestration이 무엇인지에 대해 살펴보았습니다. 다음으로는 Kubernetes 컴포넌트에 대해서 간단히 알아보도록 하겠습니다. 아래 그림을 통해 Kubernetes 클러스터를 구성하는 필수 컴포넌트들에 대한 개요를 확인하실 수 있습니다.
 
 ![Kubernetes Components](./images/kubernetes_components.png)
+
+Kubernetes 클러스터는 Control Plane과 하나 이상의 Worker Node로 구성됩니다.
+
+#### Control Plane 컴포넌트
+
+Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
+
+- `kube-apiserver`
+  - Kubernetes HTTP API를 노출하는 핵심 서버 컴포넌트
+- `etcd`
+  - 모든 API 서버 데이터를 위한 일관성과 고가용성을 갖춘 key-value 저장소
+- `kube-scheduler`
+  - 노드에 할당되지 않은 pod을 찾아 적절한 노드에 할당
+- `kube-controller-manager`
+  - 컨트롤러를 실행하여 쿠버네티스 API 동작을 구현
+
+#### Worker Node 컴포넌트
+
+모든 노드에서 실행되며, 실행 중인 pod를 유지하고 Kubernetes runtime 환경을 제공합니다.
+
+- `kubelet`
+  - 노드 에이전트, Pod와 그 안의 container가 실행 중임을 보장
+- `kube-proxy` (Optional)
+  - 노드에서 네트워크 규칙을 유지하여 서비스를 구현
+- `container-runtime`
+  - Container 실행을 담당하는 소프트웨어
+
+지금까지 Kubernetes와 클러스터 레벨에서 Kubernetes가 어떠한 역할을 하는지에 대해 살펴보았습니다. 그렇다면 사내 개발 환경 구축을 Kubernetes 기반으로 진행했던 이유는 어떤 것일까요? 다음으로는 Kubernetes 클러스터 형태로 개발 환경을 관리하는 것의 장점을 기반으로 선택 이유에 대해 설명하겠습니다.
 
 ### Kubernetes 기반 개발 환경의 장점
 
@@ -153,5 +188,6 @@ HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루�
 
 - [Kubernetes Docs](https://kubernetes.io/ko/docs/home/)
 - [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
+- [Why Kubernetes?](https://mlops-for-all.github.io/docs/introduction/why_kubernetes/)
 - [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
 - [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
