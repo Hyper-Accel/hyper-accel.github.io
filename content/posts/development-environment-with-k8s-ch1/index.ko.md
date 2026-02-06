@@ -254,5 +254,5 @@ HyperAccel에서 다루는 기술들을 보시고, 관심이 있으시다면 [Hy
 - [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
 - [Why Kubernetes?](https://mlops-for-all.github.io/docs/introduction/why_kubernetes/)
 - [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
-- [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
+- [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/)
 - [Actions Runner Controller](https://docs.github.com/ko/actions/concepts/runners/actions-runner-controller)

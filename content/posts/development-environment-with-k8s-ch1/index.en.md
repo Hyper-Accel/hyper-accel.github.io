@@ -250,10 +250,10 @@ If you're interested in the technologies we work with at HyperAccel, please appl
 
 ## Reference
 
-- [Kubernetes Docs](https://kubernetes.io/ko/docs/home/)
+- [Kubernetes Docs](https://kubernetes.io/docs/home/)
 - [What is Kubernetes?](https://www.mirantis.com/cloud-native-concepts/getting-started-with-kubernetes/what-is-kubernetes/)
 - [Why Kubernetes?](https://mlops-for-all.github.io/docs/introduction/why_kubernetes/)
 - [HyperAccel Builds High-Efficiency LLM Inference Service with LPU Based on Amazon EC2 F2 Instance](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
-- [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
-- [Actions Runner Controller](https://docs.github.com/ko/actions/concepts/runners/actions-runner-controller)
+- [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/)
+- [Actions Runner Controller](https://docs.github.com/en/actions/concepts/runners/actions-runner-controller)
 
