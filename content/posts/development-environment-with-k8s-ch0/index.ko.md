@@ -1,7 +1,7 @@
 ---
 date: '2026-02-04T10:38:13+09:00'
 draft: false
-title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?'
+title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 Kubernetes인가?'
 cover:
   image: "images/kubernetes_logo.png"
   # can also paste direct link from external site
@@ -13,7 +13,7 @@ authors: ["Younghoon Jun"] # must match with content/authors
 tags: [development-environment, kubernetes, container]
 categories: [kubernetes]
 series: ["Kubernetes 기반 사내 개발 환경 구축기"]
-summary: ['현재 HyperAccel SW group의 개발 환경 ~~~ 전체 여정을 공유합니다.']
+summary: ['Kubernetes 기반으로 운영되는 HyperAccel SW group의 개발 환경 구축에 대한 여정을 공유합니다.']
 comments: true
 description: ""
 keywords: [
@@ -22,7 +22,7 @@ keywords: [
 ]
 ---
 
-# Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes가 필요한가?
+# Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 kubernetes인가?
 
 안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.
 
@@ -114,6 +114,8 @@ Kubernetes는 **Container Orchestration Tool**입니다. Container를 쉽고 빠
 
 수많은 container의 상태를 지속해서 관리하고 운영하는 과정을 조금이나마 쉽게, 자동으로 할 수 있는 기능을 제공해주는 시스템이 바로 **Container Orchestration**입니다.
 
+---
+
 ### About Kubernetes
 
 지금까지 Kubernetes와 Container Orchestration이 무엇인지에 대해 살펴보았습니다. 다음으로는 Kubernetes 컴포넌트에 대해서 간단히 알아보도록 하겠습니다. 아래 그림을 통해 Kubernetes 클러스터를 구성하는 필수 컴포넌트들에 대한 개요를 확인하실 수 있습니다.
@@ -148,6 +150,8 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 지금까지 Kubernetes와 클러스터 레벨에서 Kubernetes가 어떠한 역할을 하는지에 대해 살펴보았습니다. 그렇다면 사내 개발 환경 구축을 Kubernetes 기반으로 진행했던 이유는 어떤 것일까요? 다음으로는 Kubernetes 클러스터 형태로 개발 환경을 관리하는 것의 장점을 기반으로 선택 이유에 대해 설명하겠습니다.
 
+---
+
 ### Kubernetes 기반 개발 환경의 장점
 
 내용
@@ -166,23 +170,36 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
 
+---
+
 ### Kubernetes 클러스터 구축 및 개발 환경 도입
 
 ML팀에서 k8s 클러스터 구축. 현재 클러스터에는 어떠한 스택들이 올라가 있는지 간략하게 오버뷰 느낌으로 작성. 
 
 ## 정리하자면...
 
-앞에 글에 대한 내용 정리. 다음 편에 어떤 글이 올라올지 홍보(Nexus, ARC, ...). 추가로 ASIC 칩을 지원하기 위해 hyperaccel에서 구현한 k8s 기반 sw stack에 대해서도 글 작성.
+이번 글에서는 **Kubernetes 기반 개발 환경 구축기** 시리즈 중 첫 번째 내용인 기존 개발 환경의 한계점과 Kubernetes 도입 계기 및 과정에 대해 소개드렸습니다.
+
+공통된 조건을 기반으로 격리된 개발 환경을 제공하기 위해서 container 기반 환경을 제공하고, 이를 관리하기 위해 Kubernetes를 도입하였습니다.
+*개발자 입장*에서는 인프라에 대해 신경써야 하는 부분이 최소화되기 때문에 편리하게 개발에만 집중할 수 있고, *관리자 입장*에서는 규모가 커지는 환경에서도 안정적으로 관리 및 이슈를 대응할 수 있게 되어 업무 효율성이 크게 증가하였습니다.
+
+앞으로 전개될 시리즈 글에서는 개발 환경을 고도화하고 생산성을 높이기 위해 Kubernetes 클러스터 위에 어떠한 프레임워크를 추가했는지에 대해 소개하도록 하겠습니다!
+
+나아가 저희 ML팀에서는 HyperAccel에서 출시될 ASIC chip을 Kubernetes 위에서 활용할 수 있도록 지원하는 소프트웨어 스택 개발을 진행하고 있습니다.
+Kubernetes는 개발 환경 이외에도 현재 가장 주목받고 있는 기술인 LLM(Large Language Model) Serving의 기반 인프라로써 중요한 역할을 합니다.
+해당 내용에 관련해서도 글을 통해 소개해도록 하겠습니다!
+
+향후 업로드되는 글에 대해서도 많은 관심 부탁드리며, 끝까지 읽어주셔서 감사드립니다!
 
 ---
 
 ## 추신: HyperAccel은 채용 중입니다!
 
-ML팀의 DevOps 파트가 하는 일에 대해서 간단하게 소개. 사내 개발자들이 편하게 사용할 수 있도록 노력. 추가로 향후 cloud level로 bertha를 사용하기 위해 여러가지 일을 진행 중임.
+HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루는 회사로 전 방면에 걸쳐 뛰어난 인재들이 모여있고, 이런 환경에서 한 분야에 국한된 것이 아닌 폭넓은 지식을, 심지어 깊게 배우며 지식을 공유하고 빠른 속도로 함께 성장하고 있습니다!
 
-HyperAccel은 LLM 가속 ASIC 칩 출시를 위해 HW, SW, AI를 모두 다루는 회사로 전 방면에 걸쳐 뛰어난 인재들이 모여있고, 이런 환경에서 한 분야에 국한된 것이 아닌 폭넓은 지식을, 심지어 깊게 배우며 지식을 공유하고 함께 성장하고 싶으신 분들은 언제든지 저희 HyperAccel에 지원해주세요!
+저희 **ML팀의 DevOps 파트**는 사내 개발자들의 생산성 증대를 위한 개발 환경 제공 및 관리, LPU chip을 클라우드 레벨에서의 활용을 효과적으로 지원하기 위한 소프트웨어 스택을 개발하고 있습니다.
 
-저희가 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
+HyperAccel에서 다루는 기술들을 보시고, 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
 
 ## Reference
 
