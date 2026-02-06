@@ -26,7 +26,7 @@ keywords: [
 
 Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.
 
-For those of you reading this, what kind of environment do you develop in? I imagine you're working in various environments—local setups, direct server access, cloud services, and more.
+For those of you reading this, what kind of environment do you develop in? I imagine you're working in various environments—local setups, SSH server access, cloud services, and more.
 
 The HyperAccel SW group develops on an environment built on top of a Kubernetes cluster. We spin up Pods based on `devcontainers` pre-configured with the packages needed for development, then connect to the container to do our work. To make things easier for our internal developers, we've created and provided a `devcontainer portal`.
 
@@ -36,7 +36,7 @@ The HyperAccel SW group develops on an environment built on top of a Kubernetes 
 
 Through this portal, you can easily perform container-related operations such as creating and deleting containers, checking error logs, and monitoring available resources across Kubernetes cluster nodes.
 
-We're incredibly grateful that our SW group developers have been actively using it. However, we didn't always develop in a Kubernetes environment. In this **Building an Internal Development Environment with Kubernetes** series, we want to share our journey of building a Kubernetes-based development environment to address developer pain points and provide an efficient development process. In this first post of the series, we'll cover the limitations of our previous development environment before Kubernetes and the path that led us to adopt it.
+However, we didn't always develop in a Kubernetes environment from the start. In this **Building an Internal Development Environment with Kubernetes** series, we want to share our journey of building a Kubernetes-based development environment to address developer pain points and provide an efficient development process. In this first post of the series, we'll cover the limitations of our previous development environment before Kubernetes and the path that led us to adopt it.
 
 ---
 
