@@ -219,7 +219,7 @@ Let me briefly introduce some of the components currently applied to our Kuberne
 
 - Portal Provision
 
-  - We provide the [Devcontainer Portal](#devcontainer-portal-image) to our developers. Before providing the Portal, we used `Makefile` and `.env` files to run pods. This approach caused initial entry barriers and inconvenience for users. To solve this, we applied a GUI approach through the Portal, and the required specifications are provided using `go-template` and `ConfigMap`. Developers can now easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
+  - We created the [Devcontainer Portal](#devcontainer-portal-image) and provide it to our developers. Before providing the Portal, we used `Makefile` and `.env` files to run pods. This approach caused initial entry barriers and inconvenience for users. To solve this, we applied a GUI approach through the Portal, and the required specifications are provided using `go-template` and `ConfigMap`. Developers can now easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
 
 During my master's program, I researched scheduling for efficient GPU usage in distributed training environments. I modified the Kubernetes scheduler directly for my research, but only used limited Kubernetes features. Through this project, I gained valuable experience going through the entire process from cluster setup to operation.
 
