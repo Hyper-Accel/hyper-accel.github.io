@@ -1,7 +1,7 @@
 ---
 date: '2026-02-06T10:38:13+09:00'
 draft: false
-title: 'Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 Kubernetes인가?'
+title: 'Kubernetes 기반 사내 개발 환경 구축기 1편: 왜 Kubernetes인가?'
 cover:
   image: "images/kubernetes_logo.png"
   # can also paste direct link from external site
@@ -22,7 +22,7 @@ keywords: [
 ]
 ---
 
-# Kubernetes 기반 사내 개발 환경 구축기 0편: 왜 Kubernetes인가?
+# Kubernetes 기반 사내 개발 환경 구축기 1편: 왜 Kubernetes인가?
 
 안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.
 
