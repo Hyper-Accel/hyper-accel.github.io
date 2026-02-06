@@ -58,6 +58,8 @@ HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘
 ### 패키지 버전 통일의 어려움
 여러 명이서 함께 코드를 구현하는 것에 있어서 각자 코드의 통합은 필수 항목입니다. 개인별로 독립된 환경에서 개발을 진행한다면, 향후에 이를 통합할 때 버전 문제가 발생할 수 있습니다. Torch 버전 충돌, Clang 버전 불일치와 같은 문제가 발생할 수 있는 것이죠. 소위 말하는 **It Works on my Machine**을 서로 주장하게 되는 것입니다.
 
+![It works on my machine](./images/it_works_on_my_machine.jpg)
+
 ### 자원 사용의 어려움
 HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)은 FPGA를 기반으로 제작되었습니다. FPGA 서버는 ring topology 형태로 연결되어 있기 때문에 서버 내부에서 완전 격리로 사용하기 위해서는 1대만 사용하거나 혹은 전부 다 사용하는 방식 중 하나로 활용해야만 했습니다. 개발자 여러 명이 동시에 사용하기 어려운 구조입니다. (현재는 Kubernetes 환경 위에서 원활하게 사용되고 있습니다. 해당 내용에 대해서는 향후 작성될 글에서 Kubernetes Device Plugin이라는 주제로 자세히 알아보도록 하겠습니다.)
 
@@ -129,12 +131,19 @@ Kubernetes 클러스터는 Control Plane과 하나 이상의 Worker Node로 구�
 Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 - `kube-apiserver`
+
   - Kubernetes HTTP API를 노출하는 핵심 서버 컴포넌트
+
 - `etcd`
+
   - 모든 API 서버 데이터를 위한 일관성과 고가용성을 갖춘 key-value 저장소
+
 - `kube-scheduler`
+
   - 노드에 할당되지 않은 pod을 찾아 적절한 노드에 할당
+
 - `kube-controller-manager`
+
   - 컨트롤러를 실행하여 쿠버네티스 API 동작을 구현
 
 #### Worker Node 컴포넌트
@@ -142,10 +151,15 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 모든 노드에서 실행되며, 실행 중인 pod를 유지하고 Kubernetes runtime 환경을 제공합니다.
 
 - `kubelet`
+
   - 노드 에이전트, Pod와 그 안의 container가 실행 중임을 보장
+
 - `kube-proxy` (Optional)
+
   - 노드에서 네트워크 규칙을 유지하여 서비스를 구현
+
 - `container-runtime`
+
   - Container 실행을 담당하는 소프트웨어
 
 지금까지 Kubernetes와 클러스터 레벨에서 Kubernetes가 어떠한 역할을 하는지에 대해 살펴보았습니다. 그렇다면 사내 개발 환경 구축을 Kubernetes 기반으로 진행했던 이유는 어떤 것일까요? 다음으로는 Kubernetes 클러스터 형태로 개발 환경을 관리하는 것의 장점을 기반으로 선택 이유에 대해 설명하겠습니다.
@@ -154,19 +168,21 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 ### Kubernetes 기반 개발 환경의 장점
 
-내용
+Kubernetes를 기반으로 개발 환경을 제공한다면 어떠한 장점을 얻을 수 있을까요? 앞서 제시한 container 기반 개발 환경의 한계점을 어떻게 극복할 수 있는지에 초점을 맞추어 설명하도록 하겠습니다.
 
 #### 완전한 격리 개발 환경 구축
 
-내용
+우선 개발자가 서버에 접속할 일이 없기 때문에 서버가 망가질 일이 적어짐. 클러스터 정책을 통해 유저의 접근 권한 및 자원 사용에 대해 제한할 수 있음. 노드를 용도에 맞게 분리할 수 있음.
 
 #### 유연한 개발 환경 운용
 
-내용
+특정 노드에 종속되지 않음. 볼륨도 나스로 함께
+
+portal 형태로 제공하기 때문에 클러스터 접근 권한만 얻는다면 쉽게 접속 가능
 
 #### 자원 관리 용이
 
-내용
+FPGA, GPU 완전 독접 사용 가능.
 
 나아가 ARC, MLflow와 같은 컴포넌트들을 쉽게 올릴 수 있음.
 
@@ -174,7 +190,36 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 ### Kubernetes 클러스터 구축 및 개발 환경 도입
 
-ML팀에서 k8s 클러스터 구축. 현재 클러스터에는 어떠한 스택들이 올라가 있는지 간략하게 오버뷰 느낌으로 작성. 
+> *결과적으로 Kubernetes 클러스터를 구축하고, 이를 기반으로 사내 개발 환경을 도입하였습니다!!*
+
+현재 저희 Kubernetes 클러스터에 적용되어 있는 컴포넌트에 대해 간략하게 소개해보겠습니다.
+
+- 고가용성(High Availability)
+
+  - Kubernetes에서 Control Plane을 하나로 유지한다면 SPOF(Single Point Of Failure)가 생깁니다. 클러스터가 다운되면 개발자분들의 작업이 전부 중단되는 불상사가 발생하게 됩니다. 이를 방지하기 위해 3개 노드를 Control Plane으로 지정하였고, `KeepAlived`와 `HAProxy`를 적용하여 특정 노드가 다운되어도 클러스터가 정상 운영되도록 하였습니다.
+
+    ![KeepAlived and HAProxy](./images/keepalived_haproxy.png)
+
+- 저장소 관리
+
+  - 관리 편의성 증대 및 네트워크 지연 최소화를 위해 `Rook-Ceph`과 `Harbor`를 도입하여 내부 OCI Registry 운영하고 있습니다.
+  - 사내 PyPi 서버 환경 제공을 위해 `Nexus` 도입하여 운영하고 있습니다.
+
+- CI/CD 고도화
+
+  - Github 환경에서 CI/CD를 진행할 때 기존에는 컴퓨팅 노드에 Github Action Runner를 직접 띄워 쓰는 방식이었습니다. Kubernetes 클러스터가 구축되며 보다 안정적인 runner 실행을 위해 `ARC(Actions Runner Controller)`를 도입하였습니다.
+
+    ![ARC Overview](./images/arc_overview.png)
+
+  - Secret 관리의 중앙화 및 개발자들의 secret 접근성 증대를 위해 `Vault`을 도입하여 운영하고 있습니다.
+
+- Portal 제공
+
+  - `Devcontainer Portal`을 제공하여 개발자분들에게 제공하고 있습니다. 이를 통해 개발자들이 편하게 개발 환경 인프라를 실행하고, 모니터링을 통해 log 확인이 용이해졌기 때문에 개발에 더욱 집중할 수 있는 환경이 되었습니다.
+
+저는 석사과정 당시 분산학습 환경에서 효율적인 GPU 사용을 위한 스케줄링 연구를 진행했었습니다. 연구 진행을 위해 Kubernetes scheduler를 직접 수정해보며 Kubernetes의 제한적인 기능만을 활용했었는데요, 이번 구축 과정을 통해 클러스터 구축부터 운영까지 전체 과정을 진행해보는 소중한 경험을 했습니다.
+
+개발 환경 제공을 위해 Kubernetes 클러스터를 구축하고 어떻게 하면 사내 개발자 여러분들의 생산성을 높이고 편의성을 증대할 수 있는지 고민하는 과정이 어렵기도 했지만 정말 보람차고 즐거웠습니다.
 
 ## 정리하자면...
 
@@ -208,3 +253,4 @@ HyperAccel에서 다루는 기술들을 보시고, 관심이 있으시다면 [Hy
 - [Why Kubernetes?](https://mlops-for-all.github.io/docs/introduction/why_kubernetes/)
 - [하이퍼엑셀(HyperAccel), Amazon EC2 F2 Instance 기반 LPU로 고효율 LLM 추론 서비스 구축](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)
 - [Hyperdex Toolchain Software Stack](https://docs.hyperaccel.ai/1.5.2/?_gl=1*pm5cz2*_ga*MTI5NTQ1MTQ2NS4xNzU2NDUwNzUw*_ga_NNX475HLH0*czE3NzAxOTYyNzkkbzMkZzEkdDE3NzAxOTYzMTgkajIxJGwwJGgw)
+- [Actions Runner Controller](https://docs.github.com/ko/actions/concepts/runners/actions-runner-controller)
