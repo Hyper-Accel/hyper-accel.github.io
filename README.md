@@ -9,6 +9,7 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 - [다국어 지원 (Multilingual)](#다국어-지원-multilingual)
 - [블로그 포스트 작성](#블로그-포스트-작성)
 - [로컬 개발 서버 실행](#로컬-개발-서버-실행)
+- [Pre-commit (1MB 초과 파일 체크)](#pre-commit-1mb-초과-파일-체크)
 - [포스트 배포](#포스트-배포)
 
 ## Repository clone 받기
@@ -412,6 +413,40 @@ hugo server
 ```bash
 hugo server -p 8080
 ```
+
+## 🔒 Pre-commit (1MB 초과 파일 체크)
+
+커밋 시 **1MB를 초과하는 파일**이 스테이징되면 커밋이 막혀 저장소 용량이 불필요하게 커지는 것을 방지합니다.
+
+### 설치 및 활성화
+
+```bash
+# pre-commit 설치
+pip install pre-commit
+# 또는 macOS: brew install pre-commit
+
+# 훅 설치 (최초 1회)
+pre-commit install
+```
+
+### 동작
+
+- `git commit` 시 스테이징된 파일 중 1MB 초과 파일이 있으면 커밋이 거부됩니다.
+- 1MB 이하로 압축하거나, [Git LFS](https://git-lfs.com/)로 대용량 파일을 관리한 뒤 커밋하세요.
+
+### 수동 실행
+
+```bash
+# 스테이징된 파일에 대해 검사
+pre-commit run
+
+# 전체 트리 검사 (--all-files)
+pre-commit run --all-files
+```
+
+### GitHub Actions
+
+PR 또는 `main`에 push할 때 [Check large files](.github/workflows/check-large-files.yml) 워크플로우가 pre-commit과 동일하게 `check-added-large-files`를 실행합니다 (`--all-files`로 전체 저장소 검사).
 
 ## 📤 포스트 배포
 
