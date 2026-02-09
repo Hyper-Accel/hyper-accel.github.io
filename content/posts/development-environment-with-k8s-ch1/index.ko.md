@@ -1,5 +1,5 @@
 ---
-date: '2026-02-06T10:38:13+09:00'
+date: '2026-02-09T10:38:13+09:00'
 draft: false
 title: 'Kubernetes 기반 사내 개발 환경 구축기 1편: 왜 Kubernetes인가?'
 cover:

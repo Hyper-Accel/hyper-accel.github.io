@@ -1,5 +1,5 @@
 ---
-date: '2026-02-06T10:38:13+09:00'
+date: '2026-02-09T10:38:13+09:00'
 draft: false
 title: 'Building an Internal Development Environment with Kubernetes Chapter 1: Why Kubernetes?'
 cover:
