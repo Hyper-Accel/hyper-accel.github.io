@@ -13,7 +13,7 @@ authors: ["Younghoon Jun"] # must match with content/authors
 tags: [development-environment, kubernetes, container]
 categories: [kubernetes]
 series: ["Kubernetes 기반 사내 개발 환경 구축기"]
-summary: ['Kubernetes 기반으로 운영되는 HyperAccel SW group의 개발 환경 구축에 대한 여정을 공유합니다.']
+summary: ['Kubernetes 기반으로 운영되는 HyperAccel의 개발 환경 구축에 대한 여정을 공유합니다.']
 comments: true
 description: ""
 keywords: [
@@ -28,15 +28,15 @@ keywords: [
 
 이 글을 보시는 분들 중에서 개발자 여러분들은 어떤 환경에서 개발하고 계신가요? 로컬 환경, SSH 서버 접속, 클라우드 서비스를 비롯한 다양한 환경 위에서 개발을 진행하고 계실 것이라고 생각됩니다.
 
-HyperAccel SW group은 Kubernetes 클러스터를 기반으로 구축된 환경 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 `devcontainer`를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 `devcontainer portal`을 만들어서 제공하고 있습니다.
+HyperAccel은 **Kubernetes 클러스터를 기반으로 구축된 환경** 위에서 개발을 진행하고 있습니다. 개발 진행 시에 필요한 패키지들을 기반으로 제작된 `devcontainer`를 기반으로 Pod을 띄우고, container 내부에 접속해서 작업을 진행하는 구조입니다. 사내 개발자분들의 보다 편리한 사용을 위해서 `Devcontainer Portal`을 만들어서 제공하고 있습니다.
 
 <a id="devcontainer-portal-image"></a>
 
 ![Devcontainer Portal](./images/devcontainer_portal_capture.png)
 
-해당 portal을 통해 container 생성 및 삭제, 에러 로그 확인, Kubernetes 클러스터 노드의 잉여 자원 확인 등 개발 container에 관련된 동작을 손쉽게 진행할 수 있습니다.
+하지만, *처음부터 Kubernetes 환경에서 개발이 진행되었던 것은 아닙니다.* **Kubernetes 기반 사내 개발 환경 구축기**에서는 사내 개발자들의 불편함을 해소하고 효율적인 개발 프로세스 제공을 위해 어떻게 Kubernetes 기반 개발 환경을 구축하였는지에 대한 여정을 소개하고자 합니다.
 
-하지만, 처음부터 Kubernetes 환경에서 개발이 진행되었던 것은 아닙니다. **Kubernetes 기반 사내 개발 환경 구축기**에서는 사내 개발자들의 불편함을 해소하고 효율적인 개발 프로세스 제공을 위해 어떻게 Kubernetes 기반 개발 환경을 구축하였는지에 대한 여정을 소개하고자 합니다. 해당 시리즈의 첫 번째 글인 이번 포스팅에서는 Kubernetes 도입 이전 기존 개발 환경의 한계점에서부터 Kubernetes를 도입하기까지 과정에 대해 소개합니다.
+해당 시리즈의 첫 번째 글인 이번 포스팅에서는 Kubernetes 도입 이전 기존 개발 환경의 한계점에서부터 Kubernetes를 도입하기까지 과정에 대해 소개합니다.
 
 ---
 
@@ -46,9 +46,9 @@ HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘
 
 ![HyperAccel Starting Members](./images/hyperaccel_starting_member.jpg)
 
-초기 스타트업의 특성 상 굉장히 빠른 템포로 개발을 진행했었고, 체계적인 개발 환경을 구축하기 어려운 상황이었습니다. 해당 시점에는 제가 HyperAccel에 합류하기 이전이기 때문에, 초창기 멤버이신 ML팀 박현준([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/))님과 대화를 통해 당시 개발 환경에 대해 전해들을 수 있었습니다.
+초기 스타트업의 특성 상 굉장히 빠른 템포로 개발을 진행했었고, 체계적인 개발 환경을 구축하기 어려운 상황이었습니다. 해당 시점에는 제가 HyperAccel에 합류하기 이전이기 때문에, 초창기 멤버이신 **ML팀 박현준([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/))님**과 대화를 통해 당시 개발 환경에 대해 전해들을 수 있었습니다.
 
-> 당시 저희는 10명 정도 규모의 굉장히 작은 조직이었고, 타이트한 기간 내에 목표를 달성하기 위해 개발 환경에는 크게 신경쓰지 못했었습니다. 사내 서버에 각자 계정을 만들고 접속해서 사용했고, 누군가 서버의 자원을 많이 사용하고 있다면 직접 자리로 찾아가서 언제 작업이 끝나는지 독촉하곤 했었죠. (웃음)
+> *당시 저희는 10명 정도 규모의 굉장히 작은 조직이었고, 타이트한 기간 내에 목표를 달성하기 위해 개발 환경에는 크게 신경쓰지 못했었습니다. 사내 서버에 각자 계정을 만들고 접속해서 사용했고, 누군가 서버의 자원을 많이 사용하고 있다면 직접 자리로 찾아가서 언제 작업이 끝나는지 독촉하곤 했었죠. (웃음)*
 
 공통된 개발 환경이 없는 경우에 발생하는 어려움에 대해서 조금 더 구체적으로 살펴보겠습니다.
 
@@ -58,12 +58,14 @@ HyperAccel은 KAIST [CAST Lab](https://castlab.kaist.ac.kr/) 구성원들이 힘
 보안 및 서버 안정성 문제도 함께 고려해야 합니다. 예를 들면, `sudo` 권한 부여에 대해서도 추가로 정책을 정할 필요가 있습니다. 추가로 개발 도중 실수(`sudo rm -rf /`와 같은 폭력적인 예시를 생각해볼 수 있습니다...)로 인해 서버가 망가지게 되면 복구하는데 비용이 들게 됩니다.
 
 ### 패키지 버전 통일의 어려움
-여러 명이서 함께 코드를 구현하는 것에 있어서 각자 코드의 통합은 필수 항목입니다. 개인별로 독립된 환경에서 개발을 진행한다면, 향후에 이를 통합할 때 버전 문제가 발생할 수 있습니다. Torch 버전 충돌, Clang 버전 불일치와 같은 문제가 발생할 수 있는 것이죠. 소위 말하는 **It Works on my Machine**을 서로 주장하게 되는 것입니다.
+여러 명이서 함께 코드를 구현하는 것에 있어서 각자 코드의 통합은 필수 항목입니다. 개인별로 독립된 환경에서 개발을 진행한다면, 향후에 이를 통합할 때 버전 문제가 발생할 수 있습니다. **Torch 버전 충돌, Clang 버전 불일치**와 같은 문제가 발생할 수 있는 것이죠. 소위 말하는 **It Works on my Machine**을 서로 주장하게 되는 것입니다.
 
 ![It works on my machine](./images/it_works_on_my_machine.jpg)
 
 ### 자원 사용의 어려움
-HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)은 FPGA를 기반으로 제작되었습니다. FPGA 서버는 ring topology 형태로 연결되어 있기 때문에 서버 내부에서 완전 격리로 사용하기 위해서는 1대만 사용하거나 혹은 전부 다 사용하는 방식 중 하나로 활용해야만 했습니다. 개발자 여러 명이 동시에 사용하기 어려운 구조입니다. (현재는 Kubernetes 환경 위에서 원활하게 사용되고 있습니다. 해당 내용에 대해서는 향후 작성될 글에서 Kubernetes Device Plugin이라는 주제로 자세히 알아보도록 하겠습니다.)
+HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/)은 FPGA를 기반으로 제작되었습니다. FPGA 서버는 ring topology 형태로 연결되어 있기 때문에 서버 내부에서 완전 격리로 사용하기 위해서는 1대만 사용하거나 혹은 전부 다 사용하는 방식 중 하나로 활용해야만 했습니다. 
+
+이러한 이유로 추가 설정 없이는 개발자 여러 명이 동시에 사용하기 어려운 구조입니다. (현재는 Kubernetes 환경 위에서 원활하게 사용되고 있습니다. 해당 내용에 대해서는 향후 작성될 글에서 Kubernetes Device Plugin이라는 주제로 자세히 알아보도록 하겠습니다.)
 
 추가로 GPU 같은 경우에도 점유 여부를 확인하기 위해서는 `nvidia-smi`와 같은 명령어를 통해 실행 중인 프로세스를 확인하거나, dashboard를 직접 참고해야하는 불편한 점이 있습니다.
 
@@ -71,9 +73,9 @@ HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpg
 
 ## Devcontainer의 도입
 
-회사의 규모가 커지고 개발자의 수가 늘어남에 따라서 체계적인 개발 환경 구축이 필요한 상황이 되었습니다. 이를 위해 ML팀 Lead이신 박민호([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/))님께서 `HyperAccel-Devcontainer`라는 컨테이너화 된 개발 환경(편의상 이번 글에서는 `devcontainer`라고 지칭하겠습니다)을 구축하셨습니다.
+회사의 규모가 커지고 개발자의 수가 늘어남에 따라서 체계적인 개발 환경 구축이 필요한 상황이 되었습니다. 이를 위해 ML팀 Lead이신 **박민호([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/))님**께서 `HyperAccel-Devcontainer`라는 컨테이너화 된 개발 환경(편의상 이번 글에서는 `devcontainer`라고 지칭하겠습니다)을 구축하셨습니다.
 
-`devcontainer`는 2가지 버전을 제공합니다. 첫 번째는 HyperAccel의 1세대 chip의 개발 및 관리를 위한 container이고, 두 번째는 HyperAccel의 2세대 ASIC chip 개발을 위한 container입니다. 두 가지 버전의 container는 모두 `base-image`를 기반으로 빌드됩니다. `base-image`에는 두 버전의 container가 동일하게 필요로 하는 패키지 및 환경이 제공됩니다. 이를 기반으로 각 버전마다 필요한 패키지와 환경을 기반으로 container 환경이 세팅됩니다.
+현재 `devcontainer`는 2가지 버전으로 제공합니다. 개발자분들이 필요로 하시는 설정이 다르기 때문에 이러한 니즈를 반영하기 위함입니다. 각 버전들은 공통으로 필요한 사항들이 설치된 base 이미지를 기반으로, 각 버전마다 필요한 패키지와 환경을 세팅하였습니다. 이를 통해 기존에 문제가 되었던 clang, torch 버전 충돌 이슈와 같은 문제들을 해결할 수 있었습니다.
 
 이렇듯 container 기반으로 개발 환경을 제공하는 경우에는 **개발 인원 모두가 같은 환경 위에서 개발을 진행**할 수 있다는 장점이 있습니다. **It Works on my Machine**을 피할 수 있는 것이죠. 또한 격리된 환경에서 개발을 진행하기 때문에 개인의 실수로 인해 서버가 망가지는 상황을 최대한 피할 수 있습니다.
 
@@ -81,7 +83,9 @@ HyperAccel의 [1세대 chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpg
 
 ### 개인별 서버 접속 계정의 필요성
 
-개인별로 서버에 접속할 수 있는 계정은 여전히 제공해야 합니다. 개발자의 입장에서는 개발을 위해서는 서버 계정의 존재 여부에 의존해야 하고, 관리자의 입장에서는 개발 팀의 인원이 변동될 때마다 계정 관리를 해주어야 하는 업무 지점이 하나 늘어나게 됩니다. 추가로, 개인에게 서버 접속을 허용해주기 때문에 위에서 말씀드린 실수로 인한 서버 고장의 가능성도 여전히 존재합니다.
+개인별로 서버에 접속할 수 있는 계정은 여전히 제공해야 합니다. 개발자의 입장에서는 개발을 위해서는 서버 계정의 존재 여부에 의존해야 하고, 관리자의 입장에서는 개발 팀의 인원이 변동될 때마다 계정 관리를 해주어야 하는 업무 지점이 하나 늘어나게 됩니다.
+
+또한, 개인에게 서버 접속을 허용해주기 때문에 위에서 말씀드린 실수로 인한 서버 고장의 가능성도 여전히 존재합니다.
 
 ### 개발 환경에 대한 유연성 부족
 
@@ -130,7 +134,9 @@ Kubernetes 클러스터는 Control Plane과 하나 이상의 Worker Node로 구�
 
 #### Control Plane 컴포넌트
 
-Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
+**Kubernetes 클러스터 전체 상태를 관리하는 역할**을 합니다. 요청받은 작업의 자원 요구사항을 분석하여 최적의 노드에 배치하는 스케줄링 프로세스와, 클러스터의 전반적인 가용성 및 보안 정책을 집행함으로써 시스템의 안정성을 보장합니다.
+
+아래 소개하는 컴포넌트들을 통해 클러스터의 전체적인 상태(Desired State)를 정의하고 관리하는 *중추적인 논리 계층* 역할을 수행합니다.
 
 - `kube-apiserver`
 
@@ -150,7 +156,9 @@ Kubernetes 클러스터 전체 상태를 관리하는 역할을 합니다.
 
 #### Worker Node 컴포넌트
 
-모든 노드에서 실행되며, 실행 중인 pod를 유지하고 Kubernetes runtime 환경을 제공합니다.
+Worker Node는 **Control Plane으로부터 할당받은 작업(pod 실행)을 실제로 수행하는 물리적(혹은 가상) 서버**입니다. 간단하게 소개하자면 *실제로 pod이 실행되는 서버*라고 할 수 있습니다.
+
+아래 소개하는 컴포넌트들은 모든 노드에서 실행되며, 실행 중인 pod를 유지하고 Kubernetes runtime 환경을 제공합니다.
 
 - `kubelet`
 
@@ -219,7 +227,21 @@ FPGA, GPU와 같은 custom 자원을 container 단위로 독점적으로 사용�
 
 - Portal 제공
 
-  - [Devcontainer Portal](#devcontainer-portal-image)을 만들어서 개발자분들에게 제공하고 있습니다. Portal을 제공하기 전에는 `Makefile` 및 `.env` 파일을 활용하여 pod을 실행하도록 하였습니다. 이러한 방식은 사용자들에게 초기 진입 장벽과 불편함을 야기합니다. 이를 해결하고자 Portal을 통해 pod 실행 환경을 GUI로 제공하는 방식을 적용하였고, 필요한 명세들은 `go-template`와 `ConfigMap`을 활용하여 제공합니다. 개발자들은 편하게 개발 환경 인프라를 실행하고 모니터링을 통해 log 확인이 용이해졌기 때문에 개발에 더욱 집중할 수 있는 환경이 되었습니다.
+  - [Devcontainer Portal](#devcontainer-portal-image)을 만들어서 개발자분들에게 제공하고 있습니다. Devcontainer Portal의 기능에 대해 좀 더 설명해보겠습니다.
+
+    - Container 생성 및 삭제
+
+      - 버튼 클릭 한 번만으로 container의 생성, 재시작, 삭제를 손쉽게 컨트롤할 수 있습니다.
+
+    - 에러 로그 확인
+
+      - Portal에서는 container 내부 terminal 접근 및 Logs 확인을 허용합니다. 이를 통해 에러가 발생했을 때 바로 확인이 가능합니다.
+
+    - Kubernetes 클러스터 노드 모니터링
+
+      - 노드의 하드웨어 자원 사용량 및 잉여 자원 여부에 대한 정보를 제공하므로, 개발에 필요한 자원에 대한 정보를 확인할 수 있습니다. HyperAccel은 HW chip을 만드는 회사이므로, 개발 시에 device가 꼭 필요하고 이를 잘 모니터링하는 것이 중요합니다.
+
+  - Portal을 제공하기 전에는 `Makefile` 및 `.env` 파일을 활용하여 pod을 실행하도록 하였습니다. 이러한 방식은 사용자들에게 초기 진입 장벽과 불편함을 야기합니다. 이를 해결하고자 Portal을 통해 pod 실행 환경을 GUI로 제공하는 방식을 적용하였고, 필요한 명세들은 `go-template`와 `ConfigMap`을 활용하여 제공합니다. 개발자들은 편하게 개발 환경 인프라를 실행하고 모니터링을 통해 log 확인이 용이해졌기 때문에 개발에 더욱 집중할 수 있는 환경이 되었습니다.
 
 저는 석사과정 당시 분산학습 환경에서 효율적인 GPU 사용을 위한 스케줄링 연구를 진행했었습니다. 연구 진행을 위해 Kubernetes scheduler를 직접 수정해보며 Kubernetes의 제한적인 기능만을 활용했었는데요, 이번 구축 과정을 통해 클러스터 구축부터 운영까지 전체 과정을 진행해보는 소중한 경험을 했습니다.
 

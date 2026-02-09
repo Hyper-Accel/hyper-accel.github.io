@@ -13,7 +13,7 @@ authors: ["Younghoon Jun"] # must match with content/authors
 tags: [development-environment, kubernetes, container]
 categories: [kubernetes]
 series: ["Building an Internal Development Environment with Kubernetes"]
-summary: ['We share our journey of building a Kubernetes-based development environment for the HyperAccel SW group.']
+summary: ['We share our journey of building a Kubernetes-based development environment at HyperAccel.']
 comments: true
 description: ""
 keywords: [
@@ -28,15 +28,15 @@ Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.
 
 For those of you reading this, what kind of environment do you develop in? I imagine you're working in various environments—local setups, SSH server access, cloud services, and more.
 
-The HyperAccel SW group develops on an environment built on top of a Kubernetes cluster. We spin up Pods based on `devcontainers` pre-configured with the packages needed for development, then connect to the container to do our work. To make things easier for our internal developers, we've created and provided a `devcontainer portal`.
+HyperAccel develops on **an environment built on top of a Kubernetes cluster**. We spin up Pods based on `devcontainers` pre-configured with the packages needed for development, then connect to the container to do our work. To make things easier for our internal developers, we've created and provided a `Devcontainer Portal`.
 
 <a id="devcontainer-portal-image"></a>
 
 ![Devcontainer Portal](./images/devcontainer_portal_capture.png)
 
-Through this portal, you can easily perform container-related operations such as creating and deleting containers, checking error logs, and monitoring available resources across Kubernetes cluster nodes.
+However, *we didn't always develop in a Kubernetes environment from the start.* In this **Building an Internal Development Environment with Kubernetes** series, we want to share our journey of building a Kubernetes-based development environment to address developer pain points and provide an efficient development process.
 
-However, we didn't always develop in a Kubernetes environment from the start. In this **Building an Internal Development Environment with Kubernetes** series, we want to share our journey of building a Kubernetes-based development environment to address developer pain points and provide an efficient development process. In this first post of the series, we'll cover the limitations of our previous development environment before Kubernetes and the path that led us to adopt it.
+In this first post of the series, we'll cover the limitations of our previous development environment before Kubernetes and the path that led us to adopt it.
 
 ---
 
@@ -46,9 +46,9 @@ HyperAccel is a startup that began small, founded by members of KAIST's [CAST La
 
 ![HyperAccel Starting Members](./images/hyperaccel_starting_member.jpg)
 
-Given the nature of an early-stage startup, development moved at an incredibly fast pace, making it difficult to establish a systematic development environment. Since this was before I joined HyperAccel, I learned about the development environment at that time through conversations with Hyunjun Park ([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/)), one of our founding members on the ML team.
+Given the nature of an early-stage startup, development moved at an incredibly fast pace, making it difficult to establish a systematic development environment. Since this was before I joined HyperAccel, I learned about the development environment at that time through conversations with **Hyunjun Park ([Author](https://hyper-accel.github.io/authors/hyunjun-park/), [LinkedIn](https://www.linkedin.com/in/hyunjun-park-14b8352a2/)), one of our founding members on the ML team**.
 
-> Back then, we were a really small team of about 10 people, and we couldn't pay much attention to the development environment while trying to meet our goals within tight deadlines. Everyone created their own accounts on the company servers and logged in to use them. If someone was using too many resources, you'd just walk over to their desk and ask when they'd be done. (laughs)
+> *Back then, we were a really small team of about 10 people, and we couldn't pay much attention to the development environment while trying to meet our goals within tight deadlines. Everyone created their own accounts on the company servers and logged in to use them. If someone was using too many resources, you'd just walk over to their desk and ask when they'd be done. (laughs)*
 
 Let's take a closer look at the challenges that arise when there's no shared development environment.
 
@@ -58,12 +58,14 @@ If you have 10 servers and 10 developers, you need a total of **100 accounts** f
 Security and server stability are also concerns. For example, you need additional policies for granting `sudo` privileges. Furthermore, if a server gets damaged due to a mistake during development (think of drastic examples like `sudo rm -rf /`...), there's a cost to recovery.
 
 ### Package Version Consistency Challenges
-When multiple people are working on code together, integrating everyone's work is essential. If everyone develops in their own isolated environment, version conflicts can arise during integration. You might run into Torch version conflicts, Clang version mismatches, and so on. This is where everyone starts claiming **"It Works on my Machine."**
+When multiple people are working on code together, integrating everyone's work is essential. If everyone develops in their own isolated environment, version conflicts can arise during integration. You might run into **Torch version conflicts, Clang version mismatches**, and so on. This is where everyone starts claiming **"It Works on my Machine."**
 
 ![It works on my machine](./images/it_works_on_my_machine.jpg)
 
 ### Resource Usage Challenges
-HyperAccel's [first-generation chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/) was built on FPGA. Since FPGA servers are connected in a ring topology, to use them in complete isolation within a server, you had to either use just one server or all of them. This structure made it difficult for multiple developers to use them simultaneously. (Currently, this works smoothly on our Kubernetes environment. We'll cover this in detail in a future post on Kubernetes Device Plugins.)
+HyperAccel's [first-generation chip](https://aws.amazon.com/ko/blogs/tech/hyperaccel-fpga-on-aws/) was built on FPGA. Since FPGA servers are connected in a ring topology, to use them in complete isolation within a server, you had to either use just one server or all of them.
+
+For this reason, without additional configuration, it was difficult for multiple developers to use them simultaneously. (Currently, this works smoothly on our Kubernetes environment. We'll cover this in detail in a future post on Kubernetes Device Plugins.)
 
 Additionally, for GPUs, checking availability required running commands like `nvidia-smi` to see running processes or manually checking a dashboard—quite inconvenient.
 
@@ -71,9 +73,9 @@ Additionally, for GPUs, checking availability required running commands like `nv
 
 ## Introducing Devcontainers
 
-As the company grew and the number of developers increased, we needed a more systematic development environment. To address this, Minho Park ([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/)), the ML team lead, built `HyperAccel-Devcontainer`, a containerized development environment (which we'll refer to as `devcontainer` in this post for convenience).
+As the company grew and the number of developers increased, we needed a more systematic development environment. To address this, **Minho Park ([Author](https://hyper-accel.github.io/authors/minho-park/), [LinkedIn](https://www.linkedin.com/in/minho-park-804a56142/)), the ML team lead**, built `HyperAccel-Devcontainer`, a containerized development environment (which we'll refer to as `devcontainer` in this post for convenience).
 
-The `devcontainer` comes in two versions. The first is for development and management of HyperAccel's first-generation chip, and the second is for developing HyperAccel's second-generation ASIC chip. Both versions are built on top of a `base-image` that provides packages and environments common to both. Each version then adds its own specific packages and configurations on top of this foundation.
+Currently, the `devcontainer` is provided in two versions. This is to accommodate the different configuration needs of our developers. Each version is built on top of a base image with commonly required packages installed, with version-specific packages and environments configured on top. This allowed us to resolve issues like clang and torch version conflicts that had been problematic before.
 
 Providing a container-based development environment has the advantage that **all developers work in the same environment**. No more **"It Works on my Machine."** Also, since development happens in an isolated environment, we can largely avoid situations where a server gets damaged due to individual mistakes.
 
@@ -81,7 +83,9 @@ However, this container-based development environment still had clear limitation
 
 ### Individual Server Accounts Still Required
 
-We still needed to provide individual server access accounts. From a developer's perspective, development depended on having a server account, and from an administrator's perspective, account management became another task whenever team membership changed. Additionally, since individuals had server access, the possibility of server damage from mistakes still existed.
+We still needed to provide individual server access accounts. From a developer's perspective, development depended on having a server account, and from an administrator's perspective, account management became another task whenever team membership changed.
+
+Additionally, since individuals had server access, the possibility of server damage from mistakes still existed.
 
 ### Lack of Development Environment Flexibility
 
@@ -130,7 +134,9 @@ A Kubernetes cluster consists of a Control Plane and one or more Worker Nodes.
 
 #### Control Plane Components
 
-These manage the overall state of the Kubernetes cluster.
+**These manage the overall state of the Kubernetes cluster.** They analyze the resource requirements of requested workloads to schedule them on optimal nodes, and enforce the cluster's overall availability and security policies to ensure system stability.
+
+The components introduced below serve as the *central logical layer* that defines and manages the overall state (Desired State) of the cluster.
 
 - `kube-apiserver`
 
@@ -150,7 +156,9 @@ These manage the overall state of the Kubernetes cluster.
 
 #### Worker Node Components
 
-These run on every node, maintaining running pods and providing the Kubernetes runtime environment.
+A Worker Node is **a physical (or virtual) server that actually performs the tasks (pod execution) assigned by the Control Plane**. Simply put, it is *the server where pods actually run*.
+
+The components introduced below run on every node, maintaining running pods and providing the Kubernetes runtime environment.
 
 - `kubelet`
 
@@ -219,7 +227,21 @@ Let me briefly introduce some of the components currently applied to our Kuberne
 
 - Portal Provision
 
-  - We created the [Devcontainer Portal](#devcontainer-portal-image) and provide it to our developers. Before providing the Portal, we used `Makefile` and `.env` files to run pods. This approach caused initial entry barriers and inconvenience for users. To solve this, we applied a GUI approach through the Portal, and the required specifications are provided using `go-template` and `ConfigMap`. Developers can now easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
+  - We created the [Devcontainer Portal](#devcontainer-portal-image) and provide it to our developers. Let me explain the features of the Devcontainer Portal in more detail.
+
+    - Container Creation and Deletion
+
+      - With just a single button click, you can easily create, restart, and delete containers.
+
+    - Error Log Checking
+
+      - The Portal allows access to the terminal inside the container and viewing Logs. This makes it possible to check errors as soon as they occur.
+
+    - Kubernetes Cluster Node Monitoring
+
+      - It provides information on node hardware resource usage and available remaining resources, so you can check the resources needed for development. Since HyperAccel is a company that builds HW chips, devices are essential for development, and monitoring them properly is important.
+
+  - Before providing the Portal, we used `Makefile` and `.env` files to run pods. This approach caused initial entry barriers and inconvenience for users. To solve this, we applied a GUI approach through the Portal to provide the pod execution environment, and the required specifications are provided using `go-template` and `ConfigMap`. Developers can now easily launch development environment infrastructure, and monitoring makes log checking convenient, creating an environment where developers can focus more on development.
 
 During my master's program, I researched scheduling for efficient GPU usage in distributed training environments. I modified the Kubernetes scheduler directly for my research, but only used limited Kubernetes features. Through this project, I gained valuable experience going through the entire process from cluster setup to operation.
 
