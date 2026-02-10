@@ -61,7 +61,13 @@ TPU 구조를 이해하기 위해서는 먼저 TPU가 개발된 배경에 대해
 
 TPU에서는 이 행렬 곱셈을 효율적으로 실행할 수 있도록 일반적인 프로세서(CPU)에서는 볼 수 없는 Systolic array라는 특별한 유닛을 사용합니다. "Systolic"은 심장의 수축 운동인 '수축기(systole)'에서 유래한 단어입니다. 마치 심장이 규칙적으로 박동하며 혈액을 신체의 각 부분으로 보내는 것처럼, 배열 구조 내에서 데이터가 연산 유닛 사이를 리듬감 있고 규칙적으로 이동하며 연산이 수행되는 모습에서 착안된 이름입니다. Systolic array는 데이터 흐름을 최적화하고 병렬 처리를 극대화하여 행렬 곱셈과 같은 대규모 연산에 효율적입니다. Systolic array가 행렬 곱셈을 진행하는 과정을 애니메이션으로 나타내보면 아래와 같습니다.
 
-![Systolic array visualization](systolic_array.gif)
+{{< rawhtml >}}
+<video controls width="100%" style="max-width: 100%; border-radius: 8px;">
+  <source src="/posts/TPU-deep-dive/systolic_array.mp4" type="video/mp4">
+  브라우저가 비디오 재생을 지원하지 않습니다.
+</video>
+{{< /rawhtml >}}
+
 다음으로는 Systolic array의 효과를 더 구체적으로 설명하기 위해 일반적인 프로세서의 연산 방식과 TPU의 systolic array를 사용한 연산 방식을 비교해보겠습니다.
 
 ![CPU VS TPU](cpuvstpu.webp)
