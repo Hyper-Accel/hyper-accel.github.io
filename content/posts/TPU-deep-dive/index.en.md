@@ -65,7 +65,7 @@ As mentioned earlier, TPU was designed specifically for AI operations. The bigge
 TPU uses a special unit called Systolic array, which cannot be found in general processors (CPUs), to efficiently execute this matrix multiplication. The term "Systolic" is derived from "systole," the contraction phase of the heart. Just as the heart rhythmically beats and sends blood to various parts of the body, data moves rhythmically and regularly between computational units within the array structure, performing operations - hence the name. Systolic array optimizes data flow and maximizes parallel processing, making it efficient for large-scale operations like matrix multiplication. The process of Systolic array performing matrix multiplication can be visualized as an animation below.
 
 {{< rawhtml >}}
-<video controls width="100%" style="max-width: 100%; border-radius: 8px;">
+<video autoplay loop muted playsinline width="100%" style="max-width: 100%; border-radius: 8px;">
   <source src="/posts/TPU-deep-dive/systolic_array.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
