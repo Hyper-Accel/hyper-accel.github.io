@@ -235,7 +235,7 @@ Then what tasks can LPU proceed faster with? From the perspective of LLM inferen
 
 **Speculative Decoding**
 
-![Speculative decoding](gifs/speculative-decoding.gif)
+![Speculative decoding](images/speculative-decoding-workflow.jpg)
 
 One recent trend in LLM serving is **Speculative Decoding**. As model sizes grow and computation time becomes longer, a small and fast model (**Draft Model**) that distills or is trained to behave similarly to the existing model (**Target Model**) quickly generates the latter part of a sentence in advance, then the Target Model verifies this in parallel. Groq's LPU clusters can be used for small-sized Draft Model computation here. This is because LPU boasts overwhelming token generation speed in small-sized models. From an overall perspective, the roles of LPU/GPU clusters can be divided as follows:
 

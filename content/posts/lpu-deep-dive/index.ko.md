@@ -236,7 +236,7 @@ LPU의 정적 스케줄링(static scheduling)은 바로 딥러닝과 LLM, 그중
 
 **Speculative Decoding**
 
-![Speculative decoding](gifs/speculative-decoding.gif)
+![Speculative decoding](images/speculative-decoding-workflow.jpg)
 
 최근 LLM 서빙의 트렌드 중 하나는 **Speculative Decoding**(추측 디코딩)입니다. 모델 사이즈가 커지면서 연산 시간이 오래 걸리다보니 기존 모델(**Target Model**)을 증류하거나 비슷한 동작을 하도록 훈련된 작고 빠른 모델(**Draft Model**)이 문장의 뒷부분을 미리 빠르게 생성하면, Target Model이 이를 병렬로 검증하는 방식입니다. 그록의 LPU 클러스터는 여기서 작은 사이즈의 Draft Model 연산에 사용될 수 있습니다. LPU는 작은 사이즈의 모델에서 압도적인 토큰 생성 속도를 자랑하기 때문입니다. 전체적인 관점에서 LPU/GPU 클러스터의 역할을 구분해보면 아래와 같습니다.
 
