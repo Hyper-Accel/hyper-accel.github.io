@@ -1,6 +1,6 @@
 ---
 date: '2026-02-12T09:30:00+09:00'
-draft: true
+draft: false
 title: 'Building a Dev Environment with Kubernetes Part 2: CI/CD Infrastructure Modernization with ARC'
 authors: ["Namyoon Kim"]
 tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook"]
