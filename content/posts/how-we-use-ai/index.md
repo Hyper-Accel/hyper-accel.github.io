@@ -1,22 +1,23 @@
 ---
 date: '2026-02-19T14:16:04+09:00'
-draft: true
+draft: false
 title: 'Copy & Paste에서 코딩 에이전트까지: 조용한 변화의 시작'
 cover:
-  image: "<image path/url>"
+  image: "images/using-ai.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "Coding with AI"
+  caption: "Coding with AI"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [] # must match with content/authors
-tags: []
-categories: []
-summary: []
+authors: ['Taeseo Um'] # must match with content/authors
+tags: ["Agents", "AI", "Tools", "Coding"]
+categories: ["Agentic Workflow"]
+summary: [“HyperAccel의 ML 팀이 어떻게 개발 워크플로우에 AI를 도입했는가”]
+series: ["Copy & Paste에서 코딩 에이전트까지"]
 comments: true
 ---
 
-# 복사-붙여넣기에서 자율 코딩 에이전트까지: 조용한 변화의 시작
+# Copy & Paste에서 자율 코딩 에이전트까지: 조용한 변화의 시작
 
 개발자들 사이에는 이런 농담이 있습니다. “우리 일은 결국 문제를 구글에 검색하고, 첫 번째로 뜨는 링크를 눌러서, Stack Overflow에서 답을 복사해 붙여넣는 거 아니냐?”
 어떤 면에서는 AI 코딩 도구의 등장이 우리가 하는 일을 완전히 바꾼 건 아닙니다. 다만 **그 일을 훨씬 더 잘, 훨씬 더 빠르게** 하게 만들었죠. 지난 몇 달 동안 우리 팀은 AI 보조 개발의 거의 모든 물결을 직접 타 봤습니다. 초기의 단발성 상호작용부터, 지금은 사실상 일상적으로 의존하는 **자율 에이전트**까지요. 이 글에서는 그 여정이 어떤 모습이었는지, 무엇을 배웠는지, 그리고 앞으로 어디로 향하고 있다고 생각하는지 정리해 보려고 합니다.
@@ -59,6 +60,8 @@ IDE 통합 도구들이 강력하긴 했지만, 우리는 곧 한계를 느꼈�
 
 ## 코드 리뷰 병목: 아무도 경고해주지 않았던 부분
 
+![테스트의 중요성](./images/test-importance.png)
+
 아무도 미리 말해주지 않았던 문제가 있습니다. AI와 에이전트 도구들이 개발자를 엄청나게 빠르게 만들었습니다. 하루 걸리던 PR이 한 시간 만에 열리기 시작했죠. 그런데 코드 리뷰—사람이 꼼꼼히 읽고 이해하고 검증해야 하는 단계—는 빨라지지 않았습니다. 오히려 병목은 더 심해졌습니다. 코드 생산 속도가 빨라질수록 리뷰 대기열이 길어지고, 진짜 개발 속도는 저희가 기대한 만큼 늘지 않았습니다.
 
 GitHub PR에서 AI를 활용해 surface-level 문제들을 잡는 데 도움을 받았지만, 더 근본적인 질문은 남았습니다. **더 높은 속도에서 품질을 어떻게 유지할 것인가?**
@@ -81,6 +84,8 @@ GitHub PR에서 AI를 활용해 surface-level 문제들을 잡는 데 도움을 
 
 우리는 개발자를 대체하는 게 아닙니다.
 **개발자라는 직업의 의미를 다시 정의하고 있을 뿐입니다.**
+
+![우리의 미래](./images/tony-stark.jpg)
 
 ---
 

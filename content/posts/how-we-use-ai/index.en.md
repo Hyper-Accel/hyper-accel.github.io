@@ -1,17 +1,18 @@
 ---
 date: '2026-02-19T14:16:19+09:00'
-draft: true
-title: 'From Copy-Paste to Autonomous Coding Agents: A Subtle Introduction'
+draft: false
+title: 'From Copy-Paste to Autonomous Agents: A Subtle Introduction'
 cover:
-  image: "<image path/url>"
+  image: "images/using-ai.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "<alt text>"
-  caption: "<text>"
+  alt: "Coding with AI"
+  caption: "Coding with AI"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ['Taeseo Um'] # must match with content/authors
 tags: ["Agents", "AI", "Tools", "Coding"]
 categories: ["Agentic Workflow"]
+series: ["From Copy-Paste to Autonomous Agents"]
 summary: ["How the ML team at HyperAccel started implemented AI into our development workflow."]
 comments: true
 ---
@@ -53,6 +54,9 @@ The difference between a rules file and a skill is the difference between a styl
 ---
 
 ## The Code Review Bottleneck
+
+![Importance of Tests](./images/test-importance.png)
+
 Here's the part nobody warned us about. AI and agentic tools made developers dramatically faster at writing code. Pull requests that used to take a day were being opened in an hour. But code review — the part that requires a human to carefully read, understand, and verify changes -- didn't get any faster. If anything, the bottleneck got worse. The faster code was produced, the longer the review queue grew, and the overall speed of shipping features didn't increase as much as we expected.
 
 We started using AI for code review in GitHub PRs, and it helped catch surface-level issues. But the deeper question remained: how do you maintain quality at higher velocity?
@@ -69,6 +73,8 @@ We're still early. Not only our team, our company, but the entire software world
 The teams that will thrive are the ones investing now in the infrastructure that makes this possible: well-structured skill definitions, comprehensive test coverage, clear architectural documentation, and a culture that treats AI tooling not as a shortcut but as a force multiplier that demands new kinds of discipline.
 
 We're not replacing developers. We're redefining what it means to be one.
+
+![The Future](./images/tony-stark.jpg)
 
 ---
 
