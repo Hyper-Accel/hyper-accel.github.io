@@ -19,6 +19,8 @@ comments: true
 
 # From Copy-Paste to Autonomous Coding Agents: A Subtle Introduction
 
+Hello, my name is Taeseo Um, currently on the ML team at HyperAccel.
+
 There is a running joke among developers that our job has always been about googling the issue, clicking the first link that pops up, then copying from Stack Overflow. In some ways, the arrival of AI coding tools didn't change what we do — it just made us dramatically better at it. Over the past few months, our team has ridden almost every wave of AI-assisted development, from the earliest interactions to the autonomous agents we rely on today. Here's what that journey looked like, what we learned, and where we think it's all heading.
 
 ---
@@ -47,10 +49,19 @@ As powerful as IDE-integrated tools were, we found they still lacked structure. 
 
 The next leap was MCPs (Model Context Protocols), which let AI tools connect to external data sources. Suddenly, an agent could pull context from our Confluence documentation, understand our internal documents, and reference design decisions that lived outside the codebase. The AI wasn't just reading code anymore — it was reading our institutional knowledge.
 
-But it was Claude Code that really set our engine of “let’s use AI to increase productivity” with rocket boosters. Claude Code introduced the concept of skills: structured, multi-step workflows that go far beyond static rules. In one of our repository, we now maintain a .claude directory with skills for planning, implementing features, writing tests, opening pull requests, and even fetching and addressing PR review comments. We have either claude code skills or rules that encode hardware constraints specific to our platform, anti-patterns our team has learned the hard way, and SDK-specific conventions.
+However, what truly attached a rocket booster to our team’s “let’s improve productivity with AI” mindset was Claude Code. Claude Code introduced the concept of skills, which go far beyond static rules and instead enable structured, multi-step workflows.
 
-The difference between a rules file and a skill is the difference between a style guide and a trained colleague. A rule says "use pytest, not unittest." A skill says "here's how to write a complete test suite for this type of module, run it, check for failures, auto-fix up to five times, and report results." Skills like /implement-tested, /pr-review, and /open-pr have turned what used to be multi-hour workflows into operations that take minutes with human oversight. This will be discussed in more detail in future posts.
+In one of our team repositories, we now maintain a .claude directory to manage skills for planning, feature implementation, writing tests, opening PRs, fetching and incorporating PR review comments, and more. We have also embedded platform-specific hardware constraints, anti-patterns our team learned the hard way, and SDK-specific conventions into either skills or Claude Code rules.
 
+We will cover in depth how we designed our Claude Code skills files and how we optimized other Claude Code use cases in future blog posts.
+
+The difference between rule files and skills is similar to the difference between a style guide and a “trained teammate.”
+A rule says, “Use pytest, do not use unittest.”
+A skill says, “Write a test suite appropriate for this type of module, execute it, automatically fix failures up to five times if needed, and summarize the results in a report.”
+
+Skills like /implement-tested, /pr-review, and /open-pr have transformed tasks that used to take hours into workflows that now take minutes under human supervision.
+
+While we had previously experimented with using LLMs for code generation, most approaches were limited to a “single prompt–single response” pattern. Claude Code’s skills allowed us to structure the entire execution flow — from planning → implementation → testing → fixing → reporting — into reusable units. In particular, they significantly reduced the cognitive load of repetitive but mentally taxing tasks, which made a tangible difference in our day-to-day productivity.
 ---
 
 ## The Code Review Bottleneck
@@ -80,7 +91,9 @@ We're not replacing developers. We're redefining what it means to be one.
 
 ## Upcoming...
 
-As our team (and other teams at HyperAccel) continues to find new ways AI melts into our workflow, we will share our journey as we navigate this new paradigm of how we develop code and amazing software.
+This post was shared as an introduction outlining the overall direction and key questions we are exploring. In future posts, I plan to cover Skills in more depth, Kernel Agent(s), and other AI tool use cases, detailing not only how to use them but also how we designed and optimized them internally.
+
+As the teams at HyperAccel continues to find new ways AI melts into our workflow, we will share our journey as we navigate this new paradigm of how we develop code and amazing software.
 
 ## HyperAccel is Hiring!
 
