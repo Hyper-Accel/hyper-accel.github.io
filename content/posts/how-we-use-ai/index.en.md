@@ -62,6 +62,7 @@ A skill says, “Write a test suite appropriate for this type of module, execute
 Skills like /implement-tested, /pr-review, and /open-pr have transformed tasks that used to take hours into workflows that now take minutes under human supervision.
 
 While we had previously experimented with using LLMs for code generation, most approaches were limited to a “single prompt–single response” pattern. Claude Code’s skills allowed us to structure the entire execution flow — from planning → implementation → testing → fixing → reporting — into reusable units. In particular, they significantly reduced the cognitive load of repetitive but mentally taxing tasks, which made a tangible difference in our day-to-day productivity.
+
 ---
 
 ## The Code Review Bottleneck
