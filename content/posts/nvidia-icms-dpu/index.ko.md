@@ -171,4 +171,4 @@ HyperAccel은 여러분의 지원을 기다립니다.
 - [LMCache: An Efficient KV Cache Layer for Enterprise-Scale LLM Inference](https://arxiv.org/pdf/2510.09665)
 - [CacheBlend: Fast Large Language Model Serving for
 RAG with Cached Knowledge Fusion](https://arxiv.org/pdf/2405.16444)
-- [NVIDIA Dynamo LMcache integration](https://docs.NVIDIA.com/dynamo/latest/integrations/lm-cache)
+- [NVIDIA Dynamo LMCache integration](https://docs.NVIDIA.com/dynamo/latest/integrations/lm-cache)
