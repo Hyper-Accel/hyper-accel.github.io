@@ -17,7 +17,7 @@ summary: "We explore the technical principles behind NVIDIA's ICMS — a new sto
 comments: true
 ---
 
-# Know Your Enemy, Know Youself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS
+# Know Your Enemy, Know Yourself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**  
 > This series aims to deeply understand competitors' hardware for the purpose of AI accelerator design.  
