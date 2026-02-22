@@ -77,7 +77,7 @@ $D_{h} : head\ dimension$
 $P : precision$  
 
 
-Applying this formula to the Llama 3.1 401B model (whose model config is publicly available), approximately **516KB** of KV cache is used per token. If we assume a context length of around 100K per user, the KV cache required per user is **48GB**. If 128 users are active simultaneously, the instantaneous KV cache requirement grows to **6TB**.
+Applying this formula to the Llama 3.1 405B model (whose model config is publicly available), approximately **516KB** of KV cache is used per token. If we assume a context length of around 100K per user, the KV cache required per user is **48GB**. If 128 users are active simultaneously, the instantaneous KV cache requirement grows to **6TB**.
 
 ![kv cache size](images/kvcache_size.png)
 
