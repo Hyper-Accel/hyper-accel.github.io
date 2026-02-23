@@ -12,6 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD"]
 series: ["지피지기면 백전불태"]
+series_idx: 4
 categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
 summary: "LLM의 새로운 병목인 KV 캐시 용량 문제를 해결하기 위해 NVIDIA가 제시한 새로운 계층의 스토리지인 ICMS와 이를 관리하는 Bluefield-4 DPU의 기술적 원리를 살펴봅니다." 
 comments: true
@@ -65,16 +66,17 @@ OpenAI의 o1, o3를 필두로 뛰어난 성능 향상으로 각광을 받은 Rea
 - **대량의 환경 데이터:** 웹 페이지 스크린샷, 전체 코드베이스, 방대한 문서 등 에이전트가 처리해야 할 데이터 자체가 크기 때문에 컨텍스트 윈도우의 요구치가 급격히 상승합니다.
 - **반복적 정교화:** 한 번에 성공하지 못할 경우 실패 원인을 분석하고 다시 시도하는 과정이 누적되면서 일반적인 챗봇 대비 수십 배 이상의 토큰을 소모하게 됩니다.
 
-용량에 대한 감이 안오시는 분들을 위해 간단하게 토큰당 필요한 KV cache 용량 계산식을 소개하면 아래와 같습니다.
+용량에 대한 감이 안오시는 분들을 위해 숫자를 통한 예시를 보여드리겠습니다.  
+Transformer 구조에서 토큰당 필요한 KV cache 용량 계산식은 아래와 같습니다.
 
-$\text{Total KV Cache Memory} = 2 \times B \times S \times L \times H_{kv} \times D_h \times P$
+$$\text{Total KV Cache Memory} = 2 \times B \times S \times L \times H_{kv} \times D_h \times P$$
 
-$B : batch\ size$  
-$S : sequence\ length$  
-$L : num\ layer$  
-$H_{kv} : num\ head$  
-$D_{h} : head\ dimension$  
-$P : precision$  
+$$B : batch\ size$$
+$$S : sequence\ length$$
+$$L : num\ layer$$
+$$H_{kv} : num\ head$$
+$$D_{h} : head\ dimension$$
+$$P : precision(BF16: 2B,\ FP8: 1B)$$
 
 
 model config가 공개된 Llama 3.1 405B 모델에 이 계산식을 적용해보면 토큰 1개당 약 **516KB**의 KV cache size가 사용됩니다. 여기서 사용자당 10만정도의 context length를 사용한다고 가정한다면 사용자당 필요한 KV cache 크기는 **48GB**, 128명의 사용자가 동시에 사용한다면 순간적으로 필요한 KV cache 크기는 **6TB**까지 커집니다.
@@ -122,13 +124,13 @@ ICMS는 별도의 전용 랙에 존재하지만, BlueField-4 DPU와 PCIe Gen 6�
 
 ### 추론 최적화를 위한 프레임워크 : vLLM과 SGLang, 그리고 LMCache
 
-앞서 설명드린 KV cache의 특성을 활용하여 추론 연산을 최적화하기 위한 다양한 프레임워크들이 개발되어왔습니다. 지난번에 김재우님([Author](https://hyper-accel.github.io/authors/jaewoo-kim/), [LinkedIn](https://www.linkedin.com/in/jaewoo-kim-b38325237/))이 소개해주신 SGLang도 그 중 하나입니다. 
+앞서 설명드린 KV cache의 특성을 활용하여 추론 연산을 최적화하기 위한 다양한 프레임워크들이 개발되어왔습니다. 지난번에 김재우님([Author](https://hyper-accel.github.io/authors/jaewoo-kim/), [LinkedIn](https://www.linkedin.com/in/jaewoo-kim-b38325237/))이 소개해주신 [SGLang](https://hyper-accel.github.io/posts/sglang-review/)도 그 중 하나입니다. 
 
 **vLLM & SGLang**
 ![vllm & sglang](images/vllm_and_sglang_logo.png)
-vLLM과 SGLang은 추론 연산 가속을 위한 엔진으로 **GPU 메모리 안에서** KV cache를 효율적으로 관리하기 위한 기능을 제공합니다. 그중 하나가 prefix caching인데요. 특정 request에서 입력된 sequence의 앞부분과 다음 request에서 입력된 sequence의 앞부분이 겹치는 경우 해당 부분 이전 request에서 생성된 KV cache를 그대로 재사용할 수 있는 기능입니다. 같은 request 내에서 decoding 작업 시 매 토큰 생성마다 해당 request 내에서 생성된 KV cache를 재사용하는 것은 기본적으로 가능하였습니다. 서로 다른 request에서도 입력토큰만 같다면 생성되는 KV cache는 같을 것이기 때문에 추가적인 연산 필요 없이 KV cache를 재사용할 수 있는 것입니다. 
+vLLM과 SGLang은 추론 연산 가속을 위한 엔진으로 **GPU 메모리 안에서** KV cache를 효율적으로 관리하기 위한 기능을 제공합니다. 그중 하나가 **prefix caching**인데요. 특정 request에서 입력된 sequence의 앞부분(prefix)과 다음 request에서 입력된 sequence의 앞부분이 겹치는 경우 해당 부분에 대해서 이전 request에서 생성된 KV cache를 그대로 재사용할 수 있는 기능입니다. 같은 request 내에서 decoding 작업 시 매 토큰 생성마다 해당 request 내에서 생성된 KV cache를 재사용하는 것은 기본적으로 가능하였습니다. 이 기능은 거기서 한발 더 나아가 서로 다른 request에서도 입력토큰만 같다면 생성되는 KV cache는 같을 것이기 때문에 추가적인 연산 필요 없이 KV cache를 재사용할 수 있는 것입니다. 
 
-다만 vLLM과 SGLang의 한계는 KV cache 관리영역이 GPU memory (+CPU host memory)로 한정되어 있고 입력 토큰이 처음부터 같을때에만 prefix caching을 사용할 수 있다는 점입니다. 같은 sub sequence가 중간에 존재하더라도 위치가 다르면 재사용할 수 없는 것이죠. 이는 같은 토큰이더라도 토큰 위치에 따라 KV cache 값이 달라지기 때문입니다. 
+다만 vLLM과 SGLang의 한계는 KV cache 관리 영역이 GPU memory (+CPU host memory)로 한정되어 있고, 입력 토큰이 **처음부터 같을 때에만** prefix caching을 사용할 수 있다는 점입니다. 같은 sub sequence가 중간에 있더라도 앞선 prefix들이 다르면 KV cache를 재사용할 수 없습니다. 이는 causal attention 구조의 특성 상 현재 토큰으로 생성되는 KV cache가 자신보다 앞에 있는 모든 토큰에 영향을 받기 때문입니다. 이 기능이 "prefix" caching이라 불리는 이유도 여기에 있습니다.
 
 **LMCache**
 ![lmcache](images/lmcache_logo.png)
@@ -140,7 +142,7 @@ vLLM과 SGLang은 추론 연산 가속을 위한 엔진으로 **GPU 메모리 �
 
 ![cacheblend](images/cacheblend_explain.png)
 
-NVIDIA의 추론 프레임워크 **Dynamo**에도 LMCache가 통합되어 있으며, ICMS에서 이 LMCache 기능이 탑재된 Dynamo가 활용됩니다. <u>HyperAccel도 LPU에서 LMCache를 지원할 수 있도록 소프트웨어를 개발중에 있습니다.</u>
+NVIDIA의 추론 프레임워크 **Dynamo**에도 LMCache가 통합되어 있으며, ICMS에서 이 LMCache 기능이 탑재된 Dynamo가 활용됩니다. 아울러 <u>HyperAccel에서도 LPU에서 LMCache를 지원할 수 있도록 소프트웨어를 개발중에 있습니다.</u>
 
 
 ## Bluefield-4 DPU의 역할
@@ -150,13 +152,13 @@ DPU는 이러한 소프트웨어를 사용하여 GPU와 다른 디바이스 간 
 
 ## 정리
 
-오늘은 LLM의 새로운 병목인 저장소 문제와 함께 이를 해결하기 위한 NVIDIA의 새로운 플랫폼 ICMS, 이를 관리하는 새로운 프로세서인 DPU와 DPU에서 구동하는 소프트웨어 프레임워크들에 대해 알아보았습니다. 이를 통해 NVIDIA가 GPU에서 활용하는 메모리를 SSD까지 확장하면서 사용한 하드웨어/소프트웨어적 기술들에 대해 알아볼 수 있었습니다.
+오늘은 LLM의 새로운 병목인 저장소 문제와 함께 이를 해결하기 위한 NVIDIA의 새로운 플랫폼 ICMS, 이를 관리하는 새로운 프로세서인 DPU와 DPU에서 구동하는 소프트웨어 프레임워크들에 대해 알아보았습니다. 이를 통해 NVIDIA가 GPU에서 활용하는 메모리를 플래시 메모리까지 확장하기 위해 사용한 하드웨어/소프트웨어적 기술들을 엿볼 수 있었습니다.
 
-다음 시간에는 다시 주제를 가속기로 전환해보겠습니다. 2편에서 다뤄본 구글 뿐만 아니라 여러 빅테크들이 GPU의 독점 구조를 탈피하기 위해 자체적인 ASIC 칩을 제작하고 있습니다. MS, Meta, Amazon 등 GPU를 구매하여 쓰던 하이퍼 스케일러들이 그 대표적인 주인공들인데요. 다음 시간에는 이들이 만든 가속기들에 대해 알아보도록 하겠습니다. 
+그런데, 이 플래시 메모리는 칩 바로 옆에 두면 더 빠르게 쓸 수 있지 않을까요? 최근 부상하고 있는 신기술인 **HBF**(High Bandwidth Flash)가 그 방법인데요. 다음 시간에는 HBF를 활용하여 LLM 추론의 메모리 병목을 해결하려는 솔루션들에 대해 알아보도록 하겠습니다.
 
 ### 추신 : HyperAccel은 채용 중입니다.
 
-HyperAccel은 데이터센터향 LPU 첫 제품 출시를 목전에 두고 있으며, 글에서 소개드린 LLM 추론의 핵심 병목을 해소할 수 있는 소프트웨어적 솔루션도 만들어 나가고 있습니다. 
+HyperAccel은 데이터센터향 LPU 첫 제품 출시를 목전에 두고 있으며, 하드웨어/소프트웨어 최적화를 통해 LLM 추론의 핵심 병목들을 해소할 수 있는 솔루션을 개발해 나가고 있습니다. 
 
 저희의 기술적 여정에 흥미가 있으시다면, [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)를 통해 지금 바로 지원해 주세요! 
 

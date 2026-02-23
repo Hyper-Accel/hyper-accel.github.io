@@ -12,6 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC"]
 series: ["Know Your Enemy, Know Yourself"]
+series_idx: 3
 categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
 summary: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
 comments: true

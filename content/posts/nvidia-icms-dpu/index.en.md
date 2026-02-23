@@ -12,6 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD"]
 series: ["Know Your Enemy, Know Yourself"]
+series_idx: 4
 categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
 summary: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 comments: true
@@ -65,16 +66,17 @@ Agentic AI goes beyond simply answering questions — it autonomously makes plan
 - **Large volumes of environmental data:** The sheer volume of data an agent must process — web page screenshots, entire codebases, extensive documents — causes the context window requirements to skyrocket.
 - **Iterative refinement:** When the agent doesn't succeed on the first try, the process of analyzing failure causes and retrying accumulates, consuming tens of times more tokens compared to a typical chatbot.
 
-To give you a sense of the capacity requirements, here is a simple formula for calculating the KV cache size per token:
+To give you a sense of the capacity requirements, here is a numerical example.  
+The formula for calculating the KV cache size per token in a Transformer architecture is as follows:
 
-$\text{Total KV Cache Memory} = 2 \times B \times S \times L \times H_{kv} \times D_h \times P$
+$$\text{Total KV Cache Memory} = 2 \times B \times S \times L \times H_{kv} \times D_h \times P$$
 
-$B : batch\ size$  
-$S : sequence\ length$  
-$L : num\ layer$  
-$H_{kv} : num\ head$  
-$D_{h} : head\ dimension$  
-$P : precision$  
+$$B : batch\ size$$
+$$S : sequence\ length$$
+$$L : num\ layer$$
+$$H_{kv} : num\ head$$
+$$D_{h} : head\ dimension$$
+$$P : precision(BF16: 2B,\ FP8: 1B)$$
 
 
 Applying this formula to the Llama 3.1 405B model (whose model config is publicly available), approximately **516KB** of KV cache is used per token. If we assume a context length of around 100K per user, the KV cache required per user is **48GB**. If 128 users are active simultaneously, the instantaneous KV cache requirement grows to **6TB**.
@@ -122,13 +124,13 @@ This is a perfectly reasonable concern. However, this limitation can be overcome
 
 ### Inference Optimization Frameworks: vLLM, SGLang, and LMCache
 
-Various frameworks have been developed to optimize inference computation by leveraging the KV cache characteristics described above. SGLang, which Jaewoo Kim ([Author](https://hyper-accel.github.io/authors/jaewoo-kim/), [LinkedIn](https://www.linkedin.com/in/jaewoo-kim-b38325237/)) introduced in a previous post, is one of them.
+Various frameworks have been developed to optimize inference computation by leveraging the KV cache characteristics described above. [SGLang](https://hyper-accel.github.io/posts/sglang-review/), which Jaewoo Kim ([Author](https://hyper-accel.github.io/authors/jaewoo-kim/), [LinkedIn](https://www.linkedin.com/in/jaewoo-kim-b38325237/)) introduced in a previous post, is one of them.
 
 **vLLM & SGLang**
 ![vllm & sglang](images/vllm_and_sglang_logo.png)
-vLLM and SGLang are inference acceleration engines that provide functionality for efficiently managing KV cache **within GPU memory**. One such feature is prefix caching: when the beginning of a sequence in a given request overlaps with the beginning of a sequence in the next request, the KV cache generated from the previous request can be directly reused. Reusing KV cache generated within the same request during decoding — for each token generation — has always been possible by default. Since the same input tokens will produce the same KV cache regardless of the request, KV cache can be reused without additional computation.
+vLLM and SGLang are inference acceleration engines that provide functionality for efficiently managing KV cache **within GPU memory**. One such feature is **prefix caching**: when the the beginning(prefix) of a sequence in a given request overlaps with the beginning of a sequence in the next request, the KV cache generated from the previous request can be directly reused. Reusing KV cache generated within the same request during decoding — for each token generation — has always been possible by default. This feature goes one step further: since the same input tokens will produce the same KV cache regardless of which request they come from, KV cache can be reused across different requests without any additional computation.
 
-However, the limitations of vLLM and SGLang are that their KV cache management scope is confined to GPU memory (+ CPU host memory), and prefix caching can only be used when input tokens are identical from the very beginning. Even if the same subsequence exists in the middle, it cannot be reused if the position differs. This is because KV cache values change depending on the token's position, even for the same token.
+However, the limitations of vLLM and SGLang are that their KV cache management scope is confined to GPU memory (+ CPU host memory), and prefix caching can only be used when input tokens are identical **from the very beginning**. Even if the same subsequence appears in the middle, it cannot be reused if the preceding prefix differs. This is because of the nature of causal attention: the KV cache generated for a given token is influenced by all tokens that come before it. This is also why the feature is called "prefix" caching.
 
 **LMCache**
 ![lmcache](images/lmcache_logo.png)
@@ -150,13 +152,13 @@ The DPU is a **co-processor** that uses this software to perform computation for
 
 ## Summary
 
-Today, we explored the emerging storage bottleneck in LLMs, along with NVIDIA's new ICMS platform designed to address it, the DPU — a new processor that manages it — and the software frameworks that run on the DPU. Through this, we gained insight into the hardware and software technologies NVIDIA employs to extend GPU-accessible memory all the way to SSDs.
+Today, we explored the emerging storage bottleneck in LLMs, along with NVIDIA's new ICMS platform designed to address it, the DPU — a new processor that manages it — and the software frameworks that run on the DPU. Through this, we gained insight into the hardware and software technologies NVIDIA employs to extend GPU-accessible memory all the way to flash memory.
 
-In the next installment, we'll shift our focus back to accelerators. Beyond Google, which we covered in Part 2, numerous big tech companies are building their own custom ASIC chips to break free from GPU monopoly. The hyperscalers — MS, Meta, Amazon, and others who previously purchased GPUs — are the key players in this movement. Next time, we'll explore the accelerators they've built.
+But what if we could place that flash memory right next to the chip for even faster access? That's exactly what **HBF** (High Bandwidth Flash), an emerging technology gaining traction recently, enables. Next time, we'll explore the solutions leveraging HBF to tackle the memory bottleneck in LLM inference.
 
 ### P.S.: HyperAccel is Hiring!
 
-HyperAccel is on the verge of launching its first datacenter LPU product, and we are also building software solutions to address the critical LLM inference bottlenecks introduced in this post.
+HyperAccel is on the verge of launching its first datacenter LPU product, and we are developing solutions through hardware and software optimization to address the critical LLM inference bottlenecks.
 
 If our technical journey interests you, please apply now through [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
 

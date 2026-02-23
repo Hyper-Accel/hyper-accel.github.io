@@ -13,6 +13,7 @@ authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
 categories: ["AI Hardware", "Architecture"]
 series: ["지피지기면 백전불태"]
+series_idx: 1
 summary: "NVIDIA GPU의 역사와 Hopper 아키텍처를 통해, 어떻게 GPU가 메모리 레이턴시를 숨기는지 정리한 글입니다."
 comments: true
 description: "1990년대 그래픽 카드 시절부터 Tesla·CUDA를 거쳐 Hopper에 이르기까지 NVIDIA GPU의 진화 과정을 따라가며, GPU가 어떻게 대규모 병렬성과 스케줄링으로 메모리 레이턴시를 숨기는지 정리한 글입니다."
