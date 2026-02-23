@@ -77,7 +77,7 @@ $D_{h} : head\ dimension$
 $P : precision$  
 
 
-model config가 공개된 Llama3.1 405B 모델에 이 계산식을 적용해보면 토큰 1개당 약 **516KB**의 KV cache size가 사용됩니다. 여기서 사용자당 10만정도의 context length를 사용한다고 가정한다면 사용자당 필요한 KV cache 크기는 **48GB**, 128명의 사용자가 동시에 사용한다면 순간적으로 필요한 KV cache 크기는 **6TB**까지 커집니다.
+model config가 공개된 Llama 3.1 405B 모델에 이 계산식을 적용해보면 토큰 1개당 약 **516KB**의 KV cache size가 사용됩니다. 여기서 사용자당 10만정도의 context length를 사용한다고 가정한다면 사용자당 필요한 KV cache 크기는 **48GB**, 128명의 사용자가 동시에 사용한다면 순간적으로 필요한 KV cache 크기는 **6TB**까지 커집니다.
 
 ![kv cache size](images/kvcache_size.png)
 
