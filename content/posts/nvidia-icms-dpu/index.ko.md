@@ -136,7 +136,7 @@ vLLM과 SGLang은 추론 연산 가속을 위한 엔진으로 **GPU 메모리 �
 
 ![prefetch](images/lmcache_overlapping.png)
 
-아울러 prefix-caching의 한계를 극복한 **CacheBlend** 기법을 사용하여 토큰 위치가 다른 곳에서 생성된 KVcache에 토큰 위치와 이전 맥락에 대한 추가적인 연산을 통해 KV cache를 그대로 다시 계산하는 것보다 훨씬 적은 연산량으로 KV cache를 계산할 수 있는 non-prefix cache reuse를 지원합니다.
+아울러 prefix-caching의 한계를 극복한 **CacheBlend** 기법을 사용하여 토큰 위치가 다른 곳에서 생성된 KV cache에 토큰 위치와 이전 맥락에 대한 추가적인 연산을 통해 KV cache를 그대로 다시 계산하는 것보다 훨씬 적은 연산량으로 KV cache를 계산할 수 있는 non-prefix cache reuse를 지원합니다.
 
 ![cacheblend](images/cacheblend_explain.png)
 
