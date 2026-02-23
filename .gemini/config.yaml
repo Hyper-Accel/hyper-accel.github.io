@@ -1,0 +1,34 @@
+# Gemini Code Assist Configuration
+# 블로그 포스트 리뷰를 위한 설정
+
+have_fun: true  # 블로그 글은 비공식적(유머 등)이어도 좋습니다.
+
+memory_config:
+  disabled: false
+
+# 리뷰에서 제외할 파일/디렉토리 패턴
+ignore_patterns:
+  - "themes/**"  # 테마 파일은 제외
+  - "*.lock"  # 빌드 락 파일
+  - ".git/**"  # Git 메타데이터
+  - "public/**"  # 빌드 결과물
+  - "static/**"  # 정적 파일 (이미지, favicon 등)
+  - "layouts/**"  # HTML 템플릿 파일
+  - "archetypes/**"  # Hugo 템플릿 파일
+  - "assets/**"  # CSS 등 에셋 파일 (선택적)
+
+# 코드 리뷰 설정
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM  # MEDIUM 이상의 이슈만 코멘트
+  max_review_comments: -1  # 최대 코멘트 수 제한
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+    include_drafts: true  # 초안 PR에서 제미나이로 수정 많이 해주세요
+
+# 마크다운 파일에 집중
+file_patterns:
+  - "content/posts/**/*.md"
+  - "content/**/*.md"
