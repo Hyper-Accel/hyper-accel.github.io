@@ -16,6 +16,7 @@ series_idx: 4
 categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
 summary: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 comments: true
+description: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 ---
 
 # Know Your Enemy, Know Yourself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS
