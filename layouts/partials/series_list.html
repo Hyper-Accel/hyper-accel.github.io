@@ -3,13 +3,34 @@
   {{- range $series -}}
     {{- $seriesPages := .Pages -}}
     {{- if gt (len $seriesPages) 1 -}}
+      {{- $weighted := slice -}}
+      {{- $unweighted := slice -}}
+      {{- range $seriesPages -}}
+        {{- if isset .Params "series_idx" -}}
+          {{- $weighted = $weighted | append . -}}
+        {{- else -}}
+          {{- $unweighted = $unweighted | append . -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $items := slice -}}
+      {{- range $weighted -}}
+        {{- $items = $items | append (dict "page" . "weight" (float .Params.series_idx)) -}}
+      {{- end -}}
+      {{- $sortedItems := sort $items "weight" "asc" -}}
       <div class="post-series">
         <h3 class="series-title">{{ i18n "series" | default "Series" }}: {{ .LinkTitle }}</h3>
         <ul class="series-list">
-          {{- range $seriesPages.ByDate -}}
-            <li class="series-item{{ if eq .Permalink $.Permalink }} current{{ end }}">
-              <a href="{{ .Permalink }}">{{ .Title }}</a>
+          {{- range $sortedItems -}}
+            <li class="series-item{{ if eq .page.Permalink $.Permalink }} current{{ end }}">
+              <a href="{{ .page.Permalink }}">{{ .page.Title }}</a>
             </li>
+          {{- end -}}
+          {{- if $unweighted -}}
+            {{- range sort $unweighted ".Date" "asc" -}}
+              <li class="series-item{{ if eq .Permalink $.Permalink }} current{{ end }}">
+                <a href="{{ .Permalink }}">{{ .Title }}</a>
+              </li>
+            {{- end -}}
           {{- end -}}
         </ul>
       </div>

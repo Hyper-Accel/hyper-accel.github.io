@@ -13,6 +13,7 @@ authors: [Jaewon Lim] # must match with content/authors
 tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture"]
 categories: ["AI Hardware", "Computer Architecture", "Semiconductor"]
 series: ["Know Your Enemy, Know Yourself"]
+series_idx: 2
 summary: We explore the background of TPU's emergence and analyze Google's AI semiconductor strategy by examining its hardware and software architecture.
 comments: true
 description: "We explore the background of Google's AI chip TPU, born in 2016, and analyze Google's AI semiconductor market strategy to compete with NVIDIA by examining the hardware and software architecture built over 10 years."

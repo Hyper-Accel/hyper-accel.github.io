@@ -12,6 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC"]
 series: ["지피지기면 백전불태"]
+series_idx: 3
 categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
 summary:  그록과 LPU의 탄생 배경과 그들의 하드웨어 / 소프트웨어 설계 철학에 대해 알아보고 엔비디아가 그록을 인수한 의도에 대해 분석해봅니다.
 comments: true
