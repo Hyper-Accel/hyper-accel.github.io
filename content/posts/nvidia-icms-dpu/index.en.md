@@ -154,7 +154,9 @@ The DPU is a **co-processor** that uses this software to perform computation for
 
 Today, we explored the emerging storage bottleneck in LLMs, along with NVIDIA's new ICMS platform designed to address it, the DPU — a new processor that manages it — and the software frameworks that run on the DPU. Through this, we gained insight into the hardware and software technologies NVIDIA employs to extend GPU-accessible memory all the way to flash memory.
 
-But what if we could place that flash memory right next to the chip for even faster access? That's exactly what **HBF** (High Bandwidth Flash), an emerging technology gaining traction recently, enables. Next time, we'll explore the solutions leveraging HBF to tackle the memory bottleneck in LLM inference.
+But what if we could place that flash memory right next to the chip for even faster access? **HBF** (High Bandwidth Flash) is an emerging technology that does exactly that. We'll cover HBF in **another series** that focuses on new technology trends.
+
+In the next post, we'll return to the topic of accelerators. We'll look at **Cerebras** — the company that drew attention for serving OpenAI's code generation model Codex-Spark — and their **Wafer Scale Engine**, an AI accelerator startup that builds chips the size of an entire wafer.
 
 ### P.S.: HyperAccel is Hiring!
 
