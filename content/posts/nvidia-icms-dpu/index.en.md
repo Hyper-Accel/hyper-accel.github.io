@@ -1,5 +1,5 @@
 ---
-date: '2026-02-22T16:53:00+09:00'
+date: '2026-02-24T21:04:00+09:00'
 draft: false
 title: 'Know Your Enemy, Know Yourself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS'
 cover:
