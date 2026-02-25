@@ -73,7 +73,7 @@ These issues cause rendering problems or significantly impact readability. They 
 **Rules**:
 - **First use**: Always write `FullTerm(Acronym)` format
 - **Subsequent use**: Only the acronym can be used
-- **Bold formatting**: Bold only the full term, not the acronym: `**FullTerm(Acronym)**`
+- **Bold formatting**: Bold the full term and the acronym together: `**FullTerm(Acronym)**`
 - If an acronym appears in the title or summary, introduce it in the first paragraph
 - For well-known acronyms (e.g., CPU, GPU, AI), you may skip the full form if it's extremely common
 
