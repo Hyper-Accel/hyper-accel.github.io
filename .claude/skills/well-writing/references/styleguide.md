@@ -175,7 +175,7 @@ These rules ensure blog posts are readable, well-structured, and technically acc
 **Paragraph Length**:
 - A paragraph should be approximately **5-7 sentences**
 - Consider splitting if a paragraph has **10 or more sentences**
-- Consider splitting if a paragraph exceeds **200 characters**
+- Consider splitting if a paragraph exceeds **300 characters**
 - Use blank lines to separate distinct ideas
 - Each paragraph should focus on one main idea
 
