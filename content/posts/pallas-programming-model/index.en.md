@@ -1,7 +1,7 @@
 ---
 date: '2026-02-25T14:50:09+09:00'
 draft: false
-title: 'Know Your Enemy Supplement: Pallas Programming Model'
+title: 'Know Your Enemy, Know Yourself, Supplement: Pallas Programming Model'
 cover:
   image: "images/00-main-image.png"
   # can also paste direct link from external site
@@ -23,7 +23,7 @@ keywords: [
 ]
 ---
 
-# Know Your Enemy Supplement: Pallas Programming Model
+# Know Your Enemy, Know Yourself, Supplement: Pallas Programming Model
 
 > **Know Your Enemy, Know Yourself (知彼知己 百戰不殆)**  
 > If you know your enemy and know yourself, you need not fear the result of a hundred battles.  
