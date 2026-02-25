@@ -54,7 +54,7 @@ This skill helps review and edit markdown blog posts for the HyperAccel technica
 ### Readability
 
 - Sentences should be within 50 characters (flexible for technical terms)
-- Paragraphs should be within 10 sentences or 200 characters
+- Paragraphs should be within 10 sentences or about 300 characters
 - Break complex explanations into multiple sentences
 - Use blank lines to separate distinct ideas
 
