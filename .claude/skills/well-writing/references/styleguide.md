@@ -73,7 +73,6 @@ These issues cause rendering problems or significantly impact readability. They 
 **Rules**:
 - **First use**: Always write `FullTerm(Acronym)` format
 - **Subsequent use**: Only the acronym can be used
-- **Bold formatting**: Bold the full term and the acronym together: `**FullTerm(Acronym)**`
 - If an acronym appears in the title or summary, introduce it in the first paragraph
 - For well-known acronyms (e.g., CPU, GPU, AI), you may skip the full form if it's extremely common
 
@@ -107,7 +106,6 @@ TPU는 구글이 개발한 AI 가속기입니다.
 **Checkpoints**:
 - [ ] Acronym is presented with full term when it first appears
 - [ ] Acronym does not appear before the full term
-- [ ] Only the full term is bolded, not the acronym
 - [ ] Acronyms in title/summary are introduced in first paragraph
 
 ---

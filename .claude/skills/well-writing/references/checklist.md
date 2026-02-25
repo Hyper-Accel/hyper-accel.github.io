@@ -14,7 +14,6 @@ This is a quick reference checklist for reviewing blog posts. For detailed expla
 ### Acronym Usage
 - [ ] All acronyms introduced with full terms first: `**FullTerm(Acronym)**`
 - [ ] Acronyms in title/summary are introduced in first paragraph
-- [ ] Only full term is bolded, not the acronym
 - [ ] Common acronyms: GPU, TPU, SM, CUDA, HBM, SMEM, VMEM, MXU, VPU, TCS, XLA, JAX, Pallas, Triton
 
 ### Capitalization

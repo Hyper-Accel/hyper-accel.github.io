@@ -85,7 +85,7 @@ Ask if anything important is missing given the selections.
 Replace placeholders with drafted content. **Always** apply `.gemini/styleguide.md`:
 - Space after bold when followed by Korean: `**GPU** 는`
 - First use of acronym: `**FullTerm(Acronym)**`
-- Sentence/paragraph length, heading hierarchy (max H3), code block language tags
+- Sentence/paragraph length, heading hierarchy (H2→H3→H4, no skipping), code block language tags
 
 #### 6. Iterative Refinement
 
@@ -169,7 +169,7 @@ Refer to `.gemini/styleguide.md` when drafting. Summary:
 | Critical | Capitalization | Acronyms uppercase, common nouns lowercase |
 | High | Readability | ~50 chars/sentence, 5–7 sentences/paragraph |
 | High | Technical terms | Explain on first use |
-| Medium | Headings | H2→H3, no H4+ |
+| Medium | Headings | H2→H3→H4, no skipping |
 | Medium | Code | Language tag required |
 
 Image rules: see well-writing skill "Stage 4: Images".

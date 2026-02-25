@@ -73,7 +73,6 @@ These issues cause rendering problems or significantly impact readability. They 
 **Rules**:
 - **First use**: Always write `FullTerm(Acronym)` format
 - **Subsequent use**: Only the acronym can be used
-- **Bold formatting**: Bold only the full term, not the acronym: `**FullTerm(Acronym)**`
 - If an acronym appears in the title or summary, introduce it in the first paragraph
 - For well-known acronyms (e.g., CPU, GPU, AI), you may skip the full form if it's extremely common
 
@@ -107,7 +106,6 @@ TPU는 구글이 개발한 AI 가속기입니다.
 **Checkpoints**:
 - [ ] Acronym is presented with full term when it first appears
 - [ ] Acronym does not appear before the full term
-- [ ] Only the full term is bolded, not the acronym
 - [ ] Acronyms in title/summary are introduced in first paragraph
 
 ---
@@ -282,39 +280,28 @@ These rules ensure proper markdown rendering and consistent formatting.
 - Use H1(`#`) only for the page title (usually in frontmatter, not in body)
 - Start body sections with H2(`##`)
 - Use H3(`###`) for subsections
-- **Maximum heading level is H3** - Do not use H4(`####`) or deeper levels
-- Do not skip heading hierarchy (e.g., do not use H3 after H1)
+- Use H4(`####`) for sub-subsections if needed
+- Do not skip heading hierarchy (e.g., do not use H4 after H2, do not use H3 after H1)
 - Use descriptive headings that summarize the section content
 - Headings should form a logical outline of the content
-- If you need more levels of organization, use lists or paragraphs instead of deeper headings
 
 **Incorrect Examples**:
 ```markdown
 # Main Title
 ## Section 1
-#### Subsection (Skipped H3, and H4 not allowed)
-
-## TPU Architecture
-### Systolic Array
-#### Data Flow  (H4 not allowed - maximum is H3)
+#### Subsection (Skipped H3)
 ```
 
 **Correct Examples**:
 ```markdown
 ## TPU Architecture
 ### Systolic Array
-
-데이터 흐름은 다음과 같습니다: (Use paragraph instead of H4)
-
-## TPU Architecture
-### Systolic Array
-### Data Flow  (Use H3 instead of H4)
+#### Data Flow
 ```
 
 **Checkpoints**:
 - [ ] H1 is only used for page title
-- [ ] Maximum heading level is H3 (no H4 or deeper)
-- [ ] Heading hierarchy is not skipped
+- [ ] Heading hierarchy is not skipped (H2 → H3 → H4)
 - [ ] Headings are descriptive
 - [ ] Headings form a logical outline
 
@@ -585,7 +572,7 @@ When reviewing a blog post, check the following items in order of priority:
 - [ ] **Images**: All images have descriptive alt text and are placed before the content they illustrate
 
 ### Medium Priority
-- [ ] **Headings**: Proper hierarchy (H2 → H3, maximum H3, no skipping)
+- [ ] **Headings**: Proper hierarchy (H2 → H3 → H4, no skipping)
 - [ ] **Links**: Descriptive link text
 - [ ] **Lists**: Consistent formatting
 - [ ] **Frontmatter**: All required fields present and correct

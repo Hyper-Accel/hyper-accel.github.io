@@ -71,7 +71,7 @@ This skill helps review and edit markdown blog posts for the HyperAccel technica
 
 **Goal**: Ensure formatting consistency.
 
-- Headings: Proper hierarchy (H2 → H3, maximum H3 level, no H4 or deeper)
+- Headings: Proper hierarchy (H2 → H3 → H4, no skipping)
 - Code blocks: All have language tags (` ```python`, ` ```bash`, etc.)
 - Images: Descriptive alt text, meaningful file names
 - Links: Descriptive link text
@@ -121,7 +121,7 @@ Refer to `.gemini/styleguide.md` when reviewing. Summary:
 | Critical | Capitalization | Acronyms uppercase, common nouns lowercase |
 | High | Readability | ~50 chars/sentence, 5–7 sentences/paragraph |
 | High | Technical terms | Explain on first use |
-| Medium | Headings | H2→H3, no H4+ |
+| Medium | Headings | H2→H3→H4, no skipping |
 | Medium | Code | Language tag required |
 | Medium | Images | `{number}-{descriptive-name}.{ext}`, descriptive alt text |
 
