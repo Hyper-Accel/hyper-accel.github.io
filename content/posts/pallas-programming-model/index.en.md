@@ -1,9 +1,9 @@
 ---
-date: '2026-01-19T14:50:09+09:00'
+date: '2026-02-25T14:50:09+09:00'
 draft: false
-title: 'Know Your Enemy 2.5: Pallas Programming Model'
+title: 'Know Your Enemy Supplement: Pallas Programming Model'
 cover:
-  image: ""
+  image: "images/00-main-image.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "Pallas Programming Model"
@@ -13,6 +13,7 @@ authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["Pallas", "TPU", "Google", "Ironwood", "Kernel", "Custom Kernel", "Programming Model"]
 categories: ["AI Hardware", "Computer Architecture"]
 series: ["Know Your Enemy, Know Yourself"]
+series_idx: 2.5
 summary: "Learn about Pallas programming model that enables writing custom kernels on TPU."
 comments: true
 description: "Building on the TPU architecture explored in part 2, we examine Pallas, a programming model that enables writing custom kernels on TPU."
@@ -22,84 +23,91 @@ keywords: [
 ]
 ---
 
-# Know Your Enemy 2.5: Pallas Programming Model
-
-[Know Your Enemy 1: GPU History and Fundamentals](https://hyper-accel.github.io/en/posts/how-gpu-works/)  
-[Know Your Enemy 2: The Rise of TPU](https://hyper-accel.github.io/en/posts/tpu-deep-dive/)
+# Know Your Enemy Supplement: Pallas Programming Model
 
 > **Know Your Enemy, Know Yourself (知彼知己 百戰不殆)**  
 > If you know your enemy and know yourself, you need not fear the result of a hundred battles.  
 > This series aims to deeply understand competitors' hardware for AI accelerator design.  
-> Part 2.5 covers **Pallas**, a programming model that enables writing custom kernels on TPU.
+> This article covers **Pallas**, a programming model that enables writing custom kernels on TPU.
 
-In part 2, we explored TPU's hardware architecture and software stack. We discussed how the XLA compiler optimizes operations and its limitations. At the end, we previewed that the next article (part 3) would introduce Groq's LPU.
+Hello, I'm Donghyeon Choi, an engineer on the HyperAccel ML team.
 
-However, to truly understand TPU, hardware and software stack alone are not enough. Especially in the latest TPU generation, Ironwood, the **Pallas** programming model plays a crucial role in performance optimization. Pallas is a tool that allows writing custom kernels on TPU, similar to CUDA or Triton. It enables direct control over hardware details while remaining relatively easy to use in a Python environment.
+In part 2, we explored TPU's hardware architecture and software stack. In this article, we'll take a deeper look at Pallas, one component of the TPU software stack.
 
-As mentioned in part 2 regarding the limitations of the XLA compiler, automatic compilers often struggle to optimize cutting-edge algorithms. Pallas is the kernel language Google created to overcome these limitations. When announced alongside Ironwood, it was emphasized with the slogan "Extreme performance: Custom kernels via Pallas," highlighting its important role in maximizing TPU performance.
+In the latest TPU generation, Ironwood, the **Pallas** programming model plays a crucial role in performance optimization. Pallas is a tool that allows writing custom kernels on TPU, similar to CUDA or Triton. It enables direct control over hardware details while remaining relatively easy to use in a Python environment.
 
-Therefore, before diving into Groq's LPU in part 3, we first examine the Pallas programming model in part 2.5 to complete our understanding of TPU. In this article, we'll explore what Pallas is, why it's needed, and how it enhances TPU performance.
+As mentioned in part 2 regarding the limitations of the XLA compiler, automatic compilers often struggle to optimize cutting-edge algorithms. Pallas is the kernel language Google created to overcome these limitations. When announced alongside Ironwood, it was emphasized with the slogan "Extreme performance: Custom kernels via Pallas." It plays an important role in maximizing TPU performance.
+
+Therefore, as a supplement to this series, we examine the Pallas programming model before moving on. In this article, we'll explore what Pallas is, why it's needed, and how it enhances TPU performance.
 
 ---
 
 ## Background: TPU Architecture and Why Pallas is Needed
 
-To understand Pallas, we first need to understand how TPU differs from CPUs or GPUs. This difference is exactly why Pallas is needed.
+To understand Pallas, we first need to understand how TPU differs from CPUs or GPUs.
+
+---
 
 ### Traditional Architecture vs TPU's Systolic Array
 
-Traditional CPU or GPU architectures repeatedly fetch and store data from SRAM to register files for each operation. This approach causes massive **memory bandwidth waste** in operations like matrix multiplication that repeatedly use the same data.
+Traditional CPU or GPU architectures repeatedly fetch and store data from SRAM to register files for each operation. In operations like matrix multiplication that repeatedly use the same data, this approach causes massive **memory bandwidth waste**.
 
-TPU solves this by adopting a structure where **once-loaded data flows between compute units and is continuously calculated**. This is the Systolic Array structure.
+TPU solves this by adopting a structure where **once-loaded data flows between compute units and is continuously calculated**. This is the Systolic Array structure described in part 2.
 
-### TPU's Data Flow
+![TPU v1 Architecture Diagram](images/01-tpuv1-arch.png)
 
 Operations within TPU follow this flow:
 
-1. **Weight Supply**: Weight data stored in DRAM is loaded into MXU (Matrix Multiply Unit) through Weight FIFO.
+1. **Weight Supply**: Weight data stored in DRAM is loaded into Matrix Multiply Unit (MXU) through Weight FIFO.
 2. **Activation Supply**: Input data stored in Unified Buffer (UB) is delivered to MXU.
 3. **Matrix Operations**: Multiplication and accumulation (Multiply-Accumulate) operations occur simultaneously through the Systolic Array structure inside MXU.
-4. **Post-processing Pipeline**: MXU output values pass through Accumulator, Activation Unit (ReLU, etc.), and Normalize/Pool Unit sequentially to perform additional operations required by AI models.
+4. **Post-processing Pipeline**: MXU output values pass through Accumulator, Activation Unit (ReLU, etc.), and Normalize/Pool Unit sequentially. These units perform additional operations required by AI models.
 5. **Result Storage**: Final output after all operation flows returns to Unified Buffer and is stored.
 
 ### Key Difference from GPU: Change in Execution Unit
 
 This structural difference creates a very significant difference from a programming model perspective.
 
-- **GPU (SIMT)**: Numerous threads perform calculations independently, managed in groups of 32 threads called Warps. It features fine-grained parallel processing focused on individual data.
-- **TPU (Tensor-centric, SPMD)**: A single data load completes the entire operation sequence. That is, rather than individual threads, **'the entire program for one tensor (or tile)' is considered as one minimum execution unit**.
+- **GPU (Single Instruction Multiple Thread, SIMT)**: Numerous threads perform calculations independently, managed in groups of 32 threads called Warps. It features fine-grained parallel processing focused on individual data.
+- **TPU (Single Instruction Multiple Data, SPMD)**: A single data load completes the entire operation sequence. That is, rather than individual threads, **'the entire program for one tensor (or tile)' is considered as one minimum execution unit**.
 
-> **Why Pallas?** Pallas is a language designed to abstract these TPU hardware characteristics (direct Unified Buffer control, MXU scheduling, etc.) while allowing developers to directly optimize this 'tensor-level flow'.
+> **Why Pallas?** Pallas is a language designed to abstract TPU hardware characteristics (direct Unified Buffer control, MXU scheduling, etc.) while allowing developers to directly optimize this 'tensor-level flow'.
 
-TPU has evolved through generations, strengthening vector operation units and developing scale-up technologies for large-scale models. The latest architecture, Ironwood, has become a 'monster compute unit' with a massive package adopting chiplet structure and mounting **four 256x256 Systolic Arrays (MXU)**. However, despite the dramatic increase in hardware scale, the core design principle of **'performing as many operations as possible through a single data load'** remains unchanged.
+![TPU v7 Ironwood Architecture Diagram](images/02-tpuv7-arch.png)
+
+TPU has evolved through generations. It has strengthened vector operation units and developed scale-up technologies for large-scale models. The latest architecture, Ironwood, has become a 'monster compute unit' with a massive package adopting chiplet structure and mounting **four 256x256 Systolic Arrays (MXU)**. Despite the dramatic increase in hardware scale, the core design principle remains unchanged: **'performing as many operations as possible through a single data load'**.
+
+---
 
 ### Why Pallas is Needed
 
-When we discussed the XLA compiler in part 2, we mentioned that while XLA is a powerful optimization compiler, it has limitations. When new operation algorithms emerge, it's difficult for manually created custom kernels to match performance until the compiler is updated to a version that can optimize them.
+When we discussed the XLA compiler in part 2, we mentioned that while XLA is a powerful optimization compiler, it has limitations. When new operation algorithms emerge, the compiler struggles to match the performance of manually created custom kernels. This remains true until it's updated to a version that can optimize them.
 
-For example, cutting-edge algorithms like Flash Attention or MoE (Mixture of Experts) often have complex memory access patterns or high data dependencies, making them difficult for automatic compilers to optimize. In such cases, developers need to directly understand the memory hierarchy and finely control how to tile data, when to move data between memory levels, and so on.
+For example, cutting-edge algorithms like Flash Attention or MoE (Mixture of Experts) often have complex memory access patterns or high data dependencies. This makes them difficult for automatic compilers to optimize. In such cases, developers need to directly understand the memory hierarchy. They must finely control how to tile data, when to move data between memory levels, and so on.
 
-On GPUs, this problem was solved with CUDA or Triton. CUDA allows direct hardware control but has a high barrier to entry, while Triton has a higher level of abstraction, making it relatively easier to use. However, both only work on GPUs.
+On GPUs, this problem was solved with CUDA or Triton. CUDA allows direct hardware control but has a high barrier to entry. Triton has a higher level of abstraction, making it relatively easier to use. However, both only work on GPUs.
 
-What about TPU? Google began providing **Pallas** as an experimental extension of JAX around 2023. Pallas shares a similar philosophy with Triton but differs significantly in that it supports both GPUs and TPUs.
+What about TPU? Google began providing **Pallas** as an experimental extension of JAX around 2023. Pallas shares a similar philosophy with Triton. It differs significantly in that it supports both GPUs and TPUs.
 
 ---
 
 ## What is Pallas?
 
-Pallas is a kernel language that enables writing custom kernels within the JAX ecosystem. It works on both GPUs and TPUs, allowing direct control over hardware memory hierarchy, data tiling, and block-level parallelism.
+Pallas is a kernel language that enables writing custom kernels within the JAX ecosystem. It works on both GPUs and TPUs. It allows direct control over hardware memory hierarchy, data tiling, and block-level parallelism.
 
-### Basic Concepts
+Pallas's core idea is simple. It allows developers to control operations that are difficult for high-level automated compilers to handle, at a level closer to hardware. Unlike CUDA, it doesn't go completely low-level. It is abstracted to be relatively easy to use in a Python environment. It finds a balance between the convenience of automatic compilers and the control of manual optimization.
 
-Pallas's core idea is simple. It allows developers to control operations that are difficult for high-level automated compilers to handle, at a level closer to hardware. However, unlike CUDA, it doesn't go completely low-level but is abstracted to be relatively easy to use in a Python environment.
+---
 
-### Key Components
+### Key Abstractions: Grid, BlockSpec, Ref
 
-Pallas consists of several core concepts:
+Pallas controls hardware through three key abstractions: **Grid**, **BlockSpec**, and **Ref**.
 
-**1. Grid and Program ID: Parallel Execution Abstraction**
+> **Grid: Parallel Execution Abstraction**
 
-Pallas models execution units through a **Grid** abstraction. Grid has different meanings depending on hardware but provides a unified interface.
+![Grid and Program ID: Grid specifies the iteration space for parallel execution, with each program having a unique program_id](images/04-grid-and-block.png)
+
+Pallas models execution units through a **Grid** abstraction. Grid has different meanings depending on hardware. It provides a unified interface regardless.
 
 ```python
 def kernel(o_ref):
@@ -114,246 +122,232 @@ result = pl.pallas_call(
 )()
 ```
 
-#### Grid Semantics: GPU vs TPU
+In Pallas, **Grid** is a collection of execution units that divide the entire work. However, how hardware processes this Grid has fundamental differences depending on the architecture.
 
-In Pallas, **Grid** is a collection of execution units that divide the entire work, but how hardware processes this Grid has fundamental differences depending on the architecture.
+&nbsp;
 
-**Grid on GPU**: In GPU backends (Triton/Mosaic), Grid assumes **fully parallel execution** by hardware schedulers. Each Grid item is mapped to one **Thread Block** and executed independently on individual SMs (Streaming Multiprocessors). Since hardware schedules threads non-deterministically, execution order between Grids is not guaranteed. Therefore, `BlockSpec`'s `index_map` design must strictly manage **race conditions** to prevent different programs from writing to the same HBM location.
+> **GPU Grid**
 
-**Grid on TPU**: In TPU backends, Grid is a model that combines parallelism between multiple cores and **sequential pipelining** within a single core. TPU is a very wide SIMD machine, but can be coded like a **single-threaded processor** from a software perspective. The control unit (TCS) provides an intuitive flow that controls entire operations by looping. There are Parallel dimensions that distribute work when multiple TensorCores exist and execute **physically simultaneously**, and Sequential dimensions that guarantee **serial execution** within a single TensorCore. Sequential dimensions are not just for slow execution, but are used as a strategic means to **hide memory latency** by overlapping (Overlap) current operations and next data loading through **Semaphores**.
+In GPU backends (Triton/Mosaic), Grid assumes **fully parallel execution** by hardware schedulers. Each Grid item is mapped to one **Thread Block** and executed independently on individual Streaming Multiprocessors (SMs). Since hardware schedules threads non-deterministically, execution order between Grids is not guaranteed. This is an important consideration during development. When designing `BlockSpec`'s `index_map`, you must strictly manage race conditions. Different programs must not write to the same High Bandwidth Memory (HBM) location.
 
-**2. BlockSpec: Memory Layout Abstraction**
+&nbsp;
 
-Pallas abstracts the process of dividing massive data into chunks that hardware can digest through **BlockSpec**. This goes beyond simply cutting data and defines **data transfer protocols between HBM (Remote) and SRAM (Local)**.
+> **TPU Grid**
 
-BlockSpec components:
+![Grid and Block on TPU: Diagram showing how Grid combines parallelism and pipelining in the TPU backend](images/05-grid-block-in-tpu.png)
 
-- `block_shape`: The size of data that each program instance will place on the Local Memory (SRAM) workbench. Designing this not to exceed hardware SRAM capacity is key to performance optimization.
-- `index_map` **function**: Takes `grid` indices (i, j) as input and returns the block start position on HBM. This function is analyzed at compile time and converted to hardware DMA (Direct Memory Access) address calculation logic.
-- `memory_space`: Specifies the physical container where fragmented data will reside. If not specified, it's allocated to the default space (`pl.SRAM`) according to backend settings.
+In TPU backends, Grid is a model that combines parallelism between multiple cores and **sequential pipelining** within a single core.
 
-**3. Ref: Memory Reference Abstraction**
+TPU is a very wide SIMD machine, but can be coded like a **single-threaded processor** from a software perspective. The Tensor Control System (TCS) provides an intuitive flow that controls entire operations by looping.
+
+When multiple TensorCores exist, there are Parallel dimensions that distribute work and execute **physically simultaneously**. There are also Sequential dimensions that guarantee **serial execution** within a single TensorCore. Sequential dimensions are not for slow execution. They are a strategic means to **hide memory latency** by overlapping current computation with loading of the next data through **Semaphores**.
+
+&nbsp;
+
+> **BlockSpec: Memory Layout Abstraction**
+
+Pallas abstracts the process of dividing massive data into chunks that hardware can digest through **BlockSpec**. This goes beyond simply cutting data. It defines **data transfer protocols between HBM (Remote) and SRAM (Local)**.
+
+BlockSpec has three components:
+
+- **`block_shape`**: The size of data that each program instance will place on the Local Memory (SRAM) workbench. Designing this not to exceed hardware SRAM capacity is key to performance optimization.
+- **`index_map` function**: Takes `grid` indices (i, j) as input and returns the block start position on HBM. At compile time, this function is analyzed and converted to hardware Direct Memory Access (DMA) address calculation logic.
+- **`memory_space`**: Specifies the physical container where fragmented data will reside. If not specified, it's allocated to the default space (`pl.SRAM`) according to backend settings.
+
+&nbsp;
+
+> **Ref: Memory Reference Abstraction**
 
 Pallas abstracts complex hardware memory address systems through **Ref** objects. This goes beyond simple pointers to data and provides a **logical view of specific data blocks on SRAM (Local Memory)**.
 
 Ref's key features:
 
-- **Local Memory Reference**: `Ref` points to data that has already been loaded or will be loaded on **SRAM (TPU's VMEM/SMEM, GPU's Shared Memory)**, the fastest workbench in hardware, not HBM.
-- **Dereferencing**: When using brackets like `x_ref[...]`, actual data loading from **SRAM → Register File** occurs, converting it to a 'Value'.
-- **Hardware Abstraction**: Even using the same `Ref` interface, it automatically converts to TPU's Vector/Scalar memory or GPU's Shared Memory access depending on the backend.
+- **Local Memory Reference**: `Ref` points to data on the fastest workbench in hardware—**SRAM (TPU's VMEM/SMEM, GPU's Shared Memory)**—not HBM. The data has already been loaded or will be loaded there.
+- **Dereferencing**: When using brackets like `x_ref[...]`, actual data loading from **SRAM → Register File** occurs, converting it to a `Value`.
+- **Hardware Abstraction**: Even using the same `Ref` interface, it automatically converts depending on the backend. It maps to TPU's Vector/Scalar memory or GPU's Shared Memory access. You can also set it directly for clear optimization.
 
-**4. Memory Hierarchy Control**
+---
 
-Pallas provides memory models that share the same big picture but differ in details for TPU and GPU. Let's first look at the overall structure that's abstracted and provided in common.
+### Pallas Hardware Modeling
 
-The structure abstracted and provided in both:
+Pallas provides hardware models for both TPU and GPU. They share the same big picture but differ in details. Let's first look at the overall structure that's common to both.
 
-- **Remote Memory (HBM)**: Memory space mainly specified through `pl.ANY`.
-- **Multiple "Core" structure**: Independent compute units for parallel processing of grids.
-  - **Local Memory (SRAM or Cache)**: SRAM memory located inside cores, slightly faster. It's recommended to separate READ and WRITE variables to maintain consistency with HBM data.
-  - **Register Files in Execution Units**: Small memory that can directly exchange data with compute units inside cores.
+![Pallas Common Hardware Model Hierarchy: Remote Memory (HBM), Multiple Core structure, Local Memory (SRAM), Register Files](images/06-common-hw-model.png)
 
-Generally, Local Memory takes 10x the latency of Register File, and Remote Memory takes another 10x the latency of Local Memory. However, in TPU v7 Ironwood adopting chiplet structure, since one chip contains HBM, Remote Memory communication can be 2~5x faster than the previous 10x.
+The common hardware model that Pallas abstracts has the following hierarchy:
 
-#### TPU Memory Hierarchy Structure
+- **Remote Memory (HBM)**: High Bandwidth Memory—the slowest but highest capacity memory space. Typically specified explicitly through `pltpu.HBM` or automatically through `pl.ANY`.
+- **Multiple "Core" structure**: A collection of independent compute units for parallel grid processing. Each core can perform computations independently.
+  - **Local Memory (SRAM or Cache)**: Fast memory located inside cores. Much faster than Remote Memory but with limited capacity. Separating READ and WRITE variables is recommended for consistency with HBM data.
+  - **Register Files in Execution Units**: The fastest memory that can directly exchange data with compute units. Provides data immediately needed for computation.
 
-Looking at TPU's memory hierarchy model:
+Generally, Local Memory takes about 10x the latency of Register File. Remote Memory takes another 10x the latency of Local Memory. However, in TPU v7 Ironwood adopting chiplet structure, one chip contains HBM. For this reason, Remote Memory communication can be 2~5x faster than the previous 10x.
+
+&nbsp;
+
+> **Pallas TPU Hardware Model**
+
+![Pallas TPU Hardware Modeling: Data flow and pipelining from HBM → VMEM/SMEM → Register File](images/07-tpu-hw-model.png)
+
+TPU's hardware model is based on the common model but has TPU-specific structures:
+
+**Memory Hierarchy**:
 
 - **Local Memory** consists of Vector Memory and Scalar Memory:
   - **Vector Memory (VMEM)**: Memory that stores data for Vector and Matrix related operations. Accessible from Vector/Matrix Units (VPU/MXU/XLU) within the same tensor core.
-  - **Scalar Memory (SMEM)**: Memory that stores data for scalar operations for logic flow (loops, conditions, etc.). Accessible from Scalar Unit (TCS) within the same tensor core. Data stored on SMEM can also be directly used in vector operations through high-level commands generated by TCS.
+  - **Scalar Memory (SMEM)**: Memory that stores data for scalar operations for logic flow (loops, conditions, etc.). Accessible from Scalar Unit (TCS) within the same tensor core. TCS generates high-level commands through which SMEM data can be directly used in vector operations.
 
 - Each VMEM and SMEM has separate READ/WRITE areas to ensure data sync with HBM. This is because modifying data read as READ without write-back can cause data inconsistency with HBM.
 
-- When calling kernels, data is loaded from Remote Memory to Local Memory according to the specified BlockSpec. At this time, corresponding data is automatically fetched according to the set Grid number.
+**Data Flow and Pipelining**:
 
-- When calling Ref data inside kernels, data is fetched from Local Memory to Register File for operations. During Local Memory ↔ Register File movement and operation, data loading from Remote Memory → Local Memory for the next Grid automatically overlaps. This can hide memory latency significantly.
+- When calling a kernel, data is loaded from Remote Memory (HBM) to Local Memory (VMEM/SMEM) according to the specified BlockSpec. Data corresponding to the set Grid number is automatically fetched.
 
-- Writing result data to the output Ref data set in the kernel writes back to Local Memory, and when all programs for that grid finish, the output Ref data is written back to Remote Memory.
+- When calling Ref data inside the kernel, data is fetched from Local Memory to Register File for computation. During Local Memory ↔ Register File transfer and computation, data loading from Remote Memory → Local Memory for the next Grid automatically overlaps. This can hide memory latency significantly.
 
-#### GPU Memory Hierarchy Structure
+- When the kernel writes result data to the configured output Ref, it is written back to Local Memory. When all programs for that grid finish, the output Ref data is written back to Remote Memory.
 
-Looking at GPU's hardware model:
+&nbsp;
 
-- **Local Memory is Shared Memory (SMEM)**: Each SM (Streaming Multiprocessor) has independent Shared Memory/L1 Cache space. Unlike TPU, it's a unified workspace without Scalar/Vector distinction, where numerous threads access this space simultaneously for parallel operations.
+> **Pallas GPU Hardware Model**
 
-- **Data Movement and Pipelining**: Unlike existing methods that rely only on hardware scheduling, Pallas GPU explicitly **overlaps HBM (Remote) → SMEM (Local) data loading and TensorCore operations**. Through `plgpu.emit_pipeline`, etc., while compute units process current data, data for the next grid is prefetched asynchronously to hide memory latency.
+![Pallas GPU Hardware Modeling: Data flow and pipelining from HBM → SMEM → Register File](images/08-gpu-hw-model.png)
 
-- **Ref Variable Entity and Hardware Mapping**: Ref variables inside kernels are addresses of data chunks that have already been loaded or will be loaded on Local Memory (SMEM), not HBM. Through `memory_space=plgpu.GPUMemorySpace.GMEM` settings, HBM (Remote) space is explicitly specified and can be directly controlled with `copy_gmem_to_smem`.
+GPU's hardware model is also based on the common model but has GPU-specific structures:
 
-**5. Memory Pipelining & Semaphore**
+**Memory Hierarchy**:
 
-Data movement between Remote Memory and Local Memory in TPU architecture causes latency of hundreds of cycles. To overcome this, Pallas supports pipelining using hardware-level semaphores.
+- **Local Memory is Shared Memory (SMEM)**: Each Streaming Multiprocessor (SM) has independent Shared Memory/L1 Cache space. Unlike TPU, it's a unified workspace without Scalar/Vector distinction. Numerous threads access this space simultaneously for parallel operations.
 
-**Hardware Role of Semaphore**: Acts as a **traffic light** between data movement (DMA) and compute units. It hardware-checks "Has data loading completed?" or "Has computation finished and space become available?" to ensure two tasks safely overlap execution.
+**Data Flow and Pipelining**:
 
-**Double Buffering**: Allocates two buffers (e.g., Buffer 0, Buffer 1) within Local Memory. **While VPU computes Buffer 0, DMA prefetches next data from HBM to Buffer 1**. As this process repeats, memory latency is completely hidden behind computation time.
+- Unlike existing methods that rely only on hardware scheduling, Pallas GPU explicitly **overlaps HBM (Remote) → SMEM (Local) data loading with TensorCore operations**. Through `plgpu.emit_pipeline`, etc., compute units process current data while data for the next grid is prefetched asynchronously. This hides memory latency.
 
-Semaphore is a **synchronization device** that coordinates two different engines—data transfer (DMA) and computation (VPU/TCS)—so they don't collide. Through `pltpu.semaphore`, it prevents problems like 'trying to read before data arrives (Read-before-ready)' or 'overwriting with new data while still computing (Write-over-active)' at the hardware level, realizing **Auto-Overlap**.
+- Ref variables inside kernels are addresses of data chunks on Local Memory (SMEM), not HBM. The data has already been loaded or will be loaded there. Through `memory_space=plgpu.GPUMemorySpace.GMEM`, HBM (Remote) space can be explicitly specified. You can control it directly with `copy_gmem_to_smem`.
 
-**3. Backend Lowering**
+---
 
-Kernels written in Pallas are eventually converted to hardware code. On GPUs, they are lowered through Triton or Mosaic GPU backends, while on TPUs, they are lowered through the Mosaic compiler to MLIR form and finally converted to hardware code.
+### Memory Pipelining and Semaphore
 
-During this process, operator fusion, tiling automation, and overlapping of data transfer and computation are optimized. The high-level code written by developers is transformed into hardware-optimized code.
+Data movement between HBM (Remote Memory) and VMEM (Local Memory) in TPU architecture causes latency of hundreds of cycles. MXU may perform matrix operations quickly. But if it has to wait for data to arrive, overall performance will be bottlenecked by memory. Pallas solves this with pipelining using hardware-level **Semaphores**.
 
-**4. Compatibility with JAX Transforms**
+> **Pallas Synchronization Mechanism: Semaphore-based Async Control**
 
-Pallas kernels are compatible with JAX transforms like `jit`, `vmap`, and `grad`. This is a major advantage, as you can still utilize features like automatic differentiation, mapping, and compilation while writing high-performance kernels.
+In Pallas, DMA and compute units operate independently. **Semaphores** are used to coordinate their speed difference. The mechanism works as a mutual signaling system:
+
+- **Data Load (Producer)**: When DMA completes loading data from external memory (HBM) to local memory (VMEM/SMEM), it increments (Signals) the semaphore value to indicate that data is ready.
+- **Compute (Consumer)**: Compute units check the semaphore value and wait until data is loaded. When the value is satisfied, they immediately start computation.
+- **Feedback Loop**: When computation completes, compute units Signal the semaphore again to notify DMA that the buffer is free, allowing it to load the next data.
+
+Through this Wait-Signal structure, data loading and computation are overlapped for execution, maximizing hardware utilization.
+
+&nbsp;
+
+> **Double Buffering: Key Technique for Hiding Latency**
+
+The most basic pipelining technique using semaphores is Double Buffering. Two buffers (Buffer 0, Buffer 1) are allocated within Local Memory, and they operate as follows:
+
+1. **Initialization**: DMA loads the first data into Buffer 0
+2. **Loop Start**: While VPU computes Buffer 0, DMA loads the next data into Buffer 1 **simultaneously**
+3. **Buffer Swap**: When both computation and load complete, roles switch—VPU works on Buffer 1, DMA loads into Buffer 0
+4. **Repeat**: This process continues until all data is processed
+
+As a result, **memory load time is completely hidden behind computation time**. Especially effective for compute-bound workloads where computation takes longer than data loading.
+
+Pallas allows explicit control of this synchronization through `pltpu.semaphore`. It prevents dangerous situations at the hardware level—'Read-before-ready (reading before data arrives)' or 'Write-over-active (overwriting during computation)'. The compiler automatically optimizes **Prefetch and Overlap**.
+
+---
+
+### Backend Lowering and JAX Integration
+
+![Pallas Programming Model Overall Structure: Python kernel flows through JAX Program Representation to Mosaic for TPU or Triton/Mosaic GPU for GPU lowering](images/09-pallas-lowering.png)
+
+Kernels written in Pallas are eventually converted to hardware code. On GPUs, they are lowered through Triton or Mosaic GPU backends. On TPUs, they are lowered through the Mosaic compiler to MLIR form and finally converted to hardware code. During this process, operator fusion, tiling automation, and overlapping of data transfer and computation are optimized. High-level code written by developers is transformed into hardware-optimized code.
+
+Pallas kernels are also compatible with JAX transforms like `jit`, `vmap`, and `grad`. You can write high-performance kernels while still utilizing automatic differentiation, mapping, and compilation. Pallas is more than a kernel language. It's a tool fully integrated with the JAX ecosystem.
 
 ---
 
 ## CUDA vs Pallas: Programming Model Comparison
 
-In part 1, we explored the CUDA programming model. Now let's compare CUDA and Pallas to clearly understand their characteristics and differences.
+We compare CUDA from part 1 with Pallas.
 
-### Abstraction Level and Approach
+### Key Comparison
 
-**CUDA**: A very low-level programming model close to hardware. Through a clear hierarchical structure of Thread, Warp, Block, and Grid, it allows direct control over hardware details. Developers must directly calculate thread IDs and carefully design memory access patterns.
+| Category | CUDA | Pallas |
+|:---:|:---|:---|
+| **Abstraction** | Thread-centric (Thread → Warp → Block → Grid) | Data-centric (Grid + BlockSpec + Ref) |
+| **Memory Control** | Explicit (`__shared__`, `__global__`) | Declarative (`memory_space`, auto mapping) |
+| **Synchronization** | Manual (`__syncthreads()`) | Automatic (semaphore-based pipelining) |
+| **Hardware** | NVIDIA GPU only | GPU + TPU support |
+| **Ecosystem** | Mature (Nsight, cuBLAS, cuDNN) | Experimental (JAX integration) |
+| **Language** | C/C++ | Python |
 
-**Pallas**: Provides one level higher abstraction than CUDA. Working in a Python environment, you only need to define how to divide data through Grid and BlockSpec, and the hardware automatically handles memory movement and scheduling. Developers can focus on "what data to place where."
+### Code Comparison: Vector Addition
 
-### Difference in Execution Units
-
-**CUDA's Execution Units**:
-- **Thread**: The minimum unit of parallel processing. Each thread has a unique thread ID and executes independently.
-- **Warp**: A hardware execution unit bundling 32 consecutive threads. Executes the same instruction simultaneously.
-- **Thread Block**: A group bundling up to 1024 threads. Shares Shared Memory and can synchronize with `__syncthreads()`.
-- **Grid**: The entire unit of kernel execution. A collection of all thread blocks.
-
-**Pallas's Execution Units**:
-- **Grid**: An abstraction specifying the iteration space for parallel execution. A `(4, 5)` grid means 20 work units.
-- **BlockSpec**: Defines how to tile data and which memory space to place it in. The hardware automatically handles data movement.
-- **Ref**: A logical view of data blocks on Local Memory (SRAM). Accessing with `x_ref[...]` automatically loads to Register File.
-
-### Memory Hierarchy Control
-
-**CUDA**:
-- Developers must explicitly specify memory spaces: `__global__`, `__shared__`, `__device__`, etc.
-- Must directly manage Shared Memory allocation and usage.
-- Requires deep understanding of hardware structure to optimize memory access patterns.
-
-**Pallas**:
-- Specifies memory space through `memory_space` parameter, but hardware automatically optimizes.
-- Automatically maps to VMEM/SMEM on TPU and Shared Memory on GPU.
-- Can declaratively define data tiling and memory movement through BlockSpec.
-
-### Hardware Target and Portability
-
-**CUDA**:
-- NVIDIA GPU exclusive.
-- Optimization methods may vary depending on GPU architecture (e.g., Hopper, Blackwell).
-- However, the CUDA ecosystem is very mature with rich tools and libraries.
-
-**Pallas**:
-- Supports both GPU and TPU.
-- Flexibility to run the same kernel definition on multiple hardware platforms.
-- However, still in experimental stage, so some features may be limited.
-
-### Development Convenience and Learning Curve
-
-**CUDA**:
-- Low-level language based on C/C++.
-- Must deeply understand hardware structure to achieve optimal performance.
-- Steep learning curve but provides complete control.
-
-**Pallas**:
-- Python-based, naturally integrated with the JAX ecosystem.
-- Compatible with JAX transforms like `jit`, `vmap`, `grad`.
-- Relatively easy to start, but still requires hardware understanding for optimal performance.
-
-### Practical Usage Example Comparison
-
-Comparing simple vector addition implemented in CUDA and Pallas clearly shows the difference.
-
-**CUDA Approach**:
+**CUDA** - Direct thread ID calculation, boundary check required:
 ```cuda
 __global__ void vector_add(float *A, float *B, float *C, int N) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < N) {
-        C[idx] = A[idx] + B[idx];
-    }
+    if (idx < N) C[idx] = A[idx] + B[idx];
 }
 ```
 
-**Pallas Approach**:
+**Pallas** - Data block-level abstraction:
 ```python
 def vector_add_kernel(a_ref, b_ref, c_ref):
     c_ref[...] = a_ref[...] + b_ref[...]
 
-result = pl.pallas_call(
-    vector_add_kernel,
-    out_shape=jax.ShapeDtypeStruct((N,), dtype),
-    grid=(N,),
-)(a, b)
+result = pl.pallas_call(vector_add_kernel, out_shape=..., grid=(N,))(a, b)
 ```
+> This is a conceptual example. For actual execution, `out_shape` and `BlockSpec` must be completed.
 
-In CUDA, you must directly calculate thread IDs and perform boundary checks, while Pallas abstracts at the data block level.
+### Selection Guide
 
-### When to Use What?
-
-**Choose CUDA when**:
-- Maximum performance is needed on NVIDIA GPUs
-- Need fine-grained control over complex custom algorithms
-- Want to leverage the rich tools and libraries of the CUDA ecosystem
-
-**Choose Pallas when**:
-- Need to support both GPU and TPU
-- Want a workflow integrated with the JAX ecosystem
-- Want to quickly prototype in a Python environment
-- Want to utilize automatic differentiation or other JAX transforms
+| Choose CUDA | Choose Pallas |
+|:---|:---|
+| Maximum performance on NVIDIA GPU needed | GPU/TPU portability needed |
+| Production stability important | Quick prototyping |
+| Leverage existing CUDA codebase | Leverage JAX ecosystem (`jit`, `vmap`, `grad`) |
+| Mature debugging/profiling tools needed | Writing TPU custom kernels |
 
 ---
 
 ## How Pallas is Used on TPU
 
-### Ironwood and Pallas
+In the latest TPU generation, Ironwood, Pallas is centered with the slogan "Extreme performance: Custom kernels via Pallas." In the Ironwood stack, Pallas definitions allow developers to directly describe strategies for memory tiling, data movement, and MXU utilization within Python. The Mosaic compiler lowers this to TPU code.
 
-In the latest TPU generation, Ironwood, Pallas is emphasized with the slogan "Extreme performance: Custom kernels via Pallas." In the Ironwood stack, developers can directly specify strategies for memory tiling, data movement, and MXU utilization through Pallas definitions, and the Mosaic compiler lowers this to TPU code.
+Through this combination, tiling strategies like input stationary, weight stationary, and output stationary can be efficiently designed. Distributed processing at stride and batch levels can be designed efficiently as well. HBM ↔ on-chip memory data transfer can be overlapped with MXU computation. Designs that minimize scheduling bottlenecks in the entire pipeline are also possible.
 
-Through this combination, tiling strategies like input stationary, weight stationary, and output stationary, as well as distributed processing at stride and batch levels, can be efficiently designed. Additionally, it enables designs that minimize scheduling bottlenecks in the entire pipeline by overlapping HBM ↔ on-chip memory data transfer and MXU computation simultaneously.
+- **Maximum Performance Potential**: Memory access patterns and tiling strategies are often difficult for automatic compilers to discover. By adjusting them explicitly, you can create very fast kernels.
 
-### Real-World Use Cases
+- **Hardware Abstraction Maintained**: You still work within the Python language and JAX ecosystem. You can use features like `jit` and `grad` as-is.
 
-Pallas is primarily used in the following cases:
-
-- **Complex Attention Mechanisms**: Cutting-edge attention algorithms like Flash Attention have complex memory access patterns that are difficult for automatic compilers to optimize. Using Pallas, you can efficiently implement them by directly controlling the memory hierarchy.
-
-- **MoE (Mixture of Experts)**: In MoE models, expert routing logic has high data dependencies, making it difficult to optimize at compile time. Using Pallas, dynamic routing can be handled efficiently.
-
-- **Sparse Operations**: For sparse matrix operations or ragged tensors, padding may change dynamically or irregular memory access may be required. Pallas is also useful in these cases.
-
----
-
-## Notable Technical Benefits and Considerations
-
-### Benefits
-
-**Maximum Performance Potential**: By explicitly adjusting memory access patterns and tiling strategies that are difficult for automatic compilers to discover, very fast kernels can be created.
-
-**Hardware Abstraction Maintained**: You still work within the Python language and JAX ecosystem, and can use features like `jit` and `grad` as-is.
-
-**Multi-Backend Support**: Supports both GPUs and TPUs, providing flexibility to run the same kernel definition on multiple hardware platforms.
+- **Multi-Backend Support**: Supports both GPUs and TPUs, providing flexibility to run the same kernel definition on multiple hardware platforms.
 
 ### Considerations
 
-**Experimental API**: Pallas is still in an experimental stage with frequent changes. Breaking changes may occur with version updates, and some features may be incomplete or throw "unimplemented" errors.
+- **Experimental Stage**: Pallas is still in an experimental stage with frequent changes. Breaking changes may occur with version updates. Some features may be incomplete or throw "unimplemented" errors.
 
-**Learning Curve**: You need to understand details like memory hierarchy, tiling, and data transfer. Poorly designed kernels can actually cause performance loss.
+- **Practical Portability**: While Pallas has backends for both GPU and TPU platforms, identical code does not run optimally on both systems. Pallas's portability today is closer to functional compatibility.
 
-**Need for Debugging and Optimization Tools**: Optimization is difficult without profiling, metrics, and system-level observation tools. It's not yet as mature as GPU's CUDA tools.
+- **Need for Debugging and Optimization Tools**: Tools for detailed analysis of MXU utilization, memory bandwidth utilization, etc. are lacking compared to the CUDA ecosystem.
+
+- **Adoption Barrier**: If you have only GPUs without TPUs, using Triton with PyTorch is more practical. Pallas, which is JAX-based and typically requires GCP for TPU access, is difficult to adopt in the general ML stack (PyTorch + AWS or on-premise servers).
 
 ---
 
 ## Conclusion
 
-As the saying goes, "Know your enemy, know yourself"—by understanding and responding to hardware (especially TPU) through Pallas, it can become a weapon in the performance war.
+In this article, we explored the **Pallas** programming model that enables writing custom kernels on TPU.
 
-Pallas is an important tool that bridges the gap between automated compilation stacks and research or production performance. The combination of Ironwood and the Mosaic compiler enables more effective processing of complex operations required by new generations of models on TPU.
+First, we examined how TPU's Systolic Array structure differs from CPU/GPU. We also looked at how these hardware characteristics affect the programming model. TPU adopts a tensor-centric execution model. It has the structural feature of performing the entire operation sequence through a single data load.
 
-As more operators with non-standard memory access and high data dependencies—like attention, MoE, and sparse operations—emerge, the importance of such custom kernel capabilities will only grow.
+Pallas emerged to address areas difficult for the XLA compiler to automatically optimize. It enables direct control over hardware memory hierarchy and data tiling through the key abstractions of Grid, BlockSpec, and Ref. It provides memory models tailored to TPU and GPU (e.g., TPU's VMEM/SMEM, GPU's Shared Memory). It maintains an abstraction level that's relatively easy to use in a Python environment.
 
-In the next article, we'll actually write a simple kernel using Pallas and compare performance, experiencing "know your enemy" in practice.
+Through comparison with CUDA, we confirmed that Pallas provides a higher level of abstraction while maintaining hardware control. We also saw how Pallas has become a key tool for "Extreme performance" in the Ironwood generation.
+
+Pallas is an important tool that bridges the gap between automated compilers and manual optimization. It enables efficient handling of the complex memory access patterns required by cutting-edge algorithms. As non-standard operation patterns like Flash Attention, MoE, and sparse operations become increasingly important, the role of custom kernel tools like Pallas will only grow.
 
 ---
 
@@ -372,6 +366,6 @@ In the next article, we'll actually write a simple kernel using Pallas and compa
 
 "Know your enemy, know yourself," but to win every battle, we need many talented people!
 
-If you're interested in the technologies we work with, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
+If you're interested in the technologies we work with, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/en/guide)!
 
 HyperAccel has many excellent and brilliant engineers. We're waiting for your application.
