@@ -71,7 +71,7 @@ TPU 내에서의 연산은 다음과 같은 흐름을 가집니다:
 이러한 구조적 차이는 프로그래밍 모델의 관점에서 매우 큰 차이를 만듭니다.
 
 - **GPU (Single Instruction Multiple Thread, SIMT)**: 수많은 스레드가 독립적으로 계산을 수행하며, 32개의 스레드를 워프(Warp) 단위로 묶어 관리합니다. 데이터 하나하나에 집중하는 세밀한 병렬 처리가 특징입니다.
-- **TPU (Single Instruction Multiple Data, SPMD)**: 한 번의 데이터 로드로 전체 연산 시퀀스를 끝내버립니다. 즉, 개별 스레드가 아닌 **'텐서(또는 타일) 하나에 대한 전체 프로그램'을 하나의 최소 실행 단위** 로 간주합니다.
+- **TPU (Single Program Multiple Data, SPMD)**: 한 번의 데이터 로드로 전체 연산 시퀀스를 끝내버립니다. 즉, 개별 스레드가 아닌 **'텐서(또는 타일) 하나에 대한 전체 프로그램'을 하나의 최소 실행 단위** 로 간주합니다.
 
 > **Why Pallas?** Pallas는 TPU의 하드웨어적 특성(Unified Buffer 직접 제어, MXU 스케줄링 등)을 추상화하면서도, 개발자가 직접 '텐서 단위의 흐름'을 최적화할 수 있도록 설계된 언어입니다.
 
@@ -111,7 +111,7 @@ Pallas는 세 가지 핵심 추상화를 통해 하드웨어를 제어합니다:
 
 ![Grid와 Program ID: Grid는 병렬 실행의 반복 공간을 지정하며, 각 프로그램은 고유한 program_id를 가집니다](images/04-grid-and-block.png)
 
-Pallas는 **Grid** 라는 추상화를 통해 실행 단위를 모델링합니다. Grid는 하드웨어별로 다른 의미를 가지지만, 통일된 인터페이스를 제공합니다.
+Pallas는 **Grid** 라는 추상화를 통해 커널의 반복 실행 공간을 정의합니다. Grid는 커널 함수가 **몇 번, 어떤 구조로 호출될지**를 지정하는 launch configuration입니다. Grid의 각 점은 고유한 `program_id`를 가진 하나의 프로그램 인스턴스에 대응되며, 이 프로그램 인스턴스가 실제로 어떤 하드웨어 단위에서 실행되는지는 백엔드에 따라 달라집니다.
 
 ```python
 def kernel(o_ref):
@@ -126,15 +126,15 @@ result = pl.pallas_call(
 )()
 ```
 
-Pallas에서 **Grid** 는 전체 작업을 잘게 쪼갠 실행 단위들의 집합입니다. 다만 하드웨어가 이 Grid를 처리하는 방식은 아키텍처에 따라 근본적인 차이가 있습니다.
+즉 `grid=(8,)`이면 커널 함수가 8개의 프로그램 인스턴스로 실행되고(`program_id`: 0~7), `grid=(4, 4)`이면 16개(4×4)의 인스턴스로 실행됩니다. CUDA에서 `<<<gridDim, blockDim>>>`으로 론칭 크기를 지정하는 것과 유사한 개념입니다. 다만 각 프로그램 인스턴스가 하드웨어의 **어떤 단위에 매핑**되는지는 아키텍처에 따라 근본적인 차이가 있습니다.
 
 &nbsp;
 
 > **GPU에서의 Grid**
 
-GPU 백엔드(Triton/Mosaic)에서 Grid는 하드웨어 스케줄러에 의한 **완전 병렬 실행** 을 전제로 합니다. 각 Grid 아이템은 하나의 **스레드 블록(Thread Block)** 에 매핑되어 개별 Streaming Multiprocessor(SM)에서 독립적으로 실행됩니다.
+GPU 백엔드(Triton/Mosaic)에서 Grid는 하드웨어 스케줄러에 의한 **완전 병렬 실행** 을 전제로 합니다. 각 프로그램 인스턴스(Grid의 각 점)는 하나의 **스레드 블록(Thread Block)** 에 매핑되어 개별 **Streaming Multiprocessor(SM)** 에서 독립적으로 실행됩니다. 예를 들어 `grid=(8,)`이면 8개의 스레드 블록이 생성되어, GPU의 SM들에 분산 배치됩니다.
 
-하드웨어가 비결정적으로 스레드를 스케줄링하므로 Grid 간의 실행 순서가 보장되지 않습니다. 따라서 개발 시 `BlockSpec`의 `index_map` 설계에서 서로 다른 프로그램이 동일한 High Bandwidth Memory(HBM) 위치에 쓰지 않도록 경쟁 조건(Race condition)을 엄격히 관리해야 합니다.
+하드웨어가 비결정적으로 스레드를 스케줄링하므로 프로그램 인스턴스 간의 실행 순서가 보장되지 않습니다. 따라서 개발 시 `BlockSpec`의 `index_map` 설계에서 서로 다른 프로그램이 동일한 High Bandwidth Memory(HBM) 위치에 쓰지 않도록 경쟁 조건(Race condition)을 엄격히 관리해야 합니다.
 
 &nbsp;
 
@@ -142,11 +142,12 @@ GPU 백엔드(Triton/Mosaic)에서 Grid는 하드웨어 스케줄러에 의한 *
 
 ![TPU에서의 Grid와 Block: TPU 백엔드에서 Grid가 어떻게 병렬성과 파이프라이닝을 조합하는지 보여주는 다이어그램](images/05-grid-block-in-tpu.png)
 
-TPU 백엔드에서 Grid는 다중 코어 간의 병렬성과 단일 코어 내의 **순차적 파이프라이닝** 을 조합한 모델입니다. 
+TPU 백엔드에서 Grid는 다중 코어 간의 병렬성과 단일 코어 내의 **순차적 파이프라이닝** 을 조합한 모델입니다. Grid 차원은 두 종류로 나뉩니다:
 
-TPU는 매우 넓은 SIMD 머신이지만, 소프트웨어적으로는 **단일 스레드 프로세서** 처럼 코딩할 수 있습니다. Tensor Control System(TCS)이 루프를 돌며 전체 연산을 제어하는 직관적인 흐름을 제공합니다.
+- **Parallel 차원**: 프로그램 인스턴스가 여러 **TensorCore에 분산**되어 물리적으로 동시에 실행됩니다. 예를 들어 `grid=(2, 8)` 에서 첫 번째 차원이 Parallel이면, 2개의 TensorCore가 각각 독립적으로 작업을 처리합니다.
+- **Sequential 차원**: 하나의 TensorCore 내에서 프로그램 인스턴스가 **순차적으로 루프를 돌며** 실행됩니다. 위 예시에서 두 번째 차원이 Sequential이면, 각 TensorCore가 8번의 반복을 직렬로 수행합니다.
 
-여러 개의 TensorCore가 있을 경우 작업을 분산하여 **물리적으로 동시에** 실행하는 Parallel 차원과, 단일 TensorCore 내에서 **직렬 실행** 을 보장하는 Sequential 차원이 있습니다.
+TPU는 매우 넓은 SIMD 머신이지만, 소프트웨어적으로는 **단일 스레드 프로세서** 처럼 코딩할 수 있습니다. Tensor Control System(TCS)이 Sequential 차원의 루프를 돌며 전체 연산을 제어하는 직관적인 흐름을 제공합니다.
 
 Sequential 차원은 단순히 느리게 실행하는 것이 목적이 아닙니다. **세마포어(Semaphore)** 를 통해 현재 연산과 다음 데이터의 로드를 중첩(Overlap)시켜 **메모리 레이턴시를 숨기기 위한 전략적 수단** 으로 사용됩니다.  
 &nbsp;
@@ -202,7 +203,7 @@ TPU의 하드웨어 모델은 공통 모델을 기반으로 하되, TPU만의 �
 
 - **Local Memory** 는 Vector Memory와 Scalar Memory로 분리되어 있습니다:
   - **Vector Memory(VMEM)**: Vector 및 Matrix 관련 연산을 위한 데이터를 저장하는 메모리입니다. 동일 텐서 코어 내의 Vector/Matrix Unit (VPU/MXU/XLU)에서 접근 가능합니다.
-  - **Scalar Memory(SMEM)**: Logic flow(loop, condition 등)를 위한 scalar 연산 관련 데이터를 저장하는 메모리입니다. 동일 텐서 코어 내의 Scalar Unit (TCS)에서 접근 가능합니다. TCS에서 생성하는 고수준의 명령을 통해 SMEM 상에 저장된 데이터를 벡터 연산에 직접 사용할 수도 있습니다.
+  - **Scalar Memory(SMEM)**: Logic flow(loop, condition 등)를 위한 scalar 연산 관련 데이터를 저장하는 메모리입니다. 동일 텐서 코어 내의 Scalar Unit (TCS)에서 접근 가능합니다. TCS에서 생성하는 고수준의 명령을 통해 SMEM 상에 저장된 데이터를 벡터 연산에 직접 사용할 수도 있습니다. 예를 들어, SMEM에 저장된 스케일링 팩터 같은 scalar 값을 TCS가 벡터 파이프라인에 브로드캐스트하여, VMEM으로 별도 복제 없이 벡터 전체에 곱셈을 수행할 수 있습니다.
 
 - 각 VMEM과 SMEM에는 READ/WRITE를 위한 영역을 따로 배치하여 HBM과의 data sync를 확보합니다. READ로 불러와진 데이터를 수정 시 다시 write-back을 안 하기 때문에 HBM과의 데이터 불일치가 발생할 수 있어서입니다.
 
@@ -253,7 +254,7 @@ Pallas에서 DMA와 연산 유닛은 서로 독립적으로 작동하며, 이들
 
 > **Double Buffering: 레이턴시를 숨기는 핵심 기법**
 
-세마포어를 활용한 가장 기본적인 파이프라이닝 기법이 Double Buffering입니다. Local Memory 내에 두 개의 버퍼(Buffer 0, Buffer 1)를 할당하고, 다음과 같이 동작합니다:
+세마포어를 활용한 가장 기본적인 파이프라이닝 기법이 Double Buffering입니다. 우선 Local Memory(TPU에서는 주로 VMEM) 내에 두 개의 버퍼(Buffer 0, Buffer 1)를 서로 다른 SRAM 주소에 독립적으로 할당합니다. 동작 예시를 들자면 할당한 두개의 버퍼 중 한쪽 영역에는 DMA가 접근하여 버퍼 쓰기 동작 등을 수행하고, 다른 한쪽에는 Compute가 각각 접근하여 연산을 수행하는 등의 방식으로 동작하며, Pallas 컴파일러가 루프 인덱스에 따라 DMA와 Compute 연산이 향하는 포인터를 교대로 스위칭합니다.
 
 1. **초기화**: DMA가 첫 번째 데이터를 Buffer 0에 로드
 2. **루프 시작**: VPU가 Buffer 0을 연산하는 **동시에**, DMA는 다음 데이터를 Buffer 1에 로드

@@ -69,7 +69,7 @@ Operations within TPU follow this flow:
 This structural difference creates a very significant difference from a programming model perspective.
 
 - **GPU (Single Instruction Multiple Thread, SIMT)**: Numerous threads perform calculations independently, managed in groups of 32 threads called Warps. It features fine-grained parallel processing focused on individual data.
-- **TPU (Single Instruction Multiple Data, SPMD)**: A single data load completes the entire operation sequence. That is, rather than individual threads, **'the entire program for one tensor (or tile)' is considered as one minimum execution unit**.
+- **TPU (Single Program Multiple Data, SPMD)**: A single data load completes the entire operation sequence. That is, rather than individual threads, **'the entire program for one tensor (or tile)' is considered as one minimum execution unit**.
 
 > **Why Pallas?** Pallas is a language designed to abstract TPU hardware characteristics (direct Unified Buffer control, MXU scheduling, etc.) while allowing developers to directly optimize this 'tensor-level flow'.
 
