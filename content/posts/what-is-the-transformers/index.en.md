@@ -11,10 +11,9 @@ authors: [Hyunjun Park]
 tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache"]
 categories: ["AI", "Deep Learning"]
 summary: 'A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques.'
+description: 'A step-by-step walkthrough of Transformer-based LLM internals: the role of Token Embedding, Attention, LM Head, and optimization techniques such as KV Cache, MHA, and GQA.'
 comments: true
 ---
-
-# Transformer World: A Deep Dive into the Building Blocks of LLMs
 
 Hi, I'm Hyunjun Park from the HyperAccel ML Team. Since ChatGPT launched in November 2022, AI technology has been advancing at an exponential pace, with new AI tools emerging almost every day.
 
@@ -24,7 +23,7 @@ In hardware, Moore's Law states that chip transistor density doubles every two y
 
 ![AI tools examples](images/AI_tools.png)
 
-I believe that to use any tool well, you need to understand how it works in detail. In this post, we'll first explore the background behind the Transformer, then understand how it works, and finally examine the bottlenecks and a few fundamental optimization techniques to address them.
+I believe that to use any tool well, you need to understand how it works in detail. In this post, we first explore the background behind the Transformer. Then we look at how it works, and finally examine the bottlenecks and a few fundamental optimization techniques to address them.
 
 ## Part 1: Background
 
@@ -145,7 +144,7 @@ For example, consider running **LLaMA-3-70B** with **bfloat16 (bf16)** at a 1-mi
 
 ### KV Cache Architecture Comparison (MHA, MQA, GQA, MLA)
 
-There are four main approaches depending on how KV is stored and shared: MHA, MQA, GQA, and MLA. The core trade-off is between **accuracy (expressiveness)** and **KV cache size (memory/bandwidth)**. A paper that visually illustrates these differences well is attached below. (https://arxiv.org/pdf/2503.11486)
+There are four main approaches depending on how KV is stored and shared: MHA, MQA, GQA, and MLA. The core trade-off is between **accuracy (expressiveness)** and **KV cache size (memory/bandwidth)**. A [paper](https://arxiv.org/pdf/2503.11486) that visually illustrates these differences well is attached below.
 
 ![KV Cache architecture comparison (MHA, MQA, GQA, MLA)](images/kv_cache.png)
 
