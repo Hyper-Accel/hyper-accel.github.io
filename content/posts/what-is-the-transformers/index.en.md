@@ -10,7 +10,7 @@ cover:
 authors: [Hyunjun Park]
 tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache"]
 categories: ["AI", "Deep Learning"]
-summary: 'A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques.'
+summary: "A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques."
 description: 'A step-by-step walkthrough of Transformer-based LLM internals: the role of Token Embedding, Attention, LM Head, and optimization techniques such as KV Cache, MHA, and GQA.'
 comments: true
 ---
@@ -78,7 +78,7 @@ Let's use the word **tower** as an example. Right after embedding, it gets a vec
 
 #### Q, K, V Generation and Intuitive Meaning
 
-GPT-2 Medium accepts at most 1024 input tokens. Since each token is converted to a vector of size 1024, the Attention input is at most [1024, 1024] (= [seq_len, N_embed]). We multiply this by three different **weight matrices** W_Q, W_K, W_V to produce the **Query (Q)**, **Key (K)**, and **Value (V)** matrices. The embedding dimension (N_embed=1024) is split into the number of heads (N_head=16) and per-head dimension (head_dim=64), so each of Q, K, V has shape [N_position, N_head, head_dim].
+GPT-2 Medium accepts at most 1024 input tokens. Since each token is converted to a vector of size 1024, the Attention input is at most [1024, 1024] (= [seq_len, N_embed]). We multiply this by three different **weight matrices** W_Q, W_K, W_V to produce the **Query (Q)**, **Key (K)**, and **Value (V)** matrices. The embedding dimension (N_embed=1024) is split into the number of heads (N_head=16) and per-head dimension (head_dim=64), so each of Q, K, V has shape [seq_len, N_head, head_dim].
 
 ![Query, Key, Value generation](images/qkv.png)
 
@@ -96,7 +96,7 @@ After this update, **is**'s vector now condenses the context "greeting + my + na
 
 We mentioned earlier that there are N_head heads. Within a single head, both Q and K have shape [N_position, head_dim]. By transposing K to Kᵀ [head_dim, N_position] and computing **Score = Q · Kᵀ**, we get an [N_position, N_position] matrix. Rows represent "the token holding the current Query," columns represent "all referenceable positions," and element (i, j) is the score for how important token i considers token j. The more aligned the Query and Key vectors are, the larger the dot product.
 
-Just as humans read text from left to right, Attention must ensure that **future tokens cannot see past tokens**. This is achieved through **masking**: setting scores at "positions after me" to −∞ before Softmax. After Softmax, these become 0, preventing later tokens from influencing earlier ones — in other words, blocking "future tokens from modifying past tokens."
+Just as humans read text from left to right, Attention must ensure that **past tokens cannot see future tokens**. This is achieved through **masking**: setting scores at "positions after me" to −∞ before Softmax. After Softmax, these become 0, preventing later tokens from influencing earlier ones — in other words, blocking "future tokens from modifying past tokens."
 
 #### Softmax & Value Weighted Sum
 
