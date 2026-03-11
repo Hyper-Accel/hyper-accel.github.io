@@ -37,22 +37,15 @@ In 2017, a Google research team published a paper titled **"Attention Is All You
 
 Mathematically, a **Large Language Model (LLM)** is "a sophisticated mathematical function that predicts the next word given some text." Rather than deterministically picking a single word, it assigns a **probability** to every possible next word. Because it samples from this probability distribution each time, the same question can produce different answers on different runs. Training is the process of making these predictions increasingly accurate by processing enormous amounts of text.
 
-Imagine someone asking an LLM to write a short movie script. The user feeds a prompt to the LLM — a "magic machine that plausibly predicts the next word for any given sentence." We feed the script so far into the machine, append the predicted word, feed it back in, and repeat. This is exactly what happens when we chat with a chatbot.
+In practice, an LLM is a "magic machine that plausibly predicts the next word for any given sentence." Imagine someone asking an LLM to write a short movie script. The user feeds a prompt to the LLM; this magic machine then repeatedly appends the predicted word and feeds the result back in until the script is complete. This is exactly what happens when we chat with a chatbot.
 
 ## Part 2: Breaking Down the Transformer
 
 ### Architecture Overview
 
-Although details vary by model, we'll use the simplest model — **GPT-2** — as our reference. A Transformer can be divided into three major stages: Token Embedding, Decoder Block, and LM Head. The Decoder Block is typically a stack of n identical blocks (24 in GPT-2's case). Each block can be further broken down into six steps:
+Although details vary by model, we'll use the simplest model — **GPT-2** — as our reference. A Transformer can be divided into three major stages: Token Embedding, Decoder Block, and LM Head. The Decoder Block is typically a stack of n identical blocks (24 in GPT-2's case). Each block can be further broken down into six steps. This is illustrated in the figure below.
 
 ![Transformer architecture (GPT-2)](images/transformer_architecture.png)
-
-1. **Layer Normalization**
-2. **Multi-Head Attention**
-3. **Residual Connection**
-4. **Layer Normalization**
-5. **Feed-Forward Network (FFN)**
-6. **Residual Connection**
 
 ### Token & Positional Embedding
 
@@ -73,6 +66,8 @@ The **Word Positional Embedding Table (WPE)** has shape [1024, 1024], mapping ea
 ### Self-Attention: The Meaning of Query, Key, and Value
 
 #### The Problem Attention Solves: Context-Dependent Meaning
+
+![Eiffel Tower](images/eiffel_tower.png)
 
 Let's use the word **tower** as an example. Right after embedding, it gets a vector pointing in the general direction of "tall structure." But if **Eiffel** appears right before it, that vector gets updated toward "Eiffel Tower." If **miniature** is added further before, the association with "large" weakens and the meaning becomes more specific. Information transfer between tokens can span long distances and capture rich context. To predict the next word in "Therefore the murderer was..." at the end of a mystery novel, the last vector **was** must absorb context from the entire preceding text. Attention computes exactly "which token should attend to which other token, and by how much."
 
@@ -176,9 +171,20 @@ K, V are compressed (projected) into low-dimensional **latent** vectors, and Att
 - **Pros**: By compressing KV cache to a much smaller latent dimension, memory efficiency surpasses even GQA. At the same time, independent Q per head is maintained, avoiding significant loss of expressiveness.
 - **Cons**: Additional computation for latent projection (compression/decompression matrix multiplications) is required, and implementation complexity is high. Information loss can occur during compression, so the compression ratio must be carefully tuned.
 
+#### When to Use Which (Situational Guide)
+
+The four approaches above are not "one size fits all" — the choice depends on **context length, memory, quality requirements, and implementation environment**. In a fast-moving LLM ecosystem, older design choices are often forgotten, while hearing only "GQA is the norm" can make it unclear why MHA or MQA might still be the right call. Below is a guide to **when each approach is worth considering**.
+
+- **MHA** — When context is short (e.g., hundreds to a few thousand tokens) and **accuracy and expressiveness** are the top priority. It still makes sense for small research or experimental models, or services where KV cache pressure is relatively low. It was the default in the early Transformer, GPT-3, and LLaMA 1/2 era, and is the one to consider when you want to keep the "one independent K, V per head" design.
+- **MQA** — When **memory and bandwidth are severely constrained** and you need very long context or large batch sizes. With a single shared K, V for all Query heads (as in PaLM, Falcon, StarCoder), cache is minimal. Expressiveness can lag behind MHA and GQA, so it suits deployments where throughput and scale matter more than marginal quality gains.
+- **GQA** — When you need a **balance of accuracy and efficiency in general production**. Adopted by most modern open LLMs (LLaMA-2-70B, LLaMA-3, Mistral, etc.). If unsure which to pick, default to GQA and consider MQA or MLA only when context is extremely long or memory is critically limited.
+- **MLA** — When you need **long context and memory efficiency** together and want more aggressive cache reduction than GQA. Compressing K, V into a latent space (as in DeepSeek-V2/V3) adds implementation and tuning cost, but fits the goal of "keeping per-head Q while shrinking cache." Best considered by teams with enough infrastructure and experimentation bandwidth.
+
+In short, no single tuning choice is always correct — it only makes sense **in the right situation**. Keeping in mind that short conversational services and million-token document services may each benefit from a different architecture helps when making these trade-offs.
+
 ### Summary
 
-In this post, we explored how LLMs work and the meaning of each operation that makes up an LLM, with appropriate analogies. To recap: the Transformer architecture consists of three major stages — Token Embedding, Decoder Block, and LM Head — and the Decoder Block can be further broken down into LayerNorm, Attention, Residual, LayerNorm, FFN, and Residual. Finally, we compared the O(N²) cost with context length, KV cache memory/bandwidth issues, and fundamental architectural variations like MHA, MQA, GQA, and MLA designed to address them.
+In this post, we explored how LLMs work and the meaning of each operation that makes up an LLM, with appropriate analogies. To recap: the Transformer architecture consists of three major stages — Token Embedding, Decoder Block, and LM Head — and the Decoder Block can be further broken down into LayerNorm, Attention, Residual, LayerNorm, FFN, and Residual. Finally, we compared the O(N²) cost with context length, KV cache memory/bandwidth issues, fundamental architectural variations like MHA, MQA, GQA, and MLA, and **when to consider each approach**.
 
 ## Reference
 https://arxiv.org/pdf/2209.10797
