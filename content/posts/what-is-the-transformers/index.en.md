@@ -135,7 +135,7 @@ Congratulations! If you've followed along this far, you've grasped the full basi
 
 The most important operation from Part 2 is undoubtedly Attention. The Score matrix produced by multiplying Query and Key has size proportional to the **square of the context size**. With N tokens, it's an N×N matrix, so computation and memory grow rapidly as context lengthens. During inference, previously computed **Key** and **Value** are stored in a **KV cache** for reuse, but as context grows, this cache becomes enormous, making context length, memory, and bandwidth major bottlenecks.
 
-For example, consider running **LLaMA-3-70B** with **bfloat16 (bf16)** at a 1-million-token context. Model parameters: 70B × 2 bytes ≈ 140 GB. The KV cache works out to roughly 2 (K,V) × batch 1 × 80 layers × 8 KV heads × 128 head_dim × 1M sequence × 2 bytes ≈ 328 GB. The total memory that must be read to generate one token is about 468 GB (model + KV cache), and generating 20 tokens per second would theoretically require ~10 TB/s of memory bandwidth.
+For example, consider running **LLaMA-3-70B** with **bfloat16 (bf16)** at a 1-million-token context. Model parameters: 70B × 2 bytes ≈ 140 GB. The KV cache works out to roughly 2 (K,V) × batch 1 × 80 layers × 8 KV heads × 128 head_dim × 1M sequence × 2 bytes ≈ 328 GB. The total memory that must be read to generate one token is about 468 GB (model + KV cache), and generating 20 tokens per second would theoretically require ~10 TB/s of memory bandwidth. Considering that NVIDIA's latest B100 GPU has a maximum memory bandwidth of 8 TB/s and only 192 GB of memory, this gives a sense of the scale involved.
 
 ### KV Cache Architecture Comparison (MHA, MQA, GQA, MLA)
 
