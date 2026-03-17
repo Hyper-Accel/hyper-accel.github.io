@@ -4,13 +4,14 @@ draft: false
 title: 'AITER 분석: AMD가 ROCm inference 성능을 2배로 올린 방법'
 cover:
   image: "images/mi300x-launch.jpg"
-  alt: "AITER 아키텍처 다이어그램"
-  caption: "AITER Architecture"
+  alt: "AMD Instinct MI300X 출시 행사"
+  caption: "AMD Instinct MI300X Launch Event"
   relative: true
 authors: [Minho Park]
 tags: [AMD, ROCm, AITER, inference, kernel, MI300X, GPU]
 categories: [report]
-summary: ['AMD GPU의 inference 성능을 끌어올린 AITER(AI Tensor Engine for ROCm)를 분석합니다. 4가지 커널 백엔드 전략, JIT 컴파일 파이프라인, 그리고 DeepSeek R1에서 2배 throughput 향상을 달성한 구조를 살펴봅니다.']
+summary: "AMD GPU의 inference 성능을 끌어올린 AITER(AI Tensor Engine for ROCm)를 분석합니다."
+description: "AMD가 ROCm inference 성능을 2배로 올린 AITER 커널 라이브러리를 분석합니다. 4가지 커널 백엔드 전략(Triton, CK, HIP, ASM), JIT 컴파일 파이프라인, 그리고 DeepSeek R1에서 2배 throughput 향상을 달성한 구조를 살펴봅니다."
 comments: true
 ---
 
@@ -18,7 +19,9 @@ comments: true
 
 안녕하세요? HyperAccel ML팀 소속 박민호입니다.
 
-반도체 업계에서 유명한 리서치 기관인 Semi Analysis 에서는 주요 GPU 의 inference 성능을 실측 비교하는 [InferenceX](https://inferencex.semianalysis.com) 벤치마크를 운영하고 있습니다. 2026년 2월에 공개된 [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) 보고서에 따르면, AMD MI300X 의 SGLang 성능이 2025년 12월에서 2026년 1월 사이 **거의 2배 가까이** 향상되었다고 합니다. 이 성능 향상의 중심에 **AI Tensor Engine for ROCm(AITER)** 이라는 커널 라이브러리가 있었습니다.
+Semi Analysis 는 반도체 업계에서 유명한 리서치 기관입니다. 이 기관은 주요 GPU 의 inference 성능을 실측 비교하는 [InferenceX](https://inferencex.semianalysis.com) 벤치마크를 운영하고 있습니다.
+
+2026년 2월에 공개된 [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) 보고서에 따르면, AMD MI300X 의 SGLang 성능이 2025년 12월에서 2026년 1월 사이 **거의 2배 가까이** 향상되었다고 합니다. 이 성능 향상의 중심에 **AI Tensor Engine for ROCm(AITER)** 이라는 커널 라이브러리가 있었습니다.
 
 ![AMD Instinct MI300X 출시 행사](./images/mi300x-launch.jpg)
 
@@ -195,7 +198,7 @@ AITER 에서는 GEMM(A8W8, A4W4, block-scale), MoE 2-stage, 일부 Attention 등
 
 **Heterogeneous-computing Interface for Portability(HIP)** 는 AMD 의 C++ 런타임 API 이자 커널 언어입니다. CUDA 의 AMD 대응물로, 대부분의 CUDA 커널 코드가 이름만 바꾸면 HIP 에서 동작합니다.
 
-```
+```text
 CUDA 개념              →  HIP 대응물
 ─────────────────────────────────────────
 cudaMalloc()           →  hipMalloc()
@@ -216,7 +219,7 @@ ASM 백엔드는 AMD GPU 의 machine code인 **AMDGCN Instruction Set Architectu
 
 왜 여기까지 내려가야 할까요? 고수준 컴파일러는 안전한 코드를 생성하는 대신 최적화 기회를 놓칩니다. ASM 은 GPU 의 **Matrix Fused Multiply-Add(MFMA)** instruction, 특수 레지스터, instruction pipelining을 100% 활용할 수 있습니다. 그 결과가 MLA Decode **17배**, MHA Prefill **14배** 향상입니다.
 
-```
+```text
 레지스터 타입:
   SGPR (Scalar GPR)  — control flow, constant (모든 스레드 공유)
   VGPR (Vector GPR)  — 데이터 operation (각 스레드별 독립 값)
@@ -231,7 +234,7 @@ ASM 백엔드는 AMD GPU 의 machine code인 **AMDGCN Instruction Set Architectu
 
 AITER 의 `hsa/` 디렉토리에는 **354개 이상의 사전 컴파일된 ASM 커널(.co 파일)** 이 있습니다. 이렇게 많은 인스턴스가 필요한 이유는 ASM 커널은 컴파일 타임에 모든 파라미터가 고정되기 때문입니다. 런타임 분기 없이 모든 가능한 조합을 사전 컴파일합니다.
 
-```
+```text
 head_dim:  {64, 128, 256}      → 3가지
 dtype:     {fp16, bf16, fp8}   → 3가지
 causal:    {true, false}       → 2가지
@@ -286,7 +289,7 @@ AITER 를 살펴보면서 눈에 띄었던 설계 패턴들을 정리합니다.
 
 하나의 커널 언어를 고집하지 않습니다. decode attention 에는 ASM, GEMM 에는 CK, MoE sorting 에는 Triton 을 사용합니다. unified compiler 전략과는 다른 접근입니다.
 
-### FP8 Block-scale quantization
+### FP8 Block-scale Quantization
 
 토큰별 (1x128) activation scale + weight별 (128x128) 스케일로 효율적인 mixed precision operation을 가능하게 합니다. 특히 DeepSeek 과 같은 MoE 아키텍처에서 큰 효과를 발휘합니다.
 

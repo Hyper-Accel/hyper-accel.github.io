@@ -4,13 +4,14 @@ draft: false
 title: 'AITER Analysis: How AMD Doubled ROCm Inference Performance'
 cover:
   image: "images/mi300x-launch.jpg"
-  alt: "AITER architecture diagram"
-  caption: "AITER Architecture"
+  alt: "AMD Instinct MI300X launch event"
+  caption: "AMD Instinct MI300X Launch Event"
   relative: true
 authors: [Minho Park]
 tags: [AMD, ROCm, AITER, inference, kernel, MI300X, GPU]
 categories: [report]
-summary: ['An analysis of AITER (AI Tensor Engine for ROCm), which boosts inference performance on AMD GPUs. We examine its four kernel backend strategies, JIT compile pipeline, and the architecture that achieved ~2× throughput improvement on DeepSeek R1.']
+summary: "An analysis of AITER (AI Tensor Engine for ROCm), which boosts inference performance on AMD GPUs."
+description: "An analysis of AMD's AITER kernel library that doubled ROCm inference performance. We examine its four kernel backend strategies (Triton, CK, HIP, ASM), JIT compile pipeline, and the architecture that achieved ~2× throughput improvement on DeepSeek R1."
 comments: true
 ---
 
@@ -18,7 +19,9 @@ comments: true
 
 Hello, I'm Minho Park from the HyperAccel ML team.
 
-Semi Analysis, a well-known semiconductor research firm, runs the [InferenceX](https://inferencex.semianalysis.com) benchmark, which measures and compares inference performance of major GPUs. According to the [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) report released in February 2026, AMD MI300X SGLang performance improved by **nearly 2×** between December 2025 and January 2026. At the center of this improvement was a kernel library called **AI Tensor Engine for ROCm (AITER)**.
+Semi Analysis is a well-known semiconductor research firm. They run the [InferenceX](https://inferencex.semianalysis.com) benchmark, which measures and compares inference performance of major GPUs.
+
+According to the [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) report released in February 2026, AMD MI300X SGLang performance improved by **nearly 2×** between December 2025 and January 2026. At the center of this improvement was a kernel library called **AI Tensor Engine for ROCm (AITER)**.
 
 ![AMD Instinct MI300X launch event](./images/mi300x-launch.jpg)
 
@@ -195,7 +198,7 @@ In AITER, CK is used for matrix-centric kernels: GEMM (A8W8, A4W4, block-scale),
 
 **Heterogeneous-computing Interface for Portability (HIP)** is AMD’s C++ runtime API and kernel language. It is the AMD counterpart to CUDA; most CUDA kernel code runs on HIP with little more than name changes.
 
-```
+```text
 CUDA concept            →  HIP equivalent
 ─────────────────────────────────────────
 cudaMalloc()             →  hipMalloc()
@@ -216,7 +219,7 @@ The ASM backend consists of kernels written directly in **AMDGCN Instruction Set
 
 Why go this low? High-level compilers generate safe code but miss optimization opportunities. ASM can fully exploit the GPU’s **Matrix Fused Multiply-Add (MFMA)** instructions, special registers, and instruction pipelining. The result is MLA Decode **17×** and MHA Prefill **14×** improvements.
 
-```
+```text
 Register types:
   SGPR (Scalar GPR)  — control flow, constants (shared across threads)
   VGPR (Vector GPR)  — data operations (per-thread values)
@@ -231,7 +234,7 @@ Key instructions:
 
 AITER’s `hsa/` directory contains **354+ precompiled ASM kernels (.co files)**. So many instances are needed because ASM kernels fix all parameters at compile time. Every viable combination is precompiled with no runtime branching.
 
-```
+```text
 head_dim:  {64, 128, 256}      → 3 options
 dtype:     {fp16, bf16, fp8}   → 3 options
 causal:    {true, false}       → 2 options
