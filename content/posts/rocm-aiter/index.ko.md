@@ -21,7 +21,7 @@ comments: true
 
 Semi Analysis 는 반도체 업계에서 유명한 리서치 기관입니다. 이 기관은 주요 GPU 의 inference 성능을 실측 비교하는 [InferenceX](https://inferencex.semianalysis.com) 벤치마크를 운영하고 있습니다.
 
-2026년 2월에 공개된 [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) 보고서에 따르면, AMD MI300X 의 SGLang 성능이 2025년 12월에서 2026년 1월 사이 **거의 2배 가까이** 향상되었다고 합니다. 이 성능 향상의 중심에 **AI Tensor Engine for ROCm(AITER)** 이라는 커널 라이브러리가 있었습니다.
+2026년 2월에 공개된 [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) 보고서에 따르면, AMD MI300X 의 SGLang throughput 성능이 2025년 12월에서 2026년 1월 사이 **거의 2배 가까이** 향상되었다고 합니다. 이 성능 향상의 중심에 **AI Tensor Engine for ROCm(AITER)** 이라는 커널 라이브러리가 있었습니다.
 
 ![AMD Instinct MI300X 출시 행사](./images/mi300x-launch.jpg)
 
@@ -73,7 +73,7 @@ AITER 는 **Large Language Model(LLM)** inference 의 핵심 operation을 폭넓
 
 백문이 불여일견이라고 하죠. AITER 가 MI300X 에서 달성한 성능 향상 수치를 먼저 보겠습니다.
 
-| 커널/워크로드 | 성능 향상 |
+| 커널/워크로드 | Throughput 향상 |
 | --- | --- |
 | Block-scale **General Matrix Multiplication(GEMM)** | **2배** |
 | Block-scale Fused **Mixture of Experts(MoE)** | **3배** |
@@ -213,7 +213,11 @@ AITER 에서는 Paged Attention, KV 캐시, TopK, AllReduce 등 general-purpose 
 
 ### Assembly(ASM)
 
+<figure style="background-color: white; padding: 16px; border-radius: 8px;">
+
 ![MLA 레이어 구조 — AITER가 ASM으로 최적화한 핵심 대상 (출처: AMD ROCm Blog)](./images/mla-architecture.png)
+
+</figure>
 
 ASM 백엔드는 AMD GPU 의 machine code인 **AMDGCN Instruction Set Architecture(ISA)** 로 직접 작성된 커널입니다. 컴파일러의 모든 추상화를 우회하고 GPU 레지스터, instruction scheduling, 메모리 접근 패턴을 개발자가 100% 제어합니다.
 

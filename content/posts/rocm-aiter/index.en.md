@@ -21,7 +21,7 @@ Hello, I'm Minho Park from the HyperAccel ML team.
 
 Semi Analysis is a well-known semiconductor research firm. They run the [InferenceX](https://inferencex.semianalysis.com) benchmark, which measures and compares inference performance of major GPUs.
 
-According to the [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) report released in February 2026, AMD MI300X SGLang performance improved by **nearly 2×** between December 2025 and January 2026. At the center of this improvement was a kernel library called **AI Tensor Engine for ROCm (AITER)**.
+According to the [InferenceX v2](https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs) report released in February 2026, AMD MI300X SGLang throughput improved by **nearly 2×** between December 2025 and January 2026. At the center of this improvement was a kernel library called **AI Tensor Engine for ROCm (AITER)**.
 
 ![AMD Instinct MI300X launch event](./images/mi300x-launch.jpg)
 
@@ -73,7 +73,7 @@ Notable here is the backend column: a single operation can have multiple backend
 
 Seeing is believing. Here are the performance gains AITER achieves on MI300X.
 
-| Kernel/Workload | Improvement |
+| Kernel/Workload | Throughput Improvement |
 | --- | --- |
 | Block-scale **General Matrix Multiplication (GEMM)** | **2×** |
 | Block-scale Fused **Mixture of Experts (MoE)** | **3×** |
@@ -213,7 +213,11 @@ AITER uses HIP for general-purpose operations such as Paged Attention, KV cache,
 
 ### Assembly (ASM)
 
+<figure style="background-color: white; padding: 16px; border-radius: 8px;">
+
 ![MLA layer structure — key target of AITER’s ASM optimization (Source: AMD ROCm Blog)](./images/mla-architecture.png)
+
+</figure>
 
 The ASM backend consists of kernels written directly in **AMDGCN Instruction Set Architecture (ISA)**, the machine code of AMD GPUs. All compiler abstraction is bypassed; the developer has full control over GPU registers, instruction scheduling, and memory access patterns.
 
