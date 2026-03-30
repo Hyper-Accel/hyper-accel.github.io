@@ -6,8 +6,8 @@ cover:
   image: "images/kubernetes_with_devices.png"
   # can also paste direct link from external site
   # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
-  alt: "Kubernetes with Devices"
-  caption: "Kubernetes with Devices"
+  alt: "Kubernetes logo surrounded by various hardware device icons"
+  caption: "Kubernetes and Device Plugins"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Younghoon Jun"] # must match with content/authors
 tags: [kubernetes, device-plugin, LPU, GPU, FPGA, DRA]
@@ -30,11 +30,11 @@ This post is the third installment of the **Building an In-House Dev Environment
 
 In Part 1, we covered the background, overall design, and direction of building a Kubernetes-based development environment. Part 2 introduced the strategy and process for building an ARC-based CI/CD infrastructure to overcome the structural limitations of self-hosted runners. In this third article, we will discuss the **Device Plugin required for utilizing custom resources on Kubernetes**.
 
-HyperAccel is a company that builds LPU devices specialized for LLM inference. To make Kubernetes recognize the LPU as a custom resource and enable smooth scheduling, a Device Plugin developed specifically for the LPU is required.
+HyperAccel is a company that builds LPU(LLM Procseeing Unit) devices specialized for LLM inference. To make Kubernetes recognize the LPU as a custom resource and enable smooth scheduling, a Device Plugin developed specifically for the LPU is required.
 
 In this article, we will explore the following topics under the theme of LPU Device Plugin:
 
-First, we explain the operating principles and detailed mechanics of the Kubernetes Device Plugin. Then, we introduce the development process of the device plugin for HyperAccel's first-generation FPGA-based LPU and how it is provided. Next, we briefly introduce the development process of the device plugin for **Bertha**, our upcoming ASIC-based LPU. Finally, we introduce **DRA (Dynamic Resource Allocation)**, a technology gaining significant attention, and explain how DRA relates to the scheduler and Device Plugin in Kubernetes.
+First, we explain the operating principles and detailed mechanics of the Kubernetes Device Plugin. Then, we introduce the development process of the device plugin for HyperAccel's first-generation FPGA-based LPU and how it is provided. Next, we briefly introduce the development process of the device plugin for **Bertha** , our upcoming ASIC-based LPU. Finally, we introduce **DRA (Dynamic Resource Allocation)**, a technology gaining significant attention, and explain how DRA relates to the scheduler and Device Plugin in Kubernetes.
 
 ---
 
@@ -48,7 +48,7 @@ By default, Kubernetes can only recognize CPU and memory resources. Without a De
 
 ### Why Do We Need a Device Plugin?
 
-Before Device Plugins were available, supporting new hardware required directly modifying the Kubernetes source code. This approach was difficult to maintain because it required understanding the vast Kubernetes codebase, and it lacked scalability since the code had to be modified every time new hardware was introduced.
+This approach was difficult to maintain because it required understanding the vast Kubernetes codebase. It also lacked scalability, since the code had to be modified every time new hardware was introduced.
 
 In summary:
 
@@ -62,7 +62,7 @@ In summary:
 
 Device Plugins typically run as `DaemonSets` and communicate with `Kubelet` through gRPC services on each node. The process of making devices recognizable through communication between `Kubelet` and the Device Plugin is as follows:
 
-![Device Registration](./images/device-registraion.png)
+![Device Registration](./images/device-registration.png)
 
 1. **Registration**
 
