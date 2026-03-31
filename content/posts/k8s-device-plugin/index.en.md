@@ -30,7 +30,7 @@ This post is the third installment of the **Building an In-House Dev Environment
 
 In Part 1, we covered the background, overall design, and direction of building a Kubernetes-based development environment. Part 2 introduced the strategy and process for building an ARC-based CI/CD infrastructure to overcome the structural limitations of self-hosted runners. In this third article, we will discuss the **Device Plugin required for utilizing custom resources on Kubernetes**.
 
-HyperAccel is a company that builds LPU(LLM Procseeing Unit) devices specialized for LLM inference. To make Kubernetes recognize the LPU as a custom resource and enable smooth scheduling, a Device Plugin developed specifically for the LPU is required.
+HyperAccel is a company that builds LPU(LLM Processing Unit) devices specialized for LLM inference. To make Kubernetes recognize the LPU as a custom resource and enable smooth scheduling, a Device Plugin developed specifically for the LPU is required.
 
 In this article, we will explore the following topics under the theme of LPU Device Plugin:
 
@@ -186,6 +186,104 @@ Once the Kubernetes level is ready to use the new device called LPU through the 
 
 As a result, users can use the new LPU device in a safe and isolated environment simply by adding a single line — `limits: hyperaccel.ai/lpu: 1` — to the YAML file, without needing to know the complex hardware setup process!
 
+However, a question may arise from step 4 above. **How does the container runtime (containerd) interpret and inject the device paths, environment variables, and mount information returned by the Device Plugin in the AllocateResponse?** The standard that addresses this is CDI (Container Device Interface).
+
+---
+
+### CDI (Container Device Interface): Standardizing Device Injection
+
+#### The Problem Before CDI
+
+When the Device Plugin sends the necessary configuration information to `Kubelet` via `AllocateResponse`, the container runtime ultimately interprets this to create the container. However, in this process, **each vendor had its own way of injecting devices into containers**.
+
+For example, using an NVIDIA GPU in a container requires more than simply mounting the `/dev/nvidia0` device file. GPU driver libraries (`libcuda.so`, `libnvidia-ml.so`, etc.), related utility binaries, and the correct paths matching their exact versions all need to be properly injected into the container. To achieve this, NVIDIA developed its own container runtime hook called `nvidia-container-runtime-hook`.
+
+Other vendors' devices — FPGAs, network accelerators (SR-IOV), cryptographic accelerators (QAT), and more — each required their own unique methods to inject device nodes, driver libraries, and configuration files into containers. This led to the following problems:
+
+- **Runtime dependencies**: Each vendor had to develop its own container runtime or runtime hook. NVIDIA's `nvidia-container-runtime`, AMD's `xilinx-container-runtime`, and others were all needed, and they were incompatible with each other.
+
+- **Complex configuration management**: To use both a GPU and an FPGA on a single node, multiple runtime hooks had to be combined, increasing operational complexity.
+
+- **Lack of portability**: Device configurations that worked with Docker sometimes didn't work with containerd or CRI-O, because each container runtime had different device injection mechanisms.
+
+#### What Is CDI?
+
+[CDI (Container Device Interface)](https://github.com/cncf-tags/container-device-interface) is a **container runtime-level standard specification** that emerged to solve these problems. CDI declaratively defines how devices are injected into containers through a single **JSON spec file**. Container runtimes (containerd, CRI-O, Podman, etc.) read this spec and inject the devices into the container.
+
+Simply put, before CDI, each vendor would say *"To put my device in a container, you need to install this special runtime."* After CDI, it became *"With just this JSON file, any runtime can inject my device."*
+
+#### Structure of a CDI Spec File
+
+CDI spec files are located at `/etc/cdi/` or `/var/run/cdi/` and have the following structure:
+
+```json
+{
+  "cdiVersion": "0.6.0",
+  "kind": "hyperaccel.ai/lpu",
+  "devices": [
+    {
+      "name": "lpu0",
+      "containerEdits": {
+        "deviceNodes": [
+          {
+            "path": "/dev/lpu0",
+            "hostPath": "/dev/lpu0",
+            "permissions": "rw"
+          }
+        ],
+        "mounts": [
+          {
+            "hostPath": "/opt/hyperaccel/lib",
+            "containerPath": "/usr/lib/hyperaccel",
+            "options": ["ro", "nosuid", "nodev", "bind"]
+          }
+        ],
+        "env": [
+          "LPU_DEVICE_INDEX=0",
+          "LPU_VISIBLE_DEVICES=0"
+        ]
+      }
+    }
+  ],
+  "containerEdits": {
+    "env": [
+      "LPU_DRIVER_VERSION=1.0.0"
+    ]
+  }
+}
+```
+
+The key components of the spec file are as follows:
+
+| Field | Description |
+| --- | --- |
+| **kind** | A vendor domain-based name that identifies the type of device (e.g., `hyperaccel.ai/lpu`) |
+| **devices** | A list of individual device definitions. Each device has a unique `name` |
+| **containerEdits** | Declaratively defines changes to apply to the container |
+| **deviceNodes** | Device file paths and permissions to expose inside the container |
+| **mounts** | Mount configurations for driver libraries, firmware, and other required files |
+| **env** | Environment variables to inject inside the container |
+
+Device-level `containerEdits` are applied only when that specific device is requested, while top-level `containerEdits` are applied as common settings whenever any device of that kind is requested.
+
+#### How CDI Works
+
+The device allocation process with CDI applied is as follows:
+
+1. **CDI Spec Generation**: The Device Plugin (or DRA Driver) detects devices on the node and generates CDI spec files for each device, storing them in the `/etc/cdi/` path.
+
+2. **CDI Device Name Passing**: When allocating a device to a Pod, the Device Plugin includes the CDI device name (e.g., `hyperaccel.ai/lpu=lpu0`) in the `AllocateResponse` and passes it to `Kubelet`.
+
+3. **Container Runtime CDI Resolution**: When `Kubelet` requests container creation from the container runtime (containerd), it passes the CDI device name along with the request. The container runtime finds and reads the corresponding spec file from the `/etc/cdi/` path, and automatically injects the device nodes, mounts, and environment variables defined in `containerEdits` into the container.
+
+4. **Container Execution**: The container runs with all device configurations applied, and the Pod can directly access the device from within.
+
+Compared to the `AllocateResponse`-based flow we examined earlier, the key difference is that **the complex logic for injecting devices into containers has been separated from the Device Plugin into CDI spec files**. The Device Plugin no longer needs to directly include device paths, mounts, and environment variables in the `AllocateResponse` — it only needs to pass the CDI device name. The rest is handled by the container runtime through the CDI spec.
+
+#### The Relationship Between CDI and DRA
+
+CDI is also closely related to DRA (Dynamic Resource Allocation), which we will introduce later. DRA Drivers use CDI as the standard interface for injecting devices into containers. In other words, **CDI started by standardizing device injection methods in the Device Plugin era and continues to play a pivotal role as a foundational technology in the DRA era as well**. DRA will be covered in detail in a later section.
+
 ---
 
 ## Device Plugin Examples
@@ -266,7 +364,7 @@ Let's look at an example. Assume a pod requests 4 LPUs within an Orion server. W
 
 In such a situation, if devices are selected without considering connectivity:
 
-- Since the 4 LPUs are not connected to each other, operations like distributed inference become difficult. (Gradient synchronization is impossible)
+- Since the 4 LPUs are not connected to each other, operations like distributed inference become difficult. (Parallel communication and LPU-to-LPU activation synchronization are impossible)
 
 - If a future pod requesting 4 LPUs is scheduled, the same problem occurs. (The IDLE device count is satisfied for scheduling, but there is no connectivity between devices)
 
@@ -352,7 +450,7 @@ In this article — the third installment of the **Building an In-House Dev Envi
 
 For a market-competitive LPU, it is important to design well at the HW level, but an optimized SW stack must also accompany it. Supporting the smooth use of LPU on top of the most widely used Kubernetes environment is a critical challenge for chip success!
 
-Our ML team's DevOps division is developing Cloud-Native Toolkit software for HyperAccel LPU's potential customers. Through components like Device Plugins and DRA that form the foundation of this software, we must support the seamless allocation of LPUs within computing nodes.
+Our ML team's DevOps division is developing Cloud-Native Toolkit software for HyperAccel LPU's potential customers. Components such as Device Plugins and DRAs, which form the foundation of this software, enable seamless use of the LPU within computing nodes.
 
 Thank you for reading to the end!
 

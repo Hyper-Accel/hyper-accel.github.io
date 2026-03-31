@@ -30,7 +30,7 @@ keywords: [
 
 1편에서는 Kubernetes를 기반으로 하는 개발 환경 구축의 배경과 전체적인 설계 및 방향에 대해서 살펴보았고, 2편에서는 기존 Self-Hosted Runner의 구조적인 한계를 뛰어넘기 위한 ARC 기반 CI/CD 인프라 설계 전략 수립 및 구축 과정에 대해 소개하였습니다. 3번째 글에서는 **Kubernetes 환경 위에서 Custom Resource 활용 시에 필요한 Device Plugin** 에 관련된 내용을 전달하고자 합니다.
 
-하이퍼엑셀은 LLM 추론에 특화된 LPU(LLM Procseeing Unit) device를 만드는 회사입니다. Kubernetes 환경 위에서 LPU라는 custom resource를 인식하게 하고 원활한 스케줄링을 돕기 위해서는 LPU를 위해 개발된 Device Plugin이 필요합니다.
+하이퍼엑셀은 LLM 추론에 특화된 LPU(LLM Processing Unit) device를 만드는 회사입니다. Kubernetes 환경 위에서 LPU라는 custom resource를 인식하게 하고 원활한 스케줄링을 돕기 위해서는 LPU를 위해 개발된 Device Plugin이 필요합니다.
 
 이번 글에서는 LPU Device Plugin이라는 키워드를 주제로 아래 내용들에 대해 이야기해보려고 합니다!
 
@@ -186,11 +186,109 @@ resources:
 
 결과적으로 사용자는 복잡한 하드웨어 설정 과정을 몰라도, 단지 YAML 파일에 `limits: hyperaccel.ai/lpu: 1`이라는 한 줄만 추가함으로써 새로운 디바이스인 LPU를 안전하고 격리된 환경에서 사용할 수 있게 되는 것입니다!
 
+그런데, 위 과정의 4단계에서 한 가지 의문이 생길 수 있습니다. Device Plugin이 `AllocateResponse`로 반환한 장치 경로, 환경 변수, 마운트 정보를 **컨테이너 런타임(containerd)은 어떻게 해석하고 주입하는 걸까요?** 이러한 과정을 표준화한 것이 바로 **CDI(Container Device Interface)** 입니다.
+
+---
+
+### CDI: 디바이스 주입의 표준화
+
+#### CDI가 등장하기 전의 문제
+
+Device Plugin이 `AllocateResponse`를 통해 컨테이너에 필요한 설정 정보를 `Kubelet`에 전달하면, 최종적으로 컨테이너 런타임이 이를 해석하여 컨테이너를 생성합니다. 그런데 이 과정에서 **벤더마다 디바이스를 컨테이너에 주입하는 방식이 제각각** 이었습니다.
+
+예를 들어, NVIDIA GPU를 컨테이너에서 사용하려면 단순히 `/dev/nvidia0` 장치 파일만 마운트하는 것으로는 부족합니다. GPU 드라이버 라이브러리(`libcuda.so`, `libnvidia-ml.so` 등), 관련 유틸리티 바이너리, 그리고 이들의 정확한 버전에 맞는 경로까지 모두 컨테이너 내부에 올바르게 주입되어야 합니다. 이를 위해 NVIDIA는 자체적인 컨테이너 런타임 Hook인 `nvidia-container-runtime-hook`을 개발하여 사용해왔습니다.
+
+FPGA, 네트워크 가속기(SR-IOV), 암호화 가속기(QAT) 등 다른 벤더의 디바이스들도 각자 고유한 방식으로 장치 노드, 드라이버 라이브러리, 설정 파일을 컨테이너에 주입해야 합니다. 이로 인해 다음과 같은 문제가 발생하였습니다.
+
+- **런타임 의존성**: 벤더마다 자체 컨테이너 런타임 혹은 런타임 Hook을 개발해야 했습니다. NVIDIA의 `nvidia-container-runtime`, AMD의 `xilinx-container-runtime` 등 각각의 런타임이 필요했고, 이들은 서로 호환되지 않았습니다.
+
+- **복잡한 설정 관리**: 하나의 노드에서 GPU와 FPGA를 동시에 사용하려면 여러 런타임 Hook을 조합해야 하는 등 운영 복잡도가 증가하였습니다.
+
+- **이식성 부족**: Docker에서 동작하던 디바이스 설정이 containerd나 CRI-O에서는 동작하지 않는 경우가 발생하였습니다. 컨테이너 런타임마다 디바이스 주입 방식이 달랐기 때문입니다.
+
+#### CDI란?
+
+[CDI(Container Device Interface)](https://github.com/cncf-tags/container-device-interface)는 이러한 문제를 해결하기 위해 등장한 **컨테이너 런타임 수준의 표준 스펙** 입니다. CDI는 디바이스를 컨테이너에 주입하는 방식을 하나의 **JSON 스펙 파일** 로 선언적으로 정의합니다. 컨테이너 런타임(containerd, CRI-O, Podman 등)이 이 스펙을 읽고 디바이스를 컨테이너에 주입하는 방식입니다.
+
+쉽게 말해, CDI 이전에는 벤더마다 *"내 디바이스를 컨테이너에 넣으려면 이런 특수한 런타임을 설치해야 해"* 라고 했다면, CDI 이후에는 *"이 JSON 파일만 있으면 어떤 런타임이든 내 디바이스를 주입할 수 있어"* 로 바뀐 것입니다.
+
+#### CDI 스펙 파일의 구조
+
+CDI 스펙 파일은 `/etc/cdi/` 또는 `/var/run/cdi/` 경로에 위치하며, 다음과 같은 구조를 가집니다.
+
+```json
+{
+  "cdiVersion": "0.6.0",
+  "kind": "hyperaccel.ai/lpu",
+  "devices": [
+    {
+      "name": "lpu0",
+      "containerEdits": {
+        "deviceNodes": [
+          {
+            "path": "/dev/lpu0",
+            "hostPath": "/dev/lpu0",
+            "permissions": "rw"
+          }
+        ],
+        "mounts": [
+          {
+            "hostPath": "/opt/hyperaccel/lib",
+            "containerPath": "/usr/lib/hyperaccel",
+            "options": ["ro", "nosuid", "nodev", "bind"]
+          }
+        ],
+        "env": [
+          "LPU_DEVICE_INDEX=0",
+          "LPU_VISIBLE_DEVICES=0"
+        ]
+      }
+    }
+  ],
+  "containerEdits": {
+    "env": [
+      "LPU_DRIVER_VERSION=1.0.0"
+    ]
+  }
+}
+```
+
+위 스펙 파일의 주요 구성 요소를 살펴보면 다음과 같습니다.
+
+| 필드 | 설명 |
+| --- | --- |
+| **kind** | 디바이스의 종류를 식별하는 벤더 도메인 기반 이름 (예: `hyperaccel.ai/lpu`) |
+| **devices** | 개별 디바이스 단위의 정의 목록. 각 디바이스는 고유한 `name`을 가짐 |
+| **containerEdits** | 컨테이너에 적용할 변경 사항을 선언적으로 정의 |
+| **deviceNodes** | 컨테이너 내부에 노출할 장치 파일 경로 및 권한 |
+| **mounts** | 드라이버 라이브러리, 펌웨어 등 필요한 파일의 마운트 설정 |
+| **env** | 컨테이너 내부에 주입할 환경 변수 |
+
+디바이스 수준의 `containerEdits`는 해당 디바이스가 요청될 때만 적용되고, 최상위 `containerEdits`는 해당 kind의 디바이스가 하나라도 요청되면 공통으로 적용됩니다.
+
+#### CDI의 동작 흐름
+
+CDI를 적용한 디바이스 할당 과정은 다음과 같습니다.
+
+1. **CDI 스펙 생성**: Device Plugin(혹은 DRA Driver)이 노드의 디바이스를 탐지하고, 각 디바이스에 대한 CDI 스펙 파일을 생성하여 `/etc/cdi/` 경로에 저장합니다.
+
+2. **CDI 디바이스 이름 전달**: Pod에 디바이스를 할당할 때, Device Plugin은 `AllocateResponse`에 CDI 디바이스 이름(예: `hyperaccel.ai/lpu=lpu0`)을 포함하여 `Kubelet`에 전달합니다.
+
+3. **컨테이너 런타임의 CDI 해석**: `Kubelet`이 컨테이너 런타임(containerd)에 컨테이너 생성을 요청할 때 CDI 디바이스 이름을 함께 전달합니다. 컨테이너 런타임은 `/etc/cdi/` 경로에서 해당 스펙 파일을 찾아 읽고, `containerEdits`에 정의된 장치 노드, 마운트, 환경 변수를 자동으로 컨테이너에 주입합니다.
+
+4. **컨테이너 실행**: 모든 디바이스 설정이 적용된 상태로 컨테이너가 실행되며, Pod 내부에서 디바이스에 직접 접근할 수 있습니다.
+
+이전에 살펴본 `AllocateResponse` 기반의 흐름과 비교하면, **디바이스를 컨테이너에 주입하는 복잡한 로직이 Device Plugin에서 CDI 스펙 파일로 분리** 되었다는 것이 핵심입니다. Device Plugin은 더 이상 장치 경로, 마운트, 환경 변수를 직접 `AllocateResponse`에 담아 반환할 필요 없이, CDI 디바이스 이름만 전달하면 됩니다. 나머지는 컨테이너 런타임이 CDI 스펙을 통해 처리합니다.
+
+#### CDI와 DRA의 관계
+
+CDI는 이후에 소개할 DRA(Dynamic Resource Allocation)와도 밀접한 관계가 있습니다. DRA Driver는 디바이스를 컨테이너에 주입할 때 CDI를 표준 인터페이스로 사용합니다. 즉, **CDI는 Device Plugin 시대의 디바이스 주입 방식을 표준화하는 데서 출발하여, DRA 시대에도 핵심적인 역할을 수행하는 기반 기술** 입니다. DRA에 대해서는 이후 섹션에서 자세히 다루겠습니다.
+
 ---
 
 ## Device Plugin Examples
 
-지금까지 Kubernetes Device Plugin이 **무엇이고, 왜 필요하고, 어떤 과정을 통해 디바이스를 감지하고 할당하는지** 살펴보았습니다. 본격적으로 LPU를 위한 Device Plugin을 살펴보기 전에, 대표적인 vendor인 NVIDIA와 AMD에서 제공하는 Device Plugin을 예시로 살펴보겠습니다.
+지금까지 Kubernetes Device Plugin이 **무엇이고, 왜 필요하고, 어떤 과정을 통해 디바이스를 감지하고 할당하는지** 와 더불어 디바이스 주입의 표준화 기술인 CDI에 대해서 살펴보았습니다. 본격적으로 LPU를 위한 Device Plugin을 살펴보기 전에, 대표적인 vendor인 NVIDIA와 AMD에서 제공하는 Device Plugin을 예시로 살펴보겠습니다.
 
 ---
 
@@ -266,7 +364,7 @@ Xilinx에서 [Xilinx FPGA Device Plugin](https://github.com/Xilinx/FPGA_as_a_Ser
 
 이러한 상황에서 위 예시처럼 연결성이 고려되지 않고 디바이스가 선택된다면,
 
-- 4개의 LPU가 서로 연결되어 있지 않기 때문에 분산 추론과 같은 동작이 어렵습니다. (Gradient 동기화 불가)
+- 4개의 LPU가 서로 연결되어 있지 않기 때문에 분산 추론과 같은 동작이 어렵습니다. (Parallel 통신 및 LPU 간 activation 동기화 불가)
 
 - 향후에 4개의 LPU를 가진 pod이 스케줄링을 요청하는 상황이 발생하는 경우, 똑같은 문제가 발생합니다. (IDLE 디바이스 개수는 만족되어 스케줄링되지만, 디바이스 간 연결성이 없음)
 
@@ -348,11 +446,11 @@ DRA는 리소스를 정의하고 요청하는 방식을 **자원 할당(Allocati
 
 ## 정리하자면...
 
-이번 글에서는 **Kubernetes 기반 개발 환경 구축기** 시리즈 중 3번째 내용인 Kubernetes Device Plugin이 무엇인지, 하이퍼엑셀의 LPU를 Kubernetes 환경에서 활용하기 위한 Device Plugin의 개발 과정, 그리고 보다 유연하게 자원을 할당하는 기술인 DRA에 대해 소개드렸습니다.
+이번 글에서는 **Kubernetes 기반 개발 환경 구축기** 시리즈 중 3번째 내용인 Kubernetes Device Plugin이 무엇인지, CDI는 어떤 기술인지, 하이퍼엑셀의 LPU를 Kubernetes 환경에서 활용하기 위한 Device Plugin의 개발 과정, 그리고 보다 유연하게 자원을 할당하는 기술인 DRA에 대해 소개드렸습니다.
 
 시장 경쟁력이 있는 LPU를 위해서는 HW 레벨에서 잘 설계하는 것도 중요하지만, 최적화된 SW 스택이 반드시 동반되어야 합니다. 가장 보편적으로 사용되고 있는 Kubernetes 환경 위에서 LPU의 원활한 사용을 지원하는 것은 chip 성공의 중요한 과제입니다!
 
-저희 ML팀의 DevOps 파트에서는 하이퍼엑셀 LPU의 잠재적인 고객분들을 위한 Cloud-Native Toolkit 소프트웨어를 개발하고 있습니다. 이러한 소프트웨어의 기반이 되는 Device Plugin, DRA와 같은 컴포넌트를 통해 컴퓨팅 노드 내부에서 원활하게 LPU를 할당할 수 있도록 지원해야 합니다.
+저희 ML팀의 DevOps 파트에서는 하이퍼엑셀 LPU의 잠재적인 고객분들을 위한 Cloud-Native Toolkit 소프트웨어를 개발하고 있습니다. 이러한 소프트웨어의 기반이 되는 Device Plugin, DRA와 같은 컴포넌트를 통해 컴퓨팅 노드 내부에서 원활하게 LPU를 사용할 수 있게 됩니다.
 
 끝까지 읽어주셔서 감사합니다!
 
