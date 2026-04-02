@@ -280,6 +280,32 @@ The device allocation process with CDI applied is as follows:
 
 Compared to the `AllocateResponse`-based flow we examined earlier, the key difference is that **the complex logic for injecting devices into containers has been separated from the Device Plugin into CDI spec files**. The Device Plugin no longer needs to directly include device paths, mounts, and environment variables in the `AllocateResponse` — it only needs to pass the CDI device name. The rest is handled by the container runtime through the CDI spec.
 
+#### CDI Configuration by containerd Version
+
+To use CDI, the container runtime must have CDI support enabled. For containerd, the level of CDI support varies by version.
+
+| containerd Version | CDI Support Status | Configuration Required |
+| --- | --- | --- |
+| **Before 1.7** | CDI not supported | Not available |
+| **1.7 ~ 1.x** | CDI supported (default: disabled) | Manual activation required |
+| **2.0 and above** | CDI supported (default: enabled) | No additional configuration needed |
+
+For containerd versions 1.7 and above but below 2.0, CDI must be explicitly enabled in `/etc/containerd/config.toml`.
+
+```toml
+[plugins."io.containerd.grpc.v1.cri"]
+  enable_cdi = true
+  cdi_spec_dirs = ["/etc/cdi", "/var/run/cdi"]
+```
+
+After changing the configuration, restart containerd to activate CDI.
+
+```bash
+sudo systemctl restart containerd
+```
+
+Starting from containerd 2.0, `enable_cdi` defaults to `true`, so CDI can be used immediately without any additional configuration.
+
 #### The Relationship Between CDI and DRA
 
 CDI is also closely related to DRA (Dynamic Resource Allocation), which we will introduce later. DRA Drivers use CDI as the standard interface for injecting devices into containers. In other words, **CDI started by standardizing device injection methods in the Device Plugin era and continues to play a pivotal role as a foundational technology in the DRA era as well**. DRA will be covered in detail in a later section.
@@ -467,6 +493,8 @@ If you're interested in the technologies HyperAccel works with, please apply thr
 ## Reference
 
 - [Kubernetes 1.26: Device Manager graduates to GA](https://kubernetes.io/blog/2022/12/19/devicemanager-ga/)
+- [CDI - Container Device Interface](https://github.com/cncf-tags/container-device-interface)
+- [containerd CRI Plugin Configuration](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
 - [NVIDIA Device Plugin](https://github.com/nvidia/k8s-device-plugin)
 - [AMD Xilinx Device Plugin](https://github.com/Xilinx/FPGA_as_a_Service/tree/master/k8s-device-plugin)
 - [Dynamic Resource Allocation](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)

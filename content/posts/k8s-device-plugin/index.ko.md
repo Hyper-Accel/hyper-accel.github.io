@@ -280,6 +280,32 @@ CDI를 적용한 디바이스 할당 과정은 다음과 같습니다.
 
 이전에 살펴본 `AllocateResponse` 기반의 흐름과 비교하면, **디바이스를 컨테이너에 주입하는 복잡한 로직이 Device Plugin에서 CDI 스펙 파일로 분리** 되었다는 것이 핵심입니다. Device Plugin은 더 이상 장치 경로, 마운트, 환경 변수를 직접 `AllocateResponse`에 담아 반환할 필요 없이, CDI 디바이스 이름만 전달하면 됩니다. 나머지는 컨테이너 런타임이 CDI 스펙을 통해 처리합니다.
 
+#### containerd 버전별 CDI 설정
+
+CDI를 사용하려면 컨테이너 런타임에서 CDI 지원이 활성화되어 있어야 합니다. containerd의 경우 버전에 따라 CDI 지원 상태가 다릅니다.
+
+| containerd 버전 | CDI 지원 상태 | 설정 필요 여부 |
+| --- | --- | --- |
+| **1.7 미만** | CDI 미지원 | 사용 불가 |
+| **1.7 ~ 1.x** | CDI 지원 (기본값: 비활성화) | 수동 활성화 필요 |
+| **2.0 이상** | CDI 지원 (기본값: 활성화) | 별도 설정 불필요 |
+
+containerd 1.7 이상 ~ 2.0 미만 버전에서는 `/etc/containerd/config.toml`에서 CDI를 명시적으로 활성화해야 합니다.
+
+```toml
+[plugins."io.containerd.grpc.v1.cri"]
+  enable_cdi = true
+  cdi_spec_dirs = ["/etc/cdi", "/var/run/cdi"]
+```
+
+설정 변경 후 containerd를 재시작하면 CDI가 활성화됩니다.
+
+```bash
+sudo systemctl restart containerd
+```
+
+containerd 2.0부터는 `enable_cdi`가 기본적으로 `true`이므로 별도의 설정 없이 CDI를 바로 사용할 수 있습니다.
+
 #### CDI와 DRA의 관계
 
 CDI는 이후에 소개할 DRA(Dynamic Resource Allocation)와도 밀접한 관계가 있습니다. DRA Driver는 디바이스를 컨테이너에 주입할 때 CDI를 표준 인터페이스로 사용합니다. 즉, **CDI는 Device Plugin 시대의 디바이스 주입 방식을 표준화하는 데서 출발하여, DRA 시대에도 핵심적인 역할을 수행하는 기반 기술** 입니다. DRA에 대해서는 이후 섹션에서 자세히 다루겠습니다.
@@ -467,6 +493,8 @@ HyperAccel에서 다루는 기술들을 보시고, 관심이 있으시다면 [Hy
 ## Reference
 
 - [Kubernetes 1.26: Device Manager graduates to GA](https://kubernetes.io/blog/2022/12/19/devicemanager-ga/)
+- [CDI - Container Device Interface](https://github.com/cncf-tags/container-device-interface)
+- [containerd CRI Plugin Configuration](https://github.com/containerd/containerd/blob/main/docs/cri/config.md)
 - [NVIDIA Device Plugin](https://github.com/nvidia/k8s-device-plugin)
 - [AMD Xilinx Device Plugin](https://github.com/Xilinx/FPGA_as_a_Service/tree/master/k8s-device-plugin)
 - [Dynamic Resource Allocation](https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/)
