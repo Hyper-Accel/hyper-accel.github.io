@@ -1,7 +1,7 @@
 ---
 date: '2026-04-14T14:00:00+09:00'
 draft: true
-title: 'HBF Stocks Are Surging — But What Actually Is HBF? Understanding the Memory Hierarchy'
+title: 'Understanding Memory: Essential Commodity of the AI Era — Part 1: Understanding HBF'
 cover:
   image: ""
   alt: "HBF High Bandwidth Flash"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Seungbin Shin]
 tags: ["HBF", "High Bandwidth Flash", "Memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
-series: ["Memory in the AI Era"]
+series: ["Understanding Memory: Essential Commodity of the AI Era"]
 series_idx: 1
 categories: ["AI Hardware", "Semiconductor"]
 summary: "Why are there so many types of memory, and where does HBF fit in? From SRAM to HBF, we explore the physical principles behind the memory hierarchy and the technical architecture of HBF."
@@ -23,9 +23,7 @@ keywords: [
 ]
 ---
 
-# HBF Stocks Are Surging — But What Actually Is HBF?
-
-> This is Part 1 of the **Memory in the AI Era** series.
+> This is Part 1 of the **Understanding Memory: Essential Commodity of the AI Era** series.
 > Part 1: Understanding the Memory Hierarchy (this post)
 > Part 2: The Memory Wall and Industry Response (coming soon)
 > Part 3: The Inference Era — Synergy Between HBF and LPU (coming soon)
@@ -34,11 +32,10 @@ keywords: [
 
 Hello, I'm Seungbin Shin, an RTL Designer at HyperAccel.
 
-Recently, "HBF-related stocks" have been making headlines in the stock market.
-News outlets are attaching labels like "dream memory rivaling HBM" and "AI semiconductor revolution,"
-while related stocks continue to swing between sharp rallies and drops.
+Recently, "memory and semiconductor stocks" have been making headlines in the stock market.
+Lately, a new term — "HBF" — has started popping up, and people are asking "What even is that?" and "So should I buy it?"
 
-Yet surprisingly few people seem to actually know what **High Bandwidth Flash (HBF)** is.
+So what exactly is **High Bandwidth Flash (HBF)**?
 
 To understand HBF, you first need to be able to answer one question:
 
@@ -68,7 +65,7 @@ Faster, smaller memory sits closer to the processor, while slower, larger memory
 
 Now let's look at why each layer of memory has the characteristics it does, starting with the cell structure.
 
-![Memory hierarchy pyramid — faster, more expensive, and smaller toward the top](01-memory-hierarchy-pyramid.png)
+![Memory hierarchy pyramid — faster, more expensive, and smaller toward the top](01-memory-hierarchy-pyramid.jpg)
 
 ---
 
@@ -168,7 +165,7 @@ For workloads like AI that need to read massive amounts of data simultaneously, 
 The core idea is simple:
 stack DRAM dies vertically and place them right next to the processor on the same substrate.
 
-![HBM stack cross-section — DRAM dies stacked with TSV and placed alongside GPU on interposer](04-hbm-tsv-stack.png)
+![HBM stack cross-section — DRAM dies stacked with TSV and placed alongside GPU on interposer](04-hbm-tsv-stack.jpg)
 
 ### TSV: Vertical Wiring Through Silicon
 
@@ -302,7 +299,7 @@ what if we could fill this gap?
 
 ## HBF — Dressing NAND in HBM's Clothes
 
-![HBF architecture — NAND dies stacked with TSV, placed alongside accelerator on interposer](05-hbf-architecture.png)
+![HBF architecture — NAND dies stacked with TSV, placed alongside accelerator on interposer](05-hbf-architecture.jpg)
 
 ### Core Idea: Familiar Cells, New Packaging
 
