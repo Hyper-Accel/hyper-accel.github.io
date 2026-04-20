@@ -338,10 +338,16 @@ Providing **8–16x the capacity of HBM at similar bandwidth and similar cost** 
 
 ### Compatibility with HBM Controllers
 
-Another strength of HBF is that its **physical interface (PHY) and pinout are compatible with HBM**.
+Another strength of HBF is that its **physical footprint and electrical interface (PHY level) are compatible with HBM**.
 
-Existing HBM controllers already built into AI accelerators can connect to HBF with no or minimal modifications.
-Since there's no need to design a new memory controller from scratch, the adoption barrier is significantly lowered from an accelerator designer's perspective.
+Pinout, package size, power profile, and stack height are nearly identical to HBM4, so the existing HBM interposer and packaging infrastructure can be reused as-is.
+
+That said, it's important to be clear that **HBF is not a drop-in replacement for HBM**.
+Because NAND differs from DRAM in access granularity (page vs. word), erase cycles, wear-leveling, and other characteristics, **minimal protocol changes are required on the host controller side**.
+The open standard being pushed by SanDisk and SK hynix is also aimed at "the same electrical interface with minimal protocol changes."
+
+In other words, there is no need to design a new memory controller from scratch, but existing HBM controllers cannot be used **as-is** either.
+Even so, the adoption barrier for accelerator designers remains substantially lower than designing a memory controller from zero.
 
 ### HBF's Limitations: Not a Silver Bullet
 
