@@ -24,9 +24,6 @@ keywords: [
 ---
 
 > This is Part 1 of the **Understanding Memory: Essential Commodity of the AI Era** series.
-> Part 1: Understanding the Memory Hierarchy (this post)
-> Part 2: The Memory Wall and Industry Response (coming soon)
-> Part 3: The Inference Era — Synergy Between HBF and LPU (coming soon)
 
 ## Introduction
 
@@ -375,9 +372,13 @@ Here's the summary:
 
 But being able to fill the gap alone doesn't complete the story.
 
-**Why is HBF needed right now?**
-In the next installment, we'll cover the **Memory Wall** problem emerging as AI models grow exponentially,
-and the technology competition among SK hynix, SanDisk, and Samsung Electronics.
+HBF has a weakness: its latency of around 10 µs is roughly 100x longer than HBM's.
+So how can this weakness be overcome, and how can HBF actually be used in real LLM workloads?
+
+**In the next installment, we'll explore how HBF can be leveraged in LLMs,**
+**focusing on SK hynix's proposed approach to overcoming HBF's long latency.**
+
+Part 2 will be written by **Jaewon Lim** from HyperAccel. Stay tuned!
 
 ---
 
