@@ -8,18 +8,18 @@ cover:
   caption: ""
   relative: true
 authors: [Seungbin Shin]
-tags: ["HBF", "High Bandwidth Flash", "Memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
+tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
 series: ["Understanding Memory: Essential Commodity of the AI Era"]
 series_idx: 1
-categories: ["AI Hardware", "Semiconductor"]
+categories: ["AI hardware", "Semiconductor"]
 summary: "Why are there so many types of memory, and where does HBF fit in? From SRAM to HBF, we explore the physical principles behind the memory hierarchy and the technical architecture of HBF."
 description: "We explain the cell structures and physical characteristics of SRAM, DRAM, HBM, and NAND, and analyze how High Bandwidth Flash (HBF) fills the gap in the memory hierarchy."
 comments: true
 keywords: [
-  "HBF", "High Bandwidth Flash", "Memory Hierarchy",
+  "HBF", "High Bandwidth Flash", "memory hierarchy",
   "SRAM", "DRAM", "HBM", "NAND", "TSV", "CBA",
-  "AI Memory", "Semiconductor", "SanDisk", "SK hynix",
-  "AI Hardware", "AI Accelerator", "Memory Wall"
+  "AI memory", "Semiconductor", "SanDisk", "SK hynix",
+  "AI hardware", "AI accelerator", "memory wall"
 ]
 ---
 
@@ -397,7 +397,7 @@ If you want to learn broadly and deeply while growing together, please apply to 
 
 - [SanDisk HBF Fact Sheet](https://documents.sandisk.com/content/dam/asset-library/en_us/assets/public/sandisk/collateral/company/Sandisk-HBF-Fact-Sheet.pdf)
 - [Scaling the Memory Wall: Behind Sandisk's High Bandwidth Flash for AI Inferencing](https://www.sandisk.com/en-ua/company/newsroom/blogs/2025/scaling-beyond-the-wall-inside-sandisks-high-bandwidth-flash-for-ai)
-- [SK hynix and Sandisk Begin Global Standardization of Next-Generation Memory 'HBF'](https://news.skhynix.com/sk-hynix-and-sandisk-begin-global-standardization-ofnext-generation-memory-hbf/)
+- [SK hynix and Sandisk Begin Global Standardization of Next-Generation Memory 'HBF'](https://news.skhynix.com/sk-hynix-and-sandisk-begin-global-standardization-of-next-generation-memory-hbf/)
 - [SK Hynix Unveils AI Chip Architecture with HBF](https://www.trendforce.com/news/2026/02/12/news-sk-hynix-unveils-ai-chip-architecture-with-hbf-reportedly-boosts-performance-per-watt-by-up-to-2-69x/)
 - [HBM VS HBF VS HBS: Building the Memory Hierarchy for AI](https://www.lovechip.com/blog/hbm-vs-hbf-vs-hbs)
 - [High Bandwidth Flash: NAND's Bid for AI Memory](https://www.viksnewsletter.com/p/high-bandwidth-flash-nands-bid-for-ai)

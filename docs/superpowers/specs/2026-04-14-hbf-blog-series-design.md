@@ -3,7 +3,7 @@
 ## 개요
 
 HBF(High Bandwidth Flash) 기술을 다루는 3부작 시리즈 블로그 글의 설계서.
-이 문서는 **1편**의 상세 구조와, 2-3편의 방향성을 정의한다.
+이 문서는 **1편** 의 상세 구조와, 2-3편의 방향성을 정의한다.
 
 ## 시리즈 구성
 
@@ -18,7 +18,7 @@ HBF(High Bandwidth Flash) 기술을 다루는 3부작 시리즈 블로그 글의
 ### 메타 정보
 
 - **제목(안)**: "HBF 관련주가 뜨는데, HBF가 도대체 뭔가? — 메모리 계층부터 이해하기"
-- **시리즈명**: "AI 시대의 메모리" (`series: ["AI 시대의 메모리"]`, `series_idx: 1`)
+- **시리즈명**: "AI 시대의 필수 소비재, 메모리 이해하기" (`series: ["AI 시대의 필수 소비재, 메모리 이해하기"]`, `series_idx: 1`)
 - **독자**: AI/LLM에 관심 있는 일반 기술 종사자 (메모리 배경지식 적음)
 - **톤**: 트렌드 관찰 + 독자 궁금증 유발, 기술적 설명은 물리적/구조적 이유 중심 (비유 최소화)
 - **깊이**: 중급 — 메모리 계층은 간결하되 "왜"를 설명, HBF 기술 구조는 상세히
@@ -38,10 +38,10 @@ cover:
   caption: ""
   relative: true
 authors: [Seungbin Shin]
-tags: ["HBF", "High Bandwidth Flash", "Memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
-series: ["AI 시대의 메모리"]
+tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
+series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 1
-categories: ["AI Hardware", "Semiconductor"]
+categories: ["AI hardware", "Semiconductor"]
 summary: "메모리는 왜 여러 종류이고, HBF는 어디에 위치하는가? ..."
 description: "SRAM, DRAM, HBM, NAND의 셀 구조와 ..."
 comments: true
