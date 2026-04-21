@@ -62,13 +62,13 @@ The evaluation tables Anthropic published with [Claude Opus 4.7](https://www.ant
 
 ### Mythos Benchmark Results
 
-The following values are directly from the Glasswing page and the Red Team post:
+The Glasswing page and the Red Team post both include several benchmark tables. On the rows they cite, Mythos Preview is listed with higher scores than Opus 4.6; the tables are long, so here are three lines excerpted as-is:
 
 - **CyberGym**: Mythos Preview **83.1%**, Opus 4.6 **66.6%**
 - **SWE-bench Verified**: Mythos **93.9%**, Opus 4.6 **80.8%**
 - **Terminal-Bench 2.0**: Mythos **82.0%**, Opus 4.6 **65.4%**
 
-Unfamiliar benchmark numbers are harder to feel in your bones than concrete cases tend to be. I've summarized examples from the [Red Team post](https://red.anthropic.com/2026/mythos-preview/) where technical detail and disclosure status are laid out clearly.
+The numbers alone already suggest a large jump, but unfamiliar benchmarks landed more slowly for me than the concrete stories in the [Red Team post](https://red.anthropic.com/2026/mythos-preview/). I unpack the technical write-ups—and the disclosure and response context—in the section that follows.
 
 ## Cases of Successful Defensive Use
 
