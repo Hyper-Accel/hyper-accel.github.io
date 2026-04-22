@@ -54,7 +54,7 @@ If we simplify benchmark evolution since the rise of LLMs, it looks like this:
 1. **Pattern-matching style tests** — early benchmarks, focused on short knowledge questions or tiny function-level fixes.
 2. **Real codebase-level coding** — evaluates whether the model can solve tasks with full project context, not isolated snippets.
 3. **Long-horizon agentic execution** — checks whether the model can complete higher-level tasks through **attempt, failure, and retry**, not just one-shot answers.
-4. **Real-outcome-oriented evaluation** — emphasizes results like finding **zero-days** not present in public benchmarks, which helps separate memorization from generalization.
+4. **Real-outcome-oriented evaluation** — have the model hunt for **zero-days** (vulnerabilities absent from public benchmark datasets), then use successful hits to verify the capability is not merely memorizing known tests.
 
 As this shift continues, many public benchmarks approach saturation and stop being strongly discriminative. Measurement naturally moves to the next questions: can the model push larger chunks of work end-to-end, and can it operate reliably in domain-specific contexts? The center of gravity is moving toward **large-scale tasks** and **domain-specialized workloads**.
 
@@ -62,27 +62,29 @@ The evaluation tables Anthropic published with [Claude Opus 4.7](https://www.ant
 
 ### Mythos Benchmark Results
 
-The Glasswing page and the Red Team post both include several benchmark tables. On the rows they cite, Mythos Preview is listed with higher scores than Opus 4.6; the tables are long, so here are three lines excerpted as-is:
+The Glasswing page and the Red Team post both include several benchmark tables. On the rows they cite, Mythos Preview is listed with higher scores than Opus 4.6; the tables are long, so here is a small excerpt:
 
-- **CyberGym**: Mythos Preview **83.1%**, Opus 4.6 **66.6%**
-- **SWE-bench Verified**: Mythos **93.9%**, Opus 4.6 **80.8%**
-- **Terminal-Bench 2.0**: Mythos **82.0%**, Opus 4.6 **65.4%**
+| Benchmark | Mythos Preview | Opus 4.6 |
+| --- | ---: | ---: |
+| CyberGym | 83.1% | 66.6% |
+| SWE-bench Verified | 93.9% | 80.8% |
+| Terminal-Bench 2.0 | 82.0% | 65.4% |
 
-The numbers alone already suggest a large jump, but unfamiliar benchmarks landed more slowly for me than the concrete stories in the [Red Team post](https://red.anthropic.com/2026/mythos-preview/). I unpack the technical write-ups—and the disclosure and response context—in the section that follows.
+The numbers alone already suggest a large jump, but unfamiliar benchmarks landed more slowly for me than the concrete stories in the [Red Team post](https://red.anthropic.com/2026/mythos-preview/). The write-ups include vulnerabilities found in software that had been running in production for a long time; I go through the details in the next section.
 
 ## Cases of Successful Defensive Use
 
 ### OpenBSD, TCP SACK (27-year-old vulnerability)
 
-**Selective Acknowledgment (SACK)** is a TCP feature that tells the sender to retransmit only missing segments. According to the Red Team report, Mythos Preview found a problematic combination in OpenBSD's SACK handling: a weak range-boundary validation path and an **integer arithmetic overflow** in sequence-number comparison logic. Under conditions that should not become true at the same time, the kernel may attempt writes to invalid addresses, potentially causing **remote Denial of Service (DoS)**.
+The first case is a bug that sat inside an OS for 27 years before it was surfaced. **Selective Acknowledgment (SACK)** is a TCP feature that tells the sender to retransmit only missing segments. According to the Red Team report, Mythos Preview found a problematic combination in OpenBSD's SACK handling: a weak range-boundary validation path and an **integer arithmetic overflow** in sequence-number comparison logic. Under conditions that should not become true at the same time, the kernel may attempt writes to invalid addresses, potentially causing **remote Denial of Service (DoS)**.
 
 ### FFmpeg, H.264 Decoder (16-year-old vulnerability)
 
-H.264 streams are decoded in small units called **slices**. The report highlights a width mismatch: slice IDs can grow to 32-bit values, while the table that stores each block's slice ownership uses 16-bit entries. That table uses **65535** as an "empty" sentinel. With an extreme number of slices, the real slice ID **65535** can collide with that sentinel meaning. As a result, adjacent entries can be referenced incorrectly, leading to a small **heap out-of-bounds write**. The report rates severity below top tier and notes exploitation appears difficult in practice, while also mentioning this line had been executed **millions of times** by automated fuzzing.
+The model also surfaced a bug in a video decoder that had been in use for over 16 years. The H.264 decoder processes frames in small units called **slices**. Here, the problem is a **width mismatch**: slice numbers can span 32 bits, but the table that records which slice each block belongs to uses only 16 bits. That table fills "empty" slots with **65535**; if someone packs an extreme number of slices, the real slice index **65535** collides with that empty marker. The wrong cell gets touched, which can lead to a small **heap out-of-bounds access** scenario; that is the behavior the write-up highlights as the finding.
 
 ### FreeBSD NFS, **Remote Code Execution (RCE)** (17-year-old vulnerability)
 
-NFS is a network file-sharing service. The Red Team report states that Mythos Preview completed a chain from vulnerability discovery to exploit generation with no human intervention, including an unauthenticated path to **root** access. The core issue was loose length validation in **RPCSEC_GSS** handling within **Remote Procedure Call (RPC)** processing, enabling kernel stack overflow. The chain then used **Return-Oriented Programming (ROP)** to add an attacker key to `authorized_keys`.
+Mythos also found a security issue in file-sharing software that had been around for 17 years. NFS is a network file-sharing service. According to the Red Team report, Mythos Preview completed a path from **bug discovery through exploit writing** with no human intervention—including **unauthenticated** access that reaches **root**. Loose length checks in **RPCSEC_GSS** handling inside **Remote Procedure Call (RPC)** processing allowed a kernel stack overflow, and the chain continued with **Return-Oriented Programming (ROP)** to add an attacker key to `authorized_keys`.
 
 ---
 
