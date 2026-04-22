@@ -102,7 +102,7 @@ keywords: ["HBF", "High Bandwidth Flash", ...]
 - Gen 1 스펙: 읽기 1.6 TB/s, 512GB (256Gb/die x 16 stack)
 - Gen 2/3 로드맵: >2 TB/s / 1TB, >3.2 TB/s / 1.5TB
 - HBM 대비: 8-16배 용량, 유사 대역폭, 유사 비용
-- HBF PHY가 HBM과 호환 → 기존 가속기 HBM 컨트롤러에 직접 연결 가능
+- 물리적 footprint와 전기적 인터페이스(PHY 레벨)가 HBM과 호환 → 기존 인터포저/패키징 인프라 재활용 가능 (단, drop-in 대체품은 아님: 호스트 컨트롤러에 최소한의 프로토콜 변경 필요)
 - 한계: 지연시간 ~10us (HBM ~100ns 대비 100배), 쓰기 속도 느림, write endurance 제한
 
 #### 섹션 9: 마무리 & 2편 티저
