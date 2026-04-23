@@ -1,6 +1,5 @@
 ---
-date: '2026-04-14T14:00:00+09:00'
-lastmod: '2026-04-23T12:34:00+09:00'
+date: '2026-04-23T12:34:00+09:00'
 draft: false
 title: 'Understanding Memory: Essential Commodity of the AI Era — Part 1: Understanding HBF'
 cover:
