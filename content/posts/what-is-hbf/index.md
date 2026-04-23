@@ -1,11 +1,11 @@
 ---
-date: '2026-04-14T14:00:00+09:00'
+date: '2026-04-23T12:34:00+09:00'
 draft: false
 title: 'AI 시대의 필수 소비재, 메모리 이해하기 1편: HBF 이해하기'
 cover:
-  image: ""
-  alt: "HBF High Bandwidth Flash"
-  caption: ""
+  image: "01-memory-hierarchy-pyramid.jpg"
+  alt: "메모리 계층 피라미드 - SRAM, DRAM, HBM, HBF, SSD"
+  caption: "AI 시대의 메모리 계층 구조"
   relative: true
 authors: [Seungbin Shin]
 tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
