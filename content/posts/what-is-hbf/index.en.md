@@ -1,6 +1,6 @@
 ---
 date: '2026-04-14T14:00:00+09:00'
-draft: true
+draft: false
 title: 'Understanding Memory: Essential Commodity of the AI Era — Part 1: Understanding HBF'
 cover:
   image: ""
