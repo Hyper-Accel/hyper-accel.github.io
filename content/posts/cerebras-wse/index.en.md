@@ -32,7 +32,7 @@ Did you know there is a company that turns an entire wafer into a single chip?
 
 Today, I want to talk about **Cerebras** and its **Wafer-Scale Engine(WSE)**.
 
-In January 2026, **Cerebras** made headlines in the AI industry. According to several reports, the company signed a contract with **OpenAI** worth around $10 billion and planned to supply up to 750MW of compute capacity by 2028. It is unusual to see a non-**NVIDIA** AI accelerator company mentioned as a candidate for a deal of this scale.
+In January 2026, **Cerebras** made headlines in the AI industry. According to several reports, the company signed a contract with **OpenAI** worth around $10 billion. It planned to supply up to 750MW of compute capacity by 2028. It is unusual to see a non-**NVIDIA** AI accelerator company mentioned as a candidate for a deal of this scale.
 
 This post explains what **Cerebras**'s **Wafer-Scale Engine(WSE)** architecture is, why yield was such a difficult problem, and how **Cerebras** approached the problem.
 
@@ -181,7 +181,9 @@ The limitations come from the same design choices. The most obvious one is that 
 Under a short-output setting(128 prompt tokens and 20 output tokens), **Cerebras** keeps single-user speed high while increasing throughput as batch size grows. But what happens if many users submit book-length prompts and require long outputs? In high-batch, long-sequence settings, WSE may struggle to hold both model weights and KV cache inside 44GB. That would increase dependence on MemoryX loading, which could lead to more visible slowdowns compared with larger-capacity HBM-based systems.
 
 If a user tries to avoid that by adding more systems for capacity, then dependence on MemoryX may decrease, but initial deployment cost rises as well.
-There is no official price list, but public estimates help show the scale. The Next Platform estimates a CS-2/CS-3 node at roughly **$2.5M–$3.2M**, or around **$4M** when MemoryX and SwarmX are included. At a rough exchange rate of $1 = ₩1,500, that is about **₩3.75B–₩6B per node**. SEC-filed purchase orders also show CS-3 cluster goods fees in the **$178M–$350M** range. In other words, moving toward WSE is not just a matter of chip performance. It implies upfront deployments that bundle CS-3, MemoryX, SwarmX, networking, power, and cooling at multi-billion-won and even hundred-million-dollar scales.
+There is no official price list, but public estimates help show the scale. The Next Platform estimates a CS-2/CS-3 node at roughly **$2.5M–$3.2M**, or around **$4M** when MemoryX and SwarmX are included. At a rough exchange rate of $1 = ₩1,500, that is about **₩3.75B–₩6B per node**. SEC-filed purchase orders also show CS-3 cluster goods fees in the **$178M–$350M** range.
+
+In other words, moving toward WSE is not just a matter of chip performance. It implies large upfront deployments. Those deployments bundle CS-3, MemoryX, SwarmX, networking, power, and cooling at multi-billion-won and even hundred-million-dollar scales.
 
 ---
 
