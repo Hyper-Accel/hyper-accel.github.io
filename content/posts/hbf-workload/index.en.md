@@ -214,7 +214,7 @@ Bringing HBF into this pipeline lets the vector DB sit much closer to the accele
 
 The traffic and latency story is the win. The random fine-grained access search demands still happens, but it stays inside the short HBF ↔ search-engine path. **Only the narrowed top-k payload travels between HBF and the accelerator, as page-aligned reads.** The accelerator-side memory interface stays clean, and placing the data close to the accelerator also speeds up search itself. As the vector DB scales (billions of documents), the combination of HBF capacity and an adjacent search engine becomes a direct cost-and-throughput lever.
 
-The catch: this picture requires a dedicated search engine alongside the vector DB, which means search-acceleration logic the HBM standard base die doesn't carry. In other words, you need a **custom base die** rather than the standard one, not something that rides a vanilla packaging line, but vendor- and workload-specific base-die customization that has to come together.
+The catch: this picture requires a dedicated search engine alongside the vector DB, which means search-acceleration logic the HBM standard base die doesn't carry. In other words, you need a **custom base die** rather than the standard one. This is not something that rides a vanilla packaging line, but vendor- and workload-specific base-die customization that has to come together.
 
 ---
 
