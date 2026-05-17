@@ -92,25 +92,31 @@ KV cache swapping : 비활성 세션은 GPU memory -> CPU DRAM / SSD로 swapping
 최근 trend : GPU가 사용하는 memory를 SSD로 offloading (model offload, KV cache offload)
 GPU -> CPU -> SSD 거치지 않고 direct로 넘기는 기술도 등장 (GPU direct storage, GDS) 
 
-on-device AI를 위해 edge device의 Flash memory를 활용하여 model구동하려는 시도도 등장 
+on-device AI를 위해 edge device의 Flash memory를 활용하여 model구동하려는 시도도 등장 [LLM in a Flash]
 적은 GPU로 큰 모델을 서빙하기 위해 SSD Storage 적극 사용 중
 
 [Flexgen]
 
 ---
 
-## 현실적인 문제와 회의론
-write-endurance를 견딜 수 있도록 cell 선택 (수명 중요, 같이 패키징되면 교체도 불가능)
+## 현실적인 문제, 그리고 HBF에 대한 회의론
+
+write-endurance를 견딜 수 있도록 cell 선택 (수명 중요, HBF + XPU같이 패키징되면 교체도 불가능)
 hardware-software co-design
 Hot / Warm / Cold KV cache의 적절한 구분
 효과적인 prefetch hint를 위한 SW적 지원 + 하드웨어 가속을 위해 HBF 근처에서 간단한 연산을 처리/보조 하는 등의 노력 필요
 HBF controller
+
+산업계 입장 : HBF를 외치고 있는 것은 memory vendor들(특히 Flash 사업에 주력하는 Sandisk 중심으로)뿐, HBM도  
+
+JEDEC 스펙이 어떻게 나오느냐가 관건이 될 듯 
+PCIe 사용한다? -> 안정적인 방법이지만 대역폭 처리 불가, PCIe 자체가 병목, CXL같은 추가적인 기술이 필요해짐
+HBM과 같이 패키징 기반 interposer 사용 -> 수명 관리를 위한 controller + SW 지원 필수적
 ---
 
 ## 마무리
 
-이번 글의 흐름을 한 번에 정리하면 이렇습니다.
-
+오늘 글에서는..
 
 
 ---
