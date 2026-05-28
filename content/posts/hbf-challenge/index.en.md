@@ -1,5 +1,5 @@
 ---
-date: '2026-05-25T21:00:00+09:00'
+date: '2026-05-28T13:42:34+09:00'
 draft: false
 title: 'Memory in the AI Era, Part 3: The Remaining Challenges of HBF'
 cover:
