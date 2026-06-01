@@ -23,14 +23,14 @@ keywords: [
 ---
 
 > This is Part 4 of the **Memory in the AI Era** series.
-> [Part 1](https://hyper-accel.github.io/posts/what-is-hbf/), [Part 2](https://hyper-accel.github.io/posts/hbf-workload/), and [Part 3](https://hyper-accel.github.io/posts/hbf-challenge/) covered **HBF**, which fills an empty seat in the memory hierarchy right next to the GPU.
-> From this part on, we shift our viewpoint outside the GPU, to the system level, and look at where **CXL** fits in the memory hierarchy.
+> [Part 1](https://hyper-accel.github.io/posts/what-is-hbf/), [Part 2](https://hyper-accel.github.io/posts/hbf-workload/), and [Part 3](https://hyper-accel.github.io/posts/hbf-challenge/) covered **High Bandwidth Flash (HBF)**, which fills an empty seat in the memory hierarchy right next to the GPU.
+> From this part on, we shift our viewpoint outside the GPU, to the system level, and look at where **Compute Express Link (CXL)** fits in the memory hierarchy.
 
 ## Introduction
 
 Hello, I'm Seungbin Shin, an RTL Designer at HyperAccel.
 
-Across Parts 1-3, we took a deep look at the **memory layer right next to the GPU**. HBM stacked DRAM to push up bandwidth, and **High Bandwidth Flash (HBF)** wrapped NAND in HBM's packaging to bring in capacity.
+Across Parts 1-3, we took a deep look at the **memory layer right next to the GPU**. HBM stacked DRAM to push up bandwidth, and HBF wrapped NAND in HBM's packaging to bring in capacity.
 
 But when you talk about data center memory, there's a name that keeps coming up from a seat other than the one next to the GPU. That name is **CXL**.
 
@@ -92,7 +92,7 @@ If we tie everything so far into a single line, it's this:
 
 ![Comparison of the limits of the DDR channel next to the CPU (close, but capacity-capped) and PCIe (far, non-coherent), and where CXL fits between them](01-cxl-position.webp)
 
-The standard that emerged to fill this empty seat is exactly **Compute Express Link (CXL)**.
+The standard that emerged to fill this empty seat is exactly **CXL**.
 
 CXL is not a physical layer built from scratch. It's a standard that **borrows PCIe's physical layer (PHY) as-is and layers a new, cache-coherent protocol on top of it.**
 
