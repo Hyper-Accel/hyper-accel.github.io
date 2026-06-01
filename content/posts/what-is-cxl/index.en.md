@@ -78,7 +78,7 @@ As it happens, this 64 GB/s figure already showed up in Part 3 — it's the very
 
 There are two problems when you attach memory over PCIe.
 
-First, **there's no cache coherency.** For the CPU to directly load/store the memory of a PCIe device, coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (memcpy).
+First, **there's no cache coherency.** Cache coherency is the property that, even when multiple agents (CPU cores, devices) each cache the same memory address, a change by one is always reflected so the others see the latest value. For the CPU to directly load/store the memory of a PCIe device, this coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (memcpy).
 
 Second, **the memory semantics are coarse.** PCIe operates in transaction units larger than the 64B cache line. You can't do fine-grained access in the small units that memory requires.
 
@@ -213,7 +213,7 @@ Let me touch on the key change in each version.
 
 This is the most basic form. A single CXL device is **connected directly, like a PCIe slot,** to a single host CPU.
 
-At this stage, CXL is a tool for "attaching extra memory one step farther out, next to DDR." Increasing the memory capacity of a single node is the main goal, and other nodes are none of its concern.
+At this stage, CXL is a tool for "attaching extra memory one step farther out, next to DDR." Increasing the memory capacity of a single node is the main goal; it doesn't extend to other nodes' memory.
 
 ### CXL 2.0 — The Switch and Memory Pooling
 
@@ -237,9 +237,9 @@ The flow continuing through 3.0 (2022), 3.1 (2023), and 3.2 (2024) gets even mor
 
 There are two key points.
 
-First, **from dynamic allocation to true sharing.** Where 2.0's pooling was "one chunk = one host (dynamic rotation)," in 3.x **multiple hosts read and write the same memory region simultaneously while hardware maintains cache coherency.** This is also called **Global Fabric Attached Memory (GFAM)**. From this stage on, real conflicts can occur, and the **home agents** on the host and device resolve them at cache-line granularity.
+First, **from dynamic allocation to true sharing.** Where 2.0's pooling was "one chunk = one host at a time (rotated between hosts)," in 3.x **multiple hosts read and write the same memory region simultaneously while hardware maintains cache coherency.** This is also called **Global Fabric Attached Memory (GFAM)**. Allocation (granting access) doesn't disappear here either — the difference is that where 2.0 gave one chunk to one host exclusively, 3.x lets the Fabric Manager grant multiple hosts simultaneous access to the same region. From this stage on, real conflicts can occur, and the **home agents** on the host and device resolve them at cache-line granularity.
 
-Second, **from port-level connections to a fabric connection.** 3.x ties together many CXL switches to form a large-scale fabric, and features like **Port-Based Routing (PBR)** let devices be arranged in various topologies such as mesh, dragonfly, and 3D torus.
+Second, **from port-level connections to a fabric connection.** 3.x ties together many CXL switches to form a large-scale fabric. Here, **Port-Based Routing (PBR)** routes by destination port ID — which, unlike the older tree structure, lets devices be arranged in various topologies such as mesh, dragonfly, and 3D torus, and scales to large device counts.
 
 Once you reach this stage, CXL effectively establishes itself as **a new interconnect standard inside the data center.** It even starts to become a point of comparison with accelerator interconnects like NVIDIA's NVLink and UALink (an open standard for connecting accelerators).
 
