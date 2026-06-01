@@ -78,7 +78,7 @@ As it happens, this 64 GB/s figure already showed up in Part 3 — it's the very
 
 There are two problems when you attach memory over PCIe.
 
-First, **there's no cache coherency.** Cache coherency is the property that, even when multiple agents (CPU cores, devices) each cache the same memory address, a change by one is always reflected so the others see the latest value. For the CPU to directly load/store the memory of a PCIe device, this coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (memcpy).
+First, **there's no cache coherency.** Cache coherency is the property that, even when multiple agents (CPU cores, devices) each cache the same memory address, a change by one is always reflected so the others see the latest value. DDR memory sits inside the CPU's coherency domain, so the CPU's cache hierarchy and memory controller maintain this automatically; PCIe sits outside that domain. For the CPU to directly load/store the memory of a PCIe device, this coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (memcpy).
 
 Second, **the memory semantics are coarse.** PCIe operates in transaction units larger than the 64B cache line. You can't do fine-grained access in the small units that memory requires.
 
@@ -301,7 +301,7 @@ The candidate workloads are things like:
 - database filtering and aggregation
 - some stages of LLM inference (e.g., KV cache compression, top-k selection)
 
-For this model to be meaningful, it has to be **a workload where the cost of moving data across CXL is greater than the cost of computing it.** Instead of pulling a huge embedding collection over to the host for similarity comparison, finishing it inside the memory module and passing back only the result reduces both traffic and latency.
+For this model to be meaningful, it has to be **a workload where the cost of moving data across CXL is greater than the cost of computing it.** Here, "cost" means **the time (latency) of moving the data** and **the bandwidth and power it consumes.** Instead of pulling a huge embedding collection over to the host for similarity comparison, finishing it inside the memory module and passing back only the result reduces both traffic and latency.
 
 The HBF + HAVEN combination covered in Part 2 — the idea of placing a huge vector DB on HBF and attaching a search engine right next to it to finish RAG similarity comparison on the spot — reappears in the CXL space as an NMP-integrated module.
 
