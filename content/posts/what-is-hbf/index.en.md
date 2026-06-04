@@ -1,7 +1,7 @@
 ---
 date: '2026-04-23T12:34:00+09:00'
 draft: false
-title: 'Understanding Memory: Essential Commodity of the AI Era — Part 1: Understanding HBF'
+title: 'Memory in the AI Era, Part 1: Understanding HBF'
 cover:
   image: "01-memory-hierarchy-pyramid.jpg"
   alt: "Memory hierarchy pyramid — SRAM, DRAM, HBM, HBF, SSD"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Seungbin Shin]
 tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
-series: ["Understanding Memory: Essential Commodity of the AI Era"]
+series: ["Memory in the AI Era"]
 series_idx: 1
 categories: ["AI hardware", "Semiconductor"]
 summary: "Why are there so many types of memory, and where does HBF fit in? From SRAM to HBF, we explore the physical principles behind the memory hierarchy and the technical architecture of HBF."
@@ -23,7 +23,7 @@ keywords: [
 ]
 ---
 
-> This is Part 1 of the **Understanding Memory: Essential Commodity of the AI Era** series.
+> This is Part 1 of the **Memory in the AI Era** series.
 
 ## Introduction
 
