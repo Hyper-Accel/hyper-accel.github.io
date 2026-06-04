@@ -1,5 +1,5 @@
 ---
-date: '2026-05-29T14:00:00+09:00'
+date: '2026-06-04T10:12:00+09:00'
 draft: false
 title: 'Memory in the AI Era, Part 4: Understanding CXL'
 cover:
@@ -36,7 +36,7 @@ But when you talk about data center memory, there's a name that keeps coming up 
 
 It's the keyword that never fails to appear in conversations like "building a memory pool," "sharing memory between VMs," or "tiering an AI server's hot/warm/cold data."
 
-And yet, when you actually search for CXL, even the acronyms are bewildering. There's CXL.io, CXL.cache, and CXL.mem; there are Type 1/2/3 devices; and the versions run from 1.1 to 2.0, 3.0, and 3.1. It's an interface with a fairly high barrier to entry.
+And yet, when you actually search for CXL, even the acronyms are bewildering. There's CXL.io, CXL.cache, and CXL.mem; there are Type 1/2/3 devices; and the versions run from 1.1 to 2.0, 3.0, 3.1, and 3.2. It's an interface with a fairly high barrier to entry.
 
 So in this part, I want to start from a single question.
 
@@ -78,7 +78,7 @@ As it happens, this 64 GB/s figure already showed up in Part 3 — it's the very
 
 There are two problems when you attach memory over PCIe.
 
-First, **there's no cache coherency.** Cache coherency is the property that, even when multiple agents (CPU cores, devices) each cache the same memory address, a change by one is always reflected so the others see the latest value. DDR memory sits inside the CPU's coherency domain, so the CPU's cache hierarchy and memory controller maintain this automatically; PCIe sits outside that domain. For the CPU to directly load/store the memory of a PCIe device, this coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (memcpy).
+First, **there's no cache coherency.** Cache coherency is the property that, even when multiple agents (CPU cores, devices) each cache the same memory address, a change by one is always reflected so the others see the latest value. DDR memory sits inside the CPU's coherency domain, so the CPU's cache hierarchy and memory controller maintain this automatically; PCIe sits outside that domain. For the CPU to directly load/store the memory of a PCIe device, this coherency has to be guaranteed at cache-line granularity. PCIe is fundamentally a packet-based I/O protocol, so it offers no such guarantee. To use PCIe memory like main memory, the OS has to explicitly copy the data over (e.g., via memcpy).
 
 Second, **the memory semantics are coarse.** PCIe operates in transaction units larger than the 64B cache line. You can't do fine-grained access in the small units that memory requires.
 
@@ -96,7 +96,7 @@ The standard that emerged to fill this empty seat is exactly **CXL**.
 
 CXL is not a physical layer built from scratch. It's a standard that **borrows PCIe's physical layer (PHY) as-is and layers a new, cache-coherent protocol on top of it.**
 
-Adding a cache-coherency contract on top of the off-the-shelf PCIe 5.0 infrastructure — that's the core idea of CXL.
+A high-speed interconnect standard that adds a cache-coherency contract on top of the off-the-shelf PCIe 5.0 infrastructure — that's the core idea of CXL.
 
 ---
 
@@ -173,7 +173,7 @@ A Type 1 device **has no memory of its own and caches host memory.**
 
 The representative candidate is the **SmartNIC**. When processing packets coming in from the network, it frequently reads the host's descriptor queues and packet buffers. Instead of making a round trip all the way to host memory every time, keeping these in the NIC's internal cache and maintaining coherency can greatly reduce packet-processing latency.
 
-Type 1 shows its value in **workloads that frequently reference host data structures**, like FPGA accelerators.
+Type 1 shows its value in **workloads that frequently reference host data structures**, as with FPGA accelerators.
 
 ### Type 2 — The Accelerator With Both Memory and Cache
 
@@ -311,7 +311,7 @@ Beyond the big three memory vendors, there are players who never go missing from
 
 - **Astera Labs**: Its Leo series controllers are used in **Microsoft Azure's M-series CXL memory** and elsewhere, aiming for the position of the "standard part" of CXL memory controllers.
 - **Marvell**, **Microchip (formerly Microsemi)**: They hold one axis of the IP camp with their controller lineups. The Micron CZ120 we saw earlier also uses Microchip's **SMC 2000** controller.
-- **Panmnesia**: A Korean fabless startup that came out of KAIST's **CAMELab (Computer Architecture and Memory Systems Laboratory)**. There's an interesting connection here. M. Jung, an author of the *Memory Pooling With CXL* paper cited earlier, is **Professor Myoungsoo Jung of KAIST**, who founded this company. It doesn't stop at controllers — it's a full-stack player that builds even **CXL 3.2 fabric switch silicon ([PANSWITCH](https://panmnesia.com/))** directly. It's implementing 3.x's most cutting-edge features, such as PBR and mesh/dragonfly/3D torus topologies, in silicon ahead of anyone else. In April 2026 it announced a second-half mass-production plan along with the supply of pre-release silicon, stepping into a full-fledged commercialization phase.
+- **Panmnesia**: A Korean fabless startup that came out of KAIST's **CAMELab (Computer Architecture and Memory Systems Laboratory)**. There's an interesting connection here. M. Jung, an author of the *Memory Pooling With CXL* paper cited in the references, is **Professor Myoungsoo Jung of KAIST**, who founded this company. It doesn't stop at controllers — it's a full-stack player that builds even **CXL 3.2 fabric switch silicon ([PANSWITCH](https://panmnesia.com/))** directly. It's implementing 3.x's most cutting-edge features, such as PBR and mesh/dragonfly/3D torus topologies, in silicon ahead of anyone else. In April 2026 it announced a second-half mass-production plan along with the supply of pre-release silicon, stepping into a full-fledged commercialization phase.
 
 Memory companies do sometimes design their own CXL controllers, but since the standard evolves so quickly, it's common to outsource to — or collaborate with — IP/silicon suppliers. Especially in **an area like the 3.x fabric, where the standard itself is only just settling**, specialist players like Panmnesia appear to be a step ahead — a pretty interesting point even from the perspective of the Korean semiconductor ecosystem.
 
