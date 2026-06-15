@@ -1,6 +1,6 @@
 ---
 date: '2026-05-07T10:00:00+09:00'
-draft: true
+draft: false
 title: 'Back to the Terminal: How Agents Made Remote Development Feel Native'
 authors: ['Taeseo Um']
 tags: ['AI Agents', 'Terminal', 'Vibe Coding', 'Context Engineering', 'Developer Tools']
@@ -39,7 +39,7 @@ It also gives me a different kind of memory. The scrollback quietly records wher
 
 ## I Started SSHing Into My Laptop
 
-One of my earliest habits here was small and almost boring: I started SSHing into my own laptop to begin work, even when I wasn't far from it.
+One of my earliest habits here was small and almost boring: I started SSHing into my own laptop to begin work; whether I was away at home, and even when I wasn't far from it.
 
 Before agent workflows, SSH had always felt useful but limited — fine for checking logs, restarting a process, or making a tiny edit, but anything larger felt uncomfortable. If I needed real context, I'd usually just wait until I was back at my desk with the IDE open.
 
