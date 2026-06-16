@@ -205,3 +205,27 @@ Agents need text instructions, but they also need a world to act on, and the CLI
 The result isn't a future where every developer abandons the IDE — I genuinely don't want that future. It's a more layered workflow, where the IDE stays a strong place for deep attention, the terminal becomes the portable execution layer, and the agent sits inside that layer turning intent into observable work.
 
 That's why I keep coming back to the black screen. Not because it's old, but because it travels well.
+
+## Wrapping Up
+
+Writing this all down, I realize the real change was never a single tool — it was a shift in how I approach the work itself. Terminal or IDE, SSH or Termux or Kubernetes, what matters now is that I've started asking, every single time, "Where, and in which environment, should this work actually run?" Agents widened the reach of my hands, but deciding what those hands touch is still entirely on me. Finding that balance has quietly become the most interesting kind of engineering I do these days.
+
+And none of this happened in isolation. HyperAccel is full of colleagues weaving AI into their workflows in their own ways, and one person's trial and error often becomes the next person's starting point. I'd like to think of this post as one small piece of that shared notebook.
+
+---
+
+## Upcoming...
+
+If this post was about **where** the work should run, the next one goes a step deeper into how we actually design those environments — how a prompt becomes a small design document, the guardrails and verification steps we hand an agent, and the exact point where context engineering turns into environment engineering, all with more concrete examples from how we work.
+
+As the teams at HyperAccel keep finding new ways for AI to melt into our workflow, we'll continue sharing the missteps and the insights along the way.
+
+---
+
+## HyperAccel is Hiring!
+
+The reason why we are writing operating this tech blog is largely too attract top talent!
+
+If you are interest in the technologies we work with, and want to join this revolution, please apply at [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)!
+
+HyperAccel is full of brilliants engineers. We will be waiting.
