@@ -1,5 +1,5 @@
 ---
-date: '2026-05-07T10:00:00+09:00'
+date: '2026-06-16T10:00:00+09:00'
 draft: false
 title: 'Back to the Terminal: How Agents Made Remote Development Feel Native'
 cover:
