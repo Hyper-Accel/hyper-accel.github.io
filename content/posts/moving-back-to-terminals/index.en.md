@@ -2,6 +2,13 @@
 date: '2026-05-07T10:00:00+09:00'
 draft: false
 title: 'Back to the Terminal: How Agents Made Remote Development Feel Native'
+cover:
+  image: "images/thumbnai.png"
+  # can also paste direct link from external site
+  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
+  alt: "mobile bridge between agent and development environment"
+  caption: "mobile bridge between agent and development environment"
+  relative: false
 authors: ['Taeseo Um']
 tags: ['AI Agents', 'Terminal', 'Vibe Coding', 'Context Engineering', 'Developer Tools']
 categories: ['AI', 'Developer Tools']
