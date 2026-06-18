@@ -1,0 +1,250 @@
+---
+date: '2026-06-08T00:00:00+09:00'
+draft: true
+title: '지피지기면 백전불태 7편 : Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작'
+cover:
+  image: "images/cover.png"
+  # TODO: 커버 이미지 제작 후 교체 (현재 images/ 비어 있음)
+  alt: "Agentic AI 시대 데이터센터 CPU 3강 — Intel, AMD, NVIDIA"
+  caption: "다시 떠오르는 데이터센터 CPU"
+  relative: true
+authors: [Jaewon Lim]
+tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference"]
+series: ["지피지기면 백전불태"]
+series_idx: 7
+categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
+summary: "Agentic AI 워크로드에서 CPU가 추론 인프라의 병목이 된 원인을 분석하고 CPU 3사의 최신 데이터센터향 CPU 라인업을 분석해보며 Agentic AI 시대에 다시 떠오른 CPU의 중요성에 대해 알아봅니다."
+description: "Agentic AI 워크로드에서 CPU가 추론 인프라의 병목이 된 원인을 분석하고 CPU 3사의 최신 데이터센터향 CPU 라인업을 분석해보며 Agentic AI 시대에 다시 떠오른 CPU의 중요성에 대해 알아봅니다."
+comments: true
+keywords: [
+  "CPU", "Agentic AI", "데이터센터 CPU", "CPU GPU 비율",
+  "Intel Xeon", "Diamond Rapids", "AMD EPYC", "Venice Dense",
+  "NVIDIA Vera", "Vera Rubin", "AMX", "LLM 추론 병목"
+]
+---
+
+# 지피지기면 백전불태 7편 : Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작
+
+> **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  
+> 이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.  
+> 일곱 번째 글에서는 Agentic AI 시대에 다시 주목받는 **데이터센터 CPU**, 그리고 이를 둘러싼 Intel·AMD·NVIDIA 세 벤더의 경쟁에 대해 다룹니다.
+
+---
+
+안녕하세요? HyperAccel DV팀 소속 하드웨어 검증 엔지니어 임재원입니다.
+
+오늘 글은 두 기업의 주가 차트로 시작해 보겠습니다.
+
+지난 4월 말, Intel이 1분기 실적을 발표하자 다음 날 주가가 하루 만에 **24%** 뛰었습니다. 1987년 이후 가장 큰 일간 상승폭이었습니다. 2주 뒤 실적을 낸 AMD의 주가도 다음 날 **18.6%** 올랐습니다. 두 회사의 실적 성장치에는 공통점이 하나 있었습니다. 바로 **CPU** 였습니다.
+
+AMD의 데이터센터 매출은 전년 대비 **57%**, Intel은 **22%** 늘었고, 두 회사 모두 서버 CPU 수요 급증을 그 배경으로 꼽았습니다. AMD의 리사 수 CEO는 서버 CPU 시장이 2030년까지 **1,200억 달러** 규모로 커질 것이라 전망하기도 했습니다.
+
+> GPU가 AI의 중심이라고 했는데, 왜 다시 CPU이야기를 하는 것 일까요?
+
+이 질문이 오늘 글의 출발점입니다. 지금까지 이 시리즈에서 다룬 가속기 구조와 여러 솔루션은 모두 "가속기를 AI 연산에 어떻게 최적화하느냐"에 대한 이야기였습니다. 그런데 추론 워크로드가 **Agentic AI** 로 옮겨가면서, 정작 이 최적화된 가속기가 오히려 일을 못하고 준비 상태로 기다리게 되는 역설이 나타나기 시작했습니다. 그리고 그 병목에는 생각지도 못한 **CPU**가 자리잡고 있습니다.
+
+이번 글에서는 먼저 Agentic AI 시대에 CPU가 다시 병목이 된 이유를 짚어 본 뒤, **Intel · AMD · NVIDIA** 세 회사의 최신 데이터센터 CPU를 비교해 보며 GPU 전쟁에 이어 앞으로 이어질 CPU 전쟁에 대해 살펴보겠습니다.
+
+<!-- [집필 메모] 위 주가/실적 수치는 검증 완료(공식 IR + CNBC/stockanalysis.com/Futurum, 2026-06-08 교차검증). ⚠️ 데이터센터 매출 +22%/+57%는 CPU+GPU 합산이므로 CPU 단독 성장이 아님(특히 AMD는 server CPU 단독 달러 미공개). 그래서 본문은 "서버 CPU 수요 급증을 핵심 동력으로 꼽았다"는 경영진 발언 수준으로만 표현했고, "CPU만으로 N% 성장"으로 과대해석하지 않도록 주의. Intel의 EPS 서프라이즈(~29×)는 컨센서스가 breakeven 가이던스라 생긴 착시라 일부러 인용하지 않음(본질은 매출 ~$1.3B 상회). 출처는 Reference 참고. -->
+
+<!-- [작성 메모 — 도입부 톤 체크] 주가 아이스브레이킹은 여기까지 (3문단 + 질문). 더 늘리지 말 것. 다음 H2부터 본론(병목 → 마이크로아키텍처). -->
+
+## GPU만 늘리면 될까? : 다시 불려 나온 CPU
+
+본격적인 이야기에 앞서, CPU와 GPU의 관계를 잠깐 짚고 가겠습니다. 우리는 흔히 AI 연산의 주인공을 GPU라고 생각하지만, **GPU는 혼자서는 한 줄도 실행하지 못합니다**. GPU는 본래 화면을 그리는 그래픽 연산을 빠르게 처리하려고 만든 보조 장치였고, 운영체제를 올리고 프로그램을 띄우고 무슨 일을 할지 지시하는 일은 처음부터 CPU의 몫이었습니다. CPU는 혼자서 컴퓨터를 돌릴 수 있지만, GPU는 자신을 먹여 주고 지휘해 줄 호스트 CPU 없이는 아무것도 하지 못합니다. 이 종속 관계는 지금도 변하지 않았습니다.
+
+이후 CUDA로 대표되는 GPGPU(General-Purpose computing on GPU)가 등장하며 GPU는 그래픽을 넘어 범용 연산까지 떠맡았지만, 그것이 CPU를 완전히 대체하려는 것은 아니었습니다. 무겁고 규칙적인 행렬 연산은 GPU가, 분기와 제어가 많은 나머지 일은 여전히 CPU가 맡는 분업이었죠. 그런데 AI 시대에 GPU의 몸값이 폭등하면서, 어느새 CPU는 'GPU를 먹여 주는 덜 중요한 부품' 정도로 취급되기 시작했습니다. 주연과 조연이 뒤바뀐 것처럼 보였습니다.
+
+하지만 GPU는 여전히 범용 장치가 아닙니다. 그리고 Agentic AI는 검색 엔진을 두드리고, 샌드박스에서 코드를 실행하고, 여러 도구를 조율하는, 어디에나 필요한 범용적인 일들을 끝없이 요구합니다. 이것은 GPU가 할 수 없고 CPU만이 하는 일입니다. 한동안 조연으로 밀려나 있던 CPU가 다시 무대 중앙으로 불려 나오고, 데이터센터 CPU를 둘러싼 새로운 전쟁이 시작되는 지점입니다.
+
+<!-- [이미지 01 예정] CPU(호스트)와 GPU(가속기)의 관계 다이어그램: CPU는 단독 구동 가능, GPU는 호스트 CPU 없이는 동작 불가(peripheral). 그래픽 가속기 → GPGPU → AI 시대로 이어지는 위상 변화. 이 문단 부근 배치. -->
+
+AI 연산에 병목이 생길 때 가장 흔하게 떠올릴 수 있는 해결책은 GPU입니다. 더 좋은 성능의 GPU, 더 많은 GPU로 인프라를 확장하는 것입니다. 모델을 한 번 통과시키는 것이 AI 어플리케이션의 전부이던 시절에는 대체로 맞는 처방이었습니다.
+
+그런데 최근 연구들은 조금 이상한 장면을 보여 줍니다. 한 연구에 따르면, agent가 도구를 호출하고 그 결과를 처리하는 시간이 워크로드에 따라 전체 응답 지연의 **최대 88%** 까지 차지했습니다. 그리고 이 도구 실행은 거의 전부 CPU에서 일어납니다. 정작 값비싼 GPU는 그 시간 동안 CPU의 실행 결과를 기다리며 놀고 있었던 셈입니다.
+
+더 흥미로운 것은 이를 해결할 방법을 보여준 또다른 연구입니다. 여기서는 GPU를 단 한 장도 추가하지 않았습니다. 대신 GPU 하나에 배정된 CPU 코어를 1개에서 8개로 늘렸을 뿐입니다. 그러자 첫 토큰까지 걸리는 시간(TTFT)이 **1.36-5.40배** 빨라졌습니다. GPU 측 최적화를 모두 켠 상태에서 나온 결과입니다.
+
+GPU를 더 늘리지 않고, CPU 코어 몇 개를 추가하는 것만으로 몇 배의 속도 차이를 보인 것입니다. CPU가 다시 컴퓨팅의 최전선으로 돌아온 것일까요? 다음 섹션에서 그 배경에 대해 알아보겠습니다.
+
+<!-- [근거] 88% / RAG-Haystack 81-89% / SWE-Agent 38-65%: Raj et al. arXiv:2511.00739. TTFT 1.36-5.40×: Chung et al. arXiv:2603.22774. "CPUs are cool again": Tom's Hardware. ⚠️ 88%는 평균이 아니라 tool-dominated 워크로드의 상한이라 "워크로드에 따라 ~까지"로 표현함. -->
+
+## 왜 CPU가 중요해지는가 : 단일 패스에서 agentic 루프로
+
+<!-- [이미지 02 예정] 단일 패스 vs agentic 루프 타임라인 다이어그램 (CPU/GPU 점유 대비). 이 문단들 앞에 배치 권장. -->
+
+CPU를 추가하는 것만으로 어떻게 이러한 성능 향상을 이룰 수 있었을까요? 답은 추론의 형태가 진화했다는 데 있습니다.
+
+지금까지 LLM 추론은 한 번의 경로로 끝납니다. CPU가 입력을 토큰으로 쪼개면, GPU가 모델을 통과시켜 답을 만들고, CPU가 다시 사람이 읽을 글자로 풀어냅니다. 이 구조에서 GPU는 거의 쉴 틈 없이 일합니다. CPU가 맡는 일은 앞뒤로 토큰을 변환하는 가벼운 작업뿐입니다.
+
+**Agentic AI** 는 이 그림을 바꿉니다. 에이전트는 모델의 답변을 내놓는 데서 끝나지 않고, 코드·문서·디자인 같은 결과물을 직접 만들어 냅니다. 이를 위해 계획을 세우고, 도구를 부르고, 결과를 본 뒤 다시 판단하는 과정을 여러 번 반복하죠. 이 과정에서 도구 실행과 검색, 코드 실행, 오케스트레이션, 재시도는 **모두** CPU의 몫입니다. GPU는 모델을 빠르게 통과시키는 일에만 특화돼 있어, 그 한 순간을 빼면 나머지는 전부 CPU가 떠안기 때문입니다. 결국 GPU는 모델을 통과시키는 순간에만 일하고, CPU가 도구를 돌리는 동안에는 멈춰서 기다립니다.
+
+그렇다면 CPU가 떠안는 일은 구체적으로 무엇일까요? 크게 세 가지입니다.
+
+첫째는 정보 검색입니다. **RAG**(Retrieval-Augmented Generation)나 벡터 DB 조회, 데이터베이스 질의처럼 외부 지식을 찾아오는 작업입니다. 거대한 인덱스를 뒤지고 디스크와 네트워크를 오가는 일이기 때문에 메모리를 많이 소모하고, CPU에서 성능이 더 좋기 때문에 CPU가 주로 진행합니다.
+
+둘째는 코드 실행입니다. Agentic AI는 코딩 작업에 특히 많이 사용됩니다. 모델이 만든 코드는 사용자에게 전달되기 전에 정상적인 코드인지 확인하는 작업을 거칩니다. 이 때 격리된 샌드박스(컨테이너나 별도 프로세스)를 띄워 그 안에서 파이썬이나 셸을 돌립니다. 이 역시 전형적인 CPU·운영체제 작업입니다.
+
+셋째는 작업과 작업을 연결하는 일입니다. 도구 호출을 준비하고, 돌아온 결과를 파싱하고, 다음 단계를 정하고, 실패하면 재시도하는 오케스트레이션이 CPU 위에서 끊임없이 돌아갑니다.
+
+Intel 측의 표현을 빌려 말하면, Agentic AI는 추론을 LLM과 같은 하나의 거대한 프로그램이 아니라, 여러 작은 서비스가 협력하는 마이크로서비스에 가깝게 만듭니다. 제어 흐름과 도구 호출, 재시도, 조율 과정이 전부 CPU 위에서 이루어집니다. 그 결과 한 번의 작업이 진행되는 시간의 상당 부분, 측정에 따라서는 **30-90%** 가 CPU에 머뭅니다.
+
+### 비용의 역설
+
+역설적인 것은 비용입니다. 클라우드 인스턴스 가격을 기준으로 보면, GPU 연산은 CPU보다 100배에서 많게는 1,600배까지 비쌉니다. 그런데 이 병목을 풀기 위해 CPU 코어를 더 얹는 비용은 한 서버 기준 약 1.5%에 그쳤습니다. 비싼 GPU를 놀리지 않으려고 값싼 CPU를 조금 더 쓰는 편이 훨씬 남는 장사인 셈입니다.
+
+여기에 한 가지가 더 붙습니다. 앞선 연구는 "GPU가 좋아질수록 병목은 오히려 CPU로 더 빠르게 옮겨간다"고 말합니다. 차세대 GPU가 모델을 더 빨리 통과시킬수록, 그 사이 다른 작업을 실행하는 CPU의 상대적 부담이 더 커지기 때문입니다. 결국 GPU를 키우는 것만으로는 이 문제가 풀리지 않습니다. 더 좋은 CPU, 더 많은 CPU가 필요해지는 것입니다. 그렇다면 이제 시선을 CPU 자체로, 그리고 CPU를 만드는 회사들로 옮겨 보겠습니다.
+
+<!-- [집필 메모] Chung et al. arXiv:2603.22774: 토큰화 50% / shm_broadcast 19× / straggler / 비용 100-1,600×·+1.5%. ⚠️ vLLM·NVIDIA GPU·SMT off·합성(attacker-victim) 부하 한정 — 메커니즘은 일반적이나 절대 수치 일반화는 주의(저자도 한계 명시). -->
+
+## 2강 구도에서 3강 구도로 — CPU 경쟁에 뛰어든 NVIDIA
+
+전통적으로 서버 한 대에서 CPU 한 개는 GPU 4-8개를 거느렸습니다. agentic 시대에는 이 비율이 거꾸로 뒤집힙니다. Intel은 차세대 GPU가 더 빨라질수록, GPU 한 개를 제대로 운용하는 데 CPU가 **최대 7개까지** 필요해질 수 있다고 주장합니다.
+
+그래서 CPU를 만드는 회사들 모두 "이제 다시 CPU의 시대"라고 외칩니다. 그런데 여기서 그동안 보이지 않던 이름이 하나 등장합니다 — 바로 GPU를 만들던 **NVIDIA** 입니다. NVIDIA가 CPU 경쟁에 직접 뛰어든 것이죠.
+
+사실 이는 **반은 맞고 반은 틀린** 이야기입니다. NVIDIA가 데이터센터 CPU 경쟁의 한복판으로 걸어 들어온 것은 분명 새로운 사건이지만, 'NVIDIA가 CPU를 처음 만든다'는 뜻은 아니기 때문입니다. GPU는 혼자서는 아무것도 시작하지 못합니다. 부팅도, 연산할 일을 나눠 던지는 것도 모두 곁에 붙은 **CPU(호스트)** 가 해 줘야 하죠. 그래서 NVIDIA는 오래전부터 자사 GPU를 거느릴 CPU를 직접 만들어 왔습니다.
+
+다만 그 무대가 데이터센터는 아니었습니다. 전통적인 데이터센터와 PC 시장은 x86을 쥔 **Intel과 AMD** 가 단단히 틀어쥐고 있었고, x86 라이선스가 없는 NVIDIA가 비집고 들어갈 자리는 거의 없었습니다. 그래서 NVIDIA의 CPU는 주로 Arm 기반 SoC인 **Tegra** 의 형태로, 닌텐도 스위치 같은 게임기와 모바일·자동차 임베디드 영역에 자리 잡았죠.
+
+하지만 NVIDIA는 그 과정에서 쌓은 코어 설계 노하우와 자사 GPU와의 호환성을 발판 삼아, Arm ISA를 중심으로 'GPU와 함께 파는' 데이터센터 CPU로 무대를 넓혀 왔습니다. Hopper·Blackwell에 짝지은 **Grace** 가 그 첫 결실이었죠. 그리고 마침내 2026년 6월 GTC Taipei에서, NVIDIA는 ARM 라이선스 코어를 빌려 쓰던 Grace와 달리 직접 설계한 코어로 만든 **Vera** 를 들고 나와 데이터센터 CPU 시장을 정조준한다고 선언했습니다. 오랫동안 Intel과 AMD의 2강 구도였던 CPU 전쟁이, 비로소 **3강 구도** 로 넘어가는 순간입니다.
+
+<!-- [이미지 03 예정: images/vera_cpu.png] NVIDIA Vera CPU 다이/발표 슬라이드 — Vera를 처음 소개하는 이 문단 부근 배치. -->
+
+
+하지만 같은 구호 아래 전략은 갈립니다. 한 줄로 줄이면 "AMX를 가진 x86(Intel), 코어로 미는 x86(AMD), GPU에 붙는 Arm(NVIDIA)"의 구도죠. 이제부터 세 회사의 CPU 아키텍처를 나란히 뜯어보겠습니다 — 먼저 핵심 사양을 아래 표로 추린 뒤, 설계가 또렷이 갈리는 세 축(**① x86 vs Arm과 행렬 연산 ISA, ② 멀티스레딩, ③ CPU-GPU 인터커넥트**)을 차례로 따라갑니다.
+
+<!-- [근거] 비교 축 = wiki/concepts/architecture/cpu-microarchitecture.md §비교 축에서 7축 좌표계를 추렸으나, 사용자 지시로 본문은 agentic 관점에서 갈리는 3축(① SIMD/행렬 ISA=CPU 단독 SLM 추론 / ② 멀티스레딩=시분할 SMT vs 공간 분할 / ③ CPU-GPU 인터커넥트=KV-offload)만 두고, 축별 섹션으로 재편(벤더별 섹션 폐기). 디코드 폭·ROB·캐시·메모리 세부는 표에서 빼고 각 축 끝 근거 주석에만 남김. [reported, ServeTheHome/Chips and Cheese, 2026-06] -->
+
+<!-- [집필 메모] 위 1문단은 사용자 지시로 'The Great Rebalance + 시장 신호' 섹션을 압축한 것. 생략한 내용: TrendForce 전통 1:4~1:8 → agentic 1:1~1:2 / GW당 코어 30M→120M, OpenAI "tens of millions of CPUs", 서버 CPU 가격 10~20%↑·리드타임 6개월. ⚠️ Intel 비율은 현재 1:1~1.4:1 / 미래 최대 **7:1**(차세대 GPU+현세대 CPU 가정, vendor-claim, verdict=partial). 사용자가 언급한 8:1이 아니라 공식 수치는 7:1이라 7:1로 적음. -->
+
+<!-- [작성 메모] 아래 비교표는 모두 vendor-claim/로드맵 기준(출시 시 변동 가능). 표 → 축별 prose(① SIMD → ② 멀티스레딩 → ③ CPU-GPU) 순서. -->
+
+| 구분 | Intel Xeon | AMD EPYC | NVIDIA Vera |
+|---|---|---|---|
+| 현세대 대표 | Xeon 6980P · Redwood Cove | EPYC 9755·9965 · Zen 5 / 5c | Vera · Olympus(커스텀 Arm) |
+| **명령어 집합 (ISA)** | **x86-64** (CISC 계열) | **x86-64** (CISC 계열) | **Arm** Armv9.2-A (RISC 계열) |
+| 코어 / 스레드 | 128C / 256T | 128C/256T(9755) · 192C/384T(9965) | 88C / 176T |
+| **행렬 연산 ISA** | **AMX** + AVX-512 (전용 타일 행렬엔진) | AVX-512 / VNNI (SIMD 기반 행렬연산) | SVE2 + **FP8** |
+| **② 멀티스레딩** | 2-way **시분할 SMT** | 2-way **시분할 SMT** | 2-way **공간 멀티스레딩** (자원 물리분할) |
+| **③ CPU-GPU 링크** | PCIe 5 / CXL | PCIe 5 / Infinity Fabric | **NVLink-C2C 1.8 TB/s (coherent)** |
+| 강점 축 | AMX 행렬연산 (추론 흡수) | 코어 수 · I/O (action-heavy) | coherent KV-offload (reasoning-heavy) |
+
+<!-- [작성 메모 — 구조] v2: 사용자 지시로 벤더별 섹션(Intel/AMD/NVIDIA)을 폐기하고 축별 섹션 3개로 재편 — ① SIMD·행렬 ISA(AMX vs AVX-512 vs SVE2), ② 멀티스레딩(시분할 SMT[Intel·AMD] vs 공간 멀티스레딩[NVIDIA], 강조), ③ CPU-GPU 링크(PCIe/CXL·Infinity Fabric vs NVLink-C2C coherent→KV-offload). 디코드폭/ROB/캐시/메모리 세부와 Diamond Rapids·Venice 로드맵 풀단락은 본문에서 빼고 축별 헤드라인+근거 주석으로만 남김(원자료는 각 축 끝 주석에 보존). thesis: "AMX 있는 x86(Intel) vs 코어로 미는 x86(AMD) vs GPU에 붙는 ARM(NVIDIA)". ⚠️ 표/로드맵 수치는 vendor-claim/리크 포함(출시 시 변동). Vera 코어=커스텀 Olympus(Armv9.2-A), Neoverse는 전임자 Grace. 출처: 마이크로아키텍처 리서치 wf_913b376f, wiki/concepts/architecture/cpu-microarchitecture.md (Chips and Cheese / ServeTheHome / Tom's / Phoronix). -->
+
+### ① x86 vs Arm
+
+세 회사를 가르는 가장 근본적인 선은 코어를 얼마나 크게 키웠느냐가 아니라, 어떤 **명령어 집합(ISA)** 위에 코어를 세웠느냐입니다 — Intel·AMD는 **x86**, NVIDIA의 Vera는 **Arm** 이죠. ISA(Instruction Set Architecture)는 소프트웨어와 하드웨어 사이의 약속, 즉 프로그램이 CPU에게 시킬 수 있는 명령어의 종류와 형식·레지스터 규격을 정해 둔 '계약서'입니다. 같은 ISA끼리는 한 번 컴파일한 프로그램이 그 위 어떤 칩에서도 돌지만, ISA가 다르면 같은 프로그램도 새로 컴파일해야 합니다.
+
+x86과 Arm은 이 계약서를 짜는 철학부터 다릅니다. x86은 **CISC(Complex Instruction Set Computer)** 계열에서 출발해 명령어 하나가 복잡한 일을 처리하고 길이도 제각각(가변 길이)입니다. Arm은 **RISC(Reduced Instruction Set Computer)** 계열로 명령어를 단순하게 쪼개고 길이를 4바이트로 고정합니다. 오늘날엔 두 진영 모두 내부에서 명령어를 잘게 나눈 마이크로 연산(µop)으로 바꿔 실행해 이 경계가 많이 흐려졌지만, 한 가지 차이는 끝까지 남습니다 — **명령어를 해석(decode)하는 비용** 입니다. 길이가 들쭉날쭉한 x86은 명령어의 경계부터 찾아야 해 디코더가 복잡하고 전력을 더 먹는 반면, 길이가 고정된 Arm은 여러 명령어를 한꺼번에 나란히 해석하기 쉬워 디코더를 넓히기에 유리합니다. Arm 아키텍쳐 기반 프로세서들이 과거 모바일 시대에 AP(application processor)에 많이 사용된 이유가 여기에 있습니다.
+
+<!-- [이미지 04 예정: images/x86_vs_arm.png] x86(CISC·가변 길이) vs Arm(RISC·고정 4B) 비교 다이어그램 — 명령어 길이/디코드 비용 대비. 이 문단 부근 배치. -->
+
+그렇다면 전력이 중요한 AI 연산에서 효율 좋은 Arm이 진작 데이터센터를 차지했어야 할 텐데, 오랫동안 그러지 못했습니다. x86의 진짜 해자(moat)는 성능이 아니라 **호환성** 이기 때문입니다. 수십 년간 쌓인 운영체제와 기업용 소프트웨어, 드라이버가 모두 x86 바이너리로 컴파일돼 있고, 이 자산을 옮기는 데는 막대한 비용이 듭니다. 게다가 x86을 만들 수 있는 회사는 사실상 Intel과 AMD 둘뿐이라(상호 라이선스), 그 울타리 자체가 진입 장벽입니다.
+
+반면 Arm의 무기는 **효율과 개방성** 입니다. 본래 모바일에서 출발해 '전력당 성능'을 최우선으로 설계됐고, ISA를 라이선스로 개방해 누구나 그 위에 자기만의 코어를 직접 설계할 수 있게 했습니다. Apple의 M 시리즈, Amazon의 Graviton, 그리고 NVIDIA의 Grace·Vera가 모두 이 길에서 나왔죠. 전성비와 코어 밀도가 곧 운영비인 데이터센터에서 이 철학은 점점 힘을 받고 있고, NVIDIA가 x86 대신 Arm을 고른 이유도 여기애 있습니다.
+
+**행렬 연산 ISA 확장** 
+
+이 기본 ISA 위에, 행렬 연산을 빠르게 처리하기 위한 **확장 명령어**가 올라탑니다. 기본 명령어들은 대부분 연산을 스칼라 단위로 하나씩 처리하기 때문에 여러개의 데이터를 연산하기 위해서는 그만큼의 명령어가 필요합니다. 이 때문에 병렬화가 가능한 작업은 단일 명령어로 수행하여 처리량을 늘리기 위해 만들어진 것이 SIMD(single instruction, multiple data) 명령어입니다. 이는 지난 GPU편에서도 설명한 개념으로 CPU에서도 성능 향상을 위해 사용하고 있습니다.
+
+x86 진영(Intel·AMD)은 벡터 길이를 고정하는 **AVX** 기반 SIMD 유닛을 공통 토대로 삼고, Arm 진영은 가변 길이 벡터 확장인 **SVE2** 를 씁니다. 여기까지는 ISA가 갈라놓은 차이지만, x86 진영 안에서도 Intel과 AMD의 접근이 나뉩니다.
+
+<!-- [이미지 05 예정] 벡터 vs 행렬 연산 유닛 비교 다이어그램: AVX-512(x86 SIMD, 고정폭 레인) · SVE2(Arm 가변길이 SIMD) · AMX(2D 타일 행렬 엔진, systolic 누산). 이 문단 부근 배치. -->
+
+**Intel** 은 AVX 위에 전용 2차원 타일 행렬 엔진 **AMX**(Advanced Matrix Extensions)를 코어 안에 추가했습니다. AMX는 1차원 벡터가 아니라 행렬 단위로 곱셈-누산을 처리하는 온다이 유닛으로, 코어 하나가 한 사이클에 INT8 기준 2,048번, BF16·FP16 기준 1,024번의 곱셈-누산을 처리합니다. 이 전용 행렬 엔진으로 작은 모델(SLM) 정도는 GPU 없이 CPU만으로도 추론이 가능합니다.
+
+**AMD** 는 전용 타일 엔진 없이 **AVX-512와 VNNI** 로 행렬 연산을 처리합니다. 전용 2차원 행렬 엔진보다 하드웨어 처리 밀도는 낮지만, 기존 SIMD 유닛으로도 행렬 연산은 충분히 수행할 수 있고 무거운 연산은 GPU에 넘깁니다. 그리고 Intel과 AMD는 x86 생태계에서 CPU 측 AI 행렬 연산 확장을 표준화하기 위한 **ACE**(AI Compute Extensions) 규격을 공동으로 발표했습니다. 이는 x86 아키텍쳐에서 AMX와 같은 전용 연산 유닛 없이 범용 연산 유닛으로 AI 연산을 수행할 수 있게 하기 위한 표준입니다.
+
+**NVIDIA** Vera는 Arm **SVE2** 에 네이티브 **FP8** 을 더한 경로를 씁니다. 전용 타일 엔진은 없지만, 가변 길이 벡터 유닛과 FP8 지원으로 추론 연산을 처리하고 무거운 행렬 연산은 GPU에 넘깁니다.
+
+<!-- [근거 — x86 vs Arm] ISA=SW-HW 계약(명령어 종류/형식/레지스터 규격). x86-64=CISC 계열·가변길이→명령어 경계 탐색 필요·디코드 복잡·전력↑; Arm(AArch64)=RISC 계열·고정 4B→병렬 디코드 용이·전성비↑. ⚠️ 단 현대 양 진영 모두 내부 µop 변환→CISC/RISC 성능 우열 단정 금지(경계 흐려짐) [reported]. x86 해자=바이너리 호환성+수십년 OS/기업SW/드라이버 생태계+사실상 Intel·AMD 2사 상호라이선스(VIA/Zhaoxin 등 소수 제외). Arm=모바일 출신 와트당성능 우선+IP 라이선스 개방→커스텀 코어 가능: Apple M, AWS Graviton(Neoverse 기반), NVIDIA Grace(Neoverse V2 라이선스코어)/Vera(Olympus 풀커스텀). Vera 프런트엔드 10-wide=3사 최광폭(고정길이 디코드 이점) [reported/추정 — 본문은 '알려진'으로 하향]. 출처: cpu-microarchitecture.md, nvidia-vera.md, nvidia-grace.md. -->
+
+<!-- [근거/주의 — Intel/AMX 원자료] Granite Rapids=Redwood Cove(Intel 3), 디코드 6-wide [reported, ServeTheHome] — 초안의 8-wide는 오류라 정정(8-wide는 Lion Cove). 프런트엔드: I-cache 64KB·µop큐 192·fetch 32B/cycle·분기 2/cycle [reported, Chips and Cheese]. ROB 약 512 [reported]·L2 2MB/core [reported]·EMIB 타일·12ch DDR5-6400/MRDIMM-8800(1P 실측 약 690 GB/s [measured, c't/heise], 2P STREAM Triad >1200 GB/s). AMX: 코어당 2048 INT8 / 1024 BF16·FP16 MAC/cycle [vendor-claim, Intel], 온다이 타일+시스톨릭; Redwood Cove가 AMX-FP16 추가 [reported]. Diamond Rapids=Panther Cove(Intel 18A-P, 4 compute+2 I/O 칩렛→최대 48C/모듈→192C no-SMT, 16ch DDR5, PCIe 6.0, APX+native TF32/FP8+AVX10.2, Granite 대비 약 2배 >1.5 TB/s)는 로드맵/벤더 주장, 공식 2027(이전 보도 2026 폐기) — Hot Chips 2026 상세. 출처: wiki intel-granite-rapids/intel-diamond-rapids/amx/cpu-microarchitecture(Chips and Cheese·ServeTheHome·The Register·Tom's). ⚠️ Intel CPU:GPU 1:1-1.4:1·미래 7:1은 vendor-claim(verdict=partial); vLLM 2.7배는 64C Xeon vs 192C EPYC 비교라 유리하게 짠 것. -->
+
+<!-- [생략됨, 필요시 부활] Intel 백서의 양자화별 sliding-scale 권장 비율(8B 1.4:1 / 70B 1:1 / 405B 0.8:1)·측정시스템 불일치(Xeon 8568Y++Gaudi3 vs 권장 6767P+B200)는 분량상 본문에서 뺌. ratio 논쟁을 더 다루려면 여기로. -->
+
+
+### ② 멀티스레딩 — 시간을 쪼갤까, 공간을 가를까
+
+세 축 가운데 가장 또렷하게 갈리는 곳이 멀티스레딩입니다. 여기서 NVIDIA가 x86 두 회사와 근본적으로 다른 길을 택합니다.
+
+**멀티스레딩(hardware multithreading)** 은 코어 하나에 여러 스레드를 동시에 얹는 기법입니다. 코어가 한 스레드만 돌리면, 그 스레드가 메모리를 기다리며 멈출 때 비싼 실행 유닛이 통째로 놀게 됩니다. 그래서 스레드를 둘 얹어, 한쪽이 멈춰 있는 사이 다른 쪽이 빈 유닛을 메우게 하는 것이죠. Intel은 이를 하이퍼스레딩(Hyper-Threading), AMD는 동시 멀티스레딩(Simultaneous Multi-Threading, SMT)이라 부르지만 원리는 같습니다. 관건은 '한 코어의 자원을 두 스레드가 어떻게 나눠 쓰느냐'이고, 여기서 길이 둘로 갈립니다.
+
+**시분할 SMT (Intel · AMD).** 전통적인 2-way SMT는 디코더·실행 포트·레지스터 같은 코어 자원을 두 스레드가 시간 위에서 **동적으로** 공유합니다. 매 사이클 비어 있는 자원을 그때그때 나눠 갖는 방식이라, 한 스레드만 돌 때는 코어를 통째로 독차지하고 둘이 함께 돌면 서로 경쟁합니다. 특히 AMD Turin의 Zen 5는 SMT를 설계 한가운데 둔 코어입니다. 4-wide 디코더를 두 벌 둔 듀얼 클러스터드 디코더를 쓰는데, 단일 스레드는 두 클러스터를 동시에 쓰지 못하고 실효 8-wide 디코드는 두 SMT 스레드가 함께 돌 때 비로소 나옵니다. 448엔트리 재정렬 버퍼(ROB)도 두 스레드에 정적으로 분할되죠. 평균 처리량은 높지만, 옆 스레드가 자원을 많이 쓰면 내 스레드가 느려지는 '시끄러운 이웃(noisy neighbor)' 탓에 스레드별 성능과 테일 지연(tail latency)이 들쭉날쭉해집니다. (흥미롭게도 Intel은 차세대 Diamond Rapids에서 SMT를 아예 빼기로 했습니다 — 동시 처리량 대신 단일 스레드 성능과 예측 가능성을 택한 셈입니다.)
+
+**공간 멀티스레딩 (NVIDIA Vera).** Vera의 Olympus 코어는 거꾸로 갑니다. 시간을 쪼개 번갈아 쓰는 대신, 코어 자원을 두 스레드에 **물리적으로 분할** 해 각 스레드가 고정된(그리고 그만큼 축소된) 자원 집합을 받습니다. 88코어가 이렇게 2-way로 갈라져 176스레드가 됩니다. 한 스레드가 낼 수 있는 최고 속도는 시분할 SMT보다 낮을 수 있지만, 옆 스레드가 무엇을 하든 내 스레드의 지연이 흔들리지 않습니다.
+
+<!-- [이미지 06 예정] SMT vs 공간 멀티스레딩(Spatial Multithreading) 비교 다이어그램: (좌) 시분할 SMT — 두 스레드가 한 코어의 디코더·실행포트·레지스터를 시간 위에서 동적으로 공유·경쟁. (우) 공간 멀티스레딩 — 코어 자원을 스레드별로 물리적으로 분할(각 스레드가 고정·축소된 자원 집합). 이 문단 부근 배치. -->
+
+이 차이가 agentic 워크로드에서 의미를 갖습니다. 수십, 수백 개의 도구 호출과 샌드박스 세션을 동시에 굴릴 때 중요한 것은 한 스레드의 최고 속도가 아니라, 모든 세션이 **예측 가능한 지연** 안에서 끝나는 것이기 때문입니다. NVIDIA가 Vera를 'agent를 위한 CPU(a CPU for agents)'라 부르며 공간 멀티스레딩을 택한 명분이 여기 있습니다. 물론 이는 아직 NVIDIA의 설계 주장이고, 실제 테일 지연 이점은 출하 후 독립 측정으로 확인될 부분입니다.
+
+<!-- [근거/주의 — AMD/SMT 원자료] Turin=Zen5(9755, N4, 네이티브 512-bit AVX-512, L3 512MB/16CCD) / Zen5c(9965, N3E, 256-bit 더블펌프, L3 384MB/12CCD) [reported, amd-epyc-turin.md]. 8-wide dispatch·ROB 448(2T 정적분할; 정수 레지스터 파일이 hot 자원)·듀얼 4-wide 클러스터드 디코더(AMD 최초, 단일스레드 두 클러스터 동시사용 불가, 6K-entry op cache 뒤 2차소스, 실효 8-wide는 2T SMT)·L2 1MB/core·L3 32MB/CCD·CCD+IOD Infinity Fabric [reported, amd-epyc-turin.md / cpu-microarchitecture.md]. AMX 없음→행렬은 AVX-512/VNNI, 무거운 matmul은 GPU. Intel Diamond Rapids는 SMT 완전 제거(no-SMT) [reported]. NVIDIA Vera 공간 멀티스레딩: 코어 자원 물리분할, 88C×2=176T, 테일지연 예측가능 주장 [vendor-claim, nvidia-vera.md]. 핵심 대비: 시분할 SMT=시간 위 동적 공유(처리량↑·테일지연 가변) vs 공간 MT=공간 물리분할(단일 최고속↓·테일지연 안정). ⚠️ "Zen5·Zen5c 둘 다 256-bit" 2차정보는 오류(클래식=512-bit) [reported, amd-epyc-turin.md]. 출처: Chips and Cheese·cpu-microarchitecture.md. -->
+
+<!-- [생략됨] AMD 코어 수 노선(9965 192C/384T, Venice 최대 256C/512T)·EPYC 매출 모멘텀(Q4'25 $5.4B +39%, Turin >50%)은 멀티스레딩 초점에서 뺌 — 코어 수는 표/벤치마크, Venice 대역폭은 ③ CPU-GPU 축으로 분산. -->
+
+
+### ③ CPU-GPU 링크 — KV 캐시를 어디로 흘려보낼까
+
+마지막 축은 CPU와 GPU를 잇는 길입니다. 여기서 갈리는 것은 단순한 대역폭이 아니라, GPU에 다 담기지 않는 KV 캐시를 CPU 메모리로 흘려보낼 수 있느냐입니다.
+
+**Intel과 AMD** 는 표준 경로를 씁니다. Xeon은 PCIe 5 / CXL로, EPYC은 PCIe 5 / Infinity Fabric으로 GPU를 잇습니다. 결합은 느슨하지만, 그래서 CPU와 GPU 수를 워크로드에 맞춰 자유롭게 조절할 수 있습니다. 차세대 AMD Venice는 CPU-GPU 대역폭을 한 세대 만에 2배로 끌어올린다고 공식 예고했습니다.
+
+**NVIDIA** 는 정반대로 단단히 묶습니다. Vera는 1.8 TB/s에 이르는 **NVLink-C2C** 라는 coherent 인터커넥트로 Rubin GPU와 한 몸이 됩니다 — 전작 Grace의 900 GB/s를 정확히 2배로 끌어올린 수치입니다. CPU의 메모리(최대 1.5 TB의 LPDDR5X)와 GPU의 HBM이 하나의 주소 공간이 되기 때문에, GPU의 좁은 메모리에 다 담지 못하는 KV 캐시를 CPU 쪽으로 자연스럽게 흘려보낼 수 있습니다. 긴 문맥과 다단계 추론, 즉 reasoning-heavy 워크로드에서 이 구조가 결정적입니다. 참고로 Vera의 Olympus는 NVIDIA가 Denver 이후 처음으로 직접 설계한 풀커스텀 Arm 코어로, 전작 Grace가 Arm의 기성 Neoverse V2를 라이선스해 쓴 것과는 다릅니다.
+
+<!-- [이미지 07 예정] PCIe vs NVLink -->
+
+
+<!-- [근거/주의 — NVIDIA/Vera 원자료] Olympus=Denver 이후 NVIDIA 첫 풀커스텀 코어(Armv9.2-A, NOT Neoverse; Grace=라이선스 Neoverse V2, BlueField-4의 64C Grace로 잔존). 프런트엔드 10-wide(3사 최광폭: Redwood Cove/Neoverse V2 6-wide, Zen5 8-wide dispatch)·뉴럴 분기예측(2 taken/cyc 무패널티)·spatial MT(자원 물리분할, 88C×2=176T, 테일지연 예측가능 주장)·6× 128-bit SVE2+FP8(네이티브 FP8 첫 CPU 주장)·'at least 14 pipelines'(분석가추정·비공식)·L2 2MB/core(추정). NVLink-C2C 1.8TB/s coherent(Grace 900GB/s의 2×) + LPDDR5X 1.5TB@1.2TB/s via 1024-bit×8 SOCAMM(코어당 약 14GB/s) → KV-offload. PCIe6/CXL3.1. AMD Venice: 공식 2× CPU-GPU BW·1.6TB/s·+70% [vendor-claim, amd-epyc-venice.md]. 독립 벤치: Phoronix 프리프로덕션 — Xeon 6980P 단일소켓 대비 약 1.55×, 측정 최강 EPYC 대비 약 +11%, 코어당 메모리BW 약 4×(단 conventional 워크로드만). ⚠️ NVIDIA 비공식/추정: 클록·TDP·다이 실코어수·per-CPU 공정(플랫폼 TSMC N3)·L2(2MB/core)/L3(162MB)·14 pipelines·IPC(Grace 1.5×, 키노트 목표). ⚠️ vendor-claim: agentic sandbox 1.8×·per-core BW 3×·vs Grace 2× — 수치 불일치, 독립검증 없음(verdict=unknown). 출처: nvidia-vera.md, nvidia-grace.md, cpu-microarchitecture.md, raw/clips/2026-06-08-nvidia-olympus-vera-uarch.md (NVIDIA 제품페이지·개발자블로그, ServeTheHome, Tom's, Phoronix, AllAboutCircuits). -->
+
+<!-- [생략됨] 두 공급 경로(Rubin NVL72 1:2 + CoreWeave standalone)·첫 고객(Anthropic/OpenAI/OCI/SpaceX)은 'HyperAccel 시선/랙 유연화' 섹션에서 다루면 자연스러움(저자 메모의 GPU-only/CPU-only 랙 아이디어와 연결). -->
+
+
+## 정리
+
+오늘은 Agentic AI 시대에 다시 떠오른 CPU를 살펴봤습니다. 추론이 단일 패스에서 도구를 부르는 루프로 바뀌면서, 제어와 도구 실행이 CPU로 내려왔고, 그 사이 비싼 GPU가 노는 새로운 병목이 생겼습니다. 측정은 이를 분명히 보여 줬습니다. 도구 실행이 응답 지연의 상당 부분을 차지했고, GPU를 늘리는 대신 CPU를 늘리는 것만으로 속도가 빨라졌습니다.
+
+그리고 세 회사가 서로 다른 답을 들고 나왔습니다. Intel은 AMX라는 전용 행렬 엔진과 메모리 대역폭으로, AMD는 압도적인 코어 수와 입출력으로, NVIDIA는 GPU와 메모리를 잇는 coherent 인터커넥트로 같은 문제에 다르게 답했습니다. 설계 철학의 차이만큼은 분명하지만, 세 CPU를 동일한 agentic 워크로드로 직접 비교한 벤치마크는 아직 존재하지 않습니다.
+
+흥미로운 점은, 이 흐름이 GPU를 키울수록 더 강해진다는 것입니다. 차세대 GPU가 모델을 더 빨리 통과시킬수록, 그 사이 도구를 돌리는 CPU의 부담은 오히려 커집니다. AI 가속기를 설계하는 입장에서도, 호스트 CPU를 어떻게 고르고 어떻게 이을 것인가는 점점 더 중요한 질문이 되고 있습니다.
+
+### 추신 : HyperAccel은 채용 중입니다.
+
+HyperAccel은 데이터센터향 LPU 첫 제품 출시를 목전에 두고 있으며, 하드웨어/소프트웨어 최적화를 통해 LLM 추론의 핵심 병목들을 해소할 수 있는 솔루션을 개발해 나가고 있습니다. 
+
+저희의 기술적 여정에 흥미가 있으시다면, [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)를 통해 지금 바로 지원해 주세요! 
+
+HyperAccel은 여러분의 지원을 기다립니다.
+
+## Reference
+
+**실적·시장 반응**
+
+- [AMD Reports First Quarter 2026 Financial Results (공식 IR)](https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results)
+- [Intel Reports First-Quarter 2026 Financial Results (공식 IR)](https://www.intc.com/news-events/press-releases/detail/1767/intel-reports-first-quarter-2026-financial-results)
+- [Intel's stock has best day since 1987, soaring 24% — CNBC (2026-04-24)](https://www.cnbc.com/2026/04/24/intel-stock-soars-more-than-20percent-as-chipmaker-shows-signs-of-turnaround.html)
+- [AMD (AMD) Stock Price History — stockanalysis.com](https://stockanalysis.com/stocks/amd/history/)
+
+**Agentic AI와 CPU 병목 (연구·분석)**
+
+- [Ritik Raj et al., "Towards Understanding, Analyzing, and Optimizing Agentic AI Execution: A CPU-Centric Perspective" (arXiv:2511.00739)](https://arxiv.org/abs/2511.00739)
+- [Euijun Chung et al., "Characterizing CPU-Induced Slowdowns in Multi-GPU LLM Inference" (arXiv:2603.22774)](https://arxiv.org/abs/2603.22774)
+- [The CPU Bottleneck in Agentic AI and Why Server CPUs Matter More Than Ever — viksnewsletter](https://www.viksnewsletter.com/p/the-cpu-bottleneck-in-agentic-ai)
+- [SemiWiki, "Agentic AI Demands More Than GPUs" (2026-04-08)](https://semiwiki.com/semiconductor-manufacturers/intel/368183-agentic-ai-demands-more-than-gpus/)
+
+**CPU:GPU 비율 재조정 · 수요/공급**
+
+- [TrendForce, "The Great Rebalance: How Agentic AI Is Reshaping the CPU:GPU Ratio" (2026-04)](https://insights.trendforce.com/p/agentic-ai-cpu-gpu)
+- [Tom's Hardware, "'CPUs are cool again' — agentic AI로 CPU 수요 급증·공급 부족" (2026-04)](https://www.tomshardware.com/pc-components/cpus/cpus-are-cool-again-intel-and-amd-reporting-spikes-in-cpu-demand-due-to-agentic-ai-shortages-lisa-su-says-business-exceeded-expectations-while-intel-is-looking-at-long-term-agreements-with-potential-customers)
+- [Tom's Hardware, "AI 워크로드 CPU 수요 증가로 공급 부족·가격 인상" (2026-04)](https://www.tomshardware.com/pc-components/cpus/shifting-need-for-cpus-in-ai-workloads-drives-intensifying-shortages-price-hikes)
+
+**벤더 자료**
+
+- [Intel White Paper, "Agentic AI Requires More CPUs" (2026)](https://www.intel.com/content/www/us/en/content-details/916705/agentic-ai-requires-more-cpus.html)
+- [AMD Blog, "Agentic AI Changes the CPU/GPU Equation" (2026)](https://www.amd.com/en/blogs/2026/agentic-ai-changes-the-cpu-gpu-equation.html)
+- [NVIDIA, "NVIDIA Unveils Vera, the CPU for Agents" — GTC Taipei 2026 (2026-05-31)](https://nvidianews.nvidia.com/news/nvidia-unveils-vera-the-cpu-for-agents)
+- [NVIDIA Vera CPU 제품 페이지 — "The CPU for agents"](https://www.nvidia.com/en-us/data-center/vera-cpu/)
+
+**CPU 아키텍처 비교**
+
+- [Babai Das, "Arm vs x86: Why x86 Still Matters in an Arm-Dominated Future" — Medium](https://medium.com/@dasbabai2017/arm-vs-x86-why-x86-still-matters-in-an-arm-dominated-future-39fdecb044d5)
