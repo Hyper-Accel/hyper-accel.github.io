@@ -1,18 +1,19 @@
 ---
 date: '2025-11-16T15:10:31+09:00'
 draft: false
-title: 'Legato: A Programming Language for HyperAccel LPU'
+title: 'Legato, A Programming Language for HyperAccel LPU'
 cover:
-  image: "486.jpeg"
+  image: "Bertha.jpeg"
+  # can also paste direct link from external site
+  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "Legato programming language"
-  caption: "Legato programming language"
-  relative: true
-authors: [Jaewoo Kim]
+  caption: "Introduction to Legato, the programming language for LPU"
+  relative: false # To use relative path for cover image, used in hugo Page-bundles
+authors: [Jaewoo Kim] # must match with content/authors
 tags: [compiler]
 categories: [compiler]
 series: ["Legato"]
-summary: "An introduction to Legato — HyperAccel's programming model and compiler stack for the LPU — covering what it is, why it exists, and how it is designed."
-description: "Legato is HyperAccel's programming model and compiler for the LPU. This post explains its role in the inference stack, core design concepts, compilation pipeline, and how developers can use it with PyTorch."
+summary: "An introductory post to kick off a series on how compilers work and the overall process of building one."
 comments: true
 ---
 
@@ -32,11 +33,11 @@ What actually creates separation is the **software ecosystem**. Libraries, frame
 
 ### 1.2 The Software Competitiveness HyperAccel's LPU Needs
 
-For HyperAccel's **LLM Processing Unit (LPU)** to compete, it must go beyond building a fast chip and meet two conditions.
+For HyperAccel's LPU (LLM Processing Unit) to compete, it must go beyond building a fast chip and meet two conditions.
 
-**First, developers should not feel friction when using it.** If adopting new hardware means throwing away an entire workflow, that hardware gets ignored. The inference stack must integrate naturally with what is effectively the standard today: a `torch` and `vLLM`-based stack.
+**First, developers should not feel friction when using it.** If adopting new hardware means throwing away an entire workflow, that hardware gets ignored. It must integrate naturally with the inference stack that is effectively the standard in today's AI inference market — a `torch` and `vLLM`-based stack.
 
-**Second, it must support arbitrary models.** An accelerator that only runs a handful of internally ported models is not a true platform. It must accept whatever model users bring.
+**Second, it must support arbitrary models.** An accelerator that only runs a handful of internally ported and managed models is not a true platform. It must accept whatever model users bring.
 
 ### 1.3 Legato's Role
 
@@ -48,19 +49,23 @@ CUDA makes this idea concrete. We do not know every detail inside an NVIDIA chip
 
 Legato works the same way. It gives developers a simplified view of the LPU so they can program it without knowing low-level hardware details.
 
+
+
 ### 1.4 Where Legato Sits in the Stack
 
 Legato's role becomes clear when you see where it sits in the full inference stack.
 
 ![Legato inference stack position](images/Picture1.png)
 
-Legato connects the existing ecosystem (PyTorch/vLLM) above with LPU hardware below. Developers in the upper world write code the way they always have; Legato absorbs the complexity of the world below.
+
+
+Legato connects the existing ecosystem (PyTorch/vLLM) above with LPU hardware below. Developers write code the way they always have; Legato absorbs the complexity of the hardware below.
 
 ---
 
 ## 2. Legato at a Glance (Quick Look)
 
-A short code sample often lands faster than abstract explanation. Here is a minimal example that performs matrix multiplication (matmul) on the LPU.
+Rather than add more abstract explanation, let's look at code first. Here is a minimal example that performs matrix multiplication (matmul) on the LPU.
 
 ```python
 import torch
@@ -127,7 +132,7 @@ def simple_matmul(
 
 output = torch.zeros(10, 128, dtype=torch.bfloat16)
 
-# legato.session lets you specify JIT compilation options.
+# legato.session lets you specify JIT compilation options (output format, output directory, etc.).
 # simple_matmul is JIT-compiled at call time; if a compiled binary already
 # exists and the code has not changed, the cached binary is reused.
 with legato.session(output_type=legato.OutputType.BINARY, output_path="simple_matmul"):
@@ -138,12 +143,15 @@ with legato.session(output_type=legato.OutputType.BINARY, output_path="simple_ma
     )
 ```
 
-This short snippet captures Legato's core ideas:
+This short snippet captures all of Legato's core ideas:
 
 - **`@legato.compile`** — defines the entry point to compile.
 - **`with device.get_top()` / `with device.get_core(0)`** — specify *where* each operation runs (execution context).
+    * The kinds of contexts can vary slightly from chip to chip.
+    * In our example, the HyperAccel LPU consists of multiple cores, so we assigned the computation to core 0.
 - **`request_load` → `receive`** — specify *when and where* data moves.
-- **`legato.session(...)`** — decide what form the compilation output takes (here, `BINARY`) and where it is written.
+- **`legato.session(...)`** — decide what form the compilation output takes and where it is written.
+    * Choosing `BINARY` produces an ELF executable; you can also output `ASM`, `CORE_IR`, `BACKEND_IR`, and more, which are useful during debugging.
 
 ---
 
@@ -158,9 +166,9 @@ One important premise: **the hardware model shown to developers is intentionally
 That virtual hardware is roughly structured as follows:
 
 - **DRAM + Controller** — Shared DRAM accessible by all cores. Physically there may be eight memory chips, but the programming model treats them as one large memory.
-- **Virtual DRAM** — A shared region accessed through a **Memory Management Unit (MMU)**, assumed to be preconfigured.
-- **Processing-in-Memory (PIM)** — Used selectively when needed.
-- **Core** — The number of cores is configurable (it may be more or fewer than 32). Each core has a program counter and registers, multiple execution units (such as MPU and VPU executors), on-chip SRAM (cache), and private DRAM used only by that core.
+- **Virtual DRAM** — A shared region accessed through an MMU, assumed to be preconfigured.
+- **PIM (Processing-in-Memory)** — Used selectively when needed.
+- **Core** — The number of cores is configurable (it may be more or fewer than 32). Each core has a PC and registers, multiple execution units (such as MPU and VPU executors), on-chip SRAM (cache), and private DRAM used only by that core.
 
 ### 3.2 Memory Model
 
@@ -169,8 +177,10 @@ From a software perspective, memory is simplified into three categories:
 1. **Shared Memory** — Space shared by all cores. On Bertha, this corresponds to DRAM.
 2. **Virtual Shared Memory** — Shared space managed by the MMU.
 3. **Core Memory** — Core-local space combining private DRAM and SRAM.
+  * Each core has SRAM space that can be used as scratchpad memory; the compiler plans how to use it.
+  * Private DRAM is a per-core DRAM region used for eviction when on-core scratchpad memory is insufficient.
 
-An important design choice appears here. When a programmer allocates data in Core Memory, **whether it lands in SRAM or private DRAM is decided by the compiler's planning phase.** Developers work with the abstract notion of "this core's memory," and the compiler handles physical placement.
+An important design choice appears here. When a programmer allocates data in Core Memory, **whether it lands in SRAM or private DRAM is decided by the compiler's planning phase.** Developers work with the abstract notion of "this core's memory," and the compiler handles physical placement optimization.
 
 ### 3.3 Execution Context (Executor) and Explicit Data Movement
 
@@ -191,11 +201,11 @@ with device.get_core(0):
 - `device.get_core(i)` — run on a specific core.
 - `device.get_all_cores()` — run the enclosed region on all cores.
 
-Because each module on the LPU has its own program counter, Legato represents execution contexts naturally through `ContextOp`.
+The LPU has the characteristic that each module runs its own program counter (PC) independently. Legato represents this naturally by separating execution contexts through `ContextOp`.
 
 Data movement is **explicit, not implicit**. You request a load from a source context with `request_load`, then receive data in the target context with `receive` (or `receive_type`). When and where data moves is visible in the code.
 
-One rule: Legato scopes are stricter than Python scopes. If a value created in one region must be used in the next, you must pass it explicitly with `yield`:
+Legato scopes are stricter than Python scopes. If a value created in one region must be used in the next, you must pass it explicitly with `yield`:
 
 ```python
 with device.get_core(0):
@@ -218,21 +228,21 @@ As long as future LPUs preserve compatibility with this programming model, a pro
 
 ### 4.1 Python-Embedded DSL
 
-Legato is designed as a **Domain Specific Language (DSL)** embedded in Python. That is intentional. With a single `pip install`, developers can use it in a familiar Python environment without a separate toolchain. They start programming the LPU inside syntax they already know: `with` blocks, functions, and decorators.
+Legato is designed as a **Domain Specific Language (DSL)** embedded in Python. That is intentional. With a single `pip install`, developers can use it in a familiar Python environment without a separate toolchain, keeping the barrier to entry as low as possible. They start programming the LPU inside syntax they already know: `with` blocks, functions, and decorators.
 
-### 4.2 PyTorch-Friendly Tensor Abstraction
+### 4.2 Python-Friendly Tensor Abstraction
 
-Legato operations are built around **tensors** that programmers already know. It provides operations similar to PyTorch or NumPy — broadcast, reshape, matmul, and so on.
+Legato operations are built around **tensors** that many programmers already know. It provides operations similar to PyTorch or NumPy — broadcast, reshape, matmul, and so on.
 
-For performance tuning, it also supports advanced features such as synchronization and metaprogramming (static evaluation).
+Beyond that, it also supports advanced programming features such as synchronization and metaprogramming (static evaluation) to make performance tuning easier.
 
-The semantics of each library operation are designed to stay stable across LPU generations: the API remains consistent while the compiler lowers operations to the best implementation for each generation underneath.
+The semantics of each library operation are designed generically so they can be used without code changes even as LPU generations evolve. In other words, the API stays stable while the compiler lowers operations to the best implementation for each generation underneath.
 
-### 4.3 Explicit Control vs. Automation
+### 4.3 Explicit Control vs. Automation Trade-off
 
 Legato is a relatively low-level interface where developers **explicitly** describe execution placement, data movement, and compile-time parameters. That can look verbose, but it is deliberate. For kernels where performance is the value — where you must express data flow clearly — that explicitness is control.
 
-Legato also provides automation paths, so users can choose:
+At the same time, Legato also provides automation paths, so users can choose depending on the situation:
 
 - **Fully automatic** — hand the entire model to the `torch.compile` backend.
 - **Fully manual** — write critical kernels directly and tune them in detail.
@@ -259,8 +269,6 @@ def model(x, y):
 
 **Platform-agnostic extension.** Legato is not limited to PyTorch. It can extend to NumPy, CuPy, and other platforms. As long as the backend is implemented with Legato, there is no fundamental limit to extensibility.
 
-**Standalone use.** Legato is usable on its own. Just as CUDA or Triton alone is enough to run programs on NVIDIA GPUs, you can write and build LPU programs with Legato alone, without a higher-level framework.
-
 ---
 
 ## 5. Legato's Internal Structure
@@ -281,7 +289,7 @@ A **ComputeModel** is attached throughout the pipeline to supply hardware inform
 
 A ComputeModel is a simplified model of the hardware and plays a central role in lowering and optimization decisions. **Swapping the ComputeModel is enough to retarget the compiler.** As in the `get_bertha` example, a backend factory creates a ComputeModel instance and passes it to the compiler.
 
-Beyond supplying information, the ComputeModel is the basis for validation. If a user writes an operation that cannot run efficiently (or at all) on a given device, the compiler tries feasible transforms or, when that fails, returns a clear error message.
+Beyond supplying information, the ComputeModel is the basis for validation. If a user writes an operation that cannot run efficiently (or at all) on a given device, the compiler tries feasible transforms or, when that fails, returns a clear error message to guide the user.
 
 ### 5.3 Per-Hardware Backends
 
@@ -322,14 +330,14 @@ As described earlier, when a user writes an operation that is impossible or inef
 
 ### 6.2 Type, Layout, and Dynamic Shape Validation
 
-Legato validates tensor types and memory layouts in function signatures. Dynamic dimensions must have an upper bound:
+Legato validates tensor types and memory layouts in function signatures. In particular, dynamic dimensions must have an upper bound:
 
 ```python
 x = torch.zeros(16, 32, 32)
 torch._dynamo.mark_dynamic(x, 0, max=128)  # dim 0 is dynamic, upper bound 128
 ```
 
-Because of hardware constraints, tensors cannot be fully dynamic. Every dynamic dimension needs an upper bound for buffer allocation and command generation; dimensions without an upper bound are rejected at compile time. This prevents accidents where inputs grow silently and trigger recompilation.
+Because of hardware constraints, tensors cannot be fully dynamic. Every dynamic dimension needs an upper bound for buffer allocation and command generation; dimensions without an upper bound raise an error at compile time. This is so the compiler can plan tensor allocation at compile time.
 
 ### 6.3 Host-Device ABI (Instruction Table)
 
@@ -337,13 +345,17 @@ To pass arguments correctly across the host–device boundary, Legato defines a 
 
 ---
 
-## 7. FAQ: Do I Need to Learn All of Legato to Use the LPU?
 
-No. Not every AI developer who uses a GPU knows CUDA, OpenCL, or Vulkan in depth. HyperAccel's LPU works the same way.
+
+# Q. Do I Need to Learn All of Legato to Use the LPU?
+
+No. Of course you do not. Not every AI developer who uses a GPU knows CUDA, OpenCL, or Vulkan in depth. HyperAccel's LPU works the same way.
+
+
 
 **Legato implements backends for `torch` and other libraries; it is not something every AI developer interacts with directly.** When you use `torch` or `numpy` on the LPU, you can work the way you do on CPU or GPU today, while the underlying operations are implemented with Legato.
 
-**If you want custom kernels or extreme performance tuning, you can use Legato directly.** On GPUs, developers sometimes write custom kernels in Triton or CUDA instead of relying only on what `torch` already provides. The LPU is no different. Legato is always available for direct use, and you can insert Legato-implemented layers into an otherwise `torch`-based model, as below:
+**If you want custom kernels or extreme performance tuning, you can use Legato directly.** On GPUs, developers sometimes write custom kernels in Triton or CUDA instead of relying only on what `torch` already provides when they want to push performance or implement operations that do not exist yet. The LPU is no different. Legato is always available for direct use, and you can insert Legato-implemented layers into an otherwise `torch`-based model, as below:
 
 ```python
 @legato.compile(backend=bertha)
@@ -365,13 +377,14 @@ print(f"output from legato kernel : {out}")
 
 # Keep going with torch
 out_exp = torch.exp(out)
+
 ```
 
----
 
-## 8. Summary and Next Steps
 
-### 8.1 Summary
+## 7. Summary and Next Steps
+
+### 7.1 Summary
 
 Legato provides a **simplified programming model** for the LPU and achieves three goals at once:
 
@@ -381,14 +394,6 @@ Legato provides a **simplified programming model** for the LPU and achieves thre
 
 Just as CUDA underpins NVIDIA's ecosystem, Legato is the foundation of HyperAccel's LPU ecosystem.
 
-### 8.2 Supported Targets and Roadmap
+### 7.2 Supported Targets and Roadmap
 
 Legato currently targets the Bertha architecture (with per-generation guides such as EVT0 and EVT1). Because retargeting is built around swapping the ComputeModel, extension to future LPU generations is prepared at the design level.
-
-### 8.3 Getting Started / Further Reading
-
-- Official documentation: `legato/Documentation` (Programming Model, Decorators, Context Management, Memory Operations, and more)
-  - Not yet publicly available at the time of writing.
-- Examples: `simple_matmul`, `static_multi_core`, `attention`, and others
-  - Also not yet publicly available at the time of writing.
-- PyTorch integration guide: using `torch.compile(backend="legato")` and writing primitives/resolvers
