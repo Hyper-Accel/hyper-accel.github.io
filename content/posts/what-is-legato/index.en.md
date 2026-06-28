@@ -1,19 +1,17 @@
 ---
-date: '2025-11-16T15:10:31+09:00'
+date: '2026-06-28T16:17:48+09:00'
 draft: false
 title: 'Legato, A Programming Language for HyperAccel LPU'
 cover:
   image: "Bertha.jpeg"
-  # can also paste direct link from external site
-  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
   alt: "Legato programming language"
   caption: "Introduction to Legato, the programming language for LPU"
-  relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [Jaewoo Kim] # must match with content/authors
+  relative: true
+authors: [Jaewoo Kim]
 tags: [compiler]
 categories: [compiler]
 series: ["Legato"]
-summary: "An introductory post to kick off a series on how compilers work and the overall process of building one."
+summary: "An introduction to Legato — HyperAccel's programming model and compiler stack for the LPU — covering what it is, why it exists, and how it is designed."
 comments: true
 ---
 
@@ -165,10 +163,10 @@ One important premise: **the hardware model shown to developers is intentionally
 
 That virtual hardware is roughly structured as follows:
 
-- **DRAM + Controller** — Shared DRAM accessible by all cores. Physically there may be eight memory chips, but the programming model treats them as one large memory.
+- **DRAM + Controller** — Shared DRAM accessible by all cores. Physically it may consist of multiple memory modules, but the programming model treats them as one large memory.
 - **Virtual DRAM** — A shared region accessed through an MMU, assumed to be preconfigured.
 - **PIM (Processing-in-Memory)** — Used selectively when needed.
-- **Core** — The number of cores is configurable (it may be more or fewer than 32). Each core has a PC and registers, multiple execution units (such as MPU and VPU executors), on-chip SRAM (cache), and private DRAM used only by that core.
+- **Core** — The number of cores depends on the hardware configuration. Each core has a PC and registers, multiple execution units (such as MPU and VPU executors), on-chip SRAM (cache), and private DRAM used only by that core.
 
 ### 3.2 Memory Model
 
@@ -337,7 +335,7 @@ x = torch.zeros(16, 32, 32)
 torch._dynamo.mark_dynamic(x, 0, max=128)  # dim 0 is dynamic, upper bound 128
 ```
 
-Because of hardware constraints, tensors cannot be fully dynamic. Every dynamic dimension needs an upper bound for buffer allocation and command generation; dimensions without an upper bound raise an error at compile time. This is so the compiler can plan tensor allocation at compile time.
+Because of hardware characteristics, tensors cannot be fully dynamic. Every dynamic dimension needs an upper bound for buffer allocation and command generation; dimensions without an upper bound raise an error at compile time. This is so the compiler can plan tensor allocation at compile time.
 
 ### 6.3 Host-Device ABI (Instruction Table)
 
@@ -397,3 +395,7 @@ Just as CUDA underpins NVIDIA's ecosystem, Legato is the foundation of HyperAcce
 ### 7.2 Supported Targets and Roadmap
 
 Legato currently targets the Bertha architecture (with per-generation guides such as EVT0 and EVT1). Because retargeting is built around swapping the ComputeModel, extension to future LPU generations is prepared at the design level.
+
+## P.S.: HyperAccel is Hiring!
+
+We are looking for teammates to help build Legato and the LPU software stack. If you are interested in the technologies we work on, please apply via [HyperAccel Career](https://hyperaccel.career.greetinghr.com/en/guide).
