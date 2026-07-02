@@ -1,5 +1,5 @@
 ---
-date: '2026-06-19T00:00:00+09:00'
+date: '2026-07-02T14:33:50+09:00'
 draft: false
 title: 'Know Your Enemy, Know Yourself, Part 6: The Agentic AI Era — The Revival of the CPU and the Dawn of the CPU Three Kingdoms'
 cover:

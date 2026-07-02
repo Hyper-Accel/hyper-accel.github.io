@@ -1,5 +1,5 @@
 ---
-date: '2026-06-19T00:00:00+09:00'
+date: '2026-07-02T14:33:50+09:00'
 draft: false
 title: '지피지기면 백전불태 6편 : Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작'
 cover:
