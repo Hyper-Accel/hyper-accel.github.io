@@ -62,7 +62,7 @@ keywords: [
 
 자 이제 그래프에 대해 알았으니, 본격적으로 `torch.compile()`에 대해 알아보겠습니다. `torch.compile()` 은 크게 3단계(TorchDynamo,  AOTAutograd, TorchInductor)로 이루어져 있습니다.
 
-![PT2 백엔드 통합 구조도. Frontend의 Dynamo가 사용자 모델 스크립트를 받아 Torch IR 형태의 FX 그래프를 만들고, AOTAutograd가 이를 ATen/Prims IR로 낮춘 뒤, Backend의 Inductor가 Triton과 C++/OpenMP 코드를 생성한다](images/torch_compile_overview.jpg)
+![torch.compile의 3단 파이프라인. 파이썬 함수가 TorchDynamo를 거쳐 FX 그래프와 guard가 되고, AOTAutograd가 이를 정규화된 ATen 그래프로 다듬은 뒤, TorchInductor가 Triton 또는 C++ 커널 소스를 생성한다](images/part1-pipeline.png)
 
 전체 그림으로 보면 다음과 같이 정리할 수 있습니다. 우선 Frontend에서 Dynamo가 사용자 코드를 받아 그래프를 만듭니다. **그래프를 만든다는 것** 은 파이썬 인터프리터를 해석하는 일입니다. pytorch로 정의된 연산을 동적 타입, 데이터 의존 분기, 외부 라이브러리 호출 같은 것들을 고려하여 그래프 형태로 추출한다고도 이야기할 수 있습니다.
 
@@ -85,7 +85,7 @@ AOTAutograd는 FX 그래프를 다듬어 아래쪽 Backend로 넘깁니다. **�
 
 ## Part 2. TorchDynamo: 파이썬 코드를 fx.graph(이하 그래프)타입으로 바꿔주는 모듈 {#part2}
 
-![TorchDynamo의 처리 흐름도. 바이트코드를 FX 그래프로 캡처하고, guard로 가정을 검증해 실패 시 재컴파일하며, 다룰 수 없는 코드를 만나면 graph break로 서브그래프를 분할한 뒤 백엔드로 넘긴다](images/dynamo.png)
+![TorchDynamo의 두 가지 경우. 정상적으로 캡처되면 FX 그래프와 guard가 나오고, graph break가 일어나면 함수 하나가 그래프와 파이썬 실행 구간으로 번갈아 쪼개진다](images/part2-dynamo.png)
 
 TorchDynamo는 **파이썬 코드에서 그래프를 추출하는 작업** 을 수행합니다. 실제로 계산하지는 않고 값이 어떻게 흘러가는지만 따라가다가, 텐서 연산을 만나면 그래프에 기록합니다. Dynamo가 만들어 내는 그래프의 형식이 `fx.Graph` 입니다. AOTAutograd가 다듬는 것도, Inductor가 받아 커널로 만드는 것도 이 그래프입니다.
 
@@ -106,7 +106,7 @@ TorchDynamo는 **파이썬 코드에서 그래프를 추출하는 작업** 을 �
 
 ## Part 3. AOTAutograd: 생성된 그래프를 다듬는 모듈 {#part3}
 
-![AOTAutograd의 처리 흐름도. torch IR을 Core ATen으로 낮추고, functionalization으로 in-place 연산을 제거해 함수형으로 만든 뒤, decomposition으로 복합 연산을 Core ATen 수준으로 분해한다](images/AOTAutograd.png)
+![AOTAutograd가 하는 두 가지 일. torch.relu(x), x.relu(), F.relu(x) 같은 여러 표현이 aten.relu 하나로 통일되고, functionalization과 decomposition으로 그래프가 정리된다](images/part3-aotautograd.png)
 
 Dynamo가 꺼낸 그래프를 그대로 커널로 만들기에는 **표현이 너무 사용자 친화적** 이라는 문제가 있습니다. Dynamo의 그래프에는 우리가 코드에 쓴 형태가 그대로 남아 있습니다. 그런데 PyTorch에서 같은 연산을 부르는 방법은 여러 가지입니다. 메서드로도 부를 수 있고, 함수로도 부를 수 있고, 연산자로도 부를 수 있습니다. 백엔드를 만드는 사람 입장에서는 같은 것을 여러 번 구현해야 하는 셈입니다.
 
@@ -134,7 +134,7 @@ PyTorch에서 연산이 실행되는 과정을 잠깐 볼 필요가 있습니다
 
 ## Part 4. TorchInductor: 다듬은 그래프를 커널로 만드는 모듈 {#part4}
 
-![TorchInductor의 처리 흐름도. ATen 그래프를 Inductor IR로 변환한 뒤 Scheduler가 연산을 융합하고, CodeGen이 Triton(GPU) 또는 C++(CPU) 코드를 생성한다. 행렬 곱처럼 기존 라이브러리가 유리한 연산은 별도 커널로 위임한다](images/Inductor.jpg)
+![TorchInductor의 코드 생성 방식. 원소 단위 수식 y[i] = floor(x[i]) 하나에 Triton 규칙을 끼우면 tl.load와 libdevice.floor가, C++ 규칙을 끼우면 C++/OpenMP 코드가 생성된다](images/part4-inductor.png)
 
 마지막 요소입니다. Inductor는 다듬어진 그래프를 받아 **실제 커널 소스 코드** 를 생성합니다. GPU에서는 [Triton](https://triton-lang.org/), CPU에서는 C++/OpenMP를 뱉습니다. Inductor에서 진행하는 동작은 크게 세 단계입니다. **lowering**(그래프를 Inductor 자체 IR로 낮추기), **scheduling**(어떤 연산들을 묶을지 정하기), **codegen**(실제 코드 생성).
 
