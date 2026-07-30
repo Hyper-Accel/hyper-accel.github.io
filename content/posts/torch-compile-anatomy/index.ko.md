@@ -164,15 +164,11 @@ IR을 이렇게 표현하면 융합이 놀랄 만큼 단순해집니다. 연산 
 
 ## Conclusion
 
-`torch.compile()` 은 파이썬의 유연함을 포기하지 않으면서 그래프를 얻는다는, PyTorch의 오랜 숙제에 대한 답이었습니다. 성과는 분명합니다. eager 방식이 구조적으로 포기했던 fusion을 되찾았고, 사람이 손으로 짜던 융합 커널을 컴파일러가 대신 쓰게 되었습니다.
+`torch.compile()` 은 파이썬의 유연함을 포기하지 않으면서 그래프를 얻는다는, PyTorch의 오랜 숙제에 대한 답이었습니다. 덕분에 eager 방식이 구조적으로 갖기 어려웠던 fusion 등의 최적화 가능성을 되찾았고, 큰 성능 향상으로 사람들의 이목을 사로잡았습니다. 
 
-그런데 저는 `torch.compile()` 이 남긴 진짜 성과가 속도가 아니라 확장성을 고려한 **구조** 라고 생각합니다.
+하지만 저는 `torch.compile()` 의 진짜 면모는 확장성을 고려한 **구조** 라고 생각합니다. Part 4에서 보셨듯이, Inductor는 교체 규칙 하나만 바꿔서 Triton과 C++을 모두 만들어 냈습니다. 그렇다면 **저 자리에 완전히 다른 하드웨어를 위한 코드 생성기를 꽂으면 어떻게 될까요?** Dynamo 백엔드 자리에 Inductor 대신 다른 컴파일러를 넣으면요? Part 3에서 본 decomposition이 구현해야 할 연산 수를 크게 줄여 준다는 사실은, 새 하드웨어를 붙이려는 입장에서 어떤 의미일까요?
 
-Part 4에서 보셨듯이, Inductor는 교체 규칙 하나만 바꿔서 Triton과 C++을 모두 만들어 냈습니다. 그렇다면 **저 자리에 완전히 다른 하드웨어를 위한 코드 생성기를 꽂으면 어떻게 될까요?** Dynamo 백엔드 자리에 Inductor 대신 다른 컴파일러를 넣으면요? Part 3에서 본 decomposition이 구현해야 할 연산 수를 크게 줄여 준다는 사실은, 새 하드웨어를 붙이려는 입장에서 어떤 의미일까요?
-
-이건 우연이 아닙니다. PyTorch는 이 확장성을 의도적으로 설계하고 있습니다. CUDA가 아닌 가속기, NPU들이 PyTorch 생태계 안으로 들어올 수 있는 문을 열어 두고, 그럼으로써 AI 하드웨어 시장 전체의 표준 프레임워크 자리를 지키려는 것이라고 생각합니다.
-
-다음 편에서는 그 문이 구체적으로 어떻게 생겼는지 살펴보겠습니다. PyTorch가 서드파티 가속기를 위해 열어 둔 확장점들, 그리고 같은 문제 앞에서 여러 NPU 회사들이 어떻게 **서로 다른 답** 을 골랐는지 비교해 보려고 합니다.
+이건 우연이 아닙니다. PyTorch는 이 확장성을 의도적으로 설계하고 있습니다. CUDA가 아닌 가속기, NPU들이 PyTorch 생태계 안으로 들어올 수 있는 문을 열어 두고, 그럼으로써 AI 하드웨어 시장 전체의 표준 프레임워크 자리를 지키려는 것이라고 생각합니다. 다음 편에서는 그 문이 구체적으로 어떻게 생겼는지 살펴보겠습니다. PyTorch가 서드파티 가속기를 위해 열어 둔 확장점들, 그리고 같은 문제 앞에서 여러 NPU 회사들이 어떻게 **서로 다른 답** 을 골랐는지 비교해 보려고 합니다.
 
 그리고 마지막으로, 저희 HyperAccel의 [Legato]({{< ref "/posts/what-is-legato" >}})가 이 생태계의 어느 자리에 꽂히려 하는지, 그리고 왜 그 자리인지를 이야기하겠습니다.
 
@@ -184,10 +180,10 @@ Part 4에서 보셨듯이, Inductor는 교체 규칙 하나만 바꿔서 Triton�
 - [Custom Backends](https://docs.pytorch.org/docs/main/user_guide/torch_compiler/torch.compiler_custom_backends.html)
 - [torch.fx](https://docs.pytorch.org/docs/stable/fx.html) — FX 그래프의 구조
 
-**도구**
-
-- [Triton](https://triton-lang.org/) — Inductor가 GPU 커널을 생성할 때 쓰는 언어
-
 ## 추신: HyperAccel은 채용 중입니다!
 
-LPU 소프트웨어 스택과 컴파일러를 함께 만들어 갈 동료를 찾고 있습니다. 저희가 다루는 기술에 관심이 있으시다면 [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
+![HyperAccel의 LPU 칩 Bertha. 패키지 가운데에 HYPER ACCEL과 Bertha가 새겨진 다이가 자리하고, 주변으로 배선과 패드가 뻗어 있다](images/bertha-chip.jpg)
+
+HyperAccel은 LPU라는 새로운 아키텍처로 AI 인프라 시장에 도전장을 내밀고 있습니다. 그리고 소프트웨어팀은 이 하드웨어의 성능을 끝까지 끌어내면서, 동시에 사용자가 LPU를 **가장 직관적이고 아름다운 방식으로** 활용할 수 있도록 다양한 연구와 구현을 진행하고 있습니다.
+
+저희와 멋진 여정을 함께하고 싶으시다면, [HyperAccel Career](https://hyperaccel.career.greetinghr.com/ko/guide)로 지원해 주세요!
