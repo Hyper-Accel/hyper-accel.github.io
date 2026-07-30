@@ -8,19 +8,19 @@ cover:
   caption: "PyTorch"
   relative: true
 authors: [Hyunjun Park]
-tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "vLLM", "Compiler", "Kernel Fusion"]
+tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
 series: ["torch.compile 해부"]
 series_idx: 1
 categories: ["AI", "Compiler"]
-summary: 'torch.compile을 TorchDynamo, AOTAutograd, TorchInductor 세 요소로 분해해 각각이 무엇을 입력받아 무엇을 내놓는지 살펴보고, vLLM이 이 구조를 어떻게 활용하는지까지 정리합니다.'
-description: 'torch.compile의 세 구성 요소인 TorchDynamo, AOTAutograd, TorchInductor가 각각 어떤 원리로 동작하는지 설명합니다. 바이트코드 가로채기와 guard, 디스패처 하단에서의 연산 정규화, define-by-run IR과 코드 생성을 다루고, vLLM의 VllmBackend가 이 구조 위에 무엇을 얹었는지 소개합니다.'
+summary: 'torch.compile을 TorchDynamo, AOTAutograd, TorchInductor 세 요소로 분해해, 각각이 무엇을 입력받아 무엇을 내놓고 어떤 원리로 동작하는지 정리합니다.'
+description: 'torch.compile의 세 구성 요소인 TorchDynamo, AOTAutograd, TorchInductor가 각각 어떤 원리로 동작하는지 설명합니다. 그래프의 개념부터 바이트코드 가로채기와 guard, graph break, 디스패처 하단에서의 연산 정규화, 원소 단위 IR과 코드 생성까지 다룹니다.'
 comments: true
 keywords: [
   "torch.compile", "TorchDynamo", "TorchInductor", "AOTAutograd",
   "FX graph", "graph break", "guard", "dynamic shape",
   "Triton", "kernel fusion", "PyTorch dispatcher", "ATen",
   "functionalization", "core ATen IR", "define-by-run IR",
-  "vLLM", "VllmBackend", "piecewise compilation"
+  "loop-level IR", "OpOverrides"
 ]
 ---
 
@@ -28,7 +28,7 @@ keywords: [
 
 안녕하세요? HyperAccel CL(Compute Library)팀 박현준입니다. 저희는 **Latency Processing Unit(LPU)** 이라는 **Large Language Model(LLM)** 특화 반도체를 만드는 스타트업입니다. 그리고 GPU가 CUDA라는 언어로 동작하듯이, LPU는 저희 컴파일러팀에서 자체 제작한 embedded Domain Specific Language(eDSL)인 [Legato]({{< ref "/posts/what-is-legato" >}})라는 프로그래밍 언어를 통해 동작하고, CL팀은 LPU라는 architecture에 대한 이해를 기반으로 최적화된 legato kernel을 작성하는 업무를 주로 하고 있습니다.
 
-요즘 `torch.compile()` 이 매우 핫한 주제 중 하나인데요, vLLM도 적극적으로 도입하고 있고 실제 실행이 많이 빨라졌다는 평가도 많습니다. 그러나 이것의 동작 방식을 설명해 보라고 하면, 대부분 "그래프를 캡처해서 커널을 합쳐 준다" 정도에서 멈춥니다.
+요즘 `torch.compile()` 이 매우 핫한 주제 중 하나인데요, 실제 실행이 많이 빨라졌다는 평가도 많습니다. 그러나 이것의 동작 방식을 설명해 보라고 하면, 대부분 "그래프를 캡처해서 커널을 합쳐 준다" 정도에서 멈춥니다.
 
 사실 PyTorch가 많은 사랑을 받게 된 이유 중 하나는 eager 방식으로 한 줄씩 실행할 수 있다는 점이라고 생각합니다. 이러한 방식 덕분에 진입 장벽이 크게 낮아졌으니까요. 하지만 역설적으로, 이 방식을 채택함으로 인해 n번째 줄에 있는 코드는 그 이후에 올 코드를 알지 못하게 됩니다. 그리고 이러한 특성이 fusion을 비롯한 여러 최적화를 가로막아 PyTorch의 성능을 크게 낮추게 됩니다.
 
@@ -158,37 +158,13 @@ IR을 이렇게 표현하면 융합이 놀랄 만큼 단순해집니다. 연산 
 
 그럼 이 계산식에서 어떻게 Triton 코드가 나올까요? 앞서 말한 **기본 동작들** 을, 실제 값을 계산하는 대신 **코드 문자열을 반환하는 함수로 갈아끼웁니다.** 읽는 동작 자리에는 `tl.load(...)` 라는 문자열을 만들어 반환하는 함수를, 내림 동작 자리에는 `libdevice.floor(...)` 를 만들어 반환하는 함수를 꽂아 두는 것입니다. 
 
-이 상태에서 `y[i] = floor(x[i])` 라는 식을 그냥 평범하게 실행하면 각 자리에서 문자열이 만들어져 차례로 이어지고 그 결과 **Triton 커널 소스 코드가 완성됩니다.** 그리고 같은 식을 C++용 교체 규칙으로 실행하면 C++ 코드가 나옵니다. **동일한 IR에 대해 교체 규칙을 갈아끼면 다른 언어가 나오는 생성** 됩니다. **그리고 이 "교체 규칙만 바꾸면 다른 코드가 나온다"는 성질이 2편의 출발점입니다.**
-
----
-
-## Part 5. VllmBackend: vLLM은 torch.compile()을 어떻게 활용하는가 {#part5}
-
-![vLLM 로고](images/vllm.jpg)
-
-지금까지 본 세 요소는 범용 설계입니다. 그런데 LLM 서빙이라는 특수한 상황에서는 이 기본값이 잘 맞지 않는 부분이 있습니다. vLLM은 그 지점들을 자기 방식으로 바꿔서 쓰고 있고, 그 결과물이 `VllmBackend` 라는 자체 Dynamo 백엔드입니다.
-
-Part 1에서 세 요소가 독립적으로 교체 가능하다고 했는데, vLLM은 **Dynamo 백엔드 자리** 에 자기 것을 꽂은 사례입니다.
-
-서빙에서 달라지는 점과 vLLM의 대응을 간단히 정리하면 이렇습니다.
-
-**shape이 매 스텝 흔들립니다.** 요청이 실시간으로 들어오고 나가니 배치에 담기는 시퀀스 수와 토큰 수가 계속 변합니다. Part 2에서 본 guard 검사가 매 스텝 반복되는 고정 비용이 되는 상황이죠. vLLM은 토큰 수 축만 직접 동적으로 지정해 두고, 나머지 guard 검사를 걷어내는 선택을 합니다. 자기 스케줄러가 어떤 shape을 만들어 낼지 알고 있으니 가능한 일입니다.
-
-**컴파일하면 안 되는 연산이 그래프 한복판에 있습니다.** PagedAttention은 KV 캐시를 제자리에서 갱신하는, 고도로 최적화된 커스텀 커널입니다. Inductor가 이것을 건드려서 좋을 게 없습니다. 그래서 vLLM은 attention을 **컴파일러가 안을 들여다볼 수 없는 불투명한 연산** 으로 등록합니다. 컴파일러 입장에서는 하나의 블랙박스 노드가 되고, 융합 대상에서 빠집니다.
-
-**그래프를 조각내서 컴파일합니다.** 위처럼 attention을 불투명하게 만들어 두면, 그것을 경계로 그래프를 자를 수 있습니다. 이렇게 나눈 조각들만 따로 컴파일하고 최적화하는 방식을 **piecewise 컴파일** 이라고 합니다. attention을 그래프 밖에 두면 나머지 조각들은 CUDA Graph로 안전하게 캡처할 수 있게 됩니다.
-
-**컴파일 결과를 디스크에 캐싱합니다.** 서버를 띄울 때마다 몇 분씩 컴파일을 기다릴 수는 없으니까요.
-
-여기서 눈여겨볼 점이 하나 있습니다. `VllmBackend` 는 "그래프를 자르고, 캐싱하고, 그래프 캡처를 씌우는" **오케스트레이션** 을 담당하고, "잘린 조각 하나를 실제로 컴파일하는 일"은 **별도의 얇은 인터페이스로 분리** 되어 있습니다. 기본값으로는 그 자리에 Inductor가 꽂혀 있습니다.
-
-즉 vLLM은 `torch.compile()` 이 보여 준 역할 분리를 **한 번 더 반복** 한 셈입니다. 그리고 이 구조 덕분에, 저 자리에 Inductor가 아닌 다른 컴파일러를 꽂는 일이 가능해집니다.
+이 상태에서 `y[i] = floor(x[i])` 라는 식을 그냥 평범하게 실행하면 각 자리에서 문자열이 만들어져 차례로 이어지고 그 결과 **Triton 커널 소스 코드가 완성됩니다.** 그리고 같은 식을 C++용 교체 규칙으로 실행하면 C++ 코드가 나옵니다. **IR은 그대로 두고 교체 규칙만 갈아끼우면 다른 언어의 코드가 생성되는 것입니다.** 그리고 이 성질이 2편의 출발점입니다.
 
 ---
 
 ## Conclusion
 
-`torch.compile()` 은 파이썬의 유연함을 포기하지 않으면서 그래프를 얻는다는, PyTorch의 오랜 숙제에 대한 답이었습니다. 성과는 분명합니다. eager 방식이 구조적으로 포기했던 fusion을 되찾았고, vLLM 같은 서빙 엔진이 이를 사용하여 GPU 추론 성능을 크게 끌어올릴 수 있었습니다.
+`torch.compile()` 은 파이썬의 유연함을 포기하지 않으면서 그래프를 얻는다는, PyTorch의 오랜 숙제에 대한 답이었습니다. 성과는 분명합니다. eager 방식이 구조적으로 포기했던 fusion을 되찾았고, 사람이 손으로 짜던 융합 커널을 컴파일러가 대신 쓰게 되었습니다.
 
 그런데 저는 `torch.compile()` 이 남긴 진짜 성과가 속도가 아니라 확장성을 고려한 **구조** 라고 생각합니다.
 
@@ -207,11 +183,6 @@ Part 4에서 보셨듯이, Inductor는 교체 규칙 하나만 바꿔서 Triton�
 - [torch.compile programming model](https://docs.pytorch.org/docs/2.9/compile/programming_model.html) — Dynamo 핵심 개념, graph break, guard, dynamic shape
 - [Custom Backends](https://docs.pytorch.org/docs/main/user_guide/torch_compiler/torch.compiler_custom_backends.html)
 - [torch.fx](https://docs.pytorch.org/docs/stable/fx.html) — FX 그래프의 구조
-
-**vLLM 설계 문서**
-
-- [torch.compile integration](https://docs.vllm.ai/en/latest/design/torch_compile/)
-- [CUDA Graphs](https://docs.vllm.ai/en/latest/design/cuda_graphs/)
 
 **도구**
 
