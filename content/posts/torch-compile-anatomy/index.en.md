@@ -19,14 +19,14 @@ keywords: [
   "torch.compile", "TorchDynamo", "TorchInductor", "AOTAutograd",
   "FX graph", "graph break", "guard", "dynamic shape",
   "Triton", "kernel fusion", "PyTorch dispatcher", "ATen",
-  "functionalization", "core ATen IR", "define-by-run IR",
+  "functionalization", "core ATen IR", "Inductor IR",
   "loop-level IR", "OpOverrides"
 ]
 ---
 
 ### Introduction
 
-Hello! I'm Hyunjun Park from the CL (Compute Library) team at HyperAccel. We're a startup building a chip called the **Latency Processing Unit (LPU)**, purpose-built for **Large Language Model (LLM)** inference. Just as a GPU is driven through CUDA, the LPU is driven through [Legato]({{< ref "/posts/what-is-legato" >}}) — an embedded Domain Specific Language (eDSL) built in-house by our compiler team. The CL team's job is to write Legato kernels that squeeze the most out of the LPU architecture.
+Hello! I'm Hyunjun Park from the CL (Compute Library) team at HyperAccel. We're a startup building a chip called the **LLM Processing Unit (LPU)**, purpose-built for **Large Language Model (LLM)** inference. Just as a GPU is driven through CUDA, the LPU is driven through [Legato]({{< ref "/posts/what-is-legato" >}}) — an embedded Domain Specific Language (eDSL) built in-house by our compiler team. The CL team's job is to write Legato kernels that squeeze the most out of the LPU architecture.
 
 `torch.compile()` has been one of the hotter topics lately, and plenty of people report large speedups from it. Ask someone how it actually works, though, and the answer usually stops at "it captures a graph and fuses kernels."
 
@@ -54,6 +54,14 @@ That difference is the whole point. While Python executes line by line, there is
 
 This is the answer to the problem from the introduction, the one where line *n* can't see past itself. Which is why half of what `torch.compile()` does is simply **getting its hands on this graph**.
 
+### What is an "FX graph"?
+
+PyTorch has its own data structure for holding that graph. It's called an **FX graph**.
+
+The format came out of an earlier attempt, `torch.fx`, and today the entire `torch.compile()` stack passes it around. From here on, when this post says "graph," it almost always means this one.
+
+There's nothing exotic about it — think of it as the picture above written down in code. One operation is one node, and each node carries the list of nodes it depends on, which form the edges. What matters is that it's an **ordinary Python object**: easy to walk over and easy to rewrite, which is what makes AOTAutograd's clean-up passes possible later on.
+
 ---
 
 ## Part 1. The three components of torch.compile {#part1}
@@ -78,6 +86,8 @@ Here's what each component hands to the next:
 | **AOTAutograd** | FX graph | normalized ATen graph |
 | **TorchInductor** | ATen graph | Triton (GPU) or C++ (CPU) kernel source |
 
+The **FX graph** in that table is the name of the data structure PyTorch actually stores the graph from Part 0 in. We'll look at its structure in Part 2.
+
 And these three components are **independently replaceable**. `torch.compile(backend=...)` lets you drop in a compiler other than Inductor — which is exactly what we do with our Legato backend. More on that next time.
 
 ---
@@ -86,9 +96,9 @@ And these three components are **independently replaceable**. `torch.compile(bac
 
 ![Two cases for TorchDynamo. When capture succeeds it produces an FX graph and guards; when a graph break happens, one function is split into alternating compiled graphs and stretches that run in Python](images/part2-dynamo-en.png)
 
-TorchDynamo's job is **extracting a graph from Python code**. It doesn't actually compute anything — it just follows how values flow, and records tensor operations into a graph as it goes. The format it produces is an `fx.Graph`. That same graph is what AOTAutograd tidies up and what Inductor turns into kernels.
+TorchDynamo's job is **extracting a graph from Python code**. It doesn't actually compute anything — it just follows how values flow, and records tensor operations into a graph as it goes. What comes out is the FX graph from Part 0, and it's what AOTAutograd tidies up and what Inductor turns into kernels.
 
-The structure is simple. One operation is one **node**, and the nodes form a directed acyclic graph following the flow of data. Each node also carries the list of nodes it depends on, and those become the graph's edges. That's what lets you see **where the result of any operation flows** just by looking at the graph. It's precisely the information Python code couldn't give us, and it's the basis on which Inductor can later group operations together and fuse them.
+This is where **the destination of every operation's result** becomes visible. It's precisely the information Python code couldn't give us, and it's the basis on which Inductor can later group operations together and fuse them.
 
 ### Graph breaks: what doesn't fit in a graph
 
@@ -125,7 +135,7 @@ Two clean-up passes run over the captured graph.
 
 **Functionalization** removes **operations that overwrite existing memory**. `x.add_(1)` modifies `x` in place instead of making a new tensor, and a tensor created by `view` shares memory with its original. That forces the compiler to keep track of "which point in time is this `x` from?" every time it wants to move or merge operations. So the graph is rewritten such that **once a value is created, it never changes**.
 
-**Decomposition** lowers thousands of operations down to a few hundred, a subset called **core ATen IR**. For anyone writing a backend this is decisive: the number of operations you have to implement drops by an order of magnitude. Why that property matters so much when attaching new hardware to PyTorch is something we'll come back to in Part 2.
+**Decomposition** lowers thousands of operations down to a few hundred, a subset called **core ATen IR**. For anyone writing a backend this is decisive: the number of operations you have to implement drops by an order of magnitude. Why that property matters so much when attaching new hardware to PyTorch is something we'll come back to in the next post.
 
 Once both passes are done, what's left in the graph is **operations with no side effects, drawn from a limited set**. All that remains is turning them into actual kernels.
 
@@ -137,29 +147,25 @@ Once both passes are done, what's left in the graph is **operations with no side
 
 The last component. Inductor takes the tidied graph and generates **actual kernel source code** — [Triton](https://triton-lang.org/) on GPU, C++/OpenMP on CPU. It works in three broad stages: **lowering** (dropping the graph into Inductor's own IR), **scheduling** (deciding which operations to group), and **codegen** (emitting the code).
 
+Part 3's decomposition was also described as "lowering," but the two move along different axes. Decomposition reduced the *number of distinct operations* (thousands down to hundreds). The lowering here changes the *level of the representation*: it doesn't shrink the op set further, it rewrites what was expressed per tensor into an expression written per element. That's what the next section is about.
+
 ### From per-tensor to per-element
 
-There's one point here that's easy to trip over. Inductor has an IR of its own, and it **describes things at a different granularity** than the graphs we've seen so far. In those graphs, **one operation was one node**. A `floor` node meant "apply floor to this entire tensor" — a representation that works in whole tensors.
+There's one point here that's easy to trip over. Inductor has an IR of its own, and it **works at a different granularity** than the FX graph. In the FX graph, **one operation was one node** and its arguments were whole tensors. Inductor rewrites that same operation **in terms of a single element**: think of `y = floor(x)` becoming `y[i] = floor(x[i])`.
 
-Inductor rewrites that same operation **in terms of a single element**. `y = floor(x)` becomes `y[i] = floor(x[i])`.
-
-A spreadsheet analogy helps. If the earlier representation is like saying **"column B is column A rounded down"**, Inductor's is closer to **writing the single formula `=FLOOR(A1)` into cell `B1`** — with no decision yet about how far down you'll drag it.
-
-That "we haven't decided how many times to repeat it yet" is the key. Because the iteration count and the parallelization strategy get settled later, the same formula can be unrolled one way on GPU and another way on CPU. This is why the stage is called a **loop-level IR**. It's the `Inductor Loop-level IR` labeled at the bottom of the diagram in Part 1.
-
-The formula itself is a combination of **primitive steps**. In our example there are two: reading `x[i]`, and applying floor to it. These aren't real code yet — they're just markers saying "read here" and "round down here." Inductor holds this formula as a **Python function** rather than a data structure, so the only way to know what it computes is to run it. That approach is called a **define-by-run IR**, and the code generation trick coming up next falls straight out of it.
+The parallelization strategy is settled afterwards. That's what lets the same expression be laid out differently on different devices. This stage is called a **loop-level IR** — it works one level inside the loop nest rather than on whole tensors.
 
 ### Fusion is just concatenating formulas
 
 Why this representation is a good idea becomes clear with **fusion**. As mentioned in the introduction, eager execution's fundamental loss comes from launching a separate kernel per operation and writing intermediate results out to memory only to read them back. When a single normalization splits into five or six operations, a memory round trip wedges itself into every gap. Fusion is the optimization that **merges those operations into one kernel**, so you read once and write once.
 
-With the IR written this way, fusion becomes remarkably simple, because merging two operations turns into **concatenating two formulas**. If `y[i] = floor(x[i])` is followed by `z[i] = y[i] + 1`, you just write it as `z[i] = floor(x[i]) + 1`. The intermediate `y` never has to go out to memory. No elaborate transformation of moving graph nodes around and rewiring them.
+With the IR written this way, fusion becomes straightforward to handle, because merging two operations turns into **concatenating two formulas**. If `y[i] = floor(x[i])` is followed by `z[i] = y[i] + 1`, you just write it as `z[i] = floor(x[i]) + 1`. The intermediate `y` never has to go out to memory. No elaborate transformation of moving graph nodes around and rewiring them.
 
 ### Emitting strings instead of computing values
 
-So how does Triton code come out of that formula? You **swap those primitive steps for functions that return strings of code** instead of computing values. In the slot where a load happens you plug in a function that produces the string `tl.load(...)`; where the floor happens, one that produces `libdevice.floor(...)`.
+So how does Triton code come out of that formula? `y[i] = floor(x[i])` is really a combination of two **primitive steps**: reading `x[i]`, and applying floor to it. You **swap those steps for functions that return strings of code** instead of computing values. In the slot where a load happens you plug in a function that produces the string `tl.load(...)`; where the floor happens, one that produces `libdevice.floor(...)`.
 
-Now run the expression `y[i] = floor(x[i])` in the perfectly ordinary way. Strings get produced at each slot, concatenate in order, and out comes **Triton kernel source code**. Run the same expression with the C++ rule set and you get C++ code instead. **The IR stays put; swapping only the rules produces code in a different language.** And that property is where Part 2 begins.
+Now run the expression `y[i] = floor(x[i])` in the perfectly ordinary way. Strings get produced at each slot, concatenate in order, and out comes **Triton kernel source code**. Run the same expression with the C++ rule set and you get C++ code instead. **The IR stays put; swapping only the rules produces code in a different language.** And that property is where the next post begins.
 
 ---
 
@@ -167,9 +173,9 @@ Now run the expression `y[i] = floor(x[i])` in the perfectly ordinary way. Strin
 
 `torch.compile()` was an answer to a long-standing PyTorch problem: getting a graph without giving up Python's flexibility. It recovered optimization opportunities like fusion that eager execution structurally struggled to reach, and the resulting speedups got a lot of attention.
 
-What I find more interesting, though, is that `torch.compile()`'s real character is its **structure** — one built with extensibility in mind. As you saw in Part 4, Inductor produced both Triton and C++ by changing nothing but a set of rules. So: **what happens if you plug a code generator for entirely different hardware into that slot?** What if you put a compiler other than Inductor in the Dynamo backend slot? And what does it mean, for someone trying to attach new hardware, that the decomposition from Part 3 sharply reduces the number of operations you must implement?
+What I find more interesting, though, is that `torch.compile()`'s real character is its **structure** — one built with extensibility in mind. As you saw in Part 4, Inductor produced both Triton and C++ by changing nothing but a set of rules. So: **what happens if you plug a code generator for entirely different hardware into that slot?** And what does it mean, for someone trying to attach new hardware, that the decomposition from Part 3 sharply reduces the number of operations you must implement?
 
-None of this is accidental. PyTorch is designing for that extensibility deliberately — holding a door open for accelerators that aren't CUDA, for NPUs to walk into the PyTorch ecosystem, and in doing so keeping its place as the standard framework across the whole AI hardware market.
+I think PyTorch is designing for that extensibility deliberately — holding a door open for accelerators that aren't CUDA, for NPUs to walk into the PyTorch ecosystem, and in doing so keeping its place as the standard framework across the whole AI hardware market.
 
 Next time we'll look at what that door actually looks like: the extension points PyTorch leaves open for third-party accelerators, and how different NPU companies, facing the same problem, arrived at **different answers**.
 
