@@ -1,5 +1,5 @@
 ---
-date: '2026-07-29T10:00:00+09:00'
+date: '2026-08-04T18:00:00+09:00'
 draft: true
 title: 'torch.compile 해부 1편: TorchDynamo, AOTAutograd, TorchInductor'
 cover:
