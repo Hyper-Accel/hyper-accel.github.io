@@ -74,7 +74,7 @@ $$\text{KV cache size} = 2 \times B \times S \times L \times H_{kv} \times D_h \
 
 ### 기존 방식의 한계
 
-그래서 업계는 이미 KV cache를 GPU 밖으로 내리고 있습니다. 흔한 방식은 host DRAM이나 NVMe SSD에 KV cache를 offload 했다가 필요할 때 다시 올리는 것입니다.
+그래서 업계는 이미 KV cache를 GPU 밖으로 내리고 있습니다. 흔한 방식은 host DRAM이나 NVMe SSD에 KV cache를 offload했다가 필요할 때 다시 올리는 것입니다.
 
 하지만 GPU HBM과 host DRAM, SSD는 할당 메모리 영역이 서로 다릅니다. serving runtime이 KV block의 위치와 복사를 명시적으로 관리해야 합니다.
 
@@ -109,7 +109,7 @@ CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CP
 
 ### CXL 풀링이 푸는 방식
 
-4편에서 본 CXL 2.0의 풀링이 정확히 이 문제를 겨냥합니다. 거대한 메모리 디바이스를 **Multi-Logical Device(MLD)** 로 쪼개고, **Fabric Manager(FM)** 가 노드별 수요에 맞춰 chunk를 동적으로 배정합니다.
+4편에서 본 CXL 2.0의 풀링이 정확히 이 문제를 겨냥합니다. 거대한 메모리 디바이스를 **Multi-Logical Device(MLD)**로 쪼개고, **Fabric Manager(FM)**가 노드별 수요에 맞춰 chunk를 동적으로 배정합니다.
 
 핵심은 **동시 공유가 아니라 동적 할당**이라는 점입니다. 한 chunk는 한 시점에 한 호스트만 소유하므로 일관성 충돌이 없고, 그래서 구현이 단순하면서도 효과가 큽니다.
 
