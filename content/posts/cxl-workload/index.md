@@ -12,7 +12,7 @@ tags: ["CXL", "KV cache", "메모리 pooling", "메모리 tiering", "LLM Inferen
 series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 5
 categories: ["AI hardware", "Semiconductor"]
-summary: "CXL이 무엇인지는 4편에서 살펴봤습니다. 그렇다면 CXL은 실제 LLM 서빙과 데이터센터 워크로드의 어디에 쓰일까요? KV cache offload, 메모리 풀링을 통한 VM 통합, hot/warm/cold tiering이라는 세 가지 활용 사례로 CXL이 잘 맞는 워크로드의 조건을 짚어 봅니다."
+summary: "KV cache offload, 메모리 풀링, 메모리 tiering을 통해 CXL이 실제 워크로드에서 어떻게 쓰이는지 살펴봅니다."
 description: "KV cache offload, 메모리 풀링, 메모리 tiering을 통해 CXL이 실제 워크로드에서 어떻게 쓰이는지 살펴봅니다."
 comments: true
 keywords: [
@@ -22,8 +22,8 @@ keywords: [
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 5편입니다.
-> [1편](https://hyper-accel.github.io/posts/what-is-hbf/), [2편](https://hyper-accel.github.io/posts/hbf-workload/), [3편](https://hyper-accel.github.io/posts/hbf-challenge/)에서는 GPU 옆 메모리 계층의 빈 자리를 채우는 **High Bandwidth Flash(HBF)**를 다뤘고,
-> [4편](https://hyper-accel.github.io/posts/what-is-cxl/)에서는 시점을 시스템 레벨로 옮겨 **Compute Express Link(CXL)**이 *무엇인지* 살펴봤습니다.
+> [1편](https://hyper-accel.github.io/posts/what-is-hbf/), [2편](https://hyper-accel.github.io/posts/hbf-workload/), [3편](https://hyper-accel.github.io/posts/hbf-challenge/)에서는 GPU 옆 메모리 계층의 빈 자리를 채우는 <strong>High Bandwidth Flash(HBF)</strong>를 다뤘고,
+> [4편](https://hyper-accel.github.io/posts/what-is-cxl/)에서는 시점을 시스템 레벨로 옮겨 <strong>Compute Express Link(CXL)</strong>이 *무엇인지* 살펴봤습니다.
 > 이번 5편에서는 그 CXL이 *실제 워크로드에서 어떻게 쓰이는지*를 살펴봅니다.
 
 ## 들어가며
@@ -43,7 +43,7 @@ keywords: [
 - **장점**: 일관성 있는(coherent) 큰 메모리를, 시스템 외부로 확장해 여러 호스트가 나눠 쓸 수 있다.
 - **대가**: DDR 직결 메모리보다 **2-3배 느리다**(약 170-300 ns). 이른바 latency tax.
 
-이 둘은 동전의 양면입니다. 그래서 "CXL이 어디에 쓰이는가"라는 질문은 결국 **"이 latency tax를 감당하고도 남을 만큼, 용량과 풀링이 절실한 워크로드는 무엇인가?"**로 좁혀집니다.
+이 둘은 동전의 양면입니다. 그래서 "CXL이 어디에 쓰이는가"라는 질문은 결국 <strong>"이 latency tax를 감당하고도 남을 만큼, 용량과 풀링이 절실한 워크로드는 무엇인가?"</strong>로 좁혀집니다.
 
 이 글에서는 그런 후보를 세 가지 활용 사례 — **① KV cache offload, ② 메모리 풀링을 통한 VM 통합, ③ hot/warm/cold tiering** — 로 나눠 살펴보겠습니다.
 
@@ -58,7 +58,7 @@ CXL이 LLM 서빙에서 가장 먼저 노리는 자리는 **KV cache 저장고**
 
 ### 왜 KV cache가 문제인가
 
-LLM 추론에서 모델은 이전까지 생성한 모든 토큰의 Key/Value 벡터를 저장해 두고 재사용합니다. 이 **Key-Value cache(KV cache)**는 시퀀스가 길어질수록, 그리고 동시 사용자가 많아질수록 선형으로 불어납니다.
+LLM 추론에서 모델은 이전까지 생성한 모든 토큰의 Key/Value 벡터를 저장해 두고 재사용합니다. 이 <strong>Key-Value cache(KV cache)</strong>는 시퀀스가 길어질수록, 그리고 동시 사용자가 많아질수록 선형으로 불어납니다.
 
 KV cache의 전체 용량은 다음 식으로 계산할 수 있습니다.
 
@@ -91,7 +91,7 @@ CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CP
 - **접근 방식**: CPU는 CXL 메모리를 바이트 단위로 주소를 지정할 수 있는 메모리로 다룰 수 있습니다.
 - **위치**: SSD보다 가까운 DRAM 계층이라 block I/O를 거치지 않습니다.
 
-공개된 사례로는 SK hynix의 [TraCT](https://arxiv.org/abs/2512.18194)가 있습니다. TraCT는 NVIDIA Dynamo-vLLM에 CXL 공유 메모리를 붙였습니다. 이 공유 메모리를 prefill GPU와 decode GPU 사이의 KV 전송 공간이자 rack-level prefix cache로 사용한 것입니다. 두 서버의 실험에서 평균 **Time to First Token(TTFT)**을 최대 9.8배 개선하고, peak throughput을 최대 1.6배 높였습니다.
+공개된 사례로는 SK hynix의 [TraCT](https://arxiv.org/abs/2512.18194)가 있습니다. TraCT는 NVIDIA Dynamo-vLLM에 CXL 공유 메모리를 붙였습니다. 이 공유 메모리를 prefill GPU와 decode GPU 사이의 KV 전송 공간이자 rack-level prefix cache로 사용한 것입니다. 두 서버의 실험에서 평균 <strong>Time to First Token(TTFT)</strong>을 최대 9.8배 개선하고, peak throughput을 최대 1.6배 높였습니다.
 
 {{< figure src="tract-overview.webp" alt="TraCT에서 CXL 공유 메모리가 prefill worker와 decoding worker 사이의 KV 전송 공간과 prefix cache로 동작하는 구조" caption="CXL 공유 메모리를 이용한 KV cache 전송과 prefix cache 구조." attr="출처: TraCT, Figure 2" attrlink="https://arxiv.org/abs/2512.18194" align="center" >}}
 
@@ -105,11 +105,11 @@ CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CP
 
 클라우드 서버는 CPU core 수와 DRAM 용량이 고정된 비율로 묶여 있습니다. 고객이 CPU를 모두 빌려 가면, 남아 있는 DRAM만 따로 판매할 수 없습니다. 반대로 메모리가 먼저 소진되면 남은 CPU core가 놀게 됩니다.
 
-이처럼 한쪽 자원이 먼저 소진되어 다른 자원이 남는 현상을 **stranded 메모리**라고 합니다. 이 문제는 특히 한 서버에 여러 **Virtual Machine(VM)**을 배치하는 클라우드 환경에서 두드러지게 나타납니다.
+이처럼 한쪽 자원이 먼저 소진되어 다른 자원이 남는 현상을 **stranded 메모리**라고 합니다. 이 문제는 특히 한 서버에 여러 <strong>Virtual Machine(VM)</strong>을 배치하는 클라우드 환경에서 두드러지게 나타납니다.
 
 ### CXL 풀링이 푸는 방식
 
-4편에서 본 CXL 2.0의 풀링이 정확히 이 문제를 겨냥합니다. 거대한 메모리 디바이스를 **Multi-Logical Device(MLD)**로 쪼개고, **Fabric Manager(FM)**가 노드별 수요에 맞춰 chunk를 동적으로 배정합니다.
+4편에서 본 CXL 2.0의 풀링이 정확히 이 문제를 겨냥합니다. 거대한 메모리 디바이스를 <strong>Multi-Logical Device(MLD)</strong>로 쪼개고, <strong>Fabric Manager(FM)</strong>가 노드별 수요에 맞춰 chunk를 동적으로 배정합니다.
 
 핵심은 **동시 공유가 아니라 동적 할당**이라는 점입니다. 한 chunk는 한 시점에 한 호스트만 소유하므로 일관성 충돌이 없고, 그래서 구현이 단순하면서도 효과가 큽니다.
 
