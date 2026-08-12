@@ -143,6 +143,10 @@ Tiering을 관리하는 주체는 해당 서버가 사용되는 workload의 범�
 - 범용 workload라면 OS의 자동 tiering에 맡기는 편이 편합니다. Linux가 page access를 추적하고 hot page를 DDR로 올리며 cold page를 CXL로 내립니다.
 - 반면 **LLM 추론처럼 접근 패턴이 결정론적인 workload**라면 애플리케이션이 직접 배치할 수 있습니다. "활성 KV block은 HBM, 재사용할 prefix는 CXL"처럼 의미를 아는 주체가 결정하는 방식입니다.
 
+자동 tiering에서 말하는 "access 추적"에는 하나의 정답이 없습니다. 구현마다 최근 접근 여부(recency), 접근 빈도(frequency), 마지막 접근 이후 시간(idle time)을 조합합니다. 예를 들어 Linux의 [DAMON_LRU_SORT](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html)는 기본 설정에서 관찰 구간 중 50% 이상 접근된 메모리 영역을 hot으로, 120초 이상 접근되지 않은 영역을 cold로 분류합니다. 그런 다음 hot page의 LRU 우선순위는 높이고 cold page의 우선순위는 낮춰, 메모리가 부족할 때 cold page가 먼저 회수되도록 합니다.
+
+[TPP](https://arxiv.org/abs/2206.02878)는 이 분류를 실제 tier 이동으로 연결합니다. Local DDR에서 reclaim 대상으로 골라진 cold page는 CXL NUMA node로 비동기 demotion합니다. 반대로 CXL page가 접근되면 먼저 active LRU로 옮기고, 다음 NUMA hinting fault에서도 계속 hot한 경우에만 local DDR로 promotion합니다. 한 번의 접근만으로 page가 두 tier 사이를 왕복하는 일을 줄이기 위한 로직입니다.
+
 ### Vistara — production에서 검증한 CXL tiering
 
 Meta의 [Vistara](https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf)는 두 방식 중 자동 tiering의 대표 사례입니다. Vistara는 퇴역 서버에서 회수한 DDR4를 CXL Type 3 장치로 연결합니다. AMD Turin 서버 한 대에 local DDR5 768GB와 CXL DDR4 256GB를 구성해 총 1TB로 확장했습니다.
@@ -181,7 +185,7 @@ Meta는 CXL을 통해 실질적으로 서버 성능을 향상시킬 수 있다�
 - **공통 조건**: 용량이 병목이고, latency에 관대하며, 접근 패턴이 예측 가능한 워크로드.
 - **CXL의 자리**: 비싼 메모리를 *대체* 하는 게 아니라 그 *아래 칸을 넓히는* 계층.
 
-이 시리즈는 SRAM, DRAM, HBM, NAND와 같은 서로 다른 메모리가 왜 하나로 합쳐질 수 없는지 묻는 데서 시작했습니다. 답은 매번 같았습니다. 속도와 용량, 비용을 한 종류의 memory가 모두 만족시킬 수 없기 때문입니다.
+이 시리즈는 SRAM, DRAM, HBM, NAND와 같은 서로 다른 메모리가 왜 하나로 합쳐질 수 없는지 묻는 데서 시작했습니다. 이유는 속도와 용량, 비용을 한 종류의 memory가 모두 만족시킬 수 없기 때문입니다.
 
 HBF와 CXL도 그 trade-off를 없애지는 않습니다. 대신 빠르고 비싼 memory에는 지금 필요한 data를 남기고, 느리지만 큰 memory에는 나중에 쓸 data를 보냅니다. HBF는 GPU 가까이에서, CXL은 CPU와 system level에서 그 아래 칸을 넓힙니다.
 
@@ -200,6 +204,7 @@ HBF와 CXL도 그 trade-off를 없애지는 않습니다. 대신 빠르고 비�
 메모리 계층이 다양해질수록 가속기 회사는 더 복잡하고 흥미로운 문제를 풀어내야 합니다. 더욱이 메모리와 연산 로직, 소프트웨어와 알고리즘 등 하나의 영역에 국한되지 않고 서로 다른 도메인이 하나로 통합되어야 최적화된 가속기를 개발할 수 있습니다.
 HyperAccel은 HW, SW, AI를 모두 다루는 회사로, 전 방면에 걸쳐 뛰어난 인재들이 모여 있습니다.
 폭넓은 지식을 깊게 배우며 함께 성장하고 싶으신 분들은 언제든지 지원해 주세요!
+
 **채용 사이트**: https://hyperaccel.career.greetinghr.com/ko/guide
 
 ## Reference
@@ -208,4 +213,6 @@ HyperAccel은 HW, SW, AI를 모두 다루는 회사로, 전 방면에 걸쳐 뛰
 - [Linux Kernel — CXL Driver Documentation](https://www.kernel.org/doc/html/latest/driver-api/cxl/index.html)
 - D. Yoon et al., "TraCT: Disaggregated LLM Serving with CXL Shared Memory KV Cache at Rack-Scale," 2025. [arXiv:2512.18194](https://arxiv.org/abs/2512.18194)
 - H. Li et al., "Pond: CXL-Based Memory Pooling Systems for Cloud Platforms," *ASPLOS*, 2023. [DOI: 10.1145/3575693.3578835](https://doi.org/10.1145/3575693.3578835)
+- Linux Kernel, ["DAMON-based LRU-lists Sorting"](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html)
+- H. Al Maruf et al., "TPP: Transparent Page Placement for CXL-Enabled Tiered-Memory," *ISCA*, 2023. [arXiv:2206.02878](https://arxiv.org/abs/2206.02878)
 - N. Gholkar et al., "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment," *ISCA*, 2026. [Paper](https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf)

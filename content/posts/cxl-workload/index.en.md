@@ -143,6 +143,10 @@ Who manages tiering depends on the range of workloads the server supports.
 - For general-purpose workloads, automatic OS tiering is convenient. Linux tracks page accesses, promotes hot pages to DDR, and demotes cold pages to CXL memory.
 - For workloads with deterministic access patterns, such as **LLM inference**, the application can place data explicitly. The component that understands the data can decide, for example, that "active KV blocks stay in HBM, while reusable prefixes go to CXL."
 
+There is no universal definition of "access tracking" for automatic tiering. Implementations combine recency, access frequency, and idle time in different ways. For example, with its default settings, Linux [DAMON_LRU_SORT](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html) classifies a memory region as hot when it is accessed during at least 50% of the observation interval, and as cold when it has not been accessed for 120 seconds. It then raises the LRU priority of hot pages and lowers that of cold pages so that cold pages are reclaimed first under memory pressure.
+
+[TPP](https://arxiv.org/abs/2206.02878) turns that classification into movement between tiers. It asynchronously demotes cold reclaim candidates from local DDR to the CXL NUMA node. When a page in CXL memory is accessed, TPP first moves it to the active LRU list and promotes it to local DDR only if it remains hot at the next NUMA hinting fault. Requiring repeated evidence of hotness reduces page ping-pong caused by one-off accesses.
+
 ### Vistara — CXL Tiering Validated in Production
 
 Meta's [Vistara](https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf) is a representative example of automatic tiering. Vistara connects DDR4 recovered from retired servers through a CXL Type 3 device. One AMD Turin server combines 768 GB of local DDR5 with 256 GB of CXL-attached DDR4 for a total of 1 TB.
@@ -209,4 +213,6 @@ HyperAccel works across hardware, software, and AI, bringing together talented p
 - [Linux Kernel — CXL Driver Documentation](https://www.kernel.org/doc/html/latest/driver-api/cxl/index.html)
 - D. Yoon et al., "TraCT: Disaggregated LLM Serving with CXL Shared Memory KV Cache at Rack-Scale," 2025. [arXiv:2512.18194](https://arxiv.org/abs/2512.18194)
 - H. Li et al., "Pond: CXL-Based Memory Pooling Systems for Cloud Platforms," *ASPLOS*, 2023. [DOI: 10.1145/3575693.3578835](https://doi.org/10.1145/3575693.3578835)
+- Linux Kernel, ["DAMON-based LRU-lists Sorting"](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html)
+- H. Al Maruf et al., "TPP: Transparent Page Placement for CXL-Enabled Tiered-Memory," *ISCA*, 2023. [arXiv:2206.02878](https://arxiv.org/abs/2206.02878)
 - N. Gholkar et al., "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment," *ISCA*, 2026. [Paper](https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf)
