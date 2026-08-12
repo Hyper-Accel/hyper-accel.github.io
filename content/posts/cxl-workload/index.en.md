@@ -157,15 +157,11 @@ Linux exposes CXL memory as a CPU-less NUMA node. **Transparent Page Placement (
 
 Meta showed that CXL can produce practical improvements at the server level. Enabling CXL increased the number of jobs or VMs per server by 33% in CI and development environments. For an ML workload, it reduced the number of required servers by 25% while increasing throughput by 4%.
 
-Looking across all three use cases, KV cache offload is explicit tiering at object granularity. Memory pooling is a separate mechanism that transfers ownership of capacity between hosts. They are not the same technology, but they follow the same operating principle: **keep only hot data in expensive local memory**.
-
-This distinction also matters in accelerator design. An inference runtime knows which KV blocks the next step will need. If that knowledge is available earlier and is more precise than page-access statistics collected by the OS, explicit placement and prefetching become essential to hiding the CXL latency tax.
-
 ---
 
 ## Which Workloads Suit CXL?
 
-The three use cases reveal a common set of conditions. CXL works best for workloads with the following characteristics.
+The three use cases reveal a common set of conditions. CXL is well suited to workloads with the following characteristics.
 
 - **Capacity is the bottleneck**, rather than latency.
 - The workload contains data that **can tolerate higher latency**, such as cold data or a large working set.
@@ -177,7 +173,7 @@ This is where HBF and CXL converge. HBF increases capacity between HBM and SSD n
 
 ---
 
-## Closing the Memory in the AI Era Series
+## Conclusion
 
 Part 5 can be summarized in three points.
 
