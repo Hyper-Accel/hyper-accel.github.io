@@ -12,7 +12,7 @@ tags: ["CXL", "KV cache", "memory pooling", "memory tiering", "LLM Inference"]
 series: ["Memory in the AI Era"]
 series_idx: 5
 categories: ["AI hardware", "Semiconductor"]
-summary: "Part 4 explained what CXL is. But where does it fit in real LLM serving and datacenter workloads? We examine KV cache offload, VM consolidation through memory pooling, and hot/warm/cold tiering to identify the workloads that suit CXL."
+summary: "We examine how CXL is used in real workloads through KV cache offload, memory pooling, and memory tiering."
 description: "We examine how CXL is used in real workloads through KV cache offload, memory pooling, and memory tiering."
 comments: true
 keywords: [
