@@ -4,11 +4,11 @@ draft: false
 title: 'AI 시대의 필수 소비재, 메모리 이해하기 5편: CXL Workload 알아보기'
 cover:
   image: "cxl-workload-cover.webp"
-  alt: "GPU HBM의 KV cache가 CXL memory로 offload되고, 여러 서버의 memory pooling과 memory tiering으로 이어지는 모습"
+  alt: "GPU HBM의 KV cache가 CXL 메모리로 offload되고, 여러 서버의 메모리 pooling과 메모리 tiering으로 이어지는 모습"
   caption: "CXL의 세 가지 workload · AI generated image"
   relative: true
 authors: [Jaewon Lim]
-tags: ["CXL", "KV cache", "memory pooling", "memory tiering", "LLM Inference"]
+tags: ["CXL", "KV cache", "메모리 pooling", "메모리 tiering", "LLM Inference"]
 series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 5
 categories: ["AI hardware", "Semiconductor"]
@@ -16,8 +16,8 @@ summary: "CXL이 무엇인지는 4편에서 살펴봤습니다. 그렇다면 CXL
 description: "KV cache offload, 메모리 풀링, 메모리 tiering을 통해 CXL이 실제 워크로드에서 어떻게 쓰이는지 살펴봅니다."
 comments: true
 keywords: [
-  "CXL", "Compute Express Link", "KV cache offload", "memory pooling",
-  "VM consolidation", "memory tiering", "CMM", "LLM 추론"
+  "CXL", "Compute Express Link", "KV cache offload", "메모리 pooling",
+  "VM consolidation", "메모리 tiering", "CMM", "LLM 추론"
 ]
 ---
 
@@ -88,12 +88,12 @@ $$\text{KV cache size} = 2 \times B \times S \times L \times H_{kv} \times D_h \
 CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CPU는 별도의 block I/O 없이 일반적인 load/store로 접근할 수 있습니다. 이때 얻는 이점은 세 가지입니다.
 
 - **용량**: HBM보다 큰 KV cache 공간을 호스트 주소 공간에 붙일 수 있습니다.
-- **접근 방식**: CPU는 CXL 메모리를 byte-addressable memory로 다룰 수 있습니다.
+- **접근 방식**: CPU는 CXL 메모리를 바이트 단위로 주소를 지정할 수 있는 메모리로 다룰 수 있습니다.
 - **위치**: SSD보다 가까운 DRAM 계층이라 block I/O를 거치지 않습니다.
 
-공개된 사례로는 SK hynix의 [TraCT](https://arxiv.org/abs/2512.18194)가 있습니다. TraCT는 NVIDIA Dynamo-vLLM에 CXL shared memory를 붙였습니다. 이 shared memory를 prefill GPU와 decode GPU 사이의 KV 전송 공간이자 rack-level prefix cache로 사용한 것입니다. 두 서버의 실험에서 평균 **Time to First Token(TTFT)**을 최대 9.8배 개선하고, peak throughput을 최대 1.6배 높였습니다.
+공개된 사례로는 SK hynix의 [TraCT](https://arxiv.org/abs/2512.18194)가 있습니다. TraCT는 NVIDIA Dynamo-vLLM에 CXL 공유 메모리를 붙였습니다. 이 공유 메모리를 prefill GPU와 decode GPU 사이의 KV 전송 공간이자 rack-level prefix cache로 사용한 것입니다. 두 서버의 실험에서 평균 **Time to First Token(TTFT)**을 최대 9.8배 개선하고, peak throughput을 최대 1.6배 높였습니다.
 
-{{< figure src="tract-overview.webp" alt="TraCT에서 CXL shared memory가 prefill worker와 decoding worker 사이의 KV 전송 공간과 prefix cache로 동작하는 구조" caption="CXL shared memory를 이용한 KV cache 전송과 prefix cache 구조." attr="출처: TraCT, Figure 2" attrlink="https://arxiv.org/abs/2512.18194" align="center" >}}
+{{< figure src="tract-overview.webp" alt="TraCT에서 CXL 공유 메모리가 prefill worker와 decoding worker 사이의 KV 전송 공간과 prefix cache로 동작하는 구조" caption="CXL 공유 메모리를 이용한 KV cache 전송과 prefix cache 구조." attr="출처: TraCT, Figure 2" attrlink="https://arxiv.org/abs/2512.18194" align="center" >}}
 
 ---
 
@@ -101,11 +101,11 @@ CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CP
 
 두 번째 활용처는 데이터센터 경제성을 곧바로 개선할 수 있는 **메모리 풀링**입니다.
 
-### Stranded memory 문제
+### Stranded 메모리 문제
 
 클라우드 서버는 CPU core 수와 DRAM 용량이 고정된 비율로 묶여 있습니다. 고객이 CPU를 모두 빌려 가면, 남아 있는 DRAM만 따로 판매할 수 없습니다. 반대로 메모리가 먼저 소진되면 남은 CPU core가 놀게 됩니다.
 
-이처럼 한쪽 자원이 먼저 소진되어 다른 자원이 남는 현상을 **stranded memory**라고 합니다. 이 문제는 특히 한 서버에 여러 **Virtual Machine(VM)**을 배치하는 클라우드 환경에서 두드러지게 나타납니다.
+이처럼 한쪽 자원이 먼저 소진되어 다른 자원이 남는 현상을 **stranded 메모리**라고 합니다. 이 문제는 특히 한 서버에 여러 **Virtual Machine(VM)**을 배치하는 클라우드 환경에서 두드러지게 나타납니다.
 
 ### CXL 풀링이 푸는 방식
 
@@ -117,9 +117,9 @@ CXL Type 3 메모리는 호스트의 물리 주소 공간에 들어옵니다. CP
 
 VM scheduler도 CPU와 메모리를 더 독립적으로 배치할 수 있습니다.
 
-Microsoft Azure의 [Pond](https://www.microsoft.com/en-us/research/wp-content/uploads/2022/10/2023_Pond_asplos23_official_asplos_version.pdf)는 Azure 100개 production cluster에서 수집한 75일치 VM 배치 trace와, 158개 workload에서 CXL latency를 모사해 얻은 성능 측정값을 결합해 end-to-end simulation을 수행했습니다. local DRAM보다 memory latency가 2.22배 높은 조건에서 16-socket pool을 구성하고 성능 저하 허용치를 5%로 두었을 때, 필요한 전체 DRAM 용량이 7% 줄었습니다. 이를 전체 cloud server 비용으로 환산하면 3.5%입니다.
+Microsoft Azure의 [Pond](https://www.microsoft.com/en-us/research/wp-content/uploads/2022/10/2023_Pond_asplos23_official_asplos_version.pdf)는 Azure 100개 production cluster에서 수집한 75일치 VM 배치 trace와, 158개 workload에서 CXL latency를 모사해 얻은 성능 측정값을 결합해 end-to-end simulation을 수행했습니다. local DRAM보다 메모리 지연시간이 2.22배 높은 조건에서 16-socket pool을 구성하고 성능 저하 허용치를 5%로 두었을 때, 필요한 전체 DRAM 용량이 7% 줄었습니다. 이를 전체 cloud server 비용으로 환산하면 3.5%입니다.
 
-{{< figure src="pond-memory-stranding.webp" alt="CPU core 할당률에 따른 stranded memory와 CXL memory pool 크기에 따른 DRAM 절감 효과" caption="Azure의 stranded memory와 pool 크기에 따른 DRAM 절감 효과." attr="출처: Pond, Figure 2·3" attrlink="https://www.microsoft.com/en-us/research/wp-content/uploads/2022/10/2023_Pond_asplos23_official_asplos_version.pdf" align="center" >}}
+{{< figure src="pond-memory-stranding.webp" alt="CPU core 할당률에 따른 stranded 메모리와 CXL 메모리 pool 크기에 따른 DRAM 절감 효과" caption="Azure의 stranded 메모리와 pool 크기에 따른 DRAM 절감 효과." attr="출처: Pond, Figure 2·3" attrlink="https://www.microsoft.com/en-us/research/wp-content/uploads/2022/10/2023_Pond_asplos23_official_asplos_version.pdf" align="center" >}}
 
 ---
 
@@ -134,7 +134,7 @@ CXL 메모리는 DDR보다 2-3배 느립니다. 그러니 모든 데이터를 CX
 - **hot**: 자주 접근하는 데이터 → 가까운 DDR
 - **warm / cold**: 가끔 접근하거나 용량만 차지하는 데이터 → 한 단계 먼 CXL
 
-CPU 입장에서 CXL 메모리는 "조금 느린 **Non-Uniform Memory Access(NUMA)** 노드"처럼 보입니다. 그래서 OS와 런타임이 어떤 페이지를 어느 tier에 둘지를 관리하게 됩니다.
+CPU 입장에서 CXL 메모리는 "조금 느린 **비균일 메모리 접근(NUMA) 노드**"처럼 보입니다. 그래서 OS와 런타임이 어떤 페이지를 어느 tier에 둘지를 관리하게 됩니다.
 
 ### 자동 tiering vs 명시적 배치
 
@@ -143,21 +143,21 @@ Tiering을 관리하는 주체는 해당 서버가 사용되는 workload의 범�
 - 범용 workload라면 OS의 자동 tiering에 맡기는 편이 편합니다. Linux가 page access를 추적하고 hot page를 DDR로 올리며 cold page를 CXL로 내립니다.
 - 반면 **LLM 추론처럼 접근 패턴이 결정론적인 workload**라면 애플리케이션이 직접 배치할 수 있습니다. "활성 KV block은 HBM, 재사용할 prefix는 CXL"처럼 의미를 아는 주체가 결정하는 방식입니다.
 
-자동 tiering에서 말하는 "access 추적"에는 하나의 정답이 없습니다. 구현마다 최근 접근 여부(recency), 접근 빈도(frequency), 마지막 접근 이후 시간(idle time)을 조합합니다. 예를 들어 Linux의 [DAMON_LRU_SORT](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html)는 기본 설정에서 관찰 구간 중 50% 이상 접근된 메모리 영역을 hot으로, 120초 이상 접근되지 않은 영역을 cold로 분류합니다. 그런 다음 hot page의 LRU 우선순위는 높이고 cold page의 우선순위는 낮춰, 메모리가 부족할 때 cold page가 먼저 회수되도록 합니다.
+자동 tiering에서 말하는 "접근 추적"에는 하나의 정답이 없습니다. 구현마다 최근 접근 여부, 접근 빈도, 마지막 접근 이후 시간을 조합합니다. 예를 들어 Linux의 [DAMON_LRU_SORT](https://docs.kernel.org/admin-guide/mm/damon/lru_sort.html)는 기본 설정에서 관찰 구간 중 50% 이상 접근된 메모리 영역을 hot으로, 120초 이상 접근되지 않은 영역을 cold로 분류합니다. 그런 다음 hot 페이지의 LRU 우선순위는 높이고 cold 페이지의 우선순위는 낮춰, 메모리가 부족할 때 cold 페이지가 먼저 정리되도록 합니다.
 
-[TPP](https://arxiv.org/abs/2206.02878)는 이 분류를 실제 tier 이동으로 연결합니다. Local DDR에서 reclaim 대상으로 골라진 cold page는 CXL NUMA node로 비동기 demotion합니다. 반대로 CXL page가 접근되면 먼저 active LRU로 옮기고, 다음 NUMA hinting fault에서도 계속 hot한 경우에만 local DDR로 promotion합니다. 한 번의 접근만으로 page가 두 tier 사이를 왕복하는 일을 줄이기 위한 로직입니다.
+또 다른 예시인 [TPP](https://arxiv.org/abs/2206.02878)는 이러한 분류를 실제 CXL에서 사용합니다. 로컬 DDR에서 당장 사용하지 않는다고 판단된 cold 페이지는 CXL 메모리로 비동기적으로 내려보냅니다. 반대로 CXL에 있는 페이지가 접근되면 바로 올리지 않고 우선 활성 페이지 목록에 표시합니다. 이후 NUMA 접근 추적에서 다시 사용된 것이 확인되면 로컬 DDR로 올립니다. 단발성 접근 때문에 페이지가 두 계층 사이를 왕복하지 않도록 사용 여부를 한 번 더 확인하는 방식입니다.
 
 ### Vistara — production에서 검증한 CXL tiering
 
 Meta의 [Vistara](https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf)는 두 방식 중 자동 tiering의 대표 사례입니다. Vistara는 퇴역 서버에서 회수한 DDR4를 CXL Type 3 장치로 연결합니다. AMD Turin 서버 한 대에 local DDR5 768GB와 CXL DDR4 256GB를 구성해 총 1TB로 확장했습니다.
 
-Linux는 CXL 메모리를 CPU가 없는 NUMA node로 노출합니다. **Transparent Page Placement(TPP)**와 **Transparent Memory Offloading(TMO)**이 hot page는 local DDR5에 남기고 cold page는 CXL DDR4로 옮깁니다. 한 host의 **memory expansion + tiering**을 적용한 것입니다.
+Linux는 CXL 메모리를 CPU가 없는 NUMA node로 노출합니다. **TPP**와 **TMO**가 hot page는 local DDR5에 남기고 cold page는 CXL DDR4로 옮깁니다. 한 host에 **메모리 확장 + tiering**을 적용한 것입니다.
 
 {{< figure src="vistara-memserver.webp" alt="AMD Turin CPU의 local DDR5와 두 개의 Vistara CXL card에 연결된 DDR4로 구성한 MemServer" caption="Local DDR5와 CXL DDR4를 결합한 Vistara MemServer." attr="출처: Vistara, Figure 6" attrlink="https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf" align="center" >}}
 
 Meta는 CXL을 통해 실질적으로 서버 성능을 향상시킬 수 있다는 것을 보여주었습니다. CXL을 켠 CI·개발 환경에서는 서버당 job 또는 VM 수가 33% 늘었습니다. ML workload에서는 필요한 서버 수가 25% 줄고 처리량은 4% 늘었습니다.
 
-세 활용 사례를 종합해 보면, KV cache offload는 object 단위의 명시적 tiering입니다. Memory pooling은 host 사이에서 capacity의 소유권을 옮기는 별도 메커니즘입니다. 둘을 같은 기술로 볼 수는 없지만, **비싼 local memory에는 hot data만 남긴다**는 운영 원칙은 같습니다.
+세 활용 사례를 종합해 보면, KV cache offload는 object 단위의 명시적 tiering입니다. 메모리 pooling은 host 사이에서 capacity의 소유권을 옮기는 별도 메커니즘입니다. 둘을 같은 기술로 볼 수는 없지만, **비싼 local 메모리에는 hot data만 남긴다**는 운영 원칙은 같습니다.
 
 가속기 설계에서도 이 구분이 중요합니다. 추론 runtime은 어떤 KV block이 다음 step에 필요한지 알고 있습니다. 이 정보가 OS의 page access 통계보다 빠르고 정확하다면, 명시적 prefetch와 배치가 CXL의 latency tax를 숨기는 핵심이 됩니다.
 
@@ -185,17 +185,17 @@ Meta는 CXL을 통해 실질적으로 서버 성능을 향상시킬 수 있다�
 - **공통 조건**: 용량이 병목이고, latency에 관대하며, 접근 패턴이 예측 가능한 워크로드.
 - **CXL의 자리**: 비싼 메모리를 *대체* 하는 게 아니라 그 *아래 칸을 넓히는* 계층.
 
-이 시리즈는 SRAM, DRAM, HBM, NAND와 같은 서로 다른 메모리가 왜 하나로 합쳐질 수 없는지 묻는 데서 시작했습니다. 이유는 속도와 용량, 비용을 한 종류의 memory가 모두 만족시킬 수 없기 때문입니다.
+이 시리즈는 SRAM, DRAM, HBM, NAND와 같은 서로 다른 메모리가 왜 하나로 합쳐질 수 없는지 묻는 데서 시작했습니다. 그 이유는 메모리의 본질적인 trade-off 한계에서 기인합니다. 속도와 용량, 비용을 한 종류의 메모리가 모두 만족시킬 수 없기 때문이었습니다.
 
-HBF와 CXL도 그 trade-off를 없애지는 않습니다. 대신 빠르고 비싼 memory에는 지금 필요한 data를 남기고, 느리지만 큰 memory에는 나중에 쓸 data를 보냅니다. HBF는 GPU 가까이에서, CXL은 CPU와 system level에서 그 아래 칸을 넓힙니다.
+HBF와 CXL도 그 trade-off를 없애지는 않습니다. 대신 빠르고 비싼 메모리에는 지금 필요한 data를 남기고, 느리지만 큰 메모리에는 나중에 쓸 data를 보냅니다. HBF는 GPU 가까이에서, CXL은 CPU와 system level에서 그 아래 칸을 넓힙니다.
 
-{{< figure src="memory-hierarchy-completed.webp" alt="SRAM, HBM, DRAM 아래에서 HBF와 CXL Memory가 용량을 확장하고 NVMe SSD로 이어지는 메모리 계층 피라미드" caption="HBF와 CXL Memory가 메모리 계층의 용량을 확장합니다 · AI generated image" align="center" >}}
+{{< figure src="memory-hierarchy-completed.webp" alt="SRAM, HBM, DRAM 아래에서 HBF와 CXL 메모리가 용량을 확장하고 NVMe SSD로 이어지는 메모리 계층 피라미드" caption="HBF와 CXL 메모리가 메모리 계층의 용량을 확장합니다 · AI generated image" align="center" >}}
 
-결국 하나의 memory로 모든 문제를 풀 수는 없습니다. 데이터의 성격에 따라 적합한 memory를 고르고, 여러 계층을 조합해 workload가 요구하는 성능과 용량을 맞춰야 합니다.
+결국 하나의 메모리로 모든 문제를 풀 수는 없습니다. 데이터의 성격에 따라 적합한 메모리를 고르고, 여러 계층을 조합해 workload가 요구하는 성능과 용량을 맞춰야 합니다.
 
 이는 엔지니어링에 본질적으로 하나의 정답이 없기 때문입니다. 엔지니어링은 당대의 기술과 예산 안에서 최적점을 찾고, 새로운 workload와 기술이 등장할 때마다 그 최적점을 조정하는 과정입니다.
 
-다섯 편에 걸쳐 서로 다른 memory가 왜 존재하고, 새로운 기술들이 어떤 문제를 풀기 위해 등장했는지 살펴봤습니다. 메모리 이해하기 시리즈는 여기서 마치겠습니다. 이 시리즈가 메모리 기술을 이해하는 데 도움이 되었기를 바랍니다. 읽어 주셔서 감사합니다.
+다섯 편에 걸쳐 서로 다른 메모리가 왜 존재하고, 새로운 기술들이 어떤 문제를 풀기 위해 등장했는지 살펴봤습니다. 메모리 이해하기 시리즈는 여기서 마치겠습니다. 이 시리즈가 메모리 기술을 이해하는 데 도움이 되었기를 바랍니다. 읽어 주셔서 감사합니다.
 
 ---
 
