@@ -1,5 +1,5 @@
 ---
-date: '2026-08-10T16:32:14+09:00'
+date: '2026-08-12T17:39:35+09:00'
 draft: false
 title: 'AI 시대의 필수 소비재, 메모리 이해하기 5편: CXL Workload 알아보기'
 cover:

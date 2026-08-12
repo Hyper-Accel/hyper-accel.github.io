@@ -1,5 +1,5 @@
 ---
-date: '2026-08-10T16:32:14+09:00'
+date: '2026-08-12T17:39:35+09:00'
 draft: false
 title: 'Memory in the AI Era, Part 5: Exploring CXL Workloads'
 cover:
