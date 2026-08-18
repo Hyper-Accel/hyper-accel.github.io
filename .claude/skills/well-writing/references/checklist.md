@@ -1,6 +1,6 @@
 # Quick Reference Checklist
 
-This is a quick reference checklist for reviewing blog posts. For detailed explanations, see `styleguide.md`.
+This is a quick reference checklist for reviewing blog posts. For detailed explanations, see `STYLEGUIDE.md` at the repo root.
 
 ---
 

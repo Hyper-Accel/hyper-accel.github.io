@@ -38,7 +38,7 @@ If the draft does not exist yet and the user needs help creating structure or co
 Before reviewing:
 
 1. Read the target markdown file(s).
-2. Read `.gemini/styleguide.md`.
+2. Read `STYLEGUIDE.md`.
 3. Read `README.md` and `archetypes/posts.md` when reviewing publish readiness, frontmatter, multilingual pairing, author metadata, series fields, cover images, or SEO fields.
 4. If helpful, sample a few similar posts by the same author or in the same series to understand the intended tone and metadata pattern.
 
@@ -339,7 +339,7 @@ Avoid this style:
 ## Reviewer Guardrails
 
 - Do not over-enforce stylistic preferences when the draft is already clear.
-- Do not convert flexible guidance from `.gemini/styleguide.md` into hard blockers unless the issue is truly objective.
+- Do not convert flexible guidance from `STYLEGUIDE.md` into hard blockers unless the issue is truly objective.
 - Do not silently normalize a claim you suspect is wrong; flag it.
 - Do not rewrite highly technical claims beyond your confidence. Ask for validation when needed.
 - Do not confuse “I would write this differently” with “this will confuse or mislead the reader.”
