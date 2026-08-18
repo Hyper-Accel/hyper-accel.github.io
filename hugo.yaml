@@ -2,6 +2,9 @@ baseURL: "https://hyper-accel.github.io/"
 title: HyperAccel Tech Blog
 theme: PaperMod
 
+ignoreFiles:
+  - AGENTS\.md$
+
 defaultContentLanguage: ko
 
 languages:

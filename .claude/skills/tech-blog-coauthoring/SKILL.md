@@ -11,7 +11,7 @@ This skill turns rough technical material into a HyperAccel blog post through a 
 
 - Treat the author as the source of truth. Ask for intent, constraints, trade-offs, and factual details before inventing connective tissue.
 - Preserve the author's technical stance and Korean voice. Improve structure and readability without making the post sound generic.
-- Ground every post in this repo's conventions before drafting: read `README.md`, `.gemini/styleguide.md`, `archetypes/posts.md`, and same-author posts when available.
+- Ground every post in this repo's conventions before drafting: read `README.md`, `STYLEGUIDE.md`, `archetypes/posts.md`, and same-author posts when available.
 - Prefer small, reviewable edits. When a file already exists, patch sections instead of reprinting or rewriting the whole post.
 
 ---
@@ -20,7 +20,7 @@ This skill turns rough technical material into a HyperAccel blog post through a 
 
 Do this before creating or editing post files.
 
-1. Read `.gemini/styleguide.md` for the current writing and markdown rules.
+1. Read `STYLEGUIDE.md` for the current writing and markdown rules.
 2. Read `README.md` and `archetypes/posts.md` for Hugo and multilingual conventions.
 3. Identify the intended author from the user, frontmatter, or context.
 4. If an author is known, find posts with matching `authors` frontmatter and use those as the primary reference for:
@@ -131,7 +131,7 @@ For each section:
 
 ### Drafting Rules
 
-Apply `.gemini/styleguide.md` while writing, especially:
+Apply `STYLEGUIDE.md` while writing, especially:
 
 - Korean text after bold text needs a space: `**GPU** 는`, `**Cerebras** 의`.
 - First use of important acronyms should introduce the full term: `**Tensor Processing Unit(TPU)**`.
