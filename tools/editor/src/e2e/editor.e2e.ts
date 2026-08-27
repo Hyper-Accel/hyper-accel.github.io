@@ -203,9 +203,10 @@ async function run(): Promise<void> {
     if (
       !publishedBodyBox ||
       !publishedImageBox ||
-      Math.abs(publishedBodyBox.width - publishedImageBox.width) > 1
+      publishedImageBox.width > publishedBodyBox.width + 1 ||
+      publishedImageBox.width > imageWidth + 1
     ) {
-      throw new Error("발행 이미지가 글 본문 폭을 채우지 않습니다.")
+      throw new Error("발행 이미지가 본문 폭을 넘거나 원본보다 확대되었습니다.")
     }
     const publishedAlt = await publishedImage.getAttribute("alt")
     if (publishedAlt !== "파란 배경에 Clipboard image라고 적힌 그림") {

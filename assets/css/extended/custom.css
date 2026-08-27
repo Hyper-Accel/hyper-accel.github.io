@@ -167,12 +167,6 @@ body .posts-grid-container .post-entry {
     margin-right: auto;
 }
 
-/* Blog editor clipboard images fill the published article column. */
-.post-content img[src*="/images/pasted-"] {
-    width: 100%;
-    height: auto;
-}
-
 /* Series list styling */
 .post-series {
     margin-top: 2rem;
