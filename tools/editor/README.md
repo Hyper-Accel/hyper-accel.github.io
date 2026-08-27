@@ -4,6 +4,26 @@ Hugo Markdown 글을 PaperMod의 읽기 화면과 같은 폭과 타이포그래�
 웹 에디터입니다. 제목과 본문을 화면에서 직접 수정하고, 클립보드 이미지를 커서 위치에
 붙여넣을 수 있습니다.
 
+## 작업 흐름
+
+편집기는 현재 체크아웃된 Git 브랜치의 글을 수정하며, 브랜치나 PR을 자동으로 만들지는
+않습니다. 작업을 시작하기 전에 저장소 루트에서 글 전용 브랜치를 먼저 만드세요.
+
+```bash
+git switch -c post/<글-slug>
+```
+
+새 글은 편집기에서 만들 수 없습니다. 먼저 Hugo 명령으로 같은 slug의 한국어 파일과 영어
+파일을 모두 만든 뒤 편집기에서 여세요. 자세한 다국어 규칙은 저장소 루트의
+`README.md`를 따릅니다.
+
+```bash
+hugo new content/posts/<글-slug>/index.md
+hugo new content/posts/<글-slug>/index.en.md
+```
+
+편집과 로컬 검증을 마치면 평소 Git 도구로 커밋하고 PR을 만듭니다.
+
 ## 최초 설치
 
 저장소 루트에서:
@@ -68,8 +88,9 @@ techblog-editor
 - 오른쪽의 새 대화 버튼을 누르면 현재 기록에서 나와 빈 대화로 전환됩니다. 기존 기록은
   삭제되지 않으므로 언제든 다시 선택할 수 있습니다.
 
-세션 파일은 저장소의 `.git/techblog-editor/sessions/`에 저장되므로 Git 커밋에는 포함되지
-않습니다.
+세션 파일은 저장소의 공용 Git 디렉터리 아래 `techblog-editor/sessions/`에 저장되므로
+Git 커밋에는 포함되지 않습니다. 일반 clone에서는 `.git/techblog-editor/sessions/`이고,
+linked worktree에서도 원본 저장소의 같은 세션 기록을 사용합니다.
 
 ## 안전장치
 
