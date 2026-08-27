@@ -1,0 +1,35 @@
+{
+  "name": "@hyperaccel/blog-editor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently --kill-others --names api,web,hugo \"bun --watch src/server/index.ts\" \"vite\" \"hugo server -s ../.. --bind 127.0.0.1 --port 1413 --disableFastRender\"",
+    "build": "vite build && bun build src/server/index.ts --target bun --outdir dist-server",
+    "start": "bun run dist-server/index.js",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "check": "biome check . && bun run typecheck && bun test"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.2",
+    "@phosphor-icons/web": "^2.1.2",
+    "@tiptap/core": "^3.27.0",
+    "@tiptap/extension-image": "^3.27.0",
+    "@tiptap/extension-link": "^3.27.0",
+    "@tiptap/extension-placeholder": "^3.27.0",
+    "@tiptap/markdown": "^3.27.0",
+    "@tiptap/starter-kit": "^3.27.0",
+    "hono": "^4.9.8",
+    "ky": "^1.10.0",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.2",
+    "@types/bun": "^1.2.21",
+    "concurrently": "^9.2.1",
+    "playwright": "^1.55.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
+  }
+}

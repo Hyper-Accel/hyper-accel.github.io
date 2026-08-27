@@ -1,0 +1,247 @@
+.editor-scroll {
+  min-height: calc(100dvh - 53px);
+  padding: 48px clamp(24px, 5vw, 72px) 120px;
+}
+
+.article-canvas {
+  width: min(100%, calc(var(--main-width) + 72px));
+  min-height: calc(100dvh - 160px);
+  margin: 0 auto;
+  padding: 56px 36px 96px;
+  background: var(--editor-paper);
+  border: 1px solid var(--editor-border);
+  border-radius: var(--radius-panel);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
+}
+
+.editor-post-header {
+  width: min(100%, var(--main-width));
+  margin: 0 auto 32px;
+}
+
+.document-kicker {
+  margin-bottom: var(--space-3);
+  color: var(--editor-subtle);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.post-title-input {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  overflow: hidden;
+  color: var(--editor-text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  resize: none;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.post-title-input:focus {
+  box-shadow: inset 0 -2px var(--editor-accent);
+}
+
+.editor-meta {
+  font-size: 13px;
+}
+
+#editor {
+  width: min(100%, var(--main-width));
+  margin: 0 auto;
+}
+
+.ProseMirror {
+  min-height: 520px;
+  outline: 0;
+  caret-color: var(--editor-accent);
+}
+
+.ProseMirror > * {
+  position: relative;
+}
+
+.ProseMirror > *:hover::before {
+  position: absolute;
+  top: 0.3em;
+  left: calc(var(--space-6) * -1);
+  color: var(--editor-subtle);
+  content: "⋮";
+  font-size: 14px;
+  opacity: 0.45;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  float: left;
+  height: 0;
+  color: var(--editor-subtle);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+.ProseMirror img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem auto;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid var(--editor-accent);
+  outline-offset: 4px;
+}
+
+.hugo-shortcode {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-6) 0;
+  padding: var(--space-3) var(--space-4);
+  overflow: hidden;
+  background: var(--editor-soft);
+  border: 1px solid var(--editor-border);
+  border-radius: var(--radius-panel);
+}
+
+.hugo-shortcode.ProseMirror-selectednode {
+  border-color: var(--editor-accent);
+  outline: 2px solid var(--editor-accent-soft);
+}
+
+.hugo-shortcode img {
+  width: 100%;
+  margin: 0 0 var(--space-1);
+  border-radius: var(--radius-control);
+}
+
+.hugo-shortcode__label {
+  color: var(--editor-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hugo-shortcode code {
+  overflow: hidden;
+  color: var(--editor-secondary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.welcome {
+  display: grid;
+  max-width: 440px;
+  min-height: calc(100dvh - 200px);
+  margin: 0 auto;
+  place-content: center;
+  text-align: center;
+}
+
+.welcome[hidden],
+.article-canvas[hidden] {
+  display: none;
+}
+
+.welcome-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-5);
+  place-items: center;
+  color: var(--editor-accent);
+  background: var(--editor-accent-soft);
+  border-radius: var(--radius-panel);
+  font-size: 26px;
+}
+
+.welcome h1 {
+  margin: 0 0 var(--space-3);
+  font-size: 24px;
+}
+
+.welcome p {
+  margin: 0;
+  color: var(--editor-secondary);
+  line-height: 1.7;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .post-rail {
+    position: fixed;
+    left: 0;
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 16px 0 48px rgb(0 0 0 / 12%);
+    transition: transform 120ms ease;
+  }
+
+  .post-rail[data-open="true"] {
+    transform: translateX(0);
+  }
+
+  .rail-open,
+  .rail-close {
+    display: grid;
+  }
+
+  .save-state {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .document-actions {
+    flex: 0 0 auto;
+  }
+
+  .secondary-button span,
+  .save-button span {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .editor-scroll {
+    padding: 20px 0 80px;
+  }
+
+  .article-canvas {
+    padding: 36px 24px 72px;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .post-title-input {
+    font-size: 32px;
+  }
+
+  .command-bar {
+    padding-inline: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-rail {
+    transition: none;
+  }
+}
