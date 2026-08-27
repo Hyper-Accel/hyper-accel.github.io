@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently --kill-others --names api,web,hugo \"bun --watch src/server/index.ts\" \"vite\" \"hugo server -s ../.. --bind 127.0.0.1 --port 1413 --disableFastRender\"",
+    "dev": "concurrently --kill-others --names api,web,hugo \"bun --watch src/server/index.ts\" \"vite --open /\" \"hugo server -s ../.. --bind 127.0.0.1 --port 1413 --disableFastRender\"",
     "build": "vite build && bun build src/server/index.ts --target bun --outdir dist-server",
     "start": "bun run dist-server/index.js",
     "test": "bun test",
