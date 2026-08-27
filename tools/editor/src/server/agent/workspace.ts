@@ -1,4 +1,4 @@
-import { cp, mkdtemp, readdir, rm } from "node:fs/promises"
+import { cp, lstat, mkdtemp, readdir, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { basename, dirname, join } from "node:path"
 import { parse } from "yaml"
@@ -35,6 +35,9 @@ async function git(cwd: string, args: readonly string[]): Promise<string> {
 }
 
 async function rejectSymbolicLinks(directory: string): Promise<void> {
+  if ((await lstat(directory)).isSymbolicLink()) {
+    throw new ContentError("글 번들의 심볼릭 링크는 에이전트 작업공간에 복사할 수 없습니다.")
+  }
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (entry.isSymbolicLink()) {
       throw new ContentError(

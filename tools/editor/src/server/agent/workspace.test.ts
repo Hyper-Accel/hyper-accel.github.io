@@ -40,6 +40,30 @@ describe("agent workspace", () => {
     ).rejects.toThrow("심볼릭 링크")
   })
 
+  test("rejects a post bundle directory that is itself a symbolic link", async () => {
+    const root = await mkdtemp(join(tmpdir(), "techblog-agent-test-"))
+    temporaryRoots.push(root)
+    await git(root, "init")
+    await git(root, "config", "user.email", "editor@example.com")
+    await git(root, "config", "user.name", "Editor Test")
+    const postsDirectory = join(root, "content/posts")
+    const outsideDirectory = join(root, "outside")
+    await mkdir(postsDirectory, { recursive: true })
+    await mkdir(outsideDirectory)
+    await Bun.write(
+      join(outsideDirectory, "index.md"),
+      "---\ntitle: '외부 글'\ndraft: false\n---\n\n외부 본문\n",
+    )
+    await Bun.write(join(root, "README.md"), "base")
+    await git(root, "add", ".")
+    await git(root, "commit", "-m", "base")
+    await symlink(outsideDirectory, join(postsDirectory, "example"))
+
+    await expect(
+      createAgentWorkspace(root, "content/posts/example/index.md", "session-directory-link"),
+    ).rejects.toThrow("심볼릭 링크")
+  })
+
   test("seeds the current post bundle and cleans the git worktree", async () => {
     const root = await mkdtemp(join(tmpdir(), "techblog-agent-test-"))
     temporaryRoots.push(root)
