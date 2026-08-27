@@ -1,10 +1,16 @@
 import { describe, expect, test } from "bun:test"
+import { mkdir, mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import {
   buildImageName,
+  findRepositoryRoot,
   patchFrontmatterScalar,
   resolveContentPath,
   splitMarkdownDocument,
 } from "./content"
+
+const temporaryRoots: string[] = []
 
 describe("splitMarkdownDocument", () => {
   test("keeps the exact frontmatter and body slices", () => {
@@ -51,5 +57,20 @@ describe("buildImageName", () => {
 
   test("rejects unsupported clipboard file types", () => {
     expect(() => buildImageName("text/plain", new Date(), "a1b2")).toThrow()
+  })
+})
+
+describe("findRepositoryRoot", () => {
+  test("finds the Hugo root from a bundled server directory", async () => {
+    const root = await mkdtemp(join(tmpdir(), "editor-root-test-"))
+    temporaryRoots.push(root)
+    const serverDirectory = join(root, "tools/editor/dist-server")
+    await mkdir(join(root, "content/posts"), { recursive: true })
+    await mkdir(serverDirectory, { recursive: true })
+    await Bun.write(join(root, "hugo.yaml"), "baseURL: https://example.com\n")
+
+    expect(findRepositoryRoot(serverDirectory, serverDirectory)).toBe(root)
+
+    await Promise.all(temporaryRoots.splice(0).map((path) => rm(path, { recursive: true })))
   })
 })

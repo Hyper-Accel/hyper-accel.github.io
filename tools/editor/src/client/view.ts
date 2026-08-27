@@ -13,13 +13,40 @@ export function applicationMarkup(): string {
           </div>
           <button class="icon-button rail-close" id="rail-close" type="button" aria-label="글 목록 닫기"><i class="ph ph-x"></i></button>
         </div>
-        <label class="search-field">
-          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-          <span class="sr-only">글 검색</span>
-          <input id="post-search" type="search" placeholder="제목이나 경로 검색" autocomplete="off" />
-        </label>
-        <p class="sr-only" id="post-result-status" role="status"></p>
-        <div class="post-list" id="post-list"></div>
+        <div class="rail-tabs" role="tablist" aria-label="왼쪽 패널">
+          <button class="rail-tab" id="posts-tab" type="button" role="tab" aria-selected="true" aria-controls="posts-panel"><i class="ph ph-files"></i><span>글</span></button>
+          <button class="rail-tab" id="agent-tab" type="button" role="tab" aria-selected="false" aria-controls="agent-panel"><i class="ph ph-sparkle"></i><span>AI</span></button>
+        </div>
+        <section id="posts-panel" role="tabpanel" aria-labelledby="posts-tab">
+          <label class="search-field">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <span class="sr-only">글 검색</span>
+            <input id="post-search" type="search" placeholder="제목이나 경로 검색" autocomplete="off" />
+          </label>
+          <p class="sr-only" id="post-result-status" role="status"></p>
+          <div class="post-list" id="post-list"></div>
+        </section>
+        <section class="agent-panel" id="agent-panel" role="tabpanel" aria-labelledby="agent-tab" hidden>
+          <label class="agent-provider">
+            <span>로컬 에이전트</span>
+            <select id="agent-provider" aria-label="로컬 에이전트 선택"></select>
+          </label>
+          <div class="agent-thread" id="agent-thread" aria-live="polite">
+            <div class="agent-empty" id="agent-empty">
+              <i class="ph ph-sparkle"></i>
+              <strong>로컬 에이전트와 작업하기</strong>
+              <span>현재 글의 사본을 수정합니다.<br />원하는 제안만 골라 적용할 수 있습니다.</span>
+            </div>
+          </div>
+          <form class="agent-composer" id="agent-form">
+            <label class="sr-only" for="agent-prompt">에이전트에게 요청</label>
+            <textarea id="agent-prompt" rows="3" placeholder="예: $fluent-korean 스킬로 도입부를 자연스럽게 다듬어 주세요."></textarea>
+            <div class="agent-composer-actions">
+              <button class="secondary-button" id="agent-cancel" type="button" hidden><i class="ph ph-stop"></i><span>중단</span></button>
+              <button class="save-button" id="agent-send" type="submit"><i class="ph ph-paper-plane-tilt"></i><span>요청 보내기</span></button>
+            </div>
+          </form>
+        </section>
       </aside>
 
       <main class="workspace">
@@ -68,6 +95,25 @@ export function applicationMarkup(): string {
             </header>
             <div id="editor"></div>
           </article>
+          <section class="merge-workspace" id="merge-workspace" hidden aria-label="AI 수정 검토">
+            <header class="merge-header">
+              <div>
+                <span class="document-kicker">AI 수정 검토</span>
+                <h1>수정 제안을 검토하세요</h1>
+                <p id="merge-summary"></p>
+              </div>
+              <div class="merge-actions">
+                <button class="secondary-button" id="merge-keep-all" type="button">현재 글 모두 선택</button>
+                <button class="secondary-button" id="merge-accept-all" type="button">AI 제안 모두 선택</button>
+                <button class="save-button" id="merge-apply" type="button">선택한 내용 적용</button>
+                <button class="icon-button" id="merge-close" type="button" aria-label="병합 검토 닫기"><i class="ph ph-x"></i></button>
+              </div>
+            </header>
+            <div class="merge-column-labels" aria-hidden="true">
+              <span>현재 글</span><span></span><span>AI 제안</span>
+            </div>
+            <div class="merge-grid" id="merge-grid"></div>
+          </section>
         </section>
       </main>
     </div>

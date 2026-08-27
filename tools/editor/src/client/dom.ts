@@ -12,6 +12,11 @@ export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
 }
 
+export function resizeTextarea(element: HTMLTextAreaElement): void {
+  element.style.height = "auto"
+  element.style.height = `${element.scrollHeight}px`
+}
+
 export function renderPostRows(
   container: HTMLElement,
   posts: readonly PostSummary[],

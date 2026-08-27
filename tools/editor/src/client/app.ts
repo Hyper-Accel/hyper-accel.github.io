@@ -1,11 +1,14 @@
 import type { Editor } from "@tiptap/core"
 import type { PostDocument, PostSummary } from "../shared/contracts"
+import { setupAgentController } from "./agent-controller"
 import { fetchPost, fetchPosts, persistPost, uploadImage } from "./api"
+import { applyMergedContent } from "./apply-merge"
 import { type EditorCommand, runEditorCommand, syncToolbarState } from "./commands"
-import { errorMessage, renderPostRows, requiredElement } from "./dom"
+import { errorMessage, renderPostRows, requiredElement, resizeTextarea } from "./dom"
 import { createBlogEditor, insertImage } from "./editor"
 import { prepareMarkdown, restoreMarkdown } from "./markdown"
 import { setupRail } from "./rail"
+import { createToastController } from "./toast"
 import { applicationMarkup } from "./view"
 
 export function mountApplication(root: HTMLElement): void {
@@ -36,19 +39,9 @@ export function mountApplication(root: HTMLElement): void {
   let shortcodes: ReadonlyMap<string, string> = new Map()
   let loadingDocument = false
   let dirty = false
-  let toastTimer: ReturnType<typeof setTimeout> | undefined
+  let agentController: ReturnType<typeof setupAgentController> | undefined
 
-  const showToast = (message: string, tone: "success" | "error"): void => {
-    toast.textContent = message
-    toast.dataset["tone"] = tone
-    toast.hidden = false
-    if (toastTimer) {
-      clearTimeout(toastTimer)
-    }
-    toastTimer = setTimeout(() => {
-      toast.hidden = true
-    }, 4_000)
-  }
+  const showToast = createToastController(toast)
 
   const updateSaveState = (label?: string): void => {
     saveButton.disabled = !current || !dirty
@@ -99,11 +92,6 @@ export function mountApplication(root: HTMLElement): void {
     onImage: handleImage,
   })
 
-  const resizeTitle = (): void => {
-    title.style.height = "auto"
-    title.style.height = `${title.scrollHeight}px`
-  }
-
   const renderPostList = (): void => {
     const count = renderPostRows(postList, posts, current?.path, search.value)
     postResultStatus.textContent = `${count}개의 글`
@@ -115,6 +103,7 @@ export function mountApplication(root: HTMLElement): void {
     }
     updateSaveState("글 불러오는 중…")
     try {
+      await agentController?.reset()
       const document = await fetchPost(path)
       loadingDocument = true
       current = document
@@ -127,7 +116,7 @@ export function mountApplication(root: HTMLElement): void {
       dirty = false
       canvas.hidden = false
       welcome.hidden = true
-      resizeTitle()
+      resizeTextarea(title)
       renderPostList()
       localStorage.setItem("blog-editor:last-post", path)
     } catch (error: unknown) {
@@ -138,9 +127,12 @@ export function mountApplication(root: HTMLElement): void {
     }
   }
 
-  const save = async (): Promise<void> => {
-    if (!current || !dirty) {
-      return
+  const save = async (): Promise<boolean> => {
+    if (!current) {
+      return false
+    }
+    if (!dirty) {
+      return true
     }
     saveButton.disabled = true
     updateSaveState("Hugo 렌더링 확인 중…")
@@ -159,12 +151,36 @@ export function mountApplication(root: HTMLElement): void {
       dirty = false
       renderPostList()
       showToast("저장했고 Hugo 렌더링까지 확인했습니다.", "success")
+      return true
     } catch (error: unknown) {
       showToast(errorMessage(error), "error")
+      return false
     } finally {
       updateSaveState()
     }
   }
+
+  agentController = setupAgentController({
+    getDocument: () => current,
+    ensureSaved: save,
+    mediaUrl,
+    showToast,
+    applyMerged: (nextTitle, body) => {
+      if (!current) {
+        return
+      }
+      loadingDocument = true
+      const merged = applyMergedContent(current, editor, title, nextTitle, body)
+      shortcodes = merged.shortcodes
+      current = merged.document
+      loadingDocument = false
+      resizeTextarea(title)
+      markDirty()
+      canvas.hidden = false
+      welcome.hidden = true
+      showToast("선택한 AI 변경을 편집기에 적용했습니다.", "success")
+    },
+  })
 
   toolbar.addEventListener("click", (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>("[data-command]")
@@ -184,7 +200,7 @@ export function mountApplication(root: HTMLElement): void {
   })
   search.addEventListener("input", renderPostList)
   title.addEventListener("input", () => {
-    resizeTitle()
+    resizeTextarea(title)
     markDirty()
   })
   saveButton.addEventListener("click", () => void save())

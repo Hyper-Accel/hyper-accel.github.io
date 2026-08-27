@@ -37,6 +37,10 @@
   box-sizing: border-box;
 }
 
+[hidden][hidden] {
+  display: none;
+}
+
 html,
 body,
 #app {
@@ -82,11 +86,18 @@ button {
   position: sticky;
   top: 0;
   z-index: 20;
+  display: flex;
+  flex-direction: column;
   height: 100dvh;
   padding: 20px 16px;
-  overflow-y: auto;
+  overflow: hidden;
   background: var(--editor-paper);
   border-right: 1px solid var(--editor-border);
+}
+
+#posts-panel {
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .rail-header,
@@ -223,9 +234,15 @@ button {
   gap: var(--space-1);
 }
 
+.command-primary {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .toolbar {
   display: flex;
   align-items: center;
+  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }

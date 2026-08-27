@@ -184,7 +184,7 @@
     position: fixed;
     left: 0;
     transform: translateX(-100%);
-    width: 280px;
+    width: min(320px, calc(100vw - 32px));
     box-shadow: 16px 0 48px rgb(0 0 0 / 12%);
     transition: transform 120ms ease;
   }
@@ -199,18 +199,25 @@
   }
 
   .save-state {
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 1px;
     height: 1px;
     padding: 0;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
   }
 
   .document-actions {
     flex: 0 0 auto;
+  }
+
+  .editor-scroll {
+    padding-inline: 24px;
   }
 
   .secondary-button span,

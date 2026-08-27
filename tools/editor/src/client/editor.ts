@@ -10,6 +10,7 @@ type EditorCallbacks = {
   readonly mediaUrl: (source: string) => string
   readonly onChange: () => void
   readonly onImage: (file: File, position: number) => Promise<void>
+  readonly editable?: boolean
 }
 
 function firstClipboardImage(event: ClipboardEvent): File | undefined {
@@ -31,12 +32,16 @@ export function createBlogEditor(element: HTMLElement, callbacks: EditorCallback
     ],
     content: "",
     contentType: "markdown",
+    editable: callbacks.editable ?? true,
     editorProps: {
       attributes: {
         class: "post-content",
         "aria-label": "블로그 본문",
       },
       handlePaste(view, event) {
+        if (callbacks.editable === false) {
+          return false
+        }
         const image = firstClipboardImage(event)
         if (!image) {
           return false
@@ -46,7 +51,7 @@ export function createBlogEditor(element: HTMLElement, callbacks: EditorCallback
         return true
       },
       handleDrop(view, event, _slice, moved) {
-        if (moved) {
+        if (moved || callbacks.editable === false) {
           return false
         }
         const image = Array.from(event.dataTransfer?.files ?? []).find((file) =>

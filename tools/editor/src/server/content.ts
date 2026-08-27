@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs"
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path"
 import { parse } from "yaml"
 import { z } from "zod"
@@ -23,7 +24,24 @@ type MarkdownParts = {
   readonly body: string
 }
 
-export const repositoryRoot = resolve(import.meta.dir, "../../../..")
+export function findRepositoryRoot(moduleDirectory: string, workingDirectory: string): string {
+  const starts = [moduleDirectory, workingDirectory]
+  for (const start of starts) {
+    let candidate = resolve(start)
+    while (dirname(candidate) !== candidate) {
+      if (
+        existsSync(join(candidate, "hugo.yaml")) &&
+        existsSync(join(candidate, "content/posts"))
+      ) {
+        return candidate
+      }
+      candidate = dirname(candidate)
+    }
+  }
+  throw new ContentError("Hugo 저장소 루트를 찾을 수 없습니다.")
+}
+
+export const repositoryRoot = findRepositoryRoot(import.meta.dir, process.cwd())
 
 export function splitMarkdownDocument(source: string): MarkdownParts {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n(?:\r?\n)?/.exec(source)

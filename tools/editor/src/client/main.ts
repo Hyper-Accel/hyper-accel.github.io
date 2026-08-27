@@ -4,6 +4,8 @@ import "../../../../themes/PaperMod/assets/css/core/reset.css"
 import "../../../../themes/PaperMod/assets/css/common/post-single.css"
 import "./shell.css"
 import "./article.css"
+import "./agent.css"
+import "./merge.css"
 import { mountApplication } from "./app"
 
 const root = document.querySelector<HTMLElement>("#app")

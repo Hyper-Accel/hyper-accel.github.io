@@ -52,18 +52,22 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 - Editor article width: PaperMod `--main-width` of 1024px when the viewport has room. The
   persistent rail can reduce the available canvas at narrower desktop widths without changing
   typography.
-- Sidebar width: 280px.
+- Sidebar width: 320px.
 - Toolbar height: 52px.
 - Controls: 6px radius; panels: 12px radius; status pills: full radius.
 - Shadows are reserved for the floating toolbar and dialogs.
 
 ## 3. Layout
 
-- Desktop: 280px post rail + fluid main surface.
+- Desktop: 320px post/agent rail + fluid main surface.
 - Main: sticky command bar above a centered white article canvas.
-- At 768px: the rail becomes an off-canvas drawer; article margins reduce to 24px.
+- At 980px and below: the rail becomes an off-canvas drawer; article margins reduce to 24px.
 - Below 640px is supported for recovery, not optimized as the primary authoring mode.
 - The writing surface owns vertical scrolling. No nested content scrollbar.
+- The agent tab keeps the conversation and local tool activity in the left rail. Agent work never
+  replaces or directly mutates the current article surface.
+- Merge review uses two PaperMod-rendered columns: the current article on the left and the agent
+  proposal on the right. The center controls point toward the selected side.
 - Korean paragraphs, list items, captions, summaries, and headings use `word-break: keep-all`
   with `overflow-wrap: break-word`, matching the published site.
 
@@ -83,6 +87,12 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 - Article canvas: loading skeleton, ready, dirty, save conflict, build error.
 - Image block: uploading placeholder, ready, failed with retry/removal affordance.
 - Toast: success or error, announced through an ARIA live region.
+- Agent selector: available, unavailable, loading, and selected.
+- Agent conversation: empty guidance, user request, assistant response, tool activity, running,
+  cancelled, failed, and proposal-ready.
+- Merge hunk: current selected, proposal selected, equal, insertion, deletion, and empty.
+- Merge action: keep all current content, accept all proposed content, apply selected content,
+  and close without applying.
 
 ## 6. Motion
 
@@ -94,7 +104,9 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 
 - 1280px: persistent rail, the widest article that remaining space allows, and toolbar labels
   where useful. At wider desktop sizes the article reaches PaperMod's 1024px main width.
-- 768px: drawer rail, icon-first toolbar with horizontal overflow, 24px canvas padding.
+- 768px: 320px drawer rail, icon-first toolbar with horizontal overflow, 24px canvas padding.
+- 640px and below: merge columns stack as current content, direction controls, then proposed
+  content. Each direction control includes a visible text label.
 - Pasted images fill the article column like the published site's `.article-image-link`, use
   `max-width: 100%`, and preserve intrinsic ratio.
 
@@ -106,4 +118,6 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 - Save and upload status are announced through `aria-live="polite"`.
 - Errors remain visible until resolved; color is never the only signal.
 - Images receive editable alt text after insertion.
+- Merge direction controls expose their selected state with `aria-pressed`, icon direction, text,
+  and color.
 - Accepted MVP debt: no screen-reader-specific drag handle and no mobile-first toolbar reflow.

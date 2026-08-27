@@ -3,10 +3,13 @@ import { Hono } from "hono"
 import { serveStatic } from "hono/bun"
 import { z } from "zod"
 import { postPathSchema, savePostRequestSchema } from "../shared/contracts"
+import { createAgentRoutes } from "./agent/routes"
+import { AgentSessionManager } from "./agent/session"
 import { listPosts, readPost, resolveMediaPath, saveImage, savePost } from "./content"
 import { ContentError } from "./errors"
 
 const app = new Hono()
+const agentSessions = new AgentSessionManager()
 
 const postQuerySchema = z.object({ path: postPathSchema })
 const mediaQuerySchema = z.object({
@@ -17,6 +20,8 @@ const mediaQuerySchema = z.object({
 app.get("/api/posts", async (context) => {
   return context.json({ posts: await listPosts() })
 })
+
+app.route("/api/agent", createAgentRoutes(agentSessions))
 
 app.get("/api/post", zValidator("query", postQuerySchema), async (context) => {
   const { path } = context.req.valid("query")
@@ -71,5 +76,17 @@ app.get("*", serveStatic({ path: "./dist/index.html" }))
 export default {
   port: 4174,
   hostname: "127.0.0.1",
+  idleTimeout: 255,
   fetch: app.fetch,
+}
+
+let shuttingDown = false
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.once(signal, () => {
+    if (shuttingDown) {
+      return
+    }
+    shuttingDown = true
+    void agentSessions.disposeAll().finally(() => process.exit(0))
+  })
 }
