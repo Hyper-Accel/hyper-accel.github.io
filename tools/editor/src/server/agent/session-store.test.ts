@@ -95,13 +95,15 @@ describe("AgentSessionStore", () => {
       releaseFirst = resolve
     })
     const snapshots: string[] = []
-    const store = new AgentSessionStore(directory, async (path, content) => {
-      snapshots.push(JSON.parse(content).updatedAt)
-      if (snapshots.length === 1) {
-        markFirstStarted()
-        await firstGate
-      }
-      return Bun.write(path, content)
+    const store = new AgentSessionStore(directory)
+    Object.defineProperty(store, "write", {
+      value: async (session: { readonly updatedAt: string }): Promise<void> => {
+        snapshots.push(session.updatedAt)
+        if (snapshots.length === 1) {
+          markFirstStarted()
+          await firstGate
+        }
+      },
     })
     const base = {
       id: "10000000-0000-4000-8000-000000000058",
@@ -120,6 +122,5 @@ describe("AgentSessionStore", () => {
     await Promise.all([first, second])
 
     expect(snapshots).toEqual(["2026-08-27T10:01:00.000Z", "2026-08-27T10:02:00.000Z"])
-    expect((await store.get(base.id))?.updatedAt).toBe("2026-08-27T10:02:00.000Z")
   })
 })

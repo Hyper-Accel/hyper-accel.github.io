@@ -140,6 +140,18 @@ export async function verifySessionHistory(
     ) {
       throw new Error("에이전트 변경 뒤 새 대화 상태와 안내가 표시되지 않았습니다.")
     }
+    await page.locator("#agent-session").selectOption(sessionId)
+    await page.locator(".agent-message--user").nth(1).waitFor()
+    state.resumeError = "저장된 에이전트를 실행할 수 없습니다."
+    await page.locator("#agent-prompt").fill("실패를 알려 주세요.")
+    await page.locator("#agent-send").click()
+    await page.getByText(state.resumeError).waitFor()
+    if (
+      (await page.locator("#agent-prompt").inputValue()) !== "실패를 알려 주세요." ||
+      (await page.locator("#agent-send").isDisabled())
+    ) {
+      throw new Error("세션 재개 실패 뒤 요청 입력과 전송 상태가 복구되지 않았습니다.")
+    }
   } finally {
     await page.close()
   }

@@ -28,6 +28,41 @@ type SessionRecord = {
   cleanupTimer: ReturnType<typeof setTimeout>
 }
 
+type AgentSessionPersistence = Pick<AgentSessionStore, "get" | "list" | "save">
+
+type AgentSessionDependencies = {
+  readonly listProviders: typeof detectAgentProviders
+  readonly createWorkspace: typeof createAgentWorkspace
+  readonly createHarness: typeof createHarness
+  readonly readWorkspacePost: typeof readWorkspacePost
+  readonly cleanupWorkspace: typeof cleanupAgentWorkspace
+}
+
+const defaultDependencies: AgentSessionDependencies = {
+  listProviders: detectAgentProviders,
+  createWorkspace: createAgentWorkspace,
+  createHarness,
+  readWorkspacePost,
+  cleanupWorkspace: cleanupAgentWorkspace,
+}
+
+export function resolveAgentSessionDirectory(root: string, configured: string | undefined): string {
+  if (configured) {
+    return configured
+  }
+  const process = Bun.spawnSync(
+    ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+    { cwd: root, stdout: "pipe", stderr: "pipe" },
+  )
+  if (process.exitCode !== 0) {
+    throw new ContentError(
+      new TextDecoder().decode(process.stderr).trim() ||
+        "Git 세션 저장소 경로를 확인하지 못했습니다.",
+    )
+  }
+  return join(new TextDecoder().decode(process.stdout).trim(), "techblog-editor", "sessions")
+}
+
 export async function emitAgentFailure(
   error: unknown,
   emit: (event: AgentEvent) => void | Promise<void>,
@@ -43,14 +78,14 @@ export class AgentSessionManager {
   private readonly sessions = new Map<string, SessionRecord>()
 
   constructor(
-    private readonly store = new AgentSessionStore(
-      Bun.env["TECHBLOG_EDITOR_SESSION_DIR"] ??
-        join(repositoryRoot, ".git", "techblog-editor", "sessions"),
+    private readonly store: AgentSessionPersistence = new AgentSessionStore(
+      resolveAgentSessionDirectory(repositoryRoot, Bun.env["TECHBLOG_EDITOR_SESSION_DIR"]),
     ),
+    private readonly dependencies: AgentSessionDependencies = defaultDependencies,
   ) {}
 
   async listProviders() {
-    return detectAgentProviders()
+    return this.dependencies.listProviders()
   }
 
   private async activate(
@@ -63,8 +98,8 @@ export class AgentSessionManager {
     if (!providers.find((candidate) => candidate.id === provider)?.available) {
       throw new ContentError(`${provider} 실행 파일을 찾을 수 없습니다.`)
     }
-    const workspace = await createAgentWorkspace(repositoryRoot, postPath, id)
-    const harness = createHarness({ provider, cwd: workspace.root })
+    const workspace = await this.dependencies.createWorkspace(repositoryRoot, postPath, id)
+    const harness = this.dependencies.createHarness({ provider, cwd: workspace.root })
     const cleanupTimer = setTimeout(
       () => {
         void this.dispose(id)
@@ -145,34 +180,6 @@ export class AgentSessionManager {
       throw new ContentError("에이전트가 이미 작업 중입니다.", 409)
     }
     session.running = true
-    const userAt = new Date().toISOString()
-    session.history.entries.push({
-      type: "user",
-      text: instruction,
-      ...(context ? { context } : {}),
-      at: userAt,
-    })
-    session.history.updatedAt = userAt
-    await this.store.save(session.history)
-    const replayEntries = session.replayHistory ? session.history.entries.slice(0, -1) : []
-    const source = await Bun.file(join(session.workspace.root, session.workspace.postPath)).text()
-    const body = splitMarkdownDocument(source).body
-    if (context?.kind === "image") {
-      const image = Bun.file(
-        join(session.workspace.root, dirname(session.workspace.postPath), context.path),
-      )
-      if (!(await image.exists())) {
-        throw new ContentError("선택한 이미지 파일을 에이전트 작업공간에서 찾을 수 없습니다.")
-      }
-    }
-    const prompt = buildAgentPrompt(
-      session.workspace.postPath,
-      instruction,
-      context,
-      bodyLineOffset(source, body),
-      replayEntries,
-    )
-    session.replayHistory = false
     const emitStored = async (event: AgentEvent): Promise<void> => {
       const at = new Date().toISOString()
       const last = session.history.entries.at(-1)
@@ -189,13 +196,46 @@ export class AgentSessionManager {
       await emit(event)
     }
     try {
+      const userAt = new Date().toISOString()
+      session.history.entries.push({
+        type: "user",
+        text: instruction,
+        ...(context ? { context } : {}),
+        at: userAt,
+      })
+      session.history.updatedAt = userAt
+      await this.store.save(session.history)
+      const replayEntries = session.replayHistory ? session.history.entries.slice(0, -1) : []
+      const source = await Bun.file(join(session.workspace.root, session.workspace.postPath)).text()
+      const body = splitMarkdownDocument(source).body
+      if (context?.kind === "image") {
+        const image = Bun.file(
+          join(session.workspace.root, dirname(session.workspace.postPath), context.path),
+        )
+        if (!(await image.exists())) {
+          throw new ContentError("선택한 이미지 파일을 에이전트 작업공간에서 찾을 수 없습니다.")
+        }
+      }
+      const prompt = buildAgentPrompt(
+        session.workspace.postPath,
+        instruction,
+        context,
+        bodyLineOffset(source, body),
+        replayEntries,
+      )
       await emitStored({ type: "status", text: `${session.provider} 작업공간을 준비했습니다.` })
       await session.harness.run(prompt, emitStored)
-      const proposal = await readWorkspacePost(session.workspace)
+      session.replayHistory = false
+      const proposal = await this.dependencies.readWorkspacePost(session.workspace)
       await emitStored({ type: "proposal", title: proposal.title, body: proposal.body })
       await emitStored({ type: "done" })
     } catch (error: unknown) {
-      await emitAgentFailure(error, emitStored)
+      try {
+        await emitAgentFailure(error, emitStored)
+      } catch (storageError: unknown) {
+        console.error(storageError)
+        await emitAgentFailure(error, emit)
+      }
     } finally {
       session.running = false
       await this.store.save(session.history)
@@ -214,7 +254,7 @@ export class AgentSessionManager {
     this.sessions.delete(id)
     clearTimeout(session.cleanupTimer)
     await session.harness.dispose().catch(() => undefined)
-    await cleanupAgentWorkspace(session.workspace)
+    await this.dependencies.cleanupWorkspace(session.workspace)
   }
 
   async disposeAll(): Promise<void> {

@@ -151,19 +151,24 @@ export function setupAgentController(options: AgentControllerOptions) {
       options.showToast("먼저 글을 선택하고 에이전트에게 요청할 내용을 입력하세요.", "error")
       return
     }
-    if (!(await options.ensureSaved())) {
+    try {
+      if (!(await options.ensureSaved())) {
+        return
+      }
+      if (!sessionId || sessionPath !== post.path || sessionProvider !== selectedProvider) {
+        await closeSession()
+        sessionId = await createAgentSession(selectedProvider, post.path)
+        sessionPath = post.path
+        sessionProvider = selectedProvider
+        runtimeActive = true
+        await refreshSessions(post.path, sessionId)
+      } else if (!runtimeActive) {
+        sessionProvider = await resumeAgentSession(sessionId)
+        runtimeActive = true
+      }
+    } catch (error: unknown) {
+      options.showToast(error instanceof Error ? error.message : String(error), "error")
       return
-    }
-    if (!sessionId || sessionPath !== post.path || sessionProvider !== selectedProvider) {
-      await closeSession()
-      sessionId = await createAgentSession(selectedProvider, post.path)
-      sessionPath = post.path
-      sessionProvider = selectedProvider
-      runtimeActive = true
-      await refreshSessions(post.path, sessionId)
-    } else if (!runtimeActive) {
-      sessionProvider = await resumeAgentSession(sessionId)
-      runtimeActive = true
     }
     conversation.appendUser(instruction, context)
     setContext(undefined)

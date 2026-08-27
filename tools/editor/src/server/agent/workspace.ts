@@ -1,4 +1,4 @@
-import { cp, mkdtemp, rm } from "node:fs/promises"
+import { cp, mkdtemp, readdir, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { basename, dirname, join } from "node:path"
 import { parse } from "yaml"
@@ -34,16 +34,30 @@ async function git(cwd: string, args: readonly string[]): Promise<string> {
   return stdout
 }
 
+async function rejectSymbolicLinks(directory: string): Promise<void> {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) {
+      throw new ContentError(
+        `글 번들의 심볼릭 링크는 에이전트 작업공간에 복사할 수 없습니다: ${entry.name}`,
+      )
+    }
+    if (entry.isDirectory()) {
+      await rejectSymbolicLinks(join(directory, entry.name))
+    }
+  }
+}
+
 export async function createAgentWorkspace(
   repositoryRoot: string,
   postPath: string,
   id: string,
 ): Promise<AgentWorkspace> {
+  const sourceBundle = dirname(join(repositoryRoot, postPath))
+  await rejectSymbolicLinks(sourceBundle)
   const parent = await mkdtemp(join(tmpdir(), "techblog-editor-agent-"))
   const root = join(parent, `worktree-${id}`)
   try {
     await git(repositoryRoot, ["worktree", "add", "--detach", root, "HEAD"])
-    const sourceBundle = dirname(join(repositoryRoot, postPath))
     const targetBundle = dirname(join(root, postPath))
     await rm(targetBundle, { recursive: true, force: true })
     await cp(sourceBundle, targetBundle, { recursive: true, force: true })

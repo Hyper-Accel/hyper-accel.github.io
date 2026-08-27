@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test"
-import { mkdir, mkdtemp, rm } from "node:fs/promises"
+import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { cleanupAgentWorkspace, createAgentWorkspace, readWorkspacePost } from "./workspace"
@@ -19,6 +19,27 @@ afterEach(async () => {
 })
 
 describe("agent workspace", () => {
+  test("rejects symbolic links that escape the post bundle", async () => {
+    const root = await mkdtemp(join(tmpdir(), "techblog-agent-test-"))
+    temporaryRoots.push(root)
+    await git(root, "init")
+    await git(root, "config", "user.email", "editor@example.com")
+    await git(root, "config", "user.name", "Editor Test")
+    const postDirectory = join(root, "content/posts/example")
+    await mkdir(postDirectory, { recursive: true })
+    await Bun.write(
+      join(postDirectory, "index.md"),
+      "---\ntitle: '기준 글'\ndraft: false\n---\n\n기준 본문\n",
+    )
+    await git(root, "add", ".")
+    await git(root, "commit", "-m", "base")
+    await symlink("/tmp/outside-post-bundle", join(postDirectory, "outside.png"))
+
+    await expect(
+      createAgentWorkspace(root, "content/posts/example/index.md", "session-link"),
+    ).rejects.toThrow("심볼릭 링크")
+  })
+
   test("seeds the current post bundle and cleans the git worktree", async () => {
     const root = await mkdtemp(join(tmpdir(), "techblog-agent-test-"))
     temporaryRoots.push(root)

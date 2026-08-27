@@ -61,6 +61,7 @@ export type AgentRouteState = {
   readonly requests: AgentRequest[]
   history?: AgentSessionHistory
   providerGate?: Promise<void>
+  resumeError?: string
   resumeCount: number
 }
 
@@ -150,6 +151,14 @@ export async function installAgentRoutes(page: Page, state: AgentRouteState): Pr
     })
   })
   await page.route(`**/api/agent/sessions/${sessionId}/resume`, async (route) => {
+    if (state.resumeError) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ error: state.resumeError }),
+      })
+      return
+    }
     state.resumeCount += 1
     await route.fulfill({
       status: 200,
