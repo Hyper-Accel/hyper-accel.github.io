@@ -74,7 +74,7 @@ app.use("*", serveStatic({ root: "./dist" }))
 app.get("*", serveStatic({ path: "./dist/index.html" }))
 
 export default {
-  port: 4174,
+  port: Number(Bun.env["TECHBLOG_EDITOR_API_PORT"] ?? "4174"),
   hostname: "127.0.0.1",
   idleTimeout: 255,
   fetch: app.fetch,

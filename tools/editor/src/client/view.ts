@@ -27,11 +27,22 @@ export function applicationMarkup(): string {
           <div class="post-list" id="post-list"></div>
         </section>
         <section class="agent-panel" id="agent-panel" role="tabpanel" aria-labelledby="agent-tab" hidden>
-          <label class="agent-provider">
-            <span>로컬 에이전트</span>
-            <select id="agent-provider" aria-label="로컬 에이전트 선택"></select>
-          </label>
-          <div class="agent-thread" id="agent-thread" aria-live="polite">
+          <div class="agent-controls">
+            <label class="agent-provider">
+              <span>로컬 에이전트</span>
+              <select id="agent-provider" aria-label="로컬 에이전트 선택"></select>
+            </label>
+            <div class="agent-session-row">
+              <label class="agent-session">
+                <span>대화 기록</span>
+                <select id="agent-session">
+                  <option value="">새 대화</option>
+                </select>
+              </label>
+              <button class="agent-new-session" id="agent-new-session" type="button" aria-label="새 대화 시작" title="새 대화 시작"><i class="ph ph-plus" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="agent-thread" id="agent-thread" role="log" aria-label="에이전트 대화 기록" aria-live="polite" tabindex="0">
             <div class="agent-empty" id="agent-empty">
               <i class="ph ph-sparkle"></i>
               <strong>로컬 에이전트와 작업하기</strong>
@@ -39,6 +50,11 @@ export function applicationMarkup(): string {
             </div>
           </div>
           <form class="agent-composer" id="agent-form">
+            <div class="agent-context" id="agent-context" hidden>
+              <i class="ph ph-paperclip" aria-hidden="true"></i>
+              <span id="agent-context-label"></span>
+              <button id="agent-context-remove" type="button" aria-label="첨부 문맥 제거"><i class="ph ph-x" aria-hidden="true"></i></button>
+            </div>
             <label class="sr-only" for="agent-prompt">에이전트에게 요청</label>
             <textarea id="agent-prompt" rows="3" placeholder="예: $fluent-korean 스킬로 도입부를 자연스럽게 다듬어 주세요."></textarea>
             <div class="agent-composer-actions">

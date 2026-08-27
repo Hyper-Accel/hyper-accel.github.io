@@ -1,177 +1,42 @@
-import { mkdir, rm, writeFile } from "node:fs/promises"
-import { join, resolve } from "node:path"
-import { chromium, type Page } from "playwright"
-import type { AgentEvent } from "../shared/agent-contracts"
-
-const repositoryRoot = resolve(import.meta.dir, "../../../..")
-const fixtureDirectory = join(repositoryRoot, "content/posts/agent-ui-e2e-fixture")
-const fixturePath = join(fixtureDirectory, "index.md")
-const artifactDirectory = "/tmp/hyperaccel-blog-editor-agent-ui-e2e"
-const sessionId = "10000000-0000-4000-8000-000000000099"
-const currentParagraph = "현재 글에는 기존 문장이 있습니다."
-const proposedParagraph = "AI가 제안한 자연스러운 문장이 있습니다."
-
-const source = `---
-date: '2025-08-27T12:00:00+09:00'
-draft: false
-title: '에이전트 UI 검증 글'
-authors: ["Test"]
-tags: ["agent-ui-e2e"]
-categories: ["Test"]
----
-
-# 시작 문단
-
-${currentParagraph}
-`
-
-function agentEvents(): readonly AgentEvent[] {
-  return [
-    { type: "status", text: "로컬 스킬 3개를 불러왔습니다." },
-    { type: "tool", label: "Read: index.md", status: "completed" },
-    { type: "delta", text: "문장을 다듬고 변경 내용을 준비했습니다." },
-    {
-      type: "proposal",
-      title: "에이전트 UI 검증 글",
-      body: `# 시작 문단\n\n${proposedParagraph}\n`,
-    },
-    { type: "done" },
-  ]
-}
-
-async function installAgentRoutes(page: Page): Promise<void> {
-  await page.route("**/api/agent/sessions", async (route) => {
-    if (route.request().method() !== "POST") {
-      await route.continue()
-      return
-    }
-    await route.fulfill({
-      status: 201,
-      contentType: "application/json",
-      body: JSON.stringify({ sessionId, provider: "codex" }),
-    })
-  })
-  await page.route(`**/api/agent/sessions/${sessionId}/messages`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/x-ndjson; charset=utf-8",
-      body: `${agentEvents()
-        .map((event) => JSON.stringify(event))
-        .join("\n")}\n`,
-    })
-  })
-  await page.route(`**/api/agent/sessions/${sessionId}`, async (route) => {
-    await route.fulfill({ status: 204, body: "" })
-  })
-}
-
-async function openFixture(page: Page): Promise<void> {
-  await page.goto("http://127.0.0.1:4173", { waitUntil: "networkidle" })
-  const fixture = page.locator('[data-path="content/posts/agent-ui-e2e-fixture/index.md"]')
-  await fixture.waitFor()
-  await fixture.click()
-  await page.locator("#post-title").waitFor()
-}
-
-async function requestProposal(page: Page): Promise<void> {
-  await page.locator("#agent-tab").click()
-  await page.locator("#agent-provider").selectOption("codex")
-  await page.locator("#agent-prompt").fill("문장을 자연스럽게 다듬어 주세요.")
-  await page.locator("#agent-send").click()
-  await page.locator("#merge-workspace").waitFor()
-}
-
-async function verifyAgentPanel(page: Page): Promise<void> {
-  const [railBox, composerBox, emptyVisible, cancelVisible] = await Promise.all([
-    page.locator("#post-rail").boundingBox(),
-    page.locator("#agent-form").boundingBox(),
-    page.locator("#agent-empty").isVisible(),
-    page.locator("#agent-cancel").isVisible(),
-  ])
-  if (!railBox || !composerBox || composerBox.y + composerBox.height > railBox.y + railBox.height) {
-    throw new Error("에이전트 입력창이 왼쪽 패널 아래에서 잘립니다.")
-  }
-  if (!emptyVisible || cancelVisible) {
-    throw new Error("대기 상태에서 빈 안내 또는 중단 버튼의 표시 상태가 올바르지 않습니다.")
-  }
-}
-
-async function verifyResponsiveMerge(page: Page): Promise<void> {
-  await page.screenshot({
-    path: join(artifactDirectory, "merge-1280.png"),
-    fullPage: true,
-  })
-  const railSettled = page.locator("#post-rail").evaluate(
-    (rail) =>
-      new Promise<void>((resolveTransition, rejectTransition) => {
-        const timeout = AbortSignal.timeout(1_000)
-        rail.addEventListener("transitionend", () => resolveTransition(), { once: true })
-        timeout.addEventListener(
-          "abort",
-          () => {
-            if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-              resolveTransition()
-            } else {
-              rejectTransition(new Error("글 목록 닫힘 전환이 완료되지 않았습니다."))
-            }
-          },
-          { once: true },
-        )
-      }),
-  )
-  await page.setViewportSize({ width: 768, height: 900 })
-  await railSettled
-  const tabletWidth = await page.evaluate(() => document.documentElement.scrollWidth)
-  if (tabletWidth > 768) {
-    const overflow = await page.locator("body *").evaluateAll((elements) =>
-      elements
-        .map((element) => {
-          const box = element.getBoundingClientRect()
-          return { tag: element.tagName, className: element.className, right: box.right }
-        })
-        .filter((element) => element.right > window.innerWidth)
-        .slice(0, 8),
-    )
-    throw new Error(
-      `태블릿 병합 화면이 ${tabletWidth - 768}px 가로로 넘칩니다: ${JSON.stringify(overflow)}`,
-    )
-  }
-  await page.screenshot({
-    path: join(artifactDirectory, "merge-768.png"),
-    fullPage: true,
-  })
-  await page.setViewportSize({ width: 375, height: 812 })
-  const mobileWidth = await page.evaluate(() => document.documentElement.scrollWidth)
-  if (mobileWidth > 375) {
-    throw new Error(`모바일 병합 화면이 ${mobileWidth - 375}px 가로로 넘칩니다.`)
-  }
-  const changeRow = page.locator(".merge-row--change").first()
-  const [rowColumns, choiceLabel, proposalMobileIcon] = await Promise.all([
-    changeRow.evaluate((element) => getComputedStyle(element).gridTemplateColumns),
-    changeRow.locator(".merge-hunk-controls span").first().isVisible(),
-    changeRow.locator('[data-merge-choice="proposed"] .merge-icon-mobile').isVisible(),
-  ])
-  if (rowColumns.split(" ").length !== 1 || !choiceLabel || !proposalMobileIcon) {
-    throw new Error("모바일 병합 화면이 단일 열과 선택 레이블로 전환되지 않았습니다.")
-  }
-  await page.screenshot({
-    path: join(artifactDirectory, "merge-375.png"),
-    fullPage: true,
-  })
-  await page.setViewportSize({ width: 1280, height: 900 })
-}
+import { copyFile, mkdir, rm, writeFile } from "node:fs/promises"
+import { join } from "node:path"
+import { chromium } from "playwright"
+import { verifySessionHistory } from "./agent-session-verification"
+import {
+  type AgentRouteState,
+  artifactDirectory,
+  attachImageSelection,
+  attachTextSelection,
+  currentParagraph,
+  fixtureDirectory,
+  fixtureImagePath,
+  fixturePath,
+  installAgentRoutes,
+  openFixture,
+  proposedParagraph,
+  repositoryRoot,
+  requestProposal,
+  source,
+} from "./agent-ui-fixture"
+import { verifyAgentPanel, verifyResponsiveMerge, verifyTimeline } from "./agent-ui-verification"
 
 async function run(): Promise<void> {
   await mkdir(fixtureDirectory, { recursive: true })
+  await mkdir(join(fixtureDirectory, "images"), { recursive: true })
   await mkdir(artifactDirectory, { recursive: true })
   await writeFile(fixturePath, source, "utf8")
+  await copyFile(
+    join(repositoryRoot, "content/posts/arc-setup-guide/arc-architecture.png"),
+    fixtureImagePath,
+  )
 
   const browser = await chromium.launch({ channel: "chrome", headless: true })
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
-    await installAgentRoutes(page)
+    const state: AgentRouteState = { requests: [], resumeCount: 0 }
+    await installAgentRoutes(page, state)
     await openFixture(page)
-    await page.locator("#agent-tab").click()
+    await attachTextSelection(page)
     await verifyAgentPanel(page)
     await page.screenshot({
       path: join(artifactDirectory, "agent-panel-1280.png"),
@@ -179,6 +44,21 @@ async function run(): Promise<void> {
     })
 
     await requestProposal(page)
+    if (
+      state.requests[0]?.context?.kind !== "text" ||
+      state.requests[0].context.text !== currentParagraph ||
+      state.requests[0].context.startLine !== 3 ||
+      state.requests[0].context.endLine !== 3
+    ) {
+      throw new Error(
+        `선택 문장 문맥이 요청에 포함되지 않았습니다: ${JSON.stringify(state.requests)}`,
+      )
+    }
+    await verifyTimeline(page)
+    await page.screenshot({
+      path: join(artifactDirectory, "chat-timeline-1280.png"),
+      fullPage: true,
+    })
     const proposalAction = page.locator(".agent-proposal-open")
     if (
       (await page.locator("#agent-empty").isVisible()) ||
@@ -192,9 +72,48 @@ async function run(): Promise<void> {
       throw new Error("병합 검토를 닫은 뒤 편집 화면이 복원되지 않았습니다.")
     }
 
+    await verifySessionHistory(browser, state)
+
+    const imagePage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+    const imageState: AgentRouteState = { requests: [], resumeCount: 0 }
+    await installAgentRoutes(imagePage, imageState)
+    await openFixture(imagePage)
+    await attachImageSelection(imagePage)
+    await imagePage.locator("#agent-provider").selectOption("codex")
+    await imagePage.locator("#agent-prompt").fill("선택한 그림을 검토해 주세요.")
+    await imagePage.locator("#agent-send").click()
+    await imagePage.locator("#merge-workspace").waitFor()
+    if (
+      imageState.requests[0]?.context?.kind !== "image" ||
+      imageState.requests[0].context.path !== "images/context.png"
+    ) {
+      throw new Error(
+        `선택 이미지 문맥이 요청에 포함되지 않았습니다: ${JSON.stringify(imageState.requests)}`,
+      )
+    }
+    await imagePage.close()
+
     await proposalAction.click()
     await page.locator("#merge-workspace").waitFor()
-    await verifyResponsiveMerge(page)
+    await verifyResponsiveMerge(page, artifactDirectory)
+    const lowerChangedRow = page.locator(".merge-row--change").last()
+    await lowerChangedRow.scrollIntoViewIfNeeded()
+    const scrollBeforeChoice = await page.evaluate(() => window.scrollY)
+    if (scrollBeforeChoice < 100) {
+      throw new Error(`병합 스크롤 회귀를 검증하기에 이동 거리가 부족합니다: ${scrollBeforeChoice}`)
+    }
+    const lowerChoice = lowerChangedRow.locator('[data-merge-choice="proposed"]')
+    const originalChoice = await lowerChoice.elementHandle()
+    await lowerChoice.click()
+    const scrollAfterChoice = await page.evaluate(() => window.scrollY)
+    if (scrollAfterChoice !== scrollBeforeChoice) {
+      throw new Error(
+        `병합 블록 선택 뒤 스크롤 위치가 ${scrollBeforeChoice}에서 ${scrollAfterChoice}(으)로 바뀌었습니다.`,
+      )
+    }
+    if (!originalChoice || !(await originalChoice.evaluate((element) => element.isConnected))) {
+      throw new Error("병합 블록 선택 뒤 전체 그리드가 다시 렌더링되었습니다.")
+    }
     const changedRow = page.locator(".merge-row--change").first()
     if ((await changedRow.getAttribute("data-selected")) !== "current") {
       throw new Error("기본 병합 선택이 현재 글 카드에 표시되지 않았습니다.")
@@ -239,7 +158,12 @@ async function run(): Promise<void> {
     console.info(
       JSON.stringify({
         chatPanel: true,
+        chronologicalMarkdown: true,
+        selectionContexts: ["text", "image"],
+        sessionHistoryRestored: true,
+        resumedTurns: state.requests.length,
         mergeCloseRestoresEditor: true,
+        mergeScrollPreserved: true,
         responsiveWidths: [1280, 768, 375],
         perHunkApply: true,
         saved: true,

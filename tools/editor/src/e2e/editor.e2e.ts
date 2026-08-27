@@ -24,7 +24,9 @@ categories: ["Test"]
 `
 
 async function dispatchImagePaste(page: Page): Promise<void> {
-  await page.locator(".ProseMirror p").last().click()
+  const paragraph = page.locator(".ProseMirror p").last()
+  await paragraph.click()
+  await page.keyboard.press("End")
   await page.evaluate(async () => {
     const canvas = document.createElement("canvas")
     canvas.width = 640
@@ -93,14 +95,31 @@ async function run(): Promise<void> {
     await fixtureRow.click()
     await page.locator("#post-title").waitFor()
 
-    await page.locator(".ProseMirror").press("End")
-    await page.locator(".ProseMirror").press("Enter")
+    await page.locator(".ProseMirror p").last().click()
+    await page.keyboard.press("End")
+    await page.keyboard.press("Enter")
     await page.keyboard.type(marker)
     await dispatchImagePaste(page)
-    await page.locator(".ProseMirror img").waitFor()
+    const editorImage = page.locator(".ProseMirror img")
+    await editorImage.waitFor()
     await page.getByText(/images\/pasted-.*\.png에 이미지를 저장했습니다/).waitFor()
-    page.once("dialog", (dialog) => dialog.accept("파란 배경에 Clipboard image라고 적힌 그림"))
+    await editorImage.click()
+    await page.locator(".ProseMirror img.ProseMirror-selectednode").waitFor()
+    const altAccepted = new Promise<void>((resolveDialog, rejectDialog) => {
+      page.once("dialog", (dialog) => {
+        dialog
+          .accept("파란 배경에 Clipboard image라고 적힌 그림")
+          .then(() => resolveDialog())
+          .catch(rejectDialog)
+      })
+    })
     await page.locator("#alt-button").click()
+    await altAccepted
+    await page.waitForFunction(
+      () =>
+        document.querySelector<HTMLImageElement>(".ProseMirror img")?.alt ===
+        "파란 배경에 Clipboard image라고 적힌 그림",
+    )
     const [editorBox, editorImageBox] = await Promise.all([
       page.locator("#editor").boundingBox(),
       page.locator(".ProseMirror img").boundingBox(),

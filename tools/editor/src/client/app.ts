@@ -1,12 +1,13 @@
 import type { Editor } from "@tiptap/core"
 import type { PostDocument, PostSummary } from "../shared/contracts"
+import { connectAgentContext } from "./agent-context-attachment"
 import { setupAgentController } from "./agent-controller"
 import { fetchPost, fetchPosts, persistPost, uploadImage } from "./api"
 import { applyMergedContent } from "./apply-merge"
 import { type EditorCommand, runEditorCommand, syncToolbarState } from "./commands"
 import { errorMessage, renderPostRows, requiredElement, resizeTextarea } from "./dom"
 import { createBlogEditor, insertImage } from "./editor"
-import { prepareMarkdown, restoreMarkdown } from "./markdown"
+import { mediaPreviewUrl, prepareMarkdown, restoreMarkdown } from "./markdown"
 import { setupRail } from "./rail"
 import { createToastController } from "./toast"
 import { applicationMarkup } from "./view"
@@ -58,13 +59,7 @@ export function mountApplication(root: HTMLElement): void {
     updateSaveState()
   }
 
-  const mediaUrl = (source: string): string => {
-    if (!current || source.startsWith("/") || /^https?:\/\//.test(source)) {
-      return source
-    }
-    const query = new URLSearchParams({ path: current.path, src: source })
-    return `/api/media?${query.toString()}`
-  }
+  const mediaUrl = (source: string): string => mediaPreviewUrl(current?.path, source)
 
   let editor: Editor
   const handleImage = async (file: File, position: number): Promise<void> => {
@@ -116,6 +111,7 @@ export function mountApplication(root: HTMLElement): void {
       dirty = false
       canvas.hidden = false
       welcome.hidden = true
+      await agentController?.showPost(document.path)
       resizeTextarea(title)
       renderPostList()
       localStorage.setItem("blog-editor:last-post", path)
@@ -181,6 +177,11 @@ export function mountApplication(root: HTMLElement): void {
       showToast("선택한 AI 변경을 편집기에 적용했습니다.", "success")
     },
   })
+  connectAgentContext(
+    editor,
+    () => shortcodes,
+    (context) => agentController?.attachContext(context),
+  )
 
   toolbar.addEventListener("click", (event) => {
     const button = (event.target as Element).closest<HTMLButtonElement>("[data-command]")

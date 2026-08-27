@@ -51,7 +51,7 @@ export class MergeView {
       const choice = button?.dataset["mergeChoice"] as MergeChoice | undefined
       if (id && choice) {
         this.choices.set(id, choice)
-        this.renderRows()
+        this.updateChoice(id)
       }
     })
     requiredElement("#merge-accept-all").addEventListener("click", () => {
@@ -169,11 +169,27 @@ export class MergeView {
     }
   }
 
+  private updateChoice(id: string): void {
+    const choice = this.choices.get(id)
+    const buttons = [
+      ...this.grid.querySelectorAll<HTMLButtonElement>("[data-merge-choice]"),
+    ].filter((button) => button.dataset["mergeId"] === id)
+    const row = buttons[0]?.closest<HTMLElement>(".merge-row--change")
+    if (row && choice) {
+      row.dataset["selected"] = choice
+    }
+    for (const button of buttons) {
+      const selected = button.dataset["mergeChoice"] === choice
+      button.dataset["selected"] = String(selected)
+      button.setAttribute("aria-pressed", String(selected))
+    }
+  }
+
   private chooseAll(choice: MergeChoice): void {
     for (const id of this.choices.keys()) {
       this.choices.set(id, choice)
+      this.updateChoice(id)
     }
-    this.renderRows()
   }
 
   private apply(): void {

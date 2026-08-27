@@ -7,7 +7,10 @@ const markdownImagePattern = /(!\[[^\]]*]\()([^\s)]+)([^)]*\))/g
 const refShortcodePattern = /\{\{[<%]\s*ref\s+[\s\S]*?[>%]\}\}/g
 const refTokenPrefix = "https://hugo.local/__ref/"
 
-function mediaPreviewUrl(postPath: string, source: string): string {
+export function mediaPreviewUrl(postPath: string | undefined, source: string): string {
+  if (!postPath || !isRelativeMedia(source)) {
+    return source
+  }
   const query = new URLSearchParams({ path: postPath, src: source })
   return `/api/media?${query.toString()}`
 }
@@ -30,17 +33,14 @@ export function prepareMarkdown(body: string, postPath: string): PreparedMarkdow
   })
   const markdown = protectedRefs.replace(
     markdownImagePattern,
-    (match, opening: string, source: string, closing: string) => {
-      if (!isRelativeMedia(source)) {
-        return match
-      }
+    (_match, opening: string, source: string, closing: string) => {
       return `${opening}${mediaPreviewUrl(postPath, source)}${closing}`
     },
   )
   return { markdown, shortcodes }
 }
 
-function restoreMediaUrl(source: string): string {
+export function originalMediaSource(source: string): string {
   if (!source.startsWith("/api/media?")) {
     return source
   }
@@ -55,7 +55,7 @@ export function restoreMarkdown(
   const withImages = editorMarkdown.replace(
     markdownImagePattern,
     (_match, opening: string, source: string, closing: string) =>
-      `${opening}${restoreMediaUrl(source)}${closing}`,
+      `${opening}${originalMediaSource(source)}${closing}`,
   )
   let restored = withImages
   for (const [token, shortcode] of shortcodes) {

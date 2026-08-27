@@ -88,11 +88,22 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 - Image block: uploading placeholder, ready, failed with retry/removal affordance.
 - Toast: success or error, announced through an ARIA live region.
 - Agent selector: available, unavailable, loading, and selected.
+- Agent session picker: new conversation, saved session selected, history loading, resumed, and
+  unavailable provider.
 - Agent conversation: empty guidance, user request, assistant response, tool activity, running,
-  cancelled, failed, and proposal-ready.
+  cancelled, failed, proposal-ready, and read-only restored history.
 - Merge hunk: current selected, proposal selected, equal, insertion, deletion, and empty.
 - Merge action: keep all current content, accept all proposed content, apply selected content,
   and close without applying.
+
+Saved sessions are scoped to the current post and ordered by their latest activity. Selecting one
+restores its user, assistant, status, tool, and proposal entries without starting a harness. The
+first follow-up request resumes through a fresh isolated worktree and receives the prior
+conversation as ordered context. Starting a new conversation clears only the rail; saved history
+remains available.
+
+Individual merge choices update the existing row controls in place. They must not replace the
+merge grid or change the document's vertical scroll position.
 
 ## 6. Motion
 

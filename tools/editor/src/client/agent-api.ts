@@ -1,9 +1,14 @@
 import {
+  type AgentContext,
   type AgentEvent,
   type AgentInfo,
   type AgentProvider,
+  type AgentSessionHistory,
+  type AgentSessionSummary,
   agentEventSchema,
   agentListResponseSchema,
+  agentSessionHistorySchema,
+  agentSessionListResponseSchema,
   createAgentSessionResponseSchema,
 } from "../shared/agent-contracts"
 
@@ -38,16 +43,42 @@ export async function createAgentSession(provider: AgentProvider, path: string):
   return createAgentSessionResponseSchema.parse(await response.json()).sessionId
 }
 
+export async function fetchAgentSessions(path: string): Promise<readonly AgentSessionSummary[]> {
+  const query = new URLSearchParams({ path })
+  const response = await fetch(`/api/agent/sessions?${query.toString()}`)
+  if (!response.ok) {
+    throw await errorFrom(response)
+  }
+  return agentSessionListResponseSchema.parse(await response.json()).sessions
+}
+
+export async function fetchAgentSession(sessionId: string): Promise<AgentSessionHistory> {
+  const response = await fetch(`/api/agent/sessions/${sessionId}`)
+  if (!response.ok) {
+    throw await errorFrom(response)
+  }
+  return agentSessionHistorySchema.parse(await response.json())
+}
+
+export async function resumeAgentSession(sessionId: string): Promise<AgentProvider> {
+  const response = await fetch(`/api/agent/sessions/${sessionId}/resume`, { method: "POST" })
+  if (!response.ok) {
+    throw await errorFrom(response)
+  }
+  return createAgentSessionResponseSchema.parse(await response.json()).provider
+}
+
 export async function streamAgentMessage(
   sessionId: string,
   prompt: string,
+  context: AgentContext | undefined,
   onEvent: (event: AgentEvent) => void,
   signal: AbortSignal,
 ): Promise<void> {
   const response = await fetch(`/api/agent/sessions/${sessionId}/messages`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, context }),
     signal,
   })
   if (!response.ok || !response.body) {

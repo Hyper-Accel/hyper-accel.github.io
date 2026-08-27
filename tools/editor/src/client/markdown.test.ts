@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { prepareMarkdown, restoreMarkdown } from "./markdown"
+import { originalMediaSource, prepareMarkdown, restoreMarkdown } from "./markdown"
 
 describe("editor markdown transport", () => {
   const path = "content/posts/example/index.ko.md"
@@ -25,5 +25,11 @@ describe("editor markdown transport", () => {
     const prepared = prepareMarkdown(source, path)
 
     expect(prepared.markdown).toBe(source)
+  })
+
+  test("restores a selected local image preview to its Markdown path", () => {
+    const preview = "/api/media?path=content%2Fposts%2Fexample%2Findex.md&src=images%2Fplot.png"
+
+    expect(originalMediaSource(preview)).toBe("images/plot.png")
   })
 })

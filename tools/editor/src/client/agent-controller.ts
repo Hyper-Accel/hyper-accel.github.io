@@ -1,13 +1,16 @@
-import type { AgentEvent, AgentProvider } from "../shared/agent-contracts"
+import type { AgentContext, AgentProvider, AgentSessionSummary } from "../shared/agent-contracts"
 import type { PostDocument } from "../shared/contracts"
 import {
   cancelAgentSession,
   createAgentSession,
   disposeAgentSession,
   fetchAgentProviders,
+  fetchAgentSession,
+  fetchAgentSessions,
+  resumeAgentSession,
   streamAgentMessage,
 } from "./agent-api"
-import { MergeView } from "./merge-view"
+import { AgentConversation, describeAgentContext } from "./agent-conversation"
 
 type AgentControllerOptions = {
   readonly getDocument: () => PostDocument | undefined
@@ -31,20 +34,28 @@ export function setupAgentController(options: AgentControllerOptions) {
   const postsPanel = requiredElement<HTMLElement>("#posts-panel")
   const agentPanel = requiredElement<HTMLElement>("#agent-panel")
   const provider = requiredElement<HTMLSelectElement>("#agent-provider")
-  const thread = requiredElement<HTMLElement>("#agent-thread")
-  const empty = requiredElement<HTMLElement>("#agent-empty")
+  const sessionSelect = requiredElement<HTMLSelectElement>("#agent-session")
+  const newSession = requiredElement<HTMLButtonElement>("#agent-new-session")
   const form = requiredElement<HTMLFormElement>("#agent-form")
   const prompt = requiredElement<HTMLTextAreaElement>("#agent-prompt")
+  const contextPreview = requiredElement<HTMLElement>("#agent-context")
+  const contextLabel = requiredElement<HTMLElement>("#agent-context-label")
+  const contextRemove = requiredElement<HTMLButtonElement>("#agent-context-remove")
   const send = requiredElement<HTMLButtonElement>("#agent-send")
   const cancel = requiredElement<HTMLButtonElement>("#agent-cancel")
-  const merge = new MergeView()
 
   let sessionId: string | undefined
   let sessionPath: string | undefined
   let sessionProvider: AgentProvider | undefined
+  let runtimeActive = false
   let abortController: AbortController | undefined
-  let assistantMessage: HTMLElement | undefined
-  let proposalButton: HTMLButtonElement | undefined
+  let attachedContext: AgentContext | undefined
+
+  const setContext = (context: AgentContext | undefined): void => {
+    attachedContext = context
+    contextPreview.hidden = !context
+    contextLabel.textContent = context ? describeAgentContext(context) : ""
+  }
 
   const switchPanel = (panel: "posts" | "agent"): void => {
     const agentSelected = panel === "agent"
@@ -54,118 +65,121 @@ export function setupAgentController(options: AgentControllerOptions) {
     agentPanel.hidden = !agentSelected
   }
 
-  const appendMessage = (role: "user" | "assistant" | "tool", text: string): HTMLElement => {
-    empty.hidden = true
-    const message = document.createElement("div")
-    message.className = `agent-message agent-message--${role}`
-    message.textContent = text
-    thread.append(message)
-    thread.scrollTop = thread.scrollHeight
-    return message
-  }
-
-  const appendDelta = (text: string): void => {
-    if (!assistantMessage) {
-      assistantMessage = appendMessage("assistant", "")
-    }
-    assistantMessage.textContent = `${assistantMessage.textContent ?? ""}${text}`
-    thread.scrollTop = thread.scrollHeight
-  }
-
   const closeSession = async (): Promise<void> => {
-    if (sessionId) {
+    if (sessionId && runtimeActive) {
       await disposeAgentSession(sessionId).catch(() => undefined)
     }
     sessionId = undefined
     sessionPath = undefined
     sessionProvider = undefined
+    runtimeActive = false
   }
 
-  const handleEvent = (event: AgentEvent): void => {
-    switch (event.type) {
-      case "delta":
-        appendDelta(event.text)
-        return
-      case "message":
-        if (!assistantMessage) {
-          appendMessage("assistant", event.text)
-        }
-        return
-      case "tool":
-        appendMessage("tool", `${event.status === "running" ? "실행 중" : "완료"}: ${event.label}`)
-        return
-      case "status":
-        appendMessage("tool", event.text)
-        return
-      case "proposal": {
-        const currentDocument = options.getDocument()
-        if (currentDocument) {
-          if (proposalButton) {
-            proposalButton.disabled = true
-          }
-          const proposalMessage = appendMessage("tool", "수정 제안이 준비되었습니다.")
-          const reopenButton = document.createElement("button")
-          reopenButton.type = "button"
-          reopenButton.className = "agent-proposal-open"
-          reopenButton.textContent = "수정 제안 다시 열기"
-          proposalButton = reopenButton
-          proposalMessage.append(reopenButton)
-          merge.open({
-            currentTitle: currentDocument.title,
-            currentBody: currentDocument.body,
-            proposedTitle: event.title,
-            proposedBody: event.body,
-            postPath: currentDocument.path,
-            mediaUrl: options.mediaUrl,
-            onApply: (title, body) => {
-              reopenButton.disabled = true
-              reopenButton.textContent = "수정 제안을 적용했습니다."
-              options.applyMerged(title, body)
-              void closeSession()
-            },
-            onClose: () => {
-              requiredElement("#article-canvas").hidden = false
-              requiredElement("#welcome").hidden = true
-            },
-          })
-          reopenButton.addEventListener("click", () => merge.reopen())
-        }
-        return
-      }
-      case "error":
-        options.showToast(event.message, "error")
-        return
-      case "session":
-      case "done":
-        return
+  const conversation = new AgentConversation({
+    getDocument: options.getDocument,
+    applyMerged: options.applyMerged,
+    mediaUrl: options.mediaUrl,
+    showToast: options.showToast,
+    closeRuntime: () => void closeSession(),
+  })
+  const providersReady = fetchAgentProviders().then((agents) => {
+    provider.replaceChildren()
+    for (const agent of agents) {
+      const option = document.createElement("option")
+      option.value = agent.id
+      option.textContent = `${agent.label}${agent.available ? "" : " · 설치되지 않음"}`
+      option.disabled = !agent.available
+      provider.append(option)
+    }
+  })
+
+  const formatSession = (session: AgentSessionSummary): string => {
+    const updated = new Date(session.updatedAt)
+    const today = new Date()
+    const sameDay = updated.toDateString() === today.toDateString()
+    const date = new Intl.DateTimeFormat("ko", {
+      ...(sameDay ? {} : { month: "long", day: "numeric" }),
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(updated)
+    const rawPreview = Array.from(session.preview.replace(/\s+/g, " ").trim() || "새 대화")
+    const preview =
+      rawPreview.length > 26 ? `${rawPreview.slice(0, 25).join("")}…` : rawPreview.join("")
+    return `${preview} · ${date} · ${session.provider.toUpperCase()}`
+  }
+
+  const refreshSessions = async (postPath: string, selected = sessionId): Promise<void> => {
+    const sessions = await fetchAgentSessions(postPath)
+    sessionSelect.replaceChildren(new Option("새 대화", ""))
+    for (const session of sessions) {
+      const option = new Option(formatSession(session), session.id)
+      option.title = `${session.provider.toUpperCase()} · ${session.preview}`
+      sessionSelect.append(option)
+    }
+    sessionSelect.value =
+      selected && sessions.some((session) => session.id === selected) ? selected : ""
+  }
+
+  const startNewConversation = async (clearContext = true): Promise<void> => {
+    await closeSession()
+    sessionSelect.value = ""
+    conversation.reset()
+    if (clearContext) {
+      setContext(undefined)
     }
   }
 
+  const loadSession = async (id: string): Promise<void> => {
+    await closeSession()
+    const history = await fetchAgentSession(id)
+    await providersReady
+    sessionId = id
+    sessionPath = history.path
+    sessionProvider = history.provider
+    runtimeActive = false
+    provider.value = history.provider
+    sessionSelect.value = id
+    conversation.load(history)
+  }
+
   const run = async (): Promise<void> => {
-    const document = options.getDocument()
+    const post = options.getDocument()
     const instruction = prompt.value.trim()
+    const context = attachedContext
     const selectedProvider = provider.value as AgentProvider
-    if (!document || !instruction) {
+    if (!post || !instruction) {
       options.showToast("먼저 글을 선택하고 에이전트에게 요청할 내용을 입력하세요.", "error")
       return
     }
     if (!(await options.ensureSaved())) {
       return
     }
-    if (!sessionId || sessionPath !== document.path || sessionProvider !== selectedProvider) {
+    if (!sessionId || sessionPath !== post.path || sessionProvider !== selectedProvider) {
       await closeSession()
-      sessionId = await createAgentSession(selectedProvider, document.path)
-      sessionPath = document.path
+      sessionId = await createAgentSession(selectedProvider, post.path)
+      sessionPath = post.path
       sessionProvider = selectedProvider
+      runtimeActive = true
+      await refreshSessions(post.path, sessionId)
+    } else if (!runtimeActive) {
+      sessionProvider = await resumeAgentSession(sessionId)
+      runtimeActive = true
     }
-    appendMessage("user", instruction)
+    conversation.appendUser(instruction, context)
+    setContext(undefined)
     prompt.value = ""
-    assistantMessage = undefined
+    conversation.boundary()
     send.disabled = true
     cancel.hidden = false
     abortController = new AbortController()
     try {
-      await streamAgentMessage(sessionId, instruction, handleEvent, abortController.signal)
+      await streamAgentMessage(
+        sessionId,
+        instruction,
+        context,
+        (event) => conversation.handle(event),
+        abortController.signal,
+      )
     } catch (error: unknown) {
       if (!abortController.signal.aborted) {
         options.showToast(error instanceof Error ? error.message : String(error), "error")
@@ -174,12 +188,34 @@ export function setupAgentController(options: AgentControllerOptions) {
       send.disabled = false
       cancel.hidden = true
       abortController = undefined
+      if (sessionPath) {
+        await refreshSessions(sessionPath, sessionId).catch(() => undefined)
+      }
     }
   }
 
   postsTab.addEventListener("click", () => switchPanel("posts"))
   agentTab.addEventListener("click", () => switchPanel("agent"))
-  provider.addEventListener("change", () => void closeSession())
+  contextRemove.addEventListener("click", () => setContext(undefined))
+  provider.addEventListener("change", () => {
+    void startNewConversation(false)
+      .then(() => {
+        options.showToast(
+          "에이전트를 바꿔 새 대화를 시작했습니다. 기존 기록은 대화 기록에서 다시 열 수 있습니다.",
+          "success",
+        )
+      })
+      .catch((error: unknown) => {
+        options.showToast(error instanceof Error ? error.message : String(error), "error")
+      })
+  })
+  newSession.addEventListener("click", () => void startNewConversation())
+  sessionSelect.addEventListener("change", () => {
+    const id = sessionSelect.value
+    void (id ? loadSession(id) : startNewConversation()).catch((error: unknown) => {
+      options.showToast(error instanceof Error ? error.message : String(error), "error")
+    })
+  })
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     void run()
@@ -191,28 +227,26 @@ export function setupAgentController(options: AgentControllerOptions) {
     }
   })
 
-  void fetchAgentProviders()
-    .then((agents) => {
-      provider.replaceChildren()
-      for (const agent of agents) {
-        const option = document.createElement("option")
-        option.value = agent.id
-        option.textContent = `${agent.label}${agent.available ? "" : " · 설치되지 않음"}`
-        option.disabled = !agent.available
-        provider.append(option)
-      }
-    })
-    .catch((error: unknown) => {
-      options.showToast(error instanceof Error ? error.message : String(error), "error")
-    })
+  void providersReady.catch((error: unknown) => {
+    options.showToast(error instanceof Error ? error.message : String(error), "error")
+  })
 
   return {
     reset: async (): Promise<void> => {
-      merge.reset()
       await closeSession()
-      thread.replaceChildren(empty)
-      empty.hidden = false
-      proposalButton = undefined
+      conversation.reset()
+      sessionSelect.replaceChildren(new Option("새 대화", ""))
+      setContext(undefined)
+    },
+    showPost: async (postPath: string): Promise<void> => {
+      await refreshSessions(postPath).catch((error: unknown) => {
+        options.showToast(error instanceof Error ? error.message : String(error), "error")
+      })
+    },
+    attachContext: (context: AgentContext): void => {
+      setContext(context)
+      switchPanel("agent")
+      prompt.focus()
     },
   }
 }
