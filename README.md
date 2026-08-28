@@ -8,6 +8,7 @@ HyperAccel의 기술 블로그입니다. Hugo와 PaperMod 테마를 사용하여
 - [프로젝트 설정](#프로젝트-설정)
 - [다국어 지원 (Multilingual)](#다국어-지원-multilingual)
 - [블로그 포스트 작성](#블로그-포스트-작성)
+- [로컬 블로그 에디터](#로컬-블로그-에디터)
 - [로컬 개발 서버 실행](#로컬-개발-서버-실행)
 - [Pre-commit (1MB 초과 파일 체크)](#pre-commit-1mb-초과-파일-체크)
 - [포스트 배포](#포스트-배포)
@@ -421,6 +422,21 @@ hugo server -D
 
 # 브라우저에서 http://localhost:1313 접속
 ```
+
+## 로컬 블로그 에디터
+
+기존 포스트는 `techblog-editor`로 편집할 수 있습니다. 에디터는 현재 Git 브랜치의 파일만
+수정하므로, 먼저 글 전용 브랜치를 만들고 한국어·영어 파일을 모두 준비해야 합니다.
+
+```bash
+git switch -c post/<글-slug>
+./tools/editor/install.sh
+techblog-editor
+```
+
+에디터는 브랜치, 커밋, PR을 자동으로 만들지 않습니다. 글 편집과 Hugo 검증을 마친 뒤
+평소 사용하는 Git 도구로 커밋하고 PR을 생성하세요. 자세한 사용법은
+[`tools/editor/README.md`](tools/editor/README.md)를 참고합니다.
 
 ## 🔧 로컬 개발 서버 실행
 
