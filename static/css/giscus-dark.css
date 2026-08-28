@@ -1,0 +1,51 @@
+@import url("https://giscus.app/themes/dark.css");
+
+.gsc-reactions-count {
+  display: none;
+}
+
+.gsc-social-reaction-summary-item {
+  min-height: 36px !important;
+  padding: 6px 10px !important;
+  font-size: 16px !important;
+}
+
+.gsc-reactions-button {
+  min-width: 36px !important;
+  padding: 6px !important;
+}
+
+.gsc-reactions-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gsc-direct-reaction-button-emoji {
+  font-size: 18px;
+}
+
+.gsc-social-reaction-summary-item-count {
+  font-size: 15px;
+}
+
+.gsc-reactions-popover {
+  width: 200px;
+  min-width: 200px;
+}
+
+.gsc-reactions-popover > .m-2:last-child {
+  display: grid;
+  grid-template-columns: repeat(4, 36px);
+  gap: 4px;
+  justify-content: center;
+}
+
+.gsc-emoji-button {
+  width: 36px;
+  height: 36px;
+}
+
+.gsc-emoji {
+  font-size: 20px;
+  line-height: 1;
+}

@@ -1,21 +1,76 @@
 {{- if isset .Site.Params "giscus" -}}
 {{- if and (isset .Site.Params.giscus "repo") (not (eq .Site.Params.giscus.repo "" )) (eq (.Params.disable_comments | default false) false) -}}
-<div id="giscus_thread">
+{{- $lightTheme := "https://hyper-accel.github.io/css/giscus-light.css" -}}
+{{- $darkTheme := "https://hyper-accel.github.io/css/giscus-dark.css" -}}
+{{- if hugo.IsServer -}}
+    {{- $lightTheme = "light" -}}
+    {{- $darkTheme = "dark" -}}
+{{- end -}}
+<div id="giscus_thread" tabindex="-1">
     <script src="https://giscus.app/client.js"
             data-repo="{{ .Site.Params.giscus.repo }}"
             data-repo-id="{{ .Site.Params.giscus.repoID }}"
             data-category="{{ .Site.Params.giscus.category }}"
             data-category-id="{{ .Site.Params.giscus.categoryID }}"
             data-mapping="{{ default "pathname" .Site.Params.giscus.mapping }}"
-            data-strict="{{ default "0" .Site.Params.giscus.dataStrict }}"
+            data-strict="{{ default "0" .Site.Params.giscus.strict }}"
             data-reactions-enabled="{{ default "1" .Site.Params.giscus.reactionsEnabled }}"
             data-emit-metadata="{{ default "0" .Site.Params.giscus.emitMetadata }}"
             data-input-position="{{ default "bottom" .Site.Params.giscus.inputPosition }}"
-            data-theme="{{ default "light" .Site.Params.giscus.theme }}"
-            data-lang="{{ default "en" .Site.Params.giscus.lang }}"
+            data-theme="{{ $lightTheme }}"
+            data-lang="{{ default "en" .Language.Lang }}"
             data-loading="{{ default "lazy" .Site.Params.giscus.loading }}"
             crossorigin="anonymous"
             async>
+    </script>
+    <script>
+        (() => {
+            const thread = document.querySelector("#giscus_thread");
+            const client = thread?.querySelector('script[src="https://giscus.app/client.js"]');
+            if (!thread || !client) return;
+
+            const themes = {
+                light: "{{ $lightTheme }}",
+                dark: "{{ $darkTheme }}",
+            };
+            const currentTheme = () =>
+                document.documentElement.dataset.theme === "dark" ? themes.dark : themes.light;
+            client.dataset.theme = currentTheme();
+
+            let frame;
+            let appliedTheme;
+            const syncTheme = () => {
+                const nextFrame = thread.querySelector("iframe.giscus-frame");
+                if (!nextFrame) return;
+                if (nextFrame !== frame) {
+                    frame = nextFrame;
+                    appliedTheme = undefined;
+                    frame.addEventListener("load", () => {
+                        appliedTheme = undefined;
+                        syncTheme();
+                    }, { once: true });
+                }
+                const theme = currentTheme();
+                if (appliedTheme === theme) return;
+                appliedTheme = theme;
+                frame.contentWindow?.postMessage({
+                    giscus: { setConfig: { theme } },
+                }, "https://giscus.app");
+            };
+
+            const frameObserver = new MutationObserver(syncTheme);
+            frameObserver.observe(thread, { childList: true });
+            syncTheme();
+
+            const themeObserver = new MutationObserver(() => {
+                appliedTheme = undefined;
+                syncTheme();
+            });
+            themeObserver.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ["data-theme"],
+            });
+        })();
     </script>
 </div>
 {{- end -}}
