@@ -70,82 +70,18 @@
       summary.hidden = false;
     };
 
-    let stopFollowing;
-    summary.addEventListener("click", () => {
-      stopFollowing?.();
-
+    summary.addEventListener("click", (event) => {
       const target = document.querySelector("#giscus_thread");
       if (!target) return;
 
-      const pendingImages = new Set(
-        [...document.querySelectorAll('.post-content img[loading="lazy"]')]
-          .filter((image) => !image.complete)
-          .slice(-3),
-      );
-      const controller = new AbortController();
-      const observer = new ResizeObserver(() => {
-        target.scrollIntoView({ behavior: "auto", block: "start" });
-      });
-
-      let stopped = false;
-      stopFollowing = () => {
-        if (stopped) return;
-        stopped = true;
-        observer.disconnect();
-        controller.abort();
-        stopFollowing = undefined;
-      };
-
-      const finishIfReady = () => {
-        if (pendingImages.size > 0 || stopped) return;
-        requestAnimationFrame(() => {
-          if (stopped) return;
-          target.scrollIntoView({ behavior: "auto", block: "start" });
-          requestAnimationFrame(() => {
-            if (stopped) return;
-            stopFollowing();
-            target.focus({ preventScroll: true });
-            window.dispatchEvent(new Event("reactionsummarysettled"));
-          });
-        });
-      };
-
-      for (const image of pendingImages) {
-        const settle = () => {
-          pendingImages.delete(image);
-          finishIfReady();
-        };
-        image.addEventListener("load", settle, { once: true, signal: controller.signal });
-        image.addEventListener("error", settle, { once: true, signal: controller.signal });
-        image.loading = "eager";
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (location.hash !== summary.hash) {
+        history.pushState(null, "", summary.hash);
       }
-
-      const cancel = () => stopFollowing();
-      window.addEventListener("popstate", cancel, { once: true, signal: controller.signal });
-      window.addEventListener("wheel", cancel, {
-        once: true,
-        passive: true,
-        signal: controller.signal,
-      });
-      window.addEventListener("touchmove", cancel, {
-        once: true,
-        passive: true,
-        signal: controller.signal,
-      });
-      window.addEventListener("pointerdown", cancel, {
-        once: true,
-        passive: true,
-        signal: controller.signal,
-      });
-      window.addEventListener("keydown", (event) => {
-        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
-          cancel();
-        }
-      }, { signal: controller.signal });
-
-      observer.observe(document.body);
       target.scrollIntoView({ behavior: "auto", block: "start" });
-      finishIfReady();
+      target.focus({ preventScroll: true });
+      window.dispatchEvent(new Event("reactionsummarysettled"));
     });
 
     window.addEventListener("message", (event) => {
