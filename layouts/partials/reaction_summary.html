@@ -71,6 +71,17 @@
     };
 
     summary.addEventListener("click", (event) => {
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        event.stopImmediatePropagation();
+        return;
+      }
+      if (event.defaultPrevented || event.button !== 0) return;
+
       const target = document.querySelector("#giscus_thread");
       if (!target) return;
 
@@ -86,6 +97,8 @@
 
     window.addEventListener("message", (event) => {
       if (event.origin !== "https://giscus.app") return;
+      const frame = document.querySelector("#giscus_thread iframe.giscus-frame");
+      if (!frame || event.source !== frame.contentWindow) return;
       const message = event.data?.giscus;
       if (message?.discussion) render(message.discussion);
       if (message?.error) slot.hidden = true;
