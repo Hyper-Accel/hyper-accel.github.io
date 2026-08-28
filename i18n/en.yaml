@@ -37,3 +37,6 @@
 
 - id: series
   translation: "Series"
+
+- id: reaction_summary_aria
+  translation: "{total} reactions. React at the end of this article"

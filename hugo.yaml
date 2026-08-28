@@ -192,11 +192,9 @@ params:
     mapping: pathname
     strict: 0
     reactionsEnabled: 1
-    emitMetadata: 0
+    emitMetadata: 1
     inputPosition: bottom
-    theme: preferred_color_scheme
-    lang: ko
-    loading: lazy
+    loading: eager
 
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true

@@ -37,3 +37,6 @@
 
 - id: series
   translation: "시리즈"
+
+- id: reaction_summary_aria
+  translation: "반응 {total}개. 글 하단에서 반응 남기기"

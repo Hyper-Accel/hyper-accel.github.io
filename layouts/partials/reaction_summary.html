@@ -1,0 +1,160 @@
+{{- if and (.Param "comments") (isset .Site.Params "giscus") -}}
+{{- if and (isset .Site.Params.giscus "repo") (not (eq .Site.Params.giscus.repo "")) (eq (.Params.disable_comments | default false) false) -}}
+<div class="article-reaction-summary-slot" data-reaction-summary-slot hidden>
+  <a class="article-reaction-summary"
+     href="#giscus_thread"
+     data-reaction-summary
+     data-label-template="{{ i18n "reaction_summary_aria" }}"
+     hidden>
+    <span class="article-reaction-summary-items" data-reaction-summary-items></span>
+  </a>
+</div>
+<script>
+  (() => {
+    const slot = document.querySelector("[data-reaction-summary-slot]");
+    const summary = slot?.querySelector("[data-reaction-summary]");
+    const items = summary?.querySelector("[data-reaction-summary-items]");
+    if (!slot || !summary || !items) return;
+
+    const reactions = [
+      ["THUMBS_UP", "👍"],
+      ["THUMBS_DOWN", "👎"],
+      ["LAUGH", "😄"],
+      ["HOORAY", "🎉"],
+      ["CONFUSED", "😕"],
+      ["HEART", "❤️"],
+      ["ROCKET", "🚀"],
+      ["EYES", "👀"],
+    ];
+
+    const render = (discussion) => {
+      const total = Number(discussion?.reactionCount);
+      const groups = discussion?.reactions;
+      if (!Number.isFinite(total) || !groups || typeof groups !== "object") return;
+
+      const active = reactions.filter(([name]) => Number(groups[name]?.count) > 0);
+      if (total < 1 || active.length === 0) {
+        summary.hidden = true;
+        slot.hidden = true;
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      for (const [name, emoji] of active) {
+        const group = groups[name];
+        const item = document.createElement("span");
+        item.className = "article-reaction-summary-item";
+        item.dataset.reaction = name;
+        item.dataset.count = String(group.count);
+        if (group.viewerHasReacted) item.classList.add("is-selected");
+
+        const icon = document.createElement("span");
+        icon.className = "article-reaction-summary-emoji";
+        icon.textContent = emoji;
+
+        const count = document.createElement("span");
+        count.className = "article-reaction-summary-count";
+        count.textContent = String(group.count);
+
+        item.append(icon, count);
+        fragment.append(item);
+      }
+
+      items.replaceChildren(fragment);
+      summary.dataset.reactionTotal = String(total);
+      summary.setAttribute(
+        "aria-label",
+        summary.dataset.labelTemplate.replace("{total}", String(total)),
+      );
+      slot.hidden = false;
+      summary.hidden = false;
+    };
+
+    let stopFollowing;
+    summary.addEventListener("click", () => {
+      stopFollowing?.();
+
+      const target = document.querySelector("#giscus_thread");
+      if (!target) return;
+
+      const pendingImages = new Set(
+        [...document.querySelectorAll('.post-content img[loading="lazy"]')]
+          .filter((image) => !image.complete)
+          .slice(-3),
+      );
+      const controller = new AbortController();
+      const observer = new ResizeObserver(() => {
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+      });
+
+      let stopped = false;
+      stopFollowing = () => {
+        if (stopped) return;
+        stopped = true;
+        observer.disconnect();
+        controller.abort();
+        stopFollowing = undefined;
+      };
+
+      const finishIfReady = () => {
+        if (pendingImages.size > 0 || stopped) return;
+        requestAnimationFrame(() => {
+          if (stopped) return;
+          target.scrollIntoView({ behavior: "auto", block: "start" });
+          requestAnimationFrame(() => {
+            if (stopped) return;
+            stopFollowing();
+            target.focus({ preventScroll: true });
+            window.dispatchEvent(new Event("reactionsummarysettled"));
+          });
+        });
+      };
+
+      for (const image of pendingImages) {
+        const settle = () => {
+          pendingImages.delete(image);
+          finishIfReady();
+        };
+        image.addEventListener("load", settle, { once: true, signal: controller.signal });
+        image.addEventListener("error", settle, { once: true, signal: controller.signal });
+        image.loading = "eager";
+      }
+
+      const cancel = () => stopFollowing();
+      window.addEventListener("popstate", cancel, { once: true, signal: controller.signal });
+      window.addEventListener("wheel", cancel, {
+        once: true,
+        passive: true,
+        signal: controller.signal,
+      });
+      window.addEventListener("touchmove", cancel, {
+        once: true,
+        passive: true,
+        signal: controller.signal,
+      });
+      window.addEventListener("pointerdown", cancel, {
+        once: true,
+        passive: true,
+        signal: controller.signal,
+      });
+      window.addEventListener("keydown", (event) => {
+        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+          cancel();
+        }
+      }, { signal: controller.signal });
+
+      observer.observe(document.body);
+      target.scrollIntoView({ behavior: "auto", block: "start" });
+      finishIfReady();
+    });
+
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "https://giscus.app") return;
+      const message = event.data?.giscus;
+      if (message?.discussion) render(message.discussion);
+      if (message?.error) slot.hidden = true;
+    });
+  })();
+</script>
+{{- end -}}
+{{- end -}}
