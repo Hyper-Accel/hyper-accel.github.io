@@ -26,10 +26,25 @@ hugo new content/posts/<글-slug>/index.en.md
 
 ## 최초 설치
 
-저장소 루트에서:
+macOS/Linux에서는 저장소 루트에서:
 
 ```bash
 ./tools/editor/install.sh
+```
+
+Windows의 PowerShell 또는 명령 프롬프트에서는:
+
+```powershell
+.\tools\editor\install.cmd
+```
+
+Windows 설치 경로의 기본값은
+`%LOCALAPPDATA%\Programs\techblog-editor\bin`입니다. 설치 명령이 안내한 디렉터리가
+`PATH`에 없다면 사용자 `PATH`에 추가한 뒤 새 터미널을 여세요. 다른 위치에 설치하려면
+PowerShell에서 다음처럼 지정할 수 있습니다.
+
+```powershell
+.\tools\editor\install.ps1 -BinDir C:\Users\me\bin
 ```
 
 설치 후에는 어느 디렉터리에서든 다음 명령만 실행합니다.
@@ -43,8 +58,8 @@ techblog-editor
 - 편집기: <http://127.0.0.1:4173>
 - 실제 Hugo 결과: <http://127.0.0.1:1413>
 
-전역 명령을 설치하지 않고 실행하려면 저장소 루트에서
-`./tools/editor/run.sh`를 사용할 수도 있습니다.
+전역 명령을 설치하지 않고 실행하려면 저장소 루트에서 macOS/Linux는
+`./tools/editor/run.sh`, Windows는 `.\tools\editor\run.cmd`를 사용합니다.
 
 ## 사용
 

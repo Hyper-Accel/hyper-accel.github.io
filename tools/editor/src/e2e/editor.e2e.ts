@@ -1,11 +1,13 @@
 import { mkdir, rm, writeFile } from "node:fs/promises"
-import { join, resolve, sep } from "node:path"
+import { tmpdir } from "node:os"
+import { join, resolve } from "node:path"
 import { chromium, type Page } from "playwright"
+import { prepareCommand } from "../server/process-command"
 
 const repositoryRoot = resolve(import.meta.dir, "../../../..")
 const fixtureDirectory = join(repositoryRoot, "content/posts/editor-e2e-fixture")
 const fixturePath = join(fixtureDirectory, "index.md")
-const artifactDirectory = "/tmp/hyperaccel-blog-editor-e2e"
+const artifactDirectory = join(tmpdir(), "hyperaccel-blog-editor-e2e")
 const renderedDirectory = join(artifactDirectory, "site")
 const marker = "E2E EDITOR TEXT MARKER"
 
@@ -64,7 +66,7 @@ async function dispatchImagePaste(page: Page): Promise<void> {
 async function buildRenderedSite(): Promise<void> {
   await rm(renderedDirectory, { recursive: true, force: true })
   const process = Bun.spawn(
-    ["hugo", "--destination", renderedDirectory, "--quiet", "--noBuildLock"],
+    prepareCommand(["hugo", "--destination", renderedDirectory, "--quiet", "--noBuildLock"]),
     {
       cwd: repositoryRoot,
       stdout: "pipe",
@@ -149,10 +151,10 @@ async function run(): Promise<void> {
       port: 0,
       async fetch(request) {
         const url = new URL(request.url)
-        const requestedPath = url.pathname.endsWith(`${sep}`)
+        const requestedPath = url.pathname.endsWith("/")
           ? `${url.pathname}index.html`
           : url.pathname
-        const file = Bun.file(join(renderedDirectory, requestedPath))
+        const file = Bun.file(join(renderedDirectory, ...requestedPath.split("/").filter(Boolean)))
         return (await file.exists())
           ? new Response(file)
           : new Response("Not found", { status: 404 })

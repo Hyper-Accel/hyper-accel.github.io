@@ -3,6 +3,7 @@ import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import { chromium, type Page } from "playwright"
 import { AgentSessionStore } from "../server/agent/session-store"
+import { prepareCommand } from "../server/process-command"
 import type { AgentSessionHistory } from "../shared/agent-contracts"
 
 const repositoryRoot = resolve(import.meta.dir, "../../../..")
@@ -29,7 +30,7 @@ categories: ["Test"]
 `
 
 function startApi(sessionDirectory: string) {
-  return Bun.spawn(["bun", "src/server/index.ts"], {
+  return Bun.spawn(prepareCommand(["bun", "src/server/index.ts"]), {
     cwd: editorRoot,
     env: {
       ...process.env,
@@ -43,7 +44,7 @@ function startApi(sessionDirectory: string) {
 }
 
 function startWeb() {
-  return Bun.spawn(["bunx", "vite", "--host", "127.0.0.1"], {
+  return Bun.spawn(prepareCommand(["bun", "x", "vite", "--host", "127.0.0.1"]), {
     cwd: editorRoot,
     env: {
       ...process.env,

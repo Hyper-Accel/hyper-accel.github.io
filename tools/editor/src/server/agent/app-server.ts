@@ -1,5 +1,6 @@
 import type { AgentProvider } from "../../shared/agent-contracts"
 import { ContentError } from "../errors"
+import { prepareCommand } from "../process-command"
 import {
   type JsonObject,
   objectValue,
@@ -30,7 +31,7 @@ export class CodexAppServerHarness implements Harness {
     private readonly cwd: string,
     command: readonly string[],
   ) {
-    this.process = Bun.spawn([...command], {
+    this.process = Bun.spawn([...prepareCommand(command)], {
       cwd,
       env: process.env,
       stdin: "pipe",

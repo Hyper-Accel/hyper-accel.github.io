@@ -1,4 +1,5 @@
 import type { AgentEvent, AgentProvider } from "../../shared/agent-contracts"
+import { prepareCommand } from "../process-command"
 import { CodexAppServerHarness } from "./app-server"
 import { ClaudeHarness } from "./claude"
 import { OmoCliHarness } from "./omo"
@@ -57,19 +58,24 @@ export async function detectAgentProviders(): Promise<
       if (!executable) {
         return { id: definition.id, label: definition.label, available: false, version: null }
       }
-      const process = Bun.spawn([executable, "--version"], {
-        stdout: "pipe",
-        stderr: "pipe",
-      })
-      const [exitCode, stdout] = await Promise.all([
-        process.exited,
-        new Response(process.stdout).text(),
-      ])
-      return {
-        id: definition.id,
-        label: definition.label,
-        available: exitCode === 0,
-        version: exitCode === 0 ? (stdout.trim().split("\n")[0] ?? null) : null,
+      try {
+        const process = Bun.spawn(prepareCommand([executable, "--version"]), {
+          stdout: "pipe",
+          stderr: "pipe",
+        })
+        const [exitCode, stdout] = await Promise.all([
+          process.exited,
+          new Response(process.stdout).text(),
+          new Response(process.stderr).text(),
+        ])
+        return {
+          id: definition.id,
+          label: definition.label,
+          available: exitCode === 0,
+          version: exitCode === 0 ? (stdout.trim().split("\n")[0] ?? null) : null,
+        }
+      } catch {
+        return { id: definition.id, label: definition.label, available: false, version: null }
       }
     }),
   )

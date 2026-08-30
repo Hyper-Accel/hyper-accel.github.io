@@ -8,14 +8,6 @@ import { AgentSessionManager, emitAgentFailure, resolveAgentSessionDirectory } f
 
 const temporaryRoots: string[] = []
 
-async function git(cwd: string, ...args: string[]): Promise<void> {
-  const process = Bun.spawn(["git", ...args], { cwd, stdout: "pipe", stderr: "pipe" })
-  const exitCode = await process.exited
-  if (exitCode !== 0) {
-    throw new Error(await new Response(process.stderr).text())
-  }
-}
-
 afterEach(async () => {
   await Promise.all(temporaryRoots.splice(0).map((path) => rm(path, { recursive: true })))
 })
@@ -38,14 +30,12 @@ describe("AgentSessionManager", () => {
     temporaryRoots.push(parent)
     const repository = join(parent, "repository")
     const worktree = join(parent, "worktree")
-    await mkdir(repository)
-    await git(repository, "init")
-    await git(repository, "config", "user.email", "editor@example.com")
-    await git(repository, "config", "user.name", "Editor Test")
-    await Bun.write(join(repository, "README.md"), "test")
-    await git(repository, "add", ".")
-    await git(repository, "commit", "-m", "base")
-    await git(repository, "worktree", "add", "--detach", worktree)
+    const commonDirectory = join(repository, ".git")
+    const linkedGitDirectory = join(commonDirectory, "worktrees", "editor")
+    await mkdir(linkedGitDirectory, { recursive: true })
+    await mkdir(worktree)
+    await Bun.write(join(worktree, ".git"), `gitdir: ${linkedGitDirectory}\n`)
+    await Bun.write(join(linkedGitDirectory, "commondir"), "../..\n")
 
     expect(resolveAgentSessionDirectory(worktree, undefined)).toBe(
       join(await realpath(join(repository, ".git")), "techblog-editor", "sessions"),

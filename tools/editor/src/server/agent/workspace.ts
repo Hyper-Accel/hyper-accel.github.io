@@ -5,6 +5,7 @@ import { parse } from "yaml"
 import { z } from "zod"
 import { splitMarkdownDocument } from "../content"
 import { ContentError } from "../errors"
+import { prepareCommand } from "../process-command"
 
 const workspaceMetadataSchema = z.object({
   title: z.string().default("제목 없음"),
@@ -18,7 +19,7 @@ export type AgentWorkspace = {
 }
 
 async function git(cwd: string, args: readonly string[]): Promise<string> {
-  const process = Bun.spawn(["git", ...args], {
+  const process = Bun.spawn(prepareCommand(["git", ...args]), {
     cwd,
     stdout: "pipe",
     stderr: "pipe",

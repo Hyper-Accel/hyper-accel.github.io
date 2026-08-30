@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { mkdir, mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import {
   buildImageName,
   findRepositoryRoot,
+  normalizeContentPath,
   patchFrontmatterScalar,
   resolveContentPath,
   splitMarkdownDocument,
@@ -38,13 +39,15 @@ describe("patchFrontmatterScalar", () => {
 
 describe("resolveContentPath", () => {
   test("accepts an index markdown file inside content/posts", () => {
-    const result = resolveContentPath("/repo", "content/posts/example/index.ko.md")
-    expect(result).toBe("/repo/content/posts/example/index.ko.md")
+    const root = resolve("/repo")
+    const result = resolveContentPath(root, "content/posts/example/index.ko.md")
+    expect(result).toBe(join(root, "content", "posts", "example", "index.ko.md"))
   })
 
   test("rejects path traversal and non-index files", () => {
-    expect(() => resolveContentPath("/repo", "../../secret.md")).toThrow()
-    expect(() => resolveContentPath("/repo", "content/posts/example/note.md")).toThrow()
+    const root = resolve("/repo")
+    expect(() => resolveContentPath(root, "../../secret.md")).toThrow()
+    expect(() => resolveContentPath(root, "content/posts/example/note.md")).toThrow()
   })
 })
 
@@ -57,6 +60,17 @@ describe("buildImageName", () => {
 
   test("rejects unsupported clipboard file types", () => {
     expect(() => buildImageName("text/plain", new Date(), "a1b2")).toThrow()
+  })
+})
+
+describe("normalizeContentPath", () => {
+  test("normalizes both Windows and POSIX scan results to API paths", () => {
+    expect(normalizeContentPath("content\\posts\\example\\index.en.md")).toBe(
+      "content/posts/example/index.en.md",
+    )
+    expect(normalizeContentPath("content/posts/example/index.md")).toBe(
+      "content/posts/example/index.md",
+    )
   })
 })
 

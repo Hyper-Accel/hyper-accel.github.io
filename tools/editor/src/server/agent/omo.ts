@@ -1,4 +1,5 @@
 import { ContentError } from "../errors"
+import { prepareCommand } from "../process-command"
 import { parseHarnessEvent } from "./events"
 import type { EmitAgentEvent, Harness } from "./harness"
 
@@ -32,7 +33,7 @@ export class OmoCliHarness implements Harness {
 
   async run(prompt: string, emit: EmitAgentEvent): Promise<void> {
     await emit({ type: "status", text: "로컬 OMO 설정과 스킬을 불러왔습니다." })
-    this.activeProcess = Bun.spawn([...this.command(prompt)], {
+    this.activeProcess = Bun.spawn([...prepareCommand(this.command(prompt))], {
       cwd: this.cwd,
       env: process.env,
       stdin: "ignore",
