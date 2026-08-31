@@ -1,3 +1,4 @@
+import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import type { Page } from "playwright"
 import {
@@ -11,7 +12,7 @@ export const repositoryRoot = resolve(import.meta.dir, "../../../..")
 export const fixtureDirectory = join(repositoryRoot, "content/posts/agent-ui-e2e-fixture")
 export const fixturePath = join(fixtureDirectory, "index.md")
 export const fixtureImagePath = join(fixtureDirectory, "images/context.png")
-export const artifactDirectory = "/tmp/hyperaccel-blog-editor-agent-ui-e2e"
+export const artifactDirectory = join(tmpdir(), "hyperaccel-blog-editor-agent-ui-e2e")
 export const sessionId = "10000000-0000-4000-8000-000000000099"
 export const currentParagraph = "현재 글에는 기존 문장이 있습니다."
 export const proposedParagraph = "AI가 제안한 자연스러운 문장이 있습니다."

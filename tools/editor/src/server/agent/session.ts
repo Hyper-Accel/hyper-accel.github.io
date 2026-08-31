@@ -1,4 +1,5 @@
-import { dirname, join } from "node:path"
+import { existsSync, readFileSync, realpathSync, statSync } from "node:fs"
+import { dirname, join, resolve } from "node:path"
 import type {
   AgentContext,
   AgentEvent,
@@ -50,17 +51,28 @@ export function resolveAgentSessionDirectory(root: string, configured: string | 
   if (configured) {
     return configured
   }
-  const process = Bun.spawnSync(
-    ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-    { cwd: root, stdout: "pipe", stderr: "pipe" },
-  )
-  if (process.exitCode !== 0) {
+  try {
+    const dotGit = join(root, ".git")
+    let gitDirectory = dotGit
+    if (!statSync(dotGit).isDirectory()) {
+      const pointer = /^gitdir:\s*(.+)$/i.exec(readFileSync(dotGit, "utf8").trim())?.[1]
+      if (!pointer) {
+        throw new Error(".git 파일에 gitdir 경로가 없습니다.")
+      }
+      gitDirectory = resolve(root, pointer)
+    }
+    const commonDirectoryFile = join(gitDirectory, "commondir")
+    const commonDirectory = existsSync(commonDirectoryFile)
+      ? resolve(gitDirectory, readFileSync(commonDirectoryFile, "utf8").trim())
+      : gitDirectory
+    return join(realpathSync(commonDirectory), "techblog-editor", "sessions")
+  } catch (error: unknown) {
     throw new ContentError(
-      new TextDecoder().decode(process.stderr).trim() ||
-        "Git 세션 저장소 경로를 확인하지 못했습니다.",
+      error instanceof Error
+        ? `Git 세션 저장소 경로를 확인하지 못했습니다: ${error.message}`
+        : "Git 세션 저장소 경로를 확인하지 못했습니다.",
     )
   }
-  return join(new TextDecoder().decode(process.stdout).trim(), "techblog-editor", "sessions")
 }
 
 export async function emitAgentFailure(

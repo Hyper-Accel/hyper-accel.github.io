@@ -4,11 +4,13 @@ import { parse } from "yaml"
 import { z } from "zod"
 import { type PostDocument, type PostSummary, postPathSchema } from "../shared/contracts"
 import { ContentError, HugoBuildError, RevisionConflictError } from "./errors"
+import { prepareCommand } from "./process-command"
 
 const frontmatterSchema = z
   .object({
     title: z.string().default("제목 없음"),
     draft: z.boolean().default(false),
+    date: z.coerce.date().optional().catch(undefined),
   })
   .passthrough()
 
@@ -91,24 +93,45 @@ function languageOf(fileName: string): string {
   return match?.[1] ?? "ko"
 }
 
+export function normalizeContentPath(scannedPath: string): string {
+  return scannedPath.replaceAll("\\", "/")
+}
+
+type DatedPost = {
+  readonly summary: PostSummary
+  readonly publishedAt: string
+}
+
 export async function listPosts(): Promise<readonly PostSummary[]> {
   const glob = new Bun.Glob("content/posts/*/index*.md")
-  const posts: PostSummary[] = []
-  for await (const path of glob.scan({ cwd: repositoryRoot, onlyFiles: true })) {
+  const dated: DatedPost[] = []
+  for await (const scanned of glob.scan({ cwd: repositoryRoot, onlyFiles: true })) {
+    const path = normalizeContentPath(scanned)
     const source = await Bun.file(join(repositoryRoot, path)).text()
     const parts = splitMarkdownDocument(source)
     const metadata = frontmatterSchema.parse(parse(parts.frontmatter))
     const stats = await Bun.file(join(repositoryRoot, path)).stat()
-    posts.push({
-      path,
-      slug: basename(dirname(path)),
-      language: languageOf(basename(path)),
-      title: metadata.title,
-      draft: metadata.draft,
-      modifiedAt: stats.mtime.toISOString(),
+    const modifiedAt = stats.mtime.toISOString()
+    dated.push({
+      summary: {
+        path: postPathSchema.parse(path),
+        slug: basename(dirname(path)),
+        language: languageOf(basename(path)),
+        title: metadata.title,
+        draft: metadata.draft,
+        modifiedAt,
+      },
+      publishedAt: metadata.date?.toISOString() ?? modifiedAt,
     })
   }
-  return posts.sort((left, right) => right.modifiedAt.localeCompare(left.modifiedAt))
+  return dated
+    .sort(
+      (left, right) =>
+        right.publishedAt.localeCompare(left.publishedAt) ||
+        left.summary.slug.localeCompare(right.summary.slug) ||
+        left.summary.language.localeCompare(right.summary.language),
+    )
+    .map((entry) => entry.summary)
 }
 
 export async function readPost(contentPath: string): Promise<PostDocument> {
@@ -128,11 +151,14 @@ export async function readPost(contentPath: string): Promise<PostDocument> {
 }
 
 async function validateHugoBuild(): Promise<void> {
-  const process = Bun.spawn(["hugo", "--renderToMemory", "--quiet", "--noBuildLock"], {
-    cwd: repositoryRoot,
-    stdout: "pipe",
-    stderr: "pipe",
-  })
+  const process = Bun.spawn(
+    prepareCommand(["hugo", "--renderToMemory", "--quiet", "--noBuildLock"]),
+    {
+      cwd: repositoryRoot,
+      stdout: "pipe",
+      stderr: "pipe",
+    },
+  )
   const [exitCode, stderr] = await Promise.all([
     process.exited,
     new Response(process.stderr).text(),

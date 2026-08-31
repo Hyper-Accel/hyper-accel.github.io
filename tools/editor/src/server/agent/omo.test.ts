@@ -6,6 +6,7 @@ import type { AgentEvent } from "../../shared/agent-contracts"
 import { OmoCliHarness } from "./omo"
 
 const temporaryRoots: string[] = []
+const subprocessTestsAvailable = process.platform !== "win32"
 
 function timeoutAfter(milliseconds: number): Promise<never> {
   return new Promise((_, reject) => {
@@ -23,37 +24,46 @@ afterEach(async () => {
 })
 
 describe("OmoCliHarness", () => {
-  test("drains a large stderr stream while reading JSON stdout", async () => {
-    const root = await mkdtemp(join(tmpdir(), "omo-harness-test-"))
-    temporaryRoots.push(root)
-    const executable = join(root, "fake-omo")
-    await Bun.write(
-      executable,
-      `#!/bin/sh
-i=0
-while [ "$i" -lt 200000 ]; do
-  printf 'stderr-line-%04d-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\n' "$i" >&2
-  i=$((i + 1))
-done
-printf '{"type":"session","id":"10000000-0000-4000-8000-000000000001"}\\n'
+  test.skipIf(!subprocessTestsAvailable)(
+    "drains a large stderr stream while reading JSON stdout",
+    async () => {
+      const root = await mkdtemp(join(tmpdir(), "omo-harness-test-"))
+      temporaryRoots.push(root)
+      const script = join(root, "fake-omo.mjs")
+      await Bun.write(
+        script,
+        `const filler = "-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+for (let i = 0; i < 200000; i += 1) {
+  console.error(\`stderr-line-\${String(i).padStart(4, "0")}\${filler}\`)
+}
+console.log('{"type":"session","id":"10000000-0000-4000-8000-000000000001"}')
 `,
-    )
-    await chmod(executable, 0o755)
-    const harness = new OmoCliHarness(root, executable)
-    const events: AgentEvent[] = []
-    try {
-      await Promise.race([
-        harness.run("요청", (event) => {
-          events.push(event)
-        }),
-        timeoutAfter(5_000),
-      ])
-      expect(events).toContainEqual({
-        type: "session",
-        sessionId: "10000000-0000-4000-8000-000000000001",
-      })
-    } finally {
-      await harness.dispose()
-    }
-  })
+      )
+      const isWindows = process.platform === "win32"
+      const executable = join(root, isWindows ? "fake-omo.cmd" : "fake-omo")
+      await Bun.write(
+        executable,
+        isWindows
+          ? `@"${process.execPath}" "${script}" %*\r\n`
+          : `#!/bin/sh\nexec "${process.execPath}" "${script}" "$@"\n`,
+      )
+      await chmod(executable, 0o755)
+      const harness = new OmoCliHarness(root, executable)
+      const events: AgentEvent[] = []
+      try {
+        await Promise.race([
+          harness.run("요청", (event) => {
+            events.push(event)
+          }),
+          timeoutAfter(5_000),
+        ])
+        expect(events).toContainEqual({
+          type: "session",
+          sessionId: "10000000-0000-4000-8000-000000000001",
+        })
+      } finally {
+        await harness.dispose()
+      }
+    },
+  )
 })

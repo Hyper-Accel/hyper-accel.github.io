@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import { tmpdir } from "node:os"
+import { basename, extname } from "node:path"
 import { buildHarnessCommand } from "./harness"
 
 describe("buildHarnessCommand", () => {
@@ -6,13 +8,13 @@ describe("buildHarnessCommand", () => {
     expect(
       buildHarnessCommand({
         provider: "codex",
-        cwd: "/tmp/worktree",
+        cwd: tmpdir(),
       }),
     ).toEqual(["codex", "app-server"])
     expect(
       buildHarnessCommand({
         provider: "omo",
-        cwd: "/tmp/worktree",
+        cwd: tmpdir(),
       }),
     ).toEqual(["omo"])
   })
@@ -20,9 +22,10 @@ describe("buildHarnessCommand", () => {
   test("uses the locally installed Claude executable", () => {
     const command = buildHarnessCommand({
       provider: "claude",
-      cwd: "/tmp/worktree",
+      cwd: tmpdir(),
     })
     expect(command).toHaveLength(1)
-    expect(command[0]?.endsWith("claude")).toBe(true)
+    const executable = command[0] ?? ""
+    expect(basename(executable, extname(executable))).toBe("claude")
   })
 })

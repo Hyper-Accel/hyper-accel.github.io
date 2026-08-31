@@ -9,7 +9,7 @@ if ! command -v bun >/dev/null 2>&1; then
 fi
 
 if ! command -v hugo >/dev/null 2>&1; then
-  printf 'Hugo가 필요합니다: brew install hugo\n' >&2
+  printf 'Hugo가 필요합니다: https://gohugo.io/installation/\n' >&2
   exit 1
 fi
 

@@ -428,9 +428,19 @@ hugo server -D
 기존 포스트는 `techblog-editor`로 편집할 수 있습니다. 에디터는 현재 Git 브랜치의 파일만
 수정하므로, 먼저 글 전용 브랜치를 만들고 한국어·영어 파일을 모두 준비해야 합니다.
 
+macOS/Linux:
+
 ```bash
 git switch -c post/<글-slug>
 ./tools/editor/install.sh
+techblog-editor
+```
+
+Windows PowerShell 또는 명령 프롬프트:
+
+```powershell
+git switch -c post/<글-slug>
+.\tools\editor\install.cmd
 techblog-editor
 ```
 

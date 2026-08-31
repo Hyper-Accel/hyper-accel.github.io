@@ -1,5 +1,6 @@
 import { mkdir, rm } from "node:fs/promises"
 import { join, resolve } from "node:path"
+import { prepareCommand } from "../server/process-command"
 import { type AgentEvent, type AgentProvider, agentEventSchema } from "../shared/agent-contracts"
 
 const repositoryRoot = resolve(import.meta.dir, "../../../..")
@@ -114,7 +115,7 @@ async function run(): Promise<void> {
       await fetch(`http://127.0.0.1:4174/api/agent/sessions/${sessionId}`, {
         method: "DELETE",
       }).catch(() => undefined)
-      const worktrees = Bun.spawn(["git", "worktree", "list", "--porcelain"], {
+      const worktrees = Bun.spawn(prepareCommand(["git", "worktree", "list", "--porcelain"]), {
         cwd: repositoryRoot,
         stdout: "pipe",
       })
