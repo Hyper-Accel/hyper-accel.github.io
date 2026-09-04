@@ -39,7 +39,7 @@ OpenAI가 칩을 개발하고 있었다는 사실은 알고 있었기에 실제 
 
 또한 얼마 전 공개된 MoonshotAI의 Kimi K3 테크 리포트에서도 하드웨어 관련 언급이 있었습니다. Kimi K3가 MoonshotAI에서 실험적으로 만든 Kimi 모델 전용 가속기(통칭 KPU)의 프로토타입 RTL을 완전 자율적으로 검증하고 레이아웃까지 진행했다는 점이었습니다. 프로토타입이 어떻게 생겼는지 찾아보았고, 구조적으로 Kimi K3 모델에서 사용하는 Attention 연산 구조(Kimi delta attention, Multi-head latent attention)에 특화된 모듈이 탑재된 것을 확인할 수 있었습니다.
 
-실험적인 프로토타입이지만 이러한 움직임을 본 저는 OpenAI 또한 본인들의 모델에 특화된 구조의 가속기를 만들 수 있겠다고 생각했습니다. 새로 만든 첫 칩이 프론티어급 모델을 서빙하고 있는 GPU보다 성능이 좋을 리는 없으니, 이전 세대 혹은 상대적으로 낮은 성능의 모델 구조에 특화된 가속기로 해당 모델들을 서빙하는 전략입니다.
+실험적인 프로토타입이고 실제 모델 전체를 구동시킬 수 있는 수준은 아니지만 이러한 움직임을 본 저는 OpenAI 또한 본인들의 모델에 특화된 구조의 가속기를 만들 수 있겠다고 생각했습니다. 새로 만든 첫 칩이 프론티어급 모델을 서빙하고 있는 GPU보다 성능이 좋을 리는 없으니, 이전 세대 혹은 상대적으로 낮은 성능의 모델 구조에 특화된 가속기로 서빙할 것이라는게 제 추측이었습니다.
 
 하지만 SemiAnalysis 자료와 같은 날 열린 HotChips 발표에서 할라피뇨의 성능이 공개되었고, 저는 충격을 숨길 수 없었습니다. SemiAnalysis는 리서치뿐만 아니라 엔비디아, AMD 등의 최신 GPU 서빙 성능 벤치마크를 측정하는 기관입니다. 해당 벤치마크에서는 Llama나 중국 모델과 같이 가중치가 공개된 모델을 통해 성능을 측정합니다. SemiAnalysis는 이 벤치마크에서 측정한 성능을 공개했습니다. GPT 내부 모델용으로만 최적화된 것이 아니라, LLM 전체에 범용적으로 사용해도 좋은 가속기를 만들어낸 것입니다.
 
@@ -95,13 +95,13 @@ AI 가속기와 같은 디지털 회로가 만들어지는 과정은 하드웨�
 
 ![XLS 하드웨어 합성 도구 로고](images/xls_logo.svg)
 
-*그림 6. 할라피뇨 팀이 사용한 XLS 하드웨어 합성 도구*
+*그림 6. XLS 로고*
 
-HLS, 그중에서도 할라피뇨 팀이 사용한 XLS는 SystemVerilog 언어를 바로 작성하는 것이 아니라, RTL보다 한 단계 더 추상화된 C 코드로 하드웨어를 기술한 뒤 이를 통해 RTL 코드를 "생성"하는 방식입니다.
+HLS, 그중에서도 XLS(Accelerated HW Synthesis)는 SystemVerilog 언어를 바로 작성하는 것이 아니라, RTL 보다 한단계 더 추상화된 Rust나 C코드로 하드웨어를 기술한 뒤 이를 통해 RTL 코드를 "생성"하는 방식입니다.
 
 > ???: 그냥 RTL 코드를 바로 최적화하면 되지, 왜 C 코드를 거치는 거죠?
 
-저도 들었던 의문입니다. 사람이 설계하는 입장에서는 C 코드를 통해 RTL을 만들면 편하겠지만, AI와 함께 설계한다면 RTL 코드를 그대로 입력으로 넣을 수 있기 때문에 한 단계를 거치지 않고 최적화할 수 있을 것입니다. 다만 OpenAI는 발표에서 "인간이 이해하기 쉬운 개념은 AI도 이해하기 쉽다"고 이야기하며, 그만큼 최적화도 쉽게 진행할 수 있다고 주장했습니다. XLS가 실제 하드웨어 설계에 적합하게 만들어진 언어라는 점도 한몫했겠지만, AI가 이해하기 쉬운 것이 최적화하기도 쉽다는 점이 인상적이었습니다.
+저도 들었던 의문입니다. 사람이 설계하는 입장에서는 Rust나 C 코드를 통해 만들면 편하겠지만, AI와 함께 설계한다면 RTL 코드를 그대로 입력으로 넣을 수 있기 때문에 한 단계를 거치지 않고 최적화할 수 있을 것입니다. 다만 OpenAI는 발표에서 "인간이 이해하기 쉬운 개념은 AI도 이해하기 쉽다"고 이야기하며, 그만큼 최적화도 쉽게 진행할 수 있다고 주장했습니다. XLS가 실제 하드웨어 설계에 적합하게 만들어진 언어라는 점도 한몫했겠지만, AI가 이해하기 쉬운 것이 최적화하기도 쉽다는 점이 인상적이었습니다.
 
 ### 소프트웨어 최적화
 
@@ -147,11 +147,11 @@ GPU는 CUDA라는 해자를 통해 AI 반도체 시장을 독점했습니다. �
 
 ### 출처
 
-[https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia](https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia)
-OpenAI, You Can Just Build ~~Things~~ … Chips, HotChips 2026
-[https://taalas.com/products/](https://taalas.com/products/)
-[https://arxiv.org/pdf/2607.24653](https://arxiv.org/pdf/2607.24653) KIMI K3: OPEN FRONTIER INTELLIGENCE
-[https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/](https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/)
-[https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform)
-[https://google.github.io/xls/](https://google.github.io/xls/)
-[https://karpathy.bearblog.dev/verifiability/](https://karpathy.bearblog.dev/verifiability/)
+- [SemiAnalysis - OpenAI Jalapeño: Better Than Nvidia Blackwell](https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia)
+- OpenAI - You Can Just Build ~~Things~~ … Chips (Hot Chips 2026)
+- [Taalas - HC1 Technology Demonstrator](https://taalas.com/products/)
+- [Moonshot AI - Kimi K3: Open Frontier Intelligence](https://arxiv.org/pdf/2607.24653)
+- [NVIDIA 테크 블로그 - NVIDIA Accelerates OpenAI gpt-oss Models Delivering 1.5 M TPS Inference on NVIDIA GB200 NVL72](https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/)
+- [NVIDIA 테크 블로그 - Inside NVIDIA Groq 3 LPX](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform)
+- [Google XLS - XLS: Accelerated HW Synthesis](https://google.github.io/xls/)
+- [Andrej Karpathy - Verifiability](https://karpathy.bearblog.dev/verifiability/)

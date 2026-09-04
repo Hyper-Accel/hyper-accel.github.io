@@ -148,11 +148,11 @@ Frontier AI companies do not immediately release their highest-performing models
 
 ### Sources
 
-[https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia](https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia)
-OpenAI, You Can Just Build ~~Things~~ … Chips, Hot Chips 2026
-[https://taalas.com/products/](https://taalas.com/products/)
-[https://arxiv.org/pdf/2607.24653](https://arxiv.org/pdf/2607.24653) KIMI K3: OPEN FRONTIER INTELLIGENCE
-[https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/](https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/)
-[https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform)
-[https://google.github.io/xls/](https://google.github.io/xls/)
-[https://karpathy.bearblog.dev/verifiability/](https://karpathy.bearblog.dev/verifiability/)
+- [SemiAnalysis - OpenAI Jalapeño: Better Than Nvidia Blackwell](https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia)
+- OpenAI - You Can Just Build ~~Things~~ … Chips (Hot Chips 2026)
+- [Taalas - HC1 Technology Demonstrator](https://taalas.com/products/)
+- [Moonshot AI - Kimi K3: Open Frontier Intelligence](https://arxiv.org/pdf/2607.24653)
+- [NVIDIA Technical Blog - NVIDIA Accelerates OpenAI gpt-oss Models Delivering 1.5 M TPS Inference on NVIDIA GB200 NVL72](https://developer.nvidia.com/blog/delivering-1-5-m-tps-inference-on-nvidia-gb200-nvl72-nvidia-accelerates-openai-gpt-oss-models-from-cloud-to-edge/)
+- [NVIDIA Technical Blog - Inside NVIDIA Groq 3 LPX](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform)
+- [Google XLS - XLS: Accelerated HW Synthesis](https://google.github.io/xls/)
+- [Andrej Karpathy - Verifiability](https://karpathy.bearblog.dev/verifiability/)
