@@ -1,5 +1,5 @@
 ---
-date: '2026-09-04T00:33:38+09:00'
+date: '2026-09-04T16:00:00+09:00'
 draft: false
 title: "Know Your Enemy, Know Yourself, Part 7: A Model Trained on GPUs Builds a Better Chip Than GPUs"
 cover:
