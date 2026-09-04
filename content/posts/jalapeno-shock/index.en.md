@@ -128,20 +128,20 @@ GPUs have dominated the AI semiconductor market through the moat of CUDA. But th
 
 Frontier AI companies do not immediately release their highest-performing models to the public. For safety and other reasons, they may test models internally, provide them only to selected companies as Anthropic did with Fable 5, or release models to consumers with certain capabilities restricted. If so, frontier AI labs hold an **exclusive position: they can use “advanced intelligence” earlier than anyone else, at the greatest “speed,” and “without refinement.”** AI has already surpassed human capability in nearly every field. In this environment, early exclusive access to intelligence may already be building an invisible moat across every knowledge-intensive industry. I do not think I will fall asleep easily tonight either. I will close with a passage I shared on LinkedIn. Thank you, as always, for reading.
 
-> When AI came for the translators,
-> I remained silent.
+> When AI came for the translators,<br>
+> I remained silent.<br>
 > I was not a translator.
 >
-> Then it came for the artists,
-> and I remained silent.
+> Then it came for the artists,<br>
+> and I remained silent.<br>
 > I was not an artist.
 >
-> Then it came for the developers,
-> and I remained silent.
+> Then it came for the developers,<br>
+> and I remained silent.<br>
 > I was not a developer.
 >
-> When it came for me,
-> no one was left
+> When it came for me,<br>
+> no one was left<br>
 > to speak for me.
 >
 > — Adapted from Martin Niemöller's “First They Came”
