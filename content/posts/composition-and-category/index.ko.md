@@ -6,6 +6,7 @@ cover:
   image: "/images/logo.png"
   alt: "HyperAccel 로고"
   relative: false
+  hidden: true
 authors: [Jaeho Choi]
 tags: ["category theory", "functional programming", "Lean4", "monad", "composition"]
 series: ["모나드로 알아보는 범주론"]
