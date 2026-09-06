@@ -372,19 +372,27 @@ The operation is associative, but we cannot specify an identity. These objects a
 
 ## Lean exercise: run both computations and check the composition laws
 
-We grouped the functions that obtain a department's city in two ways. The code below runs both computations and checks the law that regrouping produces the same function. We use Lean 4, a language in which we can write both functions and proofs. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEktVxGQcBdHBxB1AVXYDIbA7LYGTrADk6AjIDuWBcogFquAYQ4D6dogbN2Ato4CPNogDTWA%2FNYAA1ogmDWAC46IC7jgBOMAoEKAAyAUwCGAO1AAWAHQBmAEzzsoAPSgAlgFsADgHsATgBdQgMdHAMuPzQgEVHAGe2hAKvMpAKU2hAC2OADmsAa46MkZQBQ%2BwF0Opg5AVqHACabAE6b5AQEAEzEAM1AAY0MDQwBnMVAAbwBBUAAhUABhUEIAFQBPfTEAX1AACgBzarLQQCTCSoBKNrTCEr7SwZHeyuqAXgFQUBSAVxkAD1AZgD5QTta01f6E5LTtZKlTbVM6wpLahuau0dBbuYXltY3t1YSc02Ml9KmJbGfJFRKJEE5HKgADuAAsxCD5hlLtdCABlP7aKTtH5%2FAFAkGgADyKRS2nS%2BXhiLEyIk4Mh0JGDLEULx%2F0BwPyABExPoJGZdGJzrCEUiFoYyRT8oRSeTKUdUqBJfKxKS2sl%2BYLheZCLytaYhecJiSpZTZqBNQLDTr5CrpUklfSIaycurWvbzbKzWITWCXVCLZ6xPJnYzHWl0qj3WHXY8WVCTZjjNjOvgZqBY1D5FGroq0skAG5iAA2hn0Rt1oH11srs2RBWVPotjazTIzjdzaIzACJYIAOsZ7oBaI4SAGIxIWJCWMlkjHkUVd3Zlsgu2%2Brg6TBkXS%2BXKwIJ1OZyv5%2FlWifcvku%2Br1ylBpuC5PdxWdQlTAiTGJdLPV2IAPoSFChjpDc3RVNyXT1I0TTIgsrRwl0VR9NygwdF05R9BUqHDM8UzjNUsE%2FqeoAIeec6XjsiyDBmF4LmRv4kTsgzDBmxgpCWb4fiC36nDqqJ%2FieoHlHc0FDI8eETIRtH5Lx5yoosGwKemoBsRxAjvmIn7fief6yRcVxCZB9wtHs4ljJJCwLNJCl6fJGYsSp7ECEAA).
+We grouped the functions that obtain a department's city in two ways. The code below runs both computations and checks the law that regrouping produces the same function. We use Lean 4, a language in which we can write both functions and proofs. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKADqlMgCUiDRtDSYAYo1QBjPMk69hiArwKIAbudB5qoFb0aw8MsFmp6A1gW6gAd2R7UAAZAhxUUAAWADoAZgAmWIlY0AA5eFBkAFtoJDwTUQJQVAI%2FP1j3bHg84sDKfDsHPACsgGICKxxYUD1anMi%2BO3NxIJCAxvF7EvszWeokAhyTaAYbKur%2BvPgLUEwAM2yTTEAMIlAjtGaS0UM9WAIALlAcaDgyI4PkRF48QRmougqtwCEdtvk9gBvACCoAAQthQM9yCRoAQAL6gAAUmGeCMASYTYACU2KOz1hhLhJPJoEJWCRAF4pKALrpQJBQAyAHz7UnsolSarIEGoQx4MhmPCMRCoEzBOWoaCMcS6PSNDCVUAASUKdlRJVhyAVB0sZn8TQiatAjAswNB2RFYrIMKRFH1mJphNhjyZLIObI53PZgtkKh411A8AOXz0BEEPG4Zl4AheqH8emCZF%2BS38VxwoBB0FuOQIotAZn6iG4VV%2BiEYBmlBu4ifMJkmlgIzL6mddAGU8CgMILa%2FWpWZQAB5aPIWMNDtdhNJkzk5tL4cD0eN0AAEQIRbEJbL7bMXajMZKzyn58FIKOZ5nBCn2MLxdL4meu%2F3eEPeGpk%2Bns4%2BgWe6vqKsT3rGUi3i8q6tk%2BWIQRe%2F7nn%2B0KwcmjKRgBBCxIurZQfaGbivBeEYSuLbJn%2B%2FaDriDIwRRvCxERJA3vaII2Ag0A%2Fq6n6ge%2BvqgJCWHnphQmkcudFCcxmEAESADiDgAdYzJoCYqpIZgAA4mo0DCQ%2BT5DPRS5Pl8Px4GkTguHgzzyUp2Iyb2NAuDJRJVJ03S9OCuwlMx8GeXs4lPohU4kuxBCcT%2B1RaUwOkBUcBk%2BZ83y%2FOZ5iWdZinKVi9mObAzmuV0PR9LUEIlFifneZm%2BnobwwW6bGT6heFb7qXQJQFbAjD4EYsojL8kaoLAZCNfAXFvmkVALDQZgrNa%2FmIAARsEiCiGQ4pokUaasvohjGFUsjQsm8AZl1ViZs8ZjoNpmigGs5iWDYJgzC8bywDOXWcJGVaWBc%2FzUICv2lqAlB7WAcLwCEvDCrYugHPAsD%2BHgWT%2BlEgY8qwOJ8pARJEoIvBZIgBy9DYKBfLYMzfKABAAI6da94pVDMSw5EVOwWAA%2Bjgh16IJsIIvS26uiiaLol2LJYqwzz0oS24khjeK0sSfKevC1KiyzJVA9i5W8gcJJ0drZXFV5mvoCSZJ0QTsAtcKbMIucRx0Qc50EGOURPQiazwNw9Z%2BKA80fNa%2BjquglRSIz00Om%2BmZs%2BCPPwoL7pK6AFIq0iava1Doo9g7FyYZbLVHOcNuwo7zxFhhT1oEq4iwojueqsHofh8s6ts5nTpxwiyKJ1iZLJwrVJpyyLLa5cjo9o7eeEy1E17JbN0MFGJg2iUTCIMBXyoME3UmFGW0GN16u7NvH0Ge3mYg61Q1ZKg4OU78ODza9vCsE9sA4AEJiw%2Bv%2BZ6PgRC0HGKwfM3BkDRg7GWPyJ9UBVCAA).
 
 Start with the two `#eval` lines. `#eval` evaluates an expression and displays its result. The first line groups `officeOf` and `addressOf` first; the second groups `addressOf` and `cityOf` first. Both take `development` as input and print `"서울"`.
 
 In the code, `compose g f` is our `g ∘ f`, and `identity` is the identity function. The first part defines the department information and functions. The three `theorem` declarations at the end state associativity and the two identity laws.
 
 ~~~lean
+-- Exploring Category Theory Through Monads, Part 1
+-- Why Regrouping Functions Preserves the Result
+-- Checked with Lean 4.32.1. No imports are needed.
+-- Compare what the two #eval commands test with what the three theorems prove.
+
+-- compose g f is g ∘ f in the article: apply f first, then g.
 def compose {A B C : Type} (g : B → C) (f : A → B) : A → C :=
   fun x => g (f x)
 
+-- identity returns its input unchanged. Its type A is inferred at each use.
 def identity {A : Type} : A → A :=
   fun x => x
 
+-- Read the office, address, and city stored in a department record.
 structure Address where
   city : String
 
@@ -401,18 +409,28 @@ def cityOf (address : Address) : String := address.city
 def development : Department :=
   { office := { address := { city := "서울" } } }
 
+-- Group officeOf and addressOf first. Result: "서울" ("Seoul").
 #eval compose cityOf (compose addressOf officeOf) development
+-- Group addressOf and cityOf first. Result: "서울" ("Seoul").
 #eval compose (compose cityOf addressOf) officeOf development
 
+-- The evaluations test only development. The theorems use arbitrary types and functions.
+-- Associativity: regrouping preserves the application order f, then g, then h.
+-- Both sides unfold to fun x => h (g (f x)), so rfl verifies their equality.
 theorem compose_assoc {A B C D : Type}
     (h : C → D) (g : B → C) (f : A → B) :
     compose h (compose g f) = compose (compose h g) f := rfl
 
+-- id_B ∘ f = f: return the B produced by f unchanged.
 theorem identity_comp {A B : Type} (f : A → B) :
     compose identity f = f := rfl
 
+-- f ∘ id_A = f: pass the input A to f unchanged.
 theorem comp_identity {A B : Type} (f : A → B) :
     compose f identity = f := rfl
+
+-- These rfl proofs use our definitions of function composition and identity.
+-- They do not establish the laws for a category with a different composition.
 ~~~
 
 The department definitions correspond to the earlier pseudocode. `structure` declares a record type, and `department.office` reads its `office` field. The expression `{ office := ... }` creates a record with that field populated. `def` begins a definition, and `fun x => ...` creates a function with input `x`.

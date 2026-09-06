@@ -372,19 +372,26 @@ not true = false
 
 ## Lean 실습: 두 계산을 실행하고 합성 법칙 확인하기
 
-앞에서 부서의 도시명을 구하는 함수를 두 가지 방식으로 묶었습니다. 아래 코드에서는 두 계산을 직접 실행하고, 묶는 위치를 바꾸어도 같은 함수가 된다는 법칙을 확인합니다. 함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEktVxGQcBdHBxB1AVXYDIbA7LYGTrADk6AjIDuWBcogFquAYQ4D6dogbN2Ato4CPNogDTWA%2FNYAA1ogmDWAC46IC7jgBOMAoEKAAyAUwCGAO1AAWAHQBmAEzzsoAPSgAlgFsADgHsATgBdQgMdHAMuPzQgEVHAGe2hAKvMpAKU2hAC2OADmsAa46MkZQBQ%2BwF0Opg5AVqHACabAE6b5AQEAEzEAM1AAY0MDQwBnMVAAbwBBUAAhUABhUEIAFQBPfTEAX1AACgBzarLQQCTCSoBKNrTCEr7SwZHeyuqAXgFQUBSAVxkAD1AZgD5QTta01f6E5LTtZKlTbVM6wpLahuau0dBbuYXltY3t1YSc02Ml9KmJbGfJFRKJEE5HKgADuAAsxCD5hlLtdCABlP7aKTtH5%2FAFAkGgADyKRS2nS%2BXhiLEyIk4Mh0JGDLEULx%2F0BwPyABExPoJGZdGJzrCEUiFoYyRT8oRSeTKUdUqBJfKxKS2sl%2BYLheZCLytaYhecJiSpZTZqBNQLDTr5CrpUklfSIaycurWvbzbKzWITWCXVCLZ6xPJnYzHWl0qj3WHXY8WVCTZjjNjOvgZqBY1D5FGroq0skAG5iAA2hn0Rt1oH11srs2RBWVPotjazTIzjdzaIzACJYIAOsZ7oBaI4SAGIxIWJCWMlkjHkUVd3Zlsgu2%2Brg6TBkXS%2BXKwIJ1OZyv5%2FlWifcvku%2Br1ylBpuC5PdxWdQlTAiTGJdLPV2IAPoSFChjpDc3RVNyXT1I0TTIgsrRwl0VR9NygwdF05R9BUqHDM8UzjNUsE%2FqeoAIeec6XjsiyDBmF4LmRv4kTsgzDBmxgpCWb4fiC36nDqqJ%2FieoHlHc0FDI8eETIRtH5Lx5yoosGwKemoBsRxAjvmIn7fief6yRcVxCZB9wtHs4ljJJCwLNJCl6fJGYsSp7ECEAA).
+앞에서 부서의 도시명을 구하는 함수를 두 가지 방식으로 묶었습니다. 아래 코드에서는 두 계산을 직접 실행하고, 묶는 위치를 바꾸어도 같은 함수가 된다는 법칙을 확인합니다. 함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOA%2BnaIC2jgKK2A4g6IGzddgI82iANNYD81gADWhAmDWABcdCAXccAE4wCgQoADIBTAIYA7UABYAdAGYATFoKAF0ZaBVNcAe44AjVwK1DgCabAJ01bQgEZ6OgDXHQASwC2ABwD2AE4ALqCAY6PioIAnQ4CRq4AGq6CUoIAR43aOsmBIgBntoIAKLaAAxIoAbsoANh58gAJjADSggB%2B1oIAlLaCAHIOgwQAWikGK3pGAuZOAoV2AGqsYmIAg47SANrWAIb2ALqugKK2AKWNa0hmgAMb%2Bfv4AzoqgAOagAGYYgB89gBzdHqeAGETngKHjDk6APF2AABPntICAE4CVY4AdVeaJ1%2Bf0AlquvaQAE0UZ22uwCh1AAG8AIKgABCoAAwqAyAAVACevkUAF9QAAKU5kLGAJMIcQBKSlwsjo%2BkYpms0D03EkAC80lA5wAruoAB6gPkAPhOzNAYoZGzknhhqmCnmChIwT0ApB2AEXGGoAAZvggAwewAaaxDHKBURhADUDfwSgBlWiiUDyAAYWnkZQIA9zsADbOgQCoE%2FNAIuTkJhcJVijVGsJKPRBOJZLx1u5Kf5gpF4slMrFSrAgADelgBlBewAnLXQUnbACzdUTq2EAMYN1DiAHaGhgbABQzgAEO%2BCAX3GMIAIMcAOBMvdL7YKBYVbYLCwJHVFQqGz%2Fb7UAAd26s4zWxjyYAyuPPKpjhsxxOpzOjgB5M5nTxbI7rxSboXKBdLlest%2BKZcn8eT6ezqAAAiii%2BMoITeFGoSPs%2BoD%2BDed5HGQ163veGzhnBCH3telIwmBEFQcmIH4cEkFqpyoAoYheJ8qAeHgaRUFaPBqGKNCsKgK%2Bi7fvsOEUix1HIVhigUfO3HLjRmGsVoXHvuxcLbpqfGyTxyZie%2BFH7oEh7UrRKnLloimEuhHEwsUihlP4vhkaEZDEQxNk0RmyJSYJtEufpH7udsO78qAABETCAB1j%2FmgOS4V5q52FnFUnFfsu160J8bBpE4fBkIFIXSEUpRlPCexIkZfE7AVRyeThAnRUyZkWVZNmbOVMU%2BUpZxJV8rCpTwvAZcF%2FnZSU5T5YiRwUiVw3NYSOGNUylWKDhNWWdZUGRRM0QxGIC11YRIyQLQFiWk42SBoANZ2lmIgAh4247pPLwLq0PYgCfHZCcjcGCgCpPYAmnNkIAILWABxrtCAHRjgAVNVwZx1McdSdB4%2FygIAOENMBgQipZsgCJo4AvVOBm4tCAD3LgAac4ALl2ZvK2agJ0lKnBScIKgygiABgtgAD3fAgRnGU8AWAkSSpJCXQ9LO3hDQcigAPrKMu%2FhbHGmI4sByZEiSpIZkKFJk2QuL0kBTJUsmdKMnKXLspyisC0iZOjQiguymcTK0WNFtm6VpMnEyLK0czZSRSqQtYo8cK0WcZBnII5pAhitD1MaoCADPNgAkHYAsJPc90vT85G0aakLY2S1iCby3rKYG3iRu20iKfqpq5ySuXflu5FcKPJ76J%2BwHXqABiNgAcddaYcRzH8fpDzSdDULJc7miUvZ0mlNqamHIF0KQpF0cEaqqXsZ%2B5J1ebG7YiADejgAMdUWbhAlQoBgoAjIO3YAtquAI8tXqGkCwwjuscinwa9iAC6dgAxNYGQJbMowSKMcQRCQmC4KIUAwxIiAFbFgE9gMCAG52sQSBACbTZCIAA).
 
 먼저 코드의 두 `#eval` 줄을 보겠습니다. `#eval`은 식을 실행해 결과를 표시합니다. 첫 줄은 `officeOf`와 `addressOf`를 먼저 묶고, 둘째 줄은 `addressOf`와 `cityOf`를 먼저 묶습니다. 두 줄 모두 `development`를 입력으로 받아 `"서울"`을 출력합니다.
 
 코드에서 `compose g f`는 본문의 `g ∘ f`이고, `identity`는 항등 함수입니다. 앞부분은 부서 정보와 함수를 정의하고, 뒷부분의 `theorem` 세 개는 결합법칙과 두 항등법칙을 적습니다.
 
 ~~~lean
+-- 모나드로 알아보는 범주론 1편: 함수를 어디서 묶어도 결과가 같은 이유
+-- Lean 4.32.1에서 확인했습니다. 별도의 import 없이 실행할 수 있습니다.
+-- 아래 두 #eval의 결과와, 그 뒤 세 theorem이 증명하는 범위를 구분해 보세요.
+
+-- compose g f는 본문의 g ∘ f입니다. 먼저 f를 적용한 뒤 g를 적용합니다.
 def compose {A B C : Type} (g : B → C) (f : A → B) : A → C :=
   fun x => g (f x)
 
+-- identity는 입력을 그대로 반환합니다. A는 사용할 때 함수의 타입에 맞춰 정해집니다.
 def identity {A : Type} : A → A :=
   fun x => x
 
+-- 부서 정보에 들어 있는 사무실, 주소, 도시명을 차례로 읽는 예제입니다.
 structure Address where
   city : String
 
@@ -401,18 +408,28 @@ def cityOf (address : Address) : String := address.city
 def development : Department :=
   { office := { address := { city := "서울" } } }
 
+-- officeOf와 addressOf를 먼저 묶습니다. 결과: "서울"
 #eval compose cityOf (compose addressOf officeOf) development
+-- addressOf와 cityOf를 먼저 묶습니다. 결과: "서울"
 #eval compose (compose cityOf addressOf) officeOf development
 
+-- 위 실행은 development 하나를 확인합니다. 아래 정리들은 임의의 타입과 함수를 다룹니다.
+-- 결합법칙: 괄호를 옮겨도 f, g, h의 적용 순서는 같습니다.
+-- 양쪽 정의를 펼치면 fun x => h (g (f x))가 되므로 rfl로 확인할 수 있습니다.
 theorem compose_assoc {A B C D : Type}
     (h : C → D) (g : B → C) (f : A → B) :
     compose h (compose g f) = compose (compose h g) f := rfl
 
+-- id_B ∘ f = f: f가 반환한 B를 그대로 돌려줍니다.
 theorem identity_comp {A B : Type} (f : A → B) :
     compose identity f = f := rfl
 
+-- f ∘ id_A = f: f에 넘길 A를 그대로 돌려줍니다.
 theorem comp_identity {A B : Type} (f : A → B) :
     compose f identity = f := rfl
+
+-- rfl은 여기서 정의한 함수 합성과 항등에 대한 증명입니다.
+-- 합성을 다르게 정한 category에서도 같은 증명이 통한다는 뜻은 아닙니다.
 ~~~
 
 부서 정보를 정의하는 부분은 앞의 의사코드와 대응합니다. `structure`는 레코드 타입을 선언하고, `department.office`는 `office` 필드를 읽습니다. `{ office := ... }`는 그 필드를 채운 레코드를 만드는 식입니다. `def`는 정의를 시작하는 키워드이고, `fun x => ...`는 입력 `x`를 받는 함수를 만듭니다.
