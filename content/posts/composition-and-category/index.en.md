@@ -135,7 +135,7 @@ h ∘ (g ∘ f) = (h ∘ g) ∘ f
 
 This equation is the **associative law**, or **associativity**. Regrouping the functions leaves the overall function unchanged.
 
-Changing the parentheses is different from changing the order of the functions. Adding 1 to 3 and then doubling gives 8; doubling 3 and then adding 1 gives 7. On both sides of the associative law, the application order is always `f`, then `g`, then `h`.
+Both expressions apply the functions in the same order: `f`, then `g`, then `h`. Only the choice of which two functions to compose first changes.
 
 ## Identity functions: composing without changing the original function
 
