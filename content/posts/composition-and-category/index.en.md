@@ -133,7 +133,7 @@ Both sides become the same expression, whatever the input `x`. We did not use an
 h ∘ (g ∘ f) = (h ∘ g) ∘ f
 ~~~
 
-This equation is the **associative law**, or **associativity**.[^milewski-composition] Regrouping the functions leaves the overall function unchanged.
+This equation is the **associative law**, or **associativity**. Regrouping the functions leaves the overall function unchanged.
 
 Changing the parentheses is different from changing the order of the functions. Adding 1 to 3 and then doubling gives 8; doubling 3 and then adding 1 gives 7. On both sides of the associative law, the application order is always `f`, then `g`, then `h`.
 
@@ -394,6 +394,5 @@ The `rfl` at the end of each proof asks Lean to check that unfolding and computi
 - Bartosz Milewski, *Category Theory for Programmers*, Ch. 1, §§1.1–1.2, pp. 3–6. Notation for function composition, associativity, and the identity laws.
 - Emily Riehl, *Category Theory in Context*, Definition 1.1.1, p. 3; Example 1.1.3(i), p. 4. The definition of a category and the example of sets and functions.
 
-[^milewski-composition]: Milewski, Ch. 1, §1.2, pp. 5–6. The employee-lookup example used to illustrate the laws is original to this series, not adapted from the book.
 [^riehl-category]: Riehl, Definition 1.1.1, p. 3. The original states two axioms: identity and associativity. Here we display the two sides of the identity law separately.
 [^size-level]: This does not mean placing all types, without restriction, into a single set. We work at a fixed size level; this assumption does not change the function calculations above.

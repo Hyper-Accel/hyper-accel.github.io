@@ -133,7 +133,7 @@ x : A
 h ∘ (g ∘ f) = (h ∘ g) ∘ f
 ~~~
 
-이 등식이 결합법칙(associativity)입니다.[^milewski-composition] 함수들을 어디서 나누어 묶을지 바꿔도, 전체 함수는 같습니다.
+이 등식이 결합법칙(associativity)입니다. 함수들을 어디서 나누어 묶을지 바꿔도, 전체 함수는 같습니다.
 
 괄호를 바꾸는 것과 함수의 순서를 바꾸는 것은 다릅니다. 예를 들어 3에 1을 더한 뒤 두 배 하면 8이고, 두 배 한 뒤 1을 더하면 7입니다. 결합법칙의 양쪽에서는 항상 `f`, `g`, `h` 순서로 적용합니다.
 
@@ -393,6 +393,5 @@ h ∘ (g ∘ f) = (h ∘ g) ∘ f
 - Bartosz Milewski, *Category Theory for Programmers*, Ch. 1, §§1.1–1.2, pp. 3–6. 함수 합성의 표기와 결합법칙·항등법칙.
 - Emily Riehl, *Category Theory in Context*, Definition 1.1.1, p. 3; Example 1.1.3(i), p. 4. Category의 정의와 집합·함수로 이루어진 category의 사례.
 
-[^milewski-composition]: Milewski, Ch. 1 §1.2, pp. 5–6. 법칙을 보여 주는 본문의 직원 조회 예제는 원전 예제를 옮긴 것이 아닙니다.
 [^riehl-category]: Riehl, Definition 1.1.1, p. 3. 원전은 항등과 결합의 두 공리로 적습니다. 여기서는 항등법칙의 좌우 등식을 각각 표시했습니다.
 [^size-level]: 모든 타입을 무제한으로 한 집합에 넣는다는 뜻은 아닙니다. 여기서는 하나의 고정된 크기 수준에서 타입을 다루며, 이 전제는 앞의 함수 계산을 바꾸지 않습니다.
