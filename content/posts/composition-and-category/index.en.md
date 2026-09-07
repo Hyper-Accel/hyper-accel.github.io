@@ -1,7 +1,7 @@
 ---
 date: '2026-09-07T00:00:00+09:00'
 draft: false
-title: 'Exploring Category Theory Through Monads, Part 1: From Function Composition to the Definition of a Category'
+title: 'Exploring Category Theory Through Monads, Part 1: Function Composition and Categories'
 cover:
   image: "cover.jpg"
   alt: "Two composition paths grouping the same functions in different places"
@@ -335,13 +335,13 @@ With this new connection, regrouping functions should still preserve the result.
 
 This optional exercise is for readers who want to check the preceding calculations in Lean. The main conclusions follow from the equation expansions in the text without running the code.
 
-We use Lean 4, a language in which we can write both functions and proofs. Instead of implementing the lookups, the code takes functions with the types used in the article as parameters and checks that the two groupings agree. The next article implements the employee lookups. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKABiDALbzGqAMZ5knbPEXR4vZJu154oPNVAARAgDM0RralDxboHNnxFSMsFmpqANYE3KAA7kasADIEOM4ALAB0AMwATIkSiaAAcmbIekh4vO6IBKCoBCEhiVK%2BoGq6%2BrxlmG7IxZiAGESgbc4WZaKaarAEAFzu0HBkbvaIvHiC%2Fc7oNdx29Y0GZQDeAIKgAELYoOPkJNAEAL6gABSY40eASYTYAJS3buP7zwdvn6DPWBOAF4pKAeqpQJBQECAHygTA3NyQF61WTINaoTR4MilPCMRCoYpGImoaCMcSqNSUOLoaqgACSRXM5zK%2B3aoDQtgIiFKoXwoFiVNAjGaq3W6IImKMZD2JwoLOuf2e%2B1GILBtghUNhkNRYHIOGC5ksCHggUY0HB6mMhPcxWgohwigIhDm7lQoSpBCCRv5ACN4BZ4QxzWh0MUcOhSgQav0kARlIo4hHueBE8hYAB9UqRpjQUOgbapuDwEiVOVnC6XUFg95obhFhClsrjbL854NkuVN43RNcWmIADyHwgekbZfbo87BBRNdu8Zw6aHco7Tf%2BoAAyngUBhftWwQ0Cs0BWnYEubgemmVe8nBzM6yuu9C9zWL1tbq%2Bj%2FPF25r%2F2h297HdB9myBUBEFsWBdVAXZeF4eA1GQfBkAAN2lcZs2DPMMFAaBSmaRBkIIYp%2BgmOBkDUJDtCQNZEB6RZqGWejJVASgalkA4A1YQw1mKVRbHgWBQlMS1IWhOFWDud5IReF5BDgsCINAQiUHsIijQIZBaIIABHRgcFgaUY2oONlA%2FAgMxwWD4ILfYjkBKxywVZ8blYcZAWeKxu3uQ41ywbthy%2BQ5d1nMyWPfTYj1aN5QNC88IrKVh0AA4EFMgup0QzI5ujcUDbHQ518T6Swjlw%2BBuEYNQQlAX1pmFdRqQwaopFjUplAlKVsQzC8bJ804FSkpUgpOZ9QvarFatylLwLS2Q3G6DL9ly8Z7Vg9SOVJcloPMMw3EpBraW4IyaFajY9AzMbpR6o4%2BsrAatu%2BYKX3inoOQxcboRe1VUqgqgiLKaacIYVxeKPJhaLWQDHE4YpXEtDQnFOpooecOJQgu7E2L1agyG4MxUADAV5hwX0DN4VgSNgHAwmKfjaI8CjCGIRAyAiQMPG4ZBbC5UpMURgxkZqIA%3D%3D%3D).
+We use Lean 4, a language in which we can write both functions and proofs. Instead of implementing the lookups, the code takes functions with the types used in the article as parameters and checks that the two groupings agree. The next article implements the employee lookups. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKABijVAGM8yTtngBbaPF7JV6nKm7Z8RJMgK8ZYLNSUBrAiYDu%2B1gBkCR0ABYAdADMAEz%2BEv6gAHLwoMjaSHi8oKIEoKgEzs7%2BUjagSlo6vKmYAGaxSZiAGESgZWigeNTJYshKsAQAXMnQcGRlJciIvHiCDQSooOjZ3ARl%2BfFFoADeAIKgAELYoJ3kJNAEAL6gABSYnRuASYTYAJTHZZ2rl2s396CXWFsAvFKgNYqgkKAPgA%2BCa3f5XHKyZDTVCqPBkRAEPCMRCoJL6dGoaCMcSKJSUIzoLKgACSiXqu1Sq2QmJKBEQiJM%2BFA3nxoEYRSmM1iMLhZBWWwolMOL0uq3aXx%2BJT%2BAOB%2F0hYHIOCc9UaCHgDkY0F%2BygMaOSSWgohwmiR9KSRhM%2BIIjlVzIARvAGhMGFq0OgLehEQRsqMkARNKBNEYcETEOBg8hYAB9RFepjQd1LCNweAkDKCnZ7fbfH63NDcFMIdOpTqRZmXItpjI3I7BrhhgDydwg2mLGcrberBAheeOAZwUebgqrJdeoAAyngUBhnrmfnNCqkB0OykdF7pUvXQ%2FTh%2F1jKOa4D53mNwt1wVNyzI7Bh9umyUbvvC12xxLQIgSrAFaBlrxePASjIPgyAAG76CQnRxq6iYYKA0CIkUiCgVYqqpDg3SwC0IHqEg0yIDUIzUOM6BEWMoCUNkshrE6rB6NMSSKCU8CwCYeAxNK4yyiCrAnGCkBXFcggAR%2BX6gChKD9KhowDCyACOjA4Fh8K%2BtQ%2FqBmeBDRjg%2F6AUsqwbO8AAimbCieRysJ07yXEZtanOs45YLWLYPOsc59ppFHHJ5pQ3B8eSXuenmsOgT6fKJ365NC0YbNUZT%2BSUUFIii4yjA5CHwNwjBKM4oD2r07LKASGBZFIfqIoG0JjHy0aLvpDnbMKYKim5Wwnp5VWwhBNSAj176fpFshlNU0WrAlnRGv%2BaGxFiOK%2FvUHGFfihKleVAYBdo0adXy9UbI12bNfNjzuaegWpLUvLdQl4UDT%2BVBWKkA3wQw8AlIxCxMAR0z7voaj6q9OoqH9G2FL9hjGDy1UQVRirUGQ3AxKgToskMOD2lhvCsGlsA4C4STMQROB5GYxCIGQbjOkT3DICUdKIrCIO6GDqDZEAA%3D%3D).
 
 In the code, `compose g f` is our `g ∘ f`, and `identity` is the identity function. `def` begins a definition, and `fun x => ...` creates a function with input `x`. A `theorem` declaration states a proposition to prove.
 
 ~~~lean
 -- Exploring Category Theory Through Monads, Part 1
--- From Function Composition to the Definition of a Category
+-- Function Composition and Categories
 -- Checked with Lean 4.32.1. No imports are needed.
 
 -- compose g f is g ∘ f in the article: apply f first, then g.

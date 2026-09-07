@@ -1,7 +1,7 @@
 ---
 date: '2026-09-07T00:00:00+09:00'
 draft: false
-title: '모나드로 알아보는 범주론 1편: 함수 합성에서 category의 정의까지'
+title: '모나드로 알아보는 범주론 1편: 함수 합성과 category'
 cover:
   image: "cover.jpg"
   alt: "같은 함수들을 서로 다른 위치에서 묶은 두 합성 경로"
@@ -335,12 +335,12 @@ g : B → Option C
 
 이 절은 앞의 계산을 Lean으로 직접 확인하고 싶은 분들을 위한 선택 실습입니다. 본문의 결론은 Lean 코드를 실행하지 않아도 식 전개로 확인할 수 있습니다.
 
-함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 아래 코드는 조회 함수의 구현을 정하는 대신, 본문에 적은 타입의 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다. 직원 정보를 실제로 조회하는 구현은 다음 편에서 다룹니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOiCWq4IyDgC6OA4g6AMYCGALgKYDmA9gCcAnoA1x0IFQJ0YBk6wAOTAKBCgAMt3YA7UABYAdAGYATDoLNQgVTXAHuOAI1cCtQ4AmmwCdNO0IBGewCPN4gJYBbAA5DOUEAx0cAXcdBAE6HASNXAA1XQakAI8fsneUUwVn4%2FfgBnblBeUAAzDEAPnsAObvF8wAwiQsBQ8cdnQB4uwAAJwsAfTtBAQAnASrHAHVXQQBKWvPbumnr5ABNuArYM%2FxzQAG8AQVAAIVAAYVAyABVhX24AX1AACnyydcAkwk2ASlPpshXr1bvH0GutkgBeeVBCgFdNAAPUBfAB8eXuoCBNxSSk8k3UnE8nGEGBqgFIOwAi46BAB%2B1gABm%2BCADB7ABproycoCWGEANQNdWKAGVaKJRxIABhZqDFAgD3OwANs5JAC6rgEXJsaTaYI7hIlHCRYrXb7I7bSnvRXfX4A4GgiFAuFgQAOE4AYtaZgBOWnEWQAJ4%2FBANg9SFAgAUW0CANm7ADLjYUAmDWAAXGmRZZOYLOSdPJOAALbhCbjeUDeDTsXjcQQAUUjngANgB9QR8QT8f6%2BTzqfILBO%2BJP8YTcXKyg6HVV%2FE4FXPjQvF0vl0AAOS4SsbJbLdxOkfU0djAHkHqAu83O34mz3q6cw%2BxkyOFeOy0qAMqcQS53ivWfpTLzeeL6YnfdzXL9weCJd19QNqfd7h3H5%2FV8zA%2B5U%2BzbK5I9JpeXjG14FHct73kWj7bF8oCCAUSbaqAgANNTQgCpPYAmnNkIAILWABxr7SAHRjgAVNW4hQADR5GRgbiN0oCADhDTAYC6ST%2BkogCJo4AvVOSKI7SAD3LgAac4ALl1qtCGqgIGpz5LW0I3DcgAANaAgAYLYAA93wLBSbwJYsQJExAbBqG4Znj%2BKbsFkWT8Kw0prJsoAACIKnslazicYlkFs1zWb25yWR8vajk8ay7m%2BBnzGJX4fpCIGgu%2B56nEFuRiTuhRQTBcEIQiKbrNU0zQQUZAFHJpJ9Ks7QEvAgAzzYAJB2ALCTYxBiG6bhmKEqoimZ4WesFbypJbzPAFr6xaAjXIqiiXZUlqkIdM1RpSs2W5RygAYjYAHHWUsVhKgBV1XJLVelRSmg2Sm1dlyscXWKj12x7t%2B8yioiQ1SqN3zJfBqRPR6gA3o4ADHUsFIfRULQdCAD81oCALargCPLRy%2BJ9IAuZOAKFddTJEo9A4g4gAunYAMTWSH0HA8AIIjMMR7qgLDYSAK2LPQOBggDc7R6SCAJtNYxAA%3D%3D).
+함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 아래 코드는 조회 함수의 구현을 정하는 대신, 본문에 적은 타입의 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다. 직원 정보를 실제로 조회하는 구현은 다음 편에서 다룹니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOiCWq4IyDgPzWgDGAhgC4CmA5gPYBOATwBQIUABlOrAHagALADoAzACYFBQAujgHEHQgVTXAHuOAI1cCtQ4AmmwCdNC0IBGewCPNgDXHQASwC2ABwHtQgMdHALuOhAE6HASNXAA1XQakAI8bNLYVEwZl53XgBnTlBuUAAzDEAPnsAObscMwAwiLMBQ8YsrQB4uwAAJrMAfTtBAQAnASrHAHVXQQBKW9IaWmgrhABNOTJZEj1TQAG8AQVAAIVAAYVAyABVBN04AX1AACgyyBcAkwiWASj2RslmTufOr0BPlkgBeYVAsgFdZAA9QZ4A%2BdIXUDfU6xMROIbSdhOdiCDClQCkHYARcdAgA%2FawAAzfBABg9gA01vqWUDTDCAGoHmmFADKtFEojkAAwulDSgQB7nYAG2dAgFQJwAuq4BFyf6QxGkM40NhgimszWG22KyJDxlLzenx%2Bf0B33BYEADhOAGLXqYATltR%2BkACePwQDYPUhQIAFFtAgDZuwAy4%2F5AJg1gAFx6n6QADk3p9ASFMJ2AALTgCTguUAuGSsbicfgAUVDTgANgB9fg8fi8D5uJzSDKTGNuOO8QScNISzZbBXvXaZTMDXP5wvF0AAOQ4strBaL512oek4cjAHlLqA2%2FXW%2B46x3y3sg6x4wPpcOi7KAMrsfiZ7h3ScJJITaezka7bfjNLd3v8OdV6Q1sftzjnV7vR%2BjHdpQ9jFJpPdxueniPnzLnJe155reKzPKA%2FCZHGaqgIADTU0IAqT2AJpzZCACC1gAcaw0gB0Y4AFTW2FkAA06REb6jgtKAgA4Q1oGD2tE3piIAiaOAL1THL2A0gA9y4AGnOAC5diogsqoC%2BnsGSViCpynIAADWgIAGC2AAPd8CQXG8AGGEkR0T6%2FqBsGR4fgmrDJMkvDMGK8xLKAAAi0rrKWk67EJZDLCc5mdgcpmPJ2g7XPMm5PjpExCW%2BL5AgBfzPseex%2BWkQkblkYEQVBMGQgmCwlCM4GZGQmRSXi7RzA0mLwIAM82ACQdgCwk%2F0foBsmwaCsKcIJkeJkLCWUqifcNw%2BY%2BkXOFCMJwrF6VxYpMEjCUSWzOlmWMoAGI2ABx1RL5VioAleVMSVVpYUJrVfWijMpktTsbUyh1Kxbu%2BEwCr1IqhZc4HDXE8Vxs6gA3o4ADHU6Oy9jtFQtCMKAgC2q4Ajy2Mhi7SALmTgChXeUMRiPQqLmIALp2ADE1HLtGwXB8EI2j4U6oCQ%2F4gCti605gYIA3O3OkggCbTf0QA%3D%3D).
 
 코드에서 `compose g f`는 본문의 `g ∘ f`이고, `identity`는 항등 함수입니다. `def`는 정의를 시작하는 키워드이고, `fun x => ...`는 입력 `x`를 받는 함수를 만듭니다. `theorem`은 증명할 명제를 선언합니다.
 
 ~~~lean
--- 모나드로 알아보는 범주론 1편: 함수 합성에서 category의 정의까지
+-- 모나드로 알아보는 범주론 1편: 함수 합성과 category
 -- Lean 4.32.1에서 확인했습니다. 별도의 import 없이 실행할 수 있습니다.
 
 -- compose g f는 본문의 g ∘ f입니다. 먼저 f를 적용한 뒤 g를 적용합니다.
