@@ -64,7 +64,7 @@ managerEmailOf employee = emailOf (managerOf employee)
 
 This gives the same contact information through `managerEmailOf (findEmployee employeeId)`. Either way, we obtain the employee, manager, and email in that order. Let us check why regrouping these steps gives the same function.
 
-## Function composition: the same computation with different grouping
+## Associativity: the same computation with different grouping
 
 The operation of connecting two functions to make a new function is called **function composition**. Using the composition symbol `∘`, we can write the functions we just defined as follows.
 

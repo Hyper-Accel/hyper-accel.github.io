@@ -64,7 +64,7 @@ managerEmailOf employee = emailOf (managerOf employee)
 
 이번에는 `managerEmailOf (findEmployee employeeId)`로 같은 연락처를 구합니다. 어느 쪽으로 나누든 직원, 팀장, 이메일 순서로 값을 구한다는 점은 같습니다. 이처럼 묶는 위치를 바꿔도 같은 함수가 되는 이유를 확인해 보겠습니다.
 
-## 함수 합성: 묶는 위치가 달라도 같은 계산
+## 결합법칙: 묶는 위치가 달라도 같은 계산
 
 두 함수를 이어 새 함수 하나를 만드는 연산을 함수 합성(function composition)이라고 합니다. 합성을 나타내는 기호 `∘`를 사용하면, 방금 만든 함수를 다음과 같이 쓸 수 있습니다.
 
