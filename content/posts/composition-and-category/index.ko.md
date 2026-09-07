@@ -214,7 +214,7 @@ Category(범주)도 이러한 추상화의 한 예입니다. 집합 사이의 �
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
 ~~~
 
-이 예제에서 `Nat`, `Employee`, `String` 같은 타입은 category의 **대상(object)**에, 타입 사이의 함수는 **사상(morphism)**에 해당합니다. 대상은 특정 직원의 정보가 아니라, 그 값이 속하는 타입 `Employee`입니다. `findEmployee`는 대상 `Nat`에서 대상 `Employee`로 가는 사상입니다. 그림에 두 번 나타난 `Employee`는 같은 대상이며, `managerOf`는 그 대상에서 자신으로 가는 사상입니다.
+이 예제에서 `Nat`, `Employee`, `String` 같은 타입은 category의 **대상**(object)에, 타입 사이의 함수는 **사상**(morphism)에 해당합니다. 대상은 특정 직원의 정보가 아니라, 그 값이 속하는 타입 `Employee`입니다. `findEmployee`는 대상 `Nat`에서 대상 `Employee`로 가는 사상입니다. 그림에 두 번 나타난 `Employee`는 같은 대상이며, `managerOf`는 그 대상에서 자신으로 가는 사상입니다.
 
 여기서 사상은 단순히 두 대상이 관련 있다는 표시가 아닙니다. 구체적인 함수를 나타냅니다. `findEmployee`와 `managerOf`를 이으면 `managerOf ∘ findEmployee : Nat → Employee`라는 또 하나의 사상을 얻습니다. 각 타입에는 값을 그대로 반환하는 항등 함수도 있습니다. 이 합성은 묶는 위치를 바꾸어도 같고, 항등 함수를 앞뒤에 붙여도 원래 함수와 같습니다.
 
