@@ -220,29 +220,35 @@ A morphism here is not merely a sign that two objects are related. It represents
 
 The definition of a category generalizes even the choice of types and functions as our ingredients. It leaves open what the objects and morphisms are, while requiring each morphism to have a source and target, specifying composition and identities, and requiring the same laws.
 
-To define a category, we specify the following components.[^riehl-category]
+Earlier, we wrote function types as `A → B`. For general morphisms, we will use `f : A ⟶ B`: the source of `f` is `A` and its target is `B`. These two objects may be the same.
 
-| Component | What we must specify |
-|---|---|
-| Objects | Which objects we work with |
-| Morphisms | Which morphisms there are, and the source and target of each |
-| Identity morphisms | A morphism `id_A : A ⟶ A` for each object `A` |
-| Composition | A specified `g ∘ f : A ⟶ C` for `f : A ⟶ B` and `g : B ⟶ C` |
+### Definition — Category
 
-The notation `A ⟶ B` denotes a morphism from object `A` to object `B`. We used `→` for functions earlier; here we use `⟶` for general morphisms. Each morphism has a specified source and target. To compose two morphisms, the target of the first must match the source of the next.
+> **A category consists of the following data, satisfying the laws below.**[^riehl-category]
+>
+> **Data**
+>
+> 1. **Objects:** Specify the objects of the category.
+> 2. **Morphisms:** For each pair of objects `A`, `B`, specify the morphisms from `A` to `B`. Each morphism has a specified source and target.
+> 3. **Identity morphisms:** For each object `A`, specify a morphism `id_A : A ⟶ A`.
+> 4. **Composition:** For every pair `f : A ⟶ B`, `g : B ⟶ C` with matching target and source, specify a composite `g ∘ f : A ⟶ C`.
+>
+> **Laws**
+>
+> **Associativity.** For every `f : A ⟶ B`, `g : B ⟶ C`, and `h : C ⟶ D`, the following equation holds.
+>
+> ~~~text
+> h ∘ (g ∘ f) = (h ∘ g) ∘ f
+> ~~~
+>
+> **Identity laws.** For every morphism `f : A ⟶ B`, both equations hold.
+>
+> ~~~text
+> id_B ∘ f = f
+> f ∘ id_A = f
+> ~~~
 
-The chosen composition and identity morphisms must satisfy these laws.
-
-~~~text
-h ∘ (g ∘ f) = (h ∘ g) ∘ f
-
-id_B ∘ f = f
-f ∘ id_A = f
-~~~
-
-The first equation is associativity, required for every composable triple of morphisms. The last two equations are the identity laws, required for every `f : A ⟶ B`.
-
-Choosing identity morphisms and a composition operation is one task; checking whether those choices satisfy associativity and the identity laws is another. Calling an operation "composition" does not by itself make a category.
+Specifying composition and identity morphisms is distinct from checking their laws. All the data above must be given and the laws must hold to form a category.
 
 Our types and functions provide one instance of this definition. Take types as objects,[^size-level] and pure total functions `A → B` as morphisms from `A` to `B`. Here, a pure function returns the same value for the same input and does not change external state; a total function returns a value of its return type for every input. Define composition by `g (f x)` and identities by returning the input unchanged. The calculations we made for arbitrary functions and inputs then prove the laws of this category.
 
