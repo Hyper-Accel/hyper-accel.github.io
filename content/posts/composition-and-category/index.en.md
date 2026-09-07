@@ -206,7 +206,7 @@ We have used functions that find employees and their managers’ contact informa
 
 Mathematics often extracts properties of interest from concrete objects and applies them to other objects. This is called **abstraction**. One example is counting three people or three apples: we set aside what we counted and retain the natural number `3`.
 
-A category retains the connections between objects, how those connections compose, and the laws that composition satisfies. Let us see what structure we can extract from our example.
+Let us set aside the concrete implementations in our function example and retain the types and functions, composition and identities, and the laws they satisfy. We will use this structure as a starting point for the definition of a category.
 
 ~~~text
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String

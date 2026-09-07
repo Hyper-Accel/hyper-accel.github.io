@@ -206,13 +206,13 @@ Nat --findEmployee-> Employee --id_Employee---> Employee
 
 수학에서는 이처럼 구체적인 대상에서 관심 있는 성질을 골라내어 다른 대상에도 적용합니다. 이를 **추상화**라고 합니다. 사람 세 명과 사과 세 개를 셀 때 무엇을 세었는지 내려놓고 자연수 `3`을 남기는 것이 한 예입니다.
 
-Category(범주)에서는 대상 사이의 연결, 그 연결을 합성하는 방법, 합성이 만족하는 법칙을 남깁니다. 앞의 예제에서 어떤 구조를 골라낼 수 있는지 보겠습니다.
+앞의 함수 예제에서 구체적인 구현을 내려놓고, 타입과 함수, 합성과 항등, 그리고 이들이 만족하는 법칙을 남겨 보겠습니다. 이 구조를 바탕으로 category(범주)의 정의를 살펴보겠습니다.
 
 ~~~text
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
 ~~~
 
-이 예제에서 `Nat`, `Employee`, `String` 같은 타입은 category의 **대상(object)**에, 타입 사이의 함수는 **사상(morphism)**에 해당합니다. 사상은 **화살표**라고도 부릅니다. 대상은 특정 직원의 정보가 아니라, 그 값이 속하는 타입 `Employee`입니다. `findEmployee`는 대상 `Nat`에서 대상 `Employee`로 가는 화살표입니다. 그림에 두 번 나타난 `Employee`는 같은 대상이며, `managerOf`는 그 대상에서 자신으로 가는 화살표입니다.
+이 예제에서 `Nat`, `Employee`, `String` 같은 타입은 category의 **대상(object)**에, 타입 사이의 함수는 **사상(morphism, 화살표)**에 해당합니다. 대상은 특정 직원의 정보가 아니라, 그 값이 속하는 타입 `Employee`입니다. `findEmployee`는 대상 `Nat`에서 대상 `Employee`로 가는 화살표입니다. 그림에 두 번 나타난 `Employee`는 같은 대상이며, `managerOf`는 그 대상에서 자신으로 가는 화살표입니다.
 
 여기서 화살표는 단순히 두 대상이 관련 있다는 표시가 아닙니다. 구체적인 함수를 나타냅니다. `findEmployee`와 `managerOf`를 이으면 `managerOf ∘ findEmployee : Nat → Employee`라는 또 하나의 화살표를 얻습니다. 각 타입에는 값을 그대로 반환하는 항등 함수도 있습니다. 이 합성은 묶는 위치를 바꾸어도 같고, 항등 함수를 앞뒤에 붙여도 원래 함수와 같습니다.
 
