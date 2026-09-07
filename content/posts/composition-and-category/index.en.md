@@ -202,7 +202,7 @@ Nat --findEmployee-> Employee --id_Employee---> Employee
 
 ## Defining a category: objects, arrows, composition, and laws
 
-We have used functions that find employees and their managers’ contact information to explore composition and identity. Yet the calculations establishing associativity and the identity laws did not use any particular employee ID or employee information. The matching input and output types, together with the definitions of composition and identity, were enough to show that both sides were the same function.
+We have used functions that find employees and their managers’ contact information to explore associativity and identity functions. Yet checking associativity and the identity laws did not require knowing the employee ID or how each function was implemented. The matching input and output types, together with the definitions of composition and identity, were enough to show that both sides were the same function.
 
 Mathematics often extracts properties of interest from concrete objects and applies them to other objects. Counting three people or three apples sets aside what we counted and retains the natural number `3`. This is one example of abstraction.
 
