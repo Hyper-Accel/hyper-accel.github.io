@@ -212,7 +212,7 @@ A category retains the connections between objects, how those connections compos
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
 ~~~
 
-In this picture, call types such as `Nat`, `Employee`, and `String` **objects**, and the functions between types **arrows**, or **morphisms**. An object here is the type `Employee`, not a particular employee. The function `findEmployee` is an arrow from the object `Nat` to the object `Employee`. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is an arrow from that object to itself.
+In this example, types such as `Nat`, `Employee`, and `String` are the **objects** of the category, and functions between types are its **morphisms**, also called **arrows**. An object here is the type `Employee`, not a particular employee. The function `findEmployee` is an arrow from the object `Nat` to the object `Employee`. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is an arrow from that object to itself.
 
 An arrow here is not merely a sign that two objects are related. It represents a specific function. Connecting `findEmployee` and `managerOf` gives another arrow, `managerOf ∘ findEmployee : Nat → Employee`. Each type also has an identity function that returns its input unchanged. This composition is associative, and composing with the appropriate identity before or after a function leaves it unchanged.
 
