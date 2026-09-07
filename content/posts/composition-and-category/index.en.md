@@ -200,36 +200,38 @@ Nat --id_Nat-------> Nat      --findEmployee--> Employee
 Nat --findEmployee-> Employee --id_Employee---> Employee
 ~~~
 
-## Defining a category: objects, arrows, composition, and laws
+## Defining a category: objects, morphisms, composition, and laws
 
 We have used functions that find employees and their managers’ contact information to explore associativity and identity functions. Yet checking associativity and the identity laws did not require knowing the employee ID or how each function was implemented. The matching input and output types, together with the definitions of composition and identity, were enough to show that both sides were the same function.
 
-Mathematics often extracts properties of interest from concrete objects and applies them to other objects. This is called **abstraction**. One example is counting three people or three apples: we set aside what we counted and retain the natural number `3`.
+Mathematics similarly focuses on shared properties rather than concrete details. Three people and three apples are different, but focusing on their number lets us represent both by the natural number `3`. We can also treat the residents of Seoul and the students at a school as sets, setting aside who the members are. Extracting properties or structure of interest from concrete details in this way is called **abstraction**.
 
-Let us set aside the concrete implementations in our function example and retain the types and functions, composition and identities, and the laws they satisfy. We will use this structure as a starting point for the definition of a category.
+A category is another example of abstraction. Functions between sets can be composed, and paths between vertices of a graph can be joined. Category theory extracts such connections, their composition, and the laws they satisfy from different mathematical structures and studies them in a common language.
+
+Let us return to our function example to see what structure we retain.
 
 ~~~text
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
 ~~~
 
-In this example, types such as `Nat`, `Employee`, and `String` are the **objects** of the category, and functions between types are its **morphisms**, also called **arrows**. An object here is the type `Employee`, not a particular employee. The function `findEmployee` is an arrow from the object `Nat` to the object `Employee`. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is an arrow from that object to itself.
+In this example, types such as `Nat`, `Employee`, and `String` are the **objects** of the category, and functions between types are its **morphisms**. An object here is the type `Employee`, not a particular employee. The function `findEmployee` is a morphism from the object `Nat` to the object `Employee`. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is a morphism from that object to itself.
 
-An arrow here is not merely a sign that two objects are related. It represents a specific function. Connecting `findEmployee` and `managerOf` gives another arrow, `managerOf ∘ findEmployee : Nat → Employee`. Each type also has an identity function that returns its input unchanged. This composition is associative, and composing with the appropriate identity before or after a function leaves it unchanged.
+A morphism here is not merely a sign that two objects are related. It represents a specific function. Connecting `findEmployee` and `managerOf` gives another morphism, `managerOf ∘ findEmployee : Nat → Employee`. Each type also has an identity function that returns its input unchanged. This composition is associative, and composing with the appropriate identity before or after a function leaves it unchanged.
 
-The definition of a category generalizes even the choice of types and functions as our ingredients. It leaves open what the objects and arrows are, while requiring each arrow to have a source and target, specifying composition and identities, and requiring the same laws.
+The definition of a category generalizes even the choice of types and functions as our ingredients. It leaves open what the objects and morphisms are, while requiring each morphism to have a source and target, specifying composition and identities, and requiring the same laws.
 
 To define a category, we specify the following components.[^riehl-category]
 
 | Component | What we must specify |
 |---|---|
 | Objects | Which objects we work with |
-| Arrows (morphisms) | Which arrows there are, and the source and target of each |
-| Identity arrows | An arrow `id_A : A ⟶ A` for each object `A` |
+| Morphisms | Which morphisms there are, and the source and target of each |
+| Identity morphisms | A morphism `id_A : A ⟶ A` for each object `A` |
 | Composition | A specified `g ∘ f : A ⟶ C` for `f : A ⟶ B` and `g : B ⟶ C` |
 
-The notation `A ⟶ B` denotes a morphism from object `A` to object `B`. We used `→` for functions earlier; here we use `⟶` for general arrows. Each arrow has a specified source and target. To compose two arrows, the target of the first must match the source of the next.
+The notation `A ⟶ B` denotes a morphism from object `A` to object `B`. We used `→` for functions earlier; here we use `⟶` for general morphisms. Each morphism has a specified source and target. To compose two morphisms, the target of the first must match the source of the next.
 
-The chosen composition and identity arrows must satisfy these laws.
+The chosen composition and identity morphisms must satisfy these laws.
 
 ~~~text
 h ∘ (g ∘ f) = (h ∘ g) ∘ f
@@ -238,19 +240,19 @@ id_B ∘ f = f
 f ∘ id_A = f
 ~~~
 
-The first equation is associativity, required for every composable triple of arrows. The last two equations are the identity laws, required for every `f : A ⟶ B`.
+The first equation is associativity, required for every composable triple of morphisms. The last two equations are the identity laws, required for every `f : A ⟶ B`.
 
-Choosing identity arrows and a composition operation is one task; checking whether those choices satisfy associativity and the identity laws is another. Calling an operation "composition" does not by itself make a category.
+Choosing identity morphisms and a composition operation is one task; checking whether those choices satisfy associativity and the identity laws is another. Calling an operation "composition" does not by itself make a category.
 
-Our types and functions provide one instance of this definition. Take types as objects,[^size-level] and pure total functions `A → B` as arrows from `A` to `B`. Here, a pure function returns the same value for the same input and does not change external state; a total function returns a value of its return type for every input. Define composition by `g (f x)` and identities by returning the input unchanged. The calculations we made for arbitrary functions and inputs then prove the laws of this category.
+Our types and functions provide one instance of this definition. Take types as objects,[^size-level] and pure total functions `A → B` as morphisms from `A` to `B`. Here, a pure function returns the same value for the same input and does not change external state; a total function returns a value of its return type for every input. Define composition by `g (f x)` and identities by returning the input unchanged. The calculations we made for arbitrary functions and inputs then prove the laws of this category.
 
-The general definition, however, does not require objects to be types or arrows to be functions. Nor does it require operations that access elements or fields inside an object. Even with already-abstract mathematical objects and connections, such as sets and functions, we can extract the structure of composition and identity. In this sense, categories provide an abstraction for discussing different mathematical structures in a common language. A later article will give an example whose arrows are not functions.
+The general definition, however, does not require objects to be types or morphisms to be functions. Nor does it require operations that access elements or fields inside an object. Even with already-abstract mathematical objects and connections, such as sets and functions, we can extract the structure of composition and identity. In this sense, categories provide an abstraction for discussing different mathematical structures in a common language. A later article will give an example whose morphisms are not functions.
 
 ## Associativity alone does not guarantee an identity
 
-Ordinary function composition satisfies both associativity and the identity laws. If we choose an associative operation, can we always find an arrow that acts as an identity? Let us choose a new candidate for composition and check whether it gives us a category. In the following example, associativity holds, but no arrow acts as an identity.
+Ordinary function composition satisfies both associativity and the identity laws. If we choose an associative operation, can we always find a morphism that acts as an identity? Let us choose a new candidate for composition and check whether it gives us a category. In the following example, associativity holds, but no morphism acts as an identity.
 
-Take `Bool` as the only object, and all functions `Bool → Bool` as arrows. Every arrow has the same source and target, so any pair has matching types.
+Take `Bool` as the only object, and all functions `Bool → Bool` as morphisms. Every morphism has the same source and target, so any pair has matching types.
 
 Instead of ordinary function composition, define an operation `⋄` that keeps only the function on the left.
 
@@ -258,7 +260,7 @@ Instead of ordinary function composition, define an operation `⋄` that keeps o
 g ⋄ f = g
 ~~~
 
-This operation returns the function `g` itself without running either function. It discards `f`. The result still has type `Bool → Bool`, as required for an arrow.
+This operation returns the function `g` itself without running either function. It discards `f`. The result still has type `Bool → Bool`, as required for a morphism.
 
 What happens when we group three functions?
 
@@ -269,7 +271,7 @@ h ⋄ (g ⋄ f) = h ⋄ g = h
 
 Either grouping leaves only the leftmost function, `h`. The operation is therefore associative.
 
-The identity law is a problem, though. If an arrow `e` acts as an identity, placing it on the left of any function `f` must leave `f` unchanged.
+The identity law is a problem, though. If a morphism `e` acts as an identity, placing it on the left of any function `f` must leave `f` unchanged.
 
 ~~~text
 e ⋄ f = f
@@ -281,7 +283,7 @@ But our operation always keeps the function on the left.
 e ⋄ f = e
 ~~~
 
-For both equations to hold, we need `e = f`. Moreover, a single identity arrow must work for **every** function, so the same `e` would have to equal every function `Bool → Bool`.
+For both equations to hold, we need `e = f`. Moreover, a single identity morphism must work for **every** function, so the same `e` would have to equal every function `Bool → Bool`.
 
 Comparing just two functions shows why this is impossible: `id_Bool`, which returns its input, and `not`, which reverses true and false.
 
@@ -290,9 +292,9 @@ id_Bool true = true
 not true = false
 ~~~
 
-These functions differ, so one `e` cannot equal both. Thus this operation has no identity arrow.
+These functions differ, so one `e` cannot equal both. Thus this operation has no identity morphism.
 
-The operation is associative, but we cannot specify an identity. These objects and arrows, with `⋄` as composition, therefore do not form a category. The identity laws do not follow automatically from associativity.
+The operation is associative, but we cannot specify an identity. These objects and morphisms, with `⋄` as composition, therefore do not form a category. The identity laws do not follow automatically from associativity.
 
 ## Returning to the earlier example
 
