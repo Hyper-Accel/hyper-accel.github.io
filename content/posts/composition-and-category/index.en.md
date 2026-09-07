@@ -258,7 +258,7 @@ Instead of ordinary function composition, define an operation `⋄` that keeps o
 g ⋄ f = g
 ~~~
 
-This operation does not run `f` and then `g`. It discards `f` and returns the function `g` itself. The result still has type `Bool → Bool`, as required for an arrow.
+This operation returns the function `g` itself without running either function. It discards `f`. The result still has type `Bool → Bool`, as required for an arrow.
 
 What happens when we group three functions?
 
