@@ -28,11 +28,11 @@ Writing a program often means connecting computations by passing one function's 
 
 You do not need to know monads or category theory beforehand. If you can read function inputs and outputs, we will introduce the necessary terms and mathematical notation as we go.
 
-In Part 1, we will build a program that finds an employee's manager's contact information by connecting three functions. Through this, we will establish the associativity and identity laws of function composition, then explore the definition of a category that generalizes this structure.
+In Part 1, we will build a program that takes an employee ID and returns that employee's manager's email address. If we split the work into three functions, will the program remain the same whichever two steps we group first? Starting from this question, we will examine function composition and identity functions, then move to the definition of a category that generalizes this structure.
 
 ## Two ways to split a manager-contact lookup
 
-Suppose we want an organization-chart screen to display an employee's manager's contact information. We look up the employee by ID, find their manager, and then read the manager's email address. Let us write each step as a function.
+Suppose we want an organization-chart screen to display the selected employee's manager's email address. We look up the employee by ID, find their manager, and then read the manager's email address. Let us write each step as a function.
 
 ~~~text
 findEmployee : Nat → Employee
@@ -92,19 +92,11 @@ emailOf ∘ (managerOf ∘ findEmployee)
 (emailOf ∘ managerOf) ∘ findEmployee
 ~~~
 
-In the first expression, `managerOf ∘ findEmployee` is the `findManager` we just defined. It finds a manager from an employee ID, then reads the email. The second expression first forms `managerEmailOf` and feeds it the employee found by `findEmployee`. Both expressions have type `Nat → String`. The parentheses change which functions we group together, not the sequence of steps the input goes through.
+![The same three functions in the same order, grouping either the first two or the last two](composition-grouping.en.svg)
 
-Applying both expressions to an employee ID `employeeId` and expanding the definition of composition gives the same nested call.
+The first expression uses `findManager` to find a manager from an employee ID, then reads the email. The second passes the employee found by `findEmployee` to `managerEmailOf`. Applying either expression to the same employee ID gives `emailOf (managerOf (findEmployee employeeId))`. Both expressions have type `Nat → String`.
 
-~~~text
-(emailOf ∘ (managerOf ∘ findEmployee)) employeeId
-= emailOf (managerOf (findEmployee employeeId))
-
-((emailOf ∘ managerOf) ∘ findEmployee) employeeId
-= emailOf (managerOf (findEmployee employeeId))
-~~~
-
-Here, equality of functions means returning the same value for every input. The calculation above did not use a particular employee ID or lookup result.
+Here, equality of functions means returning the same value for every input.
 
 Let us generalize this calculation to arbitrary functions. Take three functions whose types line up, and an input:
 
@@ -151,7 +143,7 @@ findEmployee (identityNat employeeId)
 = findEmployee employeeId
 ~~~
 
-Passing through `identityNat` does not change the ID that `findEmployee` receives. The same idea works after finding the employee. This time, place a function that returns employee information unchanged after `findEmployee`.
+After finding the employee, place a function that returns employee information unchanged after `findEmployee`.
 
 ~~~text
 identityEmployee : Employee → Employee
@@ -161,11 +153,7 @@ identityEmployee (findEmployee employeeId)
 = findEmployee employeeId
 ~~~
 
-Both calls return the same employee information as `findEmployee employeeId`. The function placed before it passes the ID through unchanged, and the one placed after it passes the employee through unchanged.
-
-A function that returns its input unchanged is called an **identity function**. We can define one not just for natural numbers and employee information, but also for strings or any other type.
-
-For a type `A`, the definition is:
+A function that returns its input unchanged is called an **identity function**. For any type `A`, we can define it as follows:
 
 ~~~text
 id_A : A → A
@@ -202,9 +190,9 @@ Nat --findEmployee-> Employee --id_Employee---> Employee
 
 ## Defining a category: objects, morphisms, composition, and laws
 
-We have used functions that find employees and their managers’ contact information to explore associativity and identity functions. Yet checking associativity and the identity laws did not require knowing the employee ID or how each function was implemented. The matching input and output types, together with the definitions of composition and identity, were enough to show that both sides were the same function.
+We have used functions that find employees and their managers’ contact information to explore associativity and identity functions. We could check the laws without knowing the employee ID or how each function was implemented. We used only the matching types and the definitions of composition and identity.
 
-Mathematics similarly focuses on shared properties rather than concrete details. Three people and three apples are different, but focusing on their number lets us represent both by the natural number `3`. We can also treat the residents of Seoul and the students at a school as sets, setting aside who the members are. Extracting properties or structure of interest from concrete details in this way is called **abstraction**.
+Mathematics similarly focuses on shared properties rather than concrete details. Three people and three apples are different, but focusing on their number lets us represent both by the natural number `3`. We can also treat the residents of Seoul and the students at a school as sets by focusing on collections of members rather than the details of each person. Extracting properties or structure of interest from concrete details in this way is called **abstraction**.
 
 A category is another example of abstraction. Functions between sets can be composed, and paths between vertices of a graph can be joined. Category theory extracts such connections, their composition, and the laws they satisfy from different mathematical structures and studies them in a common language.
 
@@ -214,9 +202,11 @@ Let us return to our function example to see what structure we retain.
 Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
 ~~~
 
-In this example, types such as `Nat`, `Employee`, and `String` are the **objects** of the category, and functions between types are its **morphisms**. An object here is the type `Employee`, not a particular employee. The function `findEmployee` is a morphism from the object `Nat` to the object `Employee`. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is a morphism from that object to itself.
+Let us describe the types and functions we have been using in the language of categories. In this example, types such as `Nat`, `Employee`, and `String` are **objects**, and functions between types are **morphisms**. The function `findEmployee : Nat → Employee` is a morphism from the object `Nat` to the object `Employee`.
 
-A morphism here is not merely a sign that two objects are related. It represents a specific function. Connecting `findEmployee` and `managerOf` gives another morphism, `managerOf ∘ findEmployee : Nat → Employee`. Each type also has an identity function that returns its input unchanged. This composition is associative, and composing with the appropriate identity before or after a function leaves it unchanged.
+An object here is the type `Employee`, not a particular employee. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is a morphism from that object to itself.
+
+Composing two morphisms gives another morphism. For example, composing `findEmployee` and `managerOf` gives `managerOf ∘ findEmployee : Nat → Employee`. Each type also has the identity function defined earlier.
 
 The definition of a category generalizes even the choice of types and functions as our ingredients. It leaves open what the objects and morphisms are, while requiring each morphism to have a source and target, specifying composition and identities, and requiring the same laws.
 
@@ -252,11 +242,11 @@ Specifying composition and identity morphisms is distinct from checking their la
 
 Our types and functions provide one instance of this definition. Take types as objects,[^size-level] and pure total functions `A → B` as morphisms from `A` to `B`. Here, a pure function returns the same value for the same input and does not change external state; a total function returns a value of its return type for every input. Define composition by `g (f x)` and identities by returning the input unchanged. The calculations we made for arbitrary functions and inputs then prove the laws of this category.
 
-The general definition, however, does not require objects to be types or morphisms to be functions. Nor does it require operations that access elements or fields inside an object. Even with already-abstract mathematical objects and connections, such as sets and functions, we can extract the structure of composition and identity. In this sense, categories provide an abstraction for discussing different mathematical structures in a common language. A later article will give an example whose morphisms are not functions.
+In a general category, objects need not be types, and morphisms need not be functions. Other choices also form a category when equipped with composition and identities satisfying the same laws. A later article will give an example whose morphisms are not functions.
 
 ## Associativity alone does not guarantee an identity
 
-Ordinary function composition satisfies both associativity and the identity laws. If we choose an associative operation, can we always find a morphism that acts as an identity? Let us choose a new candidate for composition and check whether it gives us a category. In the following example, associativity holds, but no morphism acts as an identity.
+The function composition defined earlier satisfies both associativity and the identity laws. If we choose an associative operation, can we always find a morphism that acts as an identity?
 
 Take `Bool` as the only object, and all functions `Bool → Bool` as morphisms. Every morphism has the same source and target, so any pair has matching types.
 
@@ -277,16 +267,11 @@ h ⋄ (g ⋄ f) = h ⋄ g = h
 
 Either grouping leaves only the leftmost function, `h`. The operation is therefore associative.
 
-The identity law is a problem, though. If a morphism `e` acts as an identity, placing it on the left of any function `f` must leave `f` unchanged.
+But an identity morphism `e` would have to satisfy `e ⋄ f = f` for every function `f`. Compare this requirement with the definition of the operation.
 
 ~~~text
-e ⋄ f = f
-~~~
-
-But our operation always keeps the function on the left.
-
-~~~text
-e ⋄ f = e
+e ⋄ f = f    -- required by the identity law
+e ⋄ f = e    -- given by the definition of the operation
 ~~~
 
 For both equations to hold, we need `e = f`. Moreover, a single identity morphism must work for **every** function, so the same `e` would have to equal every function `Bool → Bool`.
@@ -300,11 +285,9 @@ not true = false
 
 These functions differ, so one `e` cannot equal both. Thus this operation has no identity morphism.
 
-The operation is associative, but we cannot specify an identity. These objects and morphisms, with `⋄` as composition, therefore do not form a category. The identity laws do not follow automatically from associativity.
+Even with the same objects and morphisms, the choice of composition can determine whether we get a category. With the function composition defined earlier, the functions `Bool → Bool` have an identity function and satisfy both laws. With `⋄` as composition, no morphism acts as an identity. The operation `⋄` is not forbidden; the structure obtained by choosing it as composition fails to meet the conditions for a category.
 
 ## Returning to the earlier example
-
-The function composition we defined is associative, and composing with an identity function leaves the original function unchanged. These laws let us regroup the three functions in the manager-contact lookup without changing the result.
 
 So far, we have described each lookup as succeeding and returning the value needed by the next step. But the employee ID might not exist, the employee might have no manager assigned, or the manager's email address might be missing.
 
@@ -316,13 +299,9 @@ managerOf    : Employee → Option Employee
 emailOf      : Employee → Option String
 ~~~
 
-We can no longer write `managerOf (findEmployee employeeId)` as before. The return type of `findEmployee` is `Option Employee`, while the input type of `managerOf` is `Employee`.
+![The original connection passes Employee directly; the revised connection needs to handle Option Employee](option-composition.en.svg)
 
-~~~text
-Nat --findEmployee--> Option Employee
-                             ×
-                          Employee --managerOf--> Option Employee
-~~~
+We can no longer write `managerOf (findEmployee employeeId)` as before. The return type of `findEmployee` is `Option Employee`, while the input type of `managerOf` is `Employee`.
 
 These are still mathematical functions: `none` is also a value of the return type. What has changed is that we can no longer pass one function's result directly to the next. If an employee is found, we need to pass the enclosed employee to the next lookup; otherwise, we need to stop.
 
@@ -335,7 +314,13 @@ g : B → Option C
 Result of connecting the two functions : A → Option C
 ~~~
 
-With this new connection, regrouping functions should still preserve the result. We also need to choose a function that acts as an identity and check both identity laws again. In the next article, we will define a composition that handles `some` and `none` and examine whether these laws hold.
+## What we established
+
+We could regroup the three employee-lookup functions because function composition is associative. Identity functions left the composed functions unchanged. A category specifies objects, morphisms, composition, and identities, and requires these laws to hold.
+
+With the lookups changed to return `Option`, we can still connect them by passing a found value to the next step and stopping when it is absent. Once we make this handling part of a composition operation, we can ask the questions from earlier again. Does regrouping preserve the result? What function acts as an identity for this composition?
+
+Monads are used to connect computations that account for the absence of a value, as `Option` does. In the next article, we will turn the repeated absence handling in our employee lookup into a composition operation and check associativity and the identity laws. This will give us a concrete example on the way to understanding monads.
 
 ## Lean exercise: check the types and laws of composition
 
