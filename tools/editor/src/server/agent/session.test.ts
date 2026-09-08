@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { mkdir, mkdtemp, realpath, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { basename, dirname, join } from "node:path"
 import type { AgentEvent, AgentSessionHistory } from "../../shared/agent-contracts"
 import type { Harness } from "./harness"
 import { AgentSessionManager, emitAgentFailure, resolveAgentSessionDirectory } from "./session"
@@ -37,9 +37,12 @@ describe("AgentSessionManager", () => {
     await Bun.write(join(worktree, ".git"), `gitdir: ${linkedGitDirectory}\n`)
     await Bun.write(join(linkedGitDirectory, "commondir"), "../..\n")
 
-    expect(resolveAgentSessionDirectory(worktree, undefined)).toBe(
-      join(await realpath(join(repository, ".git")), "techblog-editor", "sessions"),
+    const sessionDirectory = resolveAgentSessionDirectory(worktree, undefined)
+    expect(await realpath(join(sessionDirectory, "../.."))).toBe(
+      await realpath(join(repository, ".git")),
     )
+    expect(basename(sessionDirectory)).toBe("sessions")
+    expect(basename(dirname(sessionDirectory))).toBe("techblog-editor")
   })
 
   test("reports preflight failures and keeps the session runnable", async () => {
