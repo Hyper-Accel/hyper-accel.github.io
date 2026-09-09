@@ -22,17 +22,19 @@ keywords: ["category theory", "범주론", "함수 합성", "결합법칙", "항
 
 안녕하세요, HyperAccel Compiler팀 최재호입니다.
 
-이번 글부터 함수형 프로그래밍에서 자주 접하는 **모나드**(monad)를 범주론의 관점에서 살펴보려 합니다.
+**모나드**(monad)라는 말을 들어보셨나요? 함수형 프로그래밍을 접하며 이름을 들어본 분도, 이번에 처음 접하는 분도 계실 것입니다. 모나드는 범주론에서 정의되는 수학적 개념이면서, 프로그래밍에서 계산을 연결하는 데 쓰이는 개념이기도 합니다.
 
-프로그램을 작성하다 보면 한 함수의 결과를 다음 함수에 넘겨 여러 계산을 연결하게 됩니다. 수학에도 대상 사이의 연결과 그 연결을 이어 붙이는 법칙에 주목하는 분야가 있습니다. **범주론**(category theory)입니다. 함수 합성은 범주론에서 다루는 연결의 한 예이며, 모나드도 이 분야에서 정의되는 개념입니다.
+수학의 정의가 어떻게 프로그램을 작성하는 방법과 이어질까요? 이번 시리즈에서는 이 연결을 구체적인 코드와 수식으로 따라가 보려 합니다. 계산을 연결하는 코드를 작성하고, 그 안에서 어떤 연산과 법칙이 필요한지 살펴보겠습니다. 그렇게 발견한 구조를 범주론의 정의와 비교하며 모나드가 무엇이고 어떤 역할을 하는지 알아보겠습니다.
+
+**범주론**(category theory)은 수학적 대상 사이의 연결과, 그 연결을 이어 붙이는 방법과 법칙을 연구하는 분야입니다. 서로 다른 대상에서도 같은 구조를 찾아 공통된 언어로 다룬다는 특징이 있습니다. 모나드를 이해하는 과정은 이러한 범주론의 관점을 익히는 구체적인 기회이기도 합니다.
 
 모나드나 범주론을 미리 알고 있을 필요는 없습니다. 함수의 입력과 출력을 읽을 수 있다면, 필요한 용어와 수학 표기는 그때그때 설명하겠습니다.
 
-1편에서는 직원 번호를 넣으면 그 직원의 팀장 이메일 주소를 돌려주는 프로그램을 만들어 보겠습니다. 세 단계를 함수로 나누었을 때, 어느 두 단계를 먼저 묶어도 같은 프로그램이 될까요? 이 질문에서 출발해 함수 합성과 항등 함수의 성질을 살펴보고, 이를 일반화한 category의 정의로 나아가겠습니다.
+첫 편에서는 가장 익숙한 연결 방식인 함수 합성에서 출발하겠습니다. 직원 번호로 그 직원의 팀장 이메일 주소를 찾는 세 함수를 연결하며, 함수 합성의 결합법칙과 항등 함수의 역할을 확인하고 category의 정의로 나아가겠습니다.
 
 ## 팀장 연락처 조회를 두 가지 방식으로 나누기
 
-조직도 화면에서 선택한 직원의 팀장 이메일 주소를 표시하려고 합니다. 직원 번호로 직원을 찾고, 그 직원의 팀장을 찾은 뒤, 팀장의 이메일 주소를 읽으면 됩니다. 각 단계를 함수로 적어 보겠습니다.
+조직도 화면에 선택한 직원의 팀장 이메일 주소를 표시하는 프로그램을 만든다고 해보겠습니다. 직원 번호로 직원을 찾고, 그 직원의 팀장을 찾은 뒤, 팀장의 이메일 주소를 읽으면 됩니다. 각 단계를 함수로 적어 보겠습니다.
 
 ~~~text
 findEmployee : Nat → Employee
@@ -181,7 +183,7 @@ f ∘ id_A = f
 id_B ∘ f = f
 ~~~
 
-앞에 붙일 항등 함수와 뒤에 붙일 항등 함수의 타입이 다르다는 점에 주의해야 합니다. `findEmployee : Nat → Employee` 앞에는 `id_Nat`, 뒤에는 `id_Employee`가 들어갑니다.
+앞에 붙일 항등 함수는 입력 타입에, 뒤에 붙일 항등 함수는 출력 타입에 맞춰야 합니다. `findEmployee : Nat → Employee` 앞에는 `id_Nat`, 뒤에는 `id_Employee`가 들어갑니다.
 
 ~~~text
 Nat --id_Nat-------> Nat      --findEmployee--> Employee
@@ -190,7 +192,7 @@ Nat --findEmployee-> Employee --id_Employee---> Employee
 
 ## Category의 정의: 대상과 사상, 합성과 법칙
 
-지금까지 직원과 팀장 연락처를 찾는 함수를 통해 결합법칙과 항등 함수를 살펴봤습니다. 이때 직원 번호나 각 함수의 구현을 몰라도 법칙을 확인할 수 있었습니다. 함수의 타입이 어떻게 이어지는지, 합성과 항등을 어떻게 정의했는지만 사용했기 때문입니다.
+지금까지 직원과 팀장 연락처를 찾는 함수를 통해 함수 합성의 결합법칙과 항등법칙을 확인했습니다. 이때 직원 번호나 각 함수의 구현을 몰라도 법칙을 확인할 수 있었습니다. 함수의 타입이 어떻게 이어지는지, 합성과 항등을 어떻게 정의했는지만 사용했기 때문입니다.
 
 수학에서도 이처럼 구체적인 내용보다 공통된 성질에 주목합니다. 사람 세 명과 사과 세 개는 서로 다르지만, 개수에 주목하면 둘 다 자연수 `3`으로 나타낼 수 있습니다. 서울 시민과 한 학교의 학생들도 각 사람의 세부 정보보다 구성원의 모임이라는 점에 주목하면 각각 하나의 집합으로 다룰 수 있습니다. 이처럼 구체적인 내용에서 관심 있는 성질이나 구조를 골라내는 것을 **추상화** 라고 합니다.
 
@@ -244,7 +246,7 @@ Category의 정의는 여기서 타입과 함수라는 구체적인 재료까지
 
 일반 category에서는 대상이 타입이거나 사상이 함수일 필요는 없습니다. 대상과 사상을 다른 것으로 정하더라도, 합성과 항등 사상을 주고 같은 법칙을 만족하면 됩니다. 함수가 아닌 사상으로 이루어진 예는 뒤의 글에서 살펴보겠습니다.
 
-## 결합법칙만으로는 항등이 보장되지 않습니다
+## 결합법칙만으로는 항등 사상의 존재가 보장되지 않습니다
 
 앞에서 정의한 함수 합성에서는 결합법칙과 항등법칙이 모두 성립했습니다. 그렇다면 결합법칙을 만족하도록 연산을 정하면, 항등 역할을 하는 사상도 항상 찾을 수 있을까요?
 
@@ -326,7 +328,7 @@ g : B → Option C
 
 이 절은 앞의 계산을 Lean으로 직접 확인하고 싶은 분들을 위한 선택 실습입니다. 본문의 결론은 Lean 코드를 실행하지 않아도 식 전개로 확인할 수 있습니다.
 
-함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 아래 코드는 조회 함수의 구현을 정하는 대신, 본문에 적은 타입의 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다. 직원 정보를 실제로 조회하는 구현은 다음 편에서 다룹니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOiCWq4IyDgPzWgDGAhgC4CmA5gPYBOATwBQIUABlOrAHagALADoAzACYFBQAujgHEHQgVTXAHuOAI1cCtQ4AmmwCdNC0IBGewCPNgDXHQASwC2ABwHtQgMdHALuOhAE6HASNXAA1XQakAI8bNLYVEwZl53XgBnTlBuUAAzDEAPnsAObscMwAwiLMBQ8YsrQB4uwAAJrMAfTtBAQAnASrHAHVXQQBKW9IaWmgrhABNOTJZEj1TQAG8AQVAAIVAAYVAyABVBN04AX1AACgyyBcAkwiWASj2RslmTufOr0BPlkgBeYVAsgFdZAA9QZ4A%2BdIXUDfU6xMROIbSdhOdiCDClQCkHYARcdAgA%2FawAAzfBABg9gA01vqWUDTDCAGoHmmFADKtFEojkAAwulDSgQB7nYAG2dAgFQJwAuq4BFyf6QxGkM40NhgimszWG22KyJDxlLzenx%2Bf0B33BYEADhOAGLXqYATltR%2BkACePwQDYPUhQIAFFtAgDZuwAy4%2F5AJg1gAFx6n6QADk3p9ASFMJ2AALTgCTguUAuGSsbicfgAUVDTgANgB9fg8fi8D5uJzSDKTGNuOO8QScNISzZbBXvXaZTMDXP5wvF0AAOQ4strBaL512oek4cjAHlLqA2%2FXW%2B46x3y3sg6x4wPpcOi7KAMrsfiZ7h3ScJJITaezka7bfjNLd3v8OdV6Q1sftzjnV7vR%2BjHdpQ9jFJpPdxueniPnzLnJe155reKzPKA%2FCZHGaqgIADTU0IAqT2AJpzZCACC1gAcaw0gB0Y4AFTW2FkAA06REb6jgtKAgA4Q1oGD2tE3piIAiaOAL1THL2A0gA9y4AGnOAC5diogsqoC%2BnsGSViCpynIAADWgIAGC2AAPd8CQXG8AGGEkR0T6%2FqBsGR4fgmrDJMkvDMGK8xLKAAAi0rrKWk67EJZDLCc5mdgcpmPJ2g7XPMm5PjpExCW%2BL5AgBfzPseex%2BWkQkblkYEQVBMGQgmCwlCM4GZGQmRSXi7RzA0mLwIAM82ACQdgCwk%2F0foBsmwaCsKcIJkeJkLCWUqifcNw%2BY%2BkXOFCMJwrF6VxYpMEjCUSWzOlmWMoAGI2ABx1RL5VioAleVMSVVpYUJrVfWijMpktTsbUyh1Kxbu%2BEwCr1IqhZc4HDXE8Vxs6gA3o4ADHU6Oy9jtFQtCMKAgC2q4Ajy2Mhi7SALmTgChXeUMRiPQqLmIALp2ADE1HLtGwXB8EI2j4U6oCQ%2F4gCti605gYIA3O3OkggCbTf0QA%3D%3D).
+함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 아래 코드는 조회 함수의 구현을 정하는 대신, 본문에 적은 타입의 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다. 직원 정보를 실제로 조회하는 구현은 다음 편에서 다룹니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOiCWq4IyDgPzWgDGAhgC4CmA5gPYBOATwBQIUABlOrAHagALADoAzACYFBQAujgHEHQgVTXAHuOAI1cCtQ4AmmwCdNC0IBGewCPNgDXHQASwC2ABwHtQgMdHALuOhAE6HASNXAA1XQakAI8bNLYVEwZl53XgBnTlBuUAAzDEAPnsAObscMwAwiLMBQ8YsrQB4uwAAJrMAfTtBAQAnASrHAHVXQQBKW9IaWmgrhABNOTJZEj1TQAG8AQVAAIVAAYVAyABVBN04AX1AACgyyBcAkwiWASj2RslmTufOr0BPlkgBeYVAsgFdZAA9QZ4A%2BdIXUDfU6xMROIbSdhOdiCDClQCkHYARcdAgA%2FawAAzfBABg9gA01vqWUDTDCAGoHmmFADKtFEojkAAwulDSgQB7nYAG2dAgFQJwAuq4BFyf6QxGkM40NhgimszWG22KyJDxlLzenx%2Bf0B33BYEADhOAGLXqYATltR%2BkACePwQDYPUhQIAFFtAgDZuwAy4%2F5AJg1gAFx6n6QADk3p9ASFMJ2AALTgCTguUAuGSsbicfgAUVDTgANgB9fg8fi8D5uJzSDKTGNuOO8QScNISzZbBXvXaZTMDXP5wvF0AAOQ4strBaL512oek4cjAHlLqA2%2FXW%2B46x3y3sg6x4wPpcOi7KAMrsfiZ7h3ScJJITaezka7bfjNLd3v8OdV6Q1sftzjnV7vR%2BjHdpQ9jFJpPdxueniPnzLnJe155reKzPKA%2FCZHGaqgIADTU0IAqT2AJpzZCACC1gAcaw0gB0Y4AFTW2FkAA06REb6jgtKAgA4Q1oGD2tE3piIAiaOAL1THL2A0gA9y4AGnOAC5diogsqoC%2BnsGSViCpynIAADWgIAGC2AAPd8CQXG8AGGEkR0T6%2FqBsGR4fgmrDJMkvDMGK8xLKAAAi0rrKWk67EJZDLCc5mdgcpmPJ2g7XPMm5PjpExCW%2BL5AgBfzPseex%2BWkQkblkYEQVBMGQgmCwlCM4GZGQmRSXi7RzA0mLwIAM82ACQdgCwk%2F0foBsmwaCsKcIJkeJkLCWUqifcNw%2BY%2BkXOFCMJwrF6VxYpMEjCUSWzOlmWMoAGI2ABx1RL5VioAleVMSVVpYUJrVfWijMpktTsbUyh1Kxbu%2BEwCr1IqhZc4HDXE8Vxs6gA3o4ADHU6Oy9jtPQTCALargCPLdSUnwchf3%2FchqKADOdgCOE%2BQqIGF6D30Ki5iAC6dgAxNRy7RsFwfBCNo%2BFOqAgC5k4AoV3%2BIArYutOYGCANztzpIIAm039EAA%3D%3D).
 
 코드에서 `compose g f`는 본문의 `g ∘ f`이고, `identity`는 항등 함수입니다. `def`는 정의를 시작하는 키워드이고, `fun x => ...`는 입력 `x`를 받는 함수를 만듭니다. `theorem`은 증명할 명제를 선언합니다.
 
@@ -363,7 +365,7 @@ theorem identity_comp {A B : Type} (f : A → B) :
 theorem comp_identity {A B : Type} (f : A → B) :
     compose f identity = f := rfl
 
--- rfl은 여기서 정의한 함수 합성과 항등에 대한 증명입니다.
+-- rfl은 여기서 정의한 합성과 항등 함수가 결합법칙과 항등법칙을 만족함을 확인합니다.
 -- 합성을 다르게 정한 category에서도 같은 증명이 통한다는 뜻은 아닙니다.
 ~~~
 

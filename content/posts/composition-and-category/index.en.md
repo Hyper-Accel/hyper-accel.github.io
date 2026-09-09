@@ -22,17 +22,19 @@ keywords: ["category theory", "function composition", "associativity", "identity
 
 Hello, I'm Jaeho Choi from the Compiler team at HyperAccel.
 
-In this series, we will explore the **monads** we often encounter in functional programming from the perspective of category theory.
+Have you heard the term **monad**? You may have encountered it through functional programming, or this may be your first introduction. A monad is both a mathematical concept defined in category theory and a concept used to connect computations in programming.
 
-Writing a program often means connecting computations by passing one function's result to the next. Mathematics has a field that studies connections between objects and the laws for composing those connections: **category theory**. Function composition is one example of the connections it studies, and monads are also defined in this field.
+How does a mathematical definition relate to the way we write programs? In this series, we will follow that connection through concrete code and equations. We will write code that connects computations and examine the operations and laws involved. By comparing the structures we find with their categorical definitions, we will explore what monads are and what role they play.
+
+**Category theory** studies connections between mathematical objects, ways to compose those connections, and the laws they satisfy. It finds common structures across different objects and studies them in a shared language. Understanding monads also gives us a concrete opportunity to learn this perspective.
 
 You do not need to know monads or category theory beforehand. If you can read function inputs and outputs, we will introduce the necessary terms and mathematical notation as we go.
 
-In Part 1, we will build a program that takes an employee ID and returns that employee's manager's email address. If we split the work into three functions, will the program remain the same whichever two steps we group first? Starting from this question, we will examine function composition and identity functions, then move to the definition of a category that generalizes this structure.
+The first article starts with a familiar way to connect computations: function composition. We will connect three functions that take an employee ID and find that employee's manager's email address. Through this example, we will examine associativity and the role of identity functions, then move to the definition of a category.
 
 ## Two ways to split a manager-contact lookup
 
-Suppose we want an organization-chart screen to display the selected employee's manager's email address. We look up the employee by ID, find their manager, and then read the manager's email address. Let us write each step as a function.
+Suppose we are building a program that displays the selected employee's manager's email address on an organization-chart screen. We look up the employee by ID, find their manager, and then read the manager's email address. Let us write each step as a function.
 
 ~~~text
 findEmployee : Nat → Employee
@@ -181,7 +183,7 @@ f ∘ id_A = f
 id_B ∘ f = f
 ~~~
 
-Notice that the identity functions before and after `f` have different types. For `findEmployee : Nat → Employee`, we need `id_Nat` before it and `id_Employee` after it.
+The identity function before `f` must match its input type, and the one after it must match its output type. For `findEmployee : Nat → Employee`, we need `id_Nat` before it and `id_Employee` after it.
 
 ~~~text
 Nat --id_Nat-------> Nat      --findEmployee--> Employee
@@ -190,7 +192,7 @@ Nat --findEmployee-> Employee --id_Employee---> Employee
 
 ## Defining a category: objects, morphisms, composition, and laws
 
-We have used functions that find employees and their managers’ contact information to explore associativity and identity functions. We could check the laws without knowing the employee ID or how each function was implemented. We used only the matching types and the definitions of composition and identity.
+We have used functions that find employees and their managers’ contact information to verify the associativity and identity laws of function composition. We could check the laws without knowing the employee ID or how each function was implemented. We used only the matching types and the definitions of composition and identity.
 
 Mathematics similarly focuses on shared properties rather than concrete details. Three people and three apples are different, but focusing on their number lets us represent both by the natural number `3`. We can also treat the residents of Seoul and the students at a school as sets by focusing on collections of members rather than the details of each person. Extracting properties or structure of interest from concrete details in this way is called **abstraction**.
 
@@ -244,7 +246,7 @@ Our types and functions provide one instance of this definition. Take types as o
 
 In a general category, objects need not be types, and morphisms need not be functions. Other choices also form a category when equipped with composition and identities satisfying the same laws. A later article will give an example whose morphisms are not functions.
 
-## Associativity alone does not guarantee an identity
+## Associativity alone does not guarantee the existence of an identity morphism
 
 The function composition defined earlier satisfies both associativity and the identity laws. If we choose an associative operation, can we always find a morphism that acts as an identity?
 
@@ -326,7 +328,7 @@ Monads are used to connect computations that account for the absence of a value,
 
 This optional exercise is for readers who want to check the preceding calculations in Lean. The main conclusions follow from the equation expansions in the text without running the code.
 
-We use Lean 4, a language in which we can write both functions and proofs. Instead of implementing the lookups, the code takes functions with the types used in the article as parameters and checks that the two groupings agree. The next article implements the employee lookups. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKABijVAGM8yTtngBbaPF7JV6nKm7Z8RJMgK8ZYLNSUBrAiYDu%2B1gBkCR0ABYAdADMAEz%2BEv6gAHLwoMjaSHi8oKIEoKgEzs7%2BUjagSlo6vKmYAGaxSZiAGESgZWigeNTJYshKsAQAXMnQcGRlJciIvHiCDQSooOjZ3ARl%2BfFFoADeAIKgAELYoJ3kJNAEAL6gABSYnRuASYTYAJTHZZ2rl2s396CXWFsAvFKgNYqgkKAPgA%2BCa3f5XHKyZDTVCqPBkRAEPCMRCoJL6dGoaCMcSKJSUIzoLKgACSiXqu1Sq2QmJKBEQiJM%2BFA3nxoEYRSmM1iMLhZBWWwolMOL0uq3aXx%2BJT%2BAOB%2F0hYHIOCc9UaCHgDkY0F%2BygMaOSSWgohwmiR9KSRhM%2BIIjlVzIARvAGhMGFq0OgLehEQRsqMkARNKBNEYcETEOBg8hYAB9RFepjQd1LCNweAkDKCnZ7fbfH63NDcFMIdOpTqRZmXItpjI3I7BrhhgDydwg2mLGcrberBAheeOAZwUebgqrJdeoAAyngUBhnrmfnNCqkB0OykdF7pUvXQ%2FTh%2F1jKOa4D53mNwt1wVNyzI7Bh9umyUbvvC12xxLQIgSrAFaBlrxePASjIPgyAAG76CQnRxq6iYYKA0CIkUiCgVYqqpDg3SwC0IHqEg0yIDUIzUOM6BEWMoCUNkshrE6rB6NMSSKCU8CwCYeAxNK4yyiCrAnGCkBXFcggAR%2BX6gChKD9KhowDCyACOjA4Fh8K%2BtQ%2FqBmeBDRjg%2F6AUsqwbO8AAimbCieRysJ07yXEZtanOs45YLWLYPOsc59ppFHHJ5pQ3B8eSXuenmsOgT6fKJ365NC0YbNUZT%2BSUUFIii4yjA5CHwNwjBKM4oD2r07LKASGBZFIfqIoG0JjHy0aLvpDnbMKYKim5Wwnp5VWwhBNSAj176fpFshlNU0WrAlnRGv%2BaGxFiOK%2FvUHGFfihKleVAYBdo0adXy9UbI12bNfNjzuaegWpLUvLdQl4UDT%2BVBWKkA3wQw8AlIxCxMAR0z7voaj6q9OoqH9G2FL9hjGDy1UQVRirUGQ3AxKgToskMOD2lhvCsGlsA4C4STMQROB5GYxCIGQbjOkT3DICUdKIrCIO6GDqDZEAA%3D%3D).
+We use Lean 4, a language in which we can write both functions and proofs. Instead of implementing the lookups, the code takes functions with the types used in the article as parameters and checks that the two groupings agree. The next article implements the employee lookups. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKABijVAGM8yTtngBbaPF7JV6nKm7Z8RJMgK8ZYLNSUBrAiYDu%2B1gBkCR0ABYAdADMAEz%2BEv6gAHLwoMjaSHi8oKIEoKgEzs7%2BUjagSlo6vKmYAGaxSZiAGESgZWigeNTJYshKsAQAXMnQcGRlJciIvHiCDQSooOjZ3ARl%2BfFFoADeAIKgAELYoJ3kJNAEAL6gABSYnRuASYTYAJTHZZ2rl2s396CXWFsAvFKgNYqgkKAPgA%2BCa3f5XHKyZDTVCqPBkRAEPCMRCoJL6dGoaCMcSKJSUIzoLKgACSiXqu1Sq2QmJKBEQiJM%2BFA3nxoEYRSmM1iMLhZBWWwolMOL0uq3aXx%2BJT%2BAOB%2F0hYHIOCc9UaCHgDkY0F%2BygMaOSSWgohwmiR9KSRhM%2BIIjlVzIARvAGhMGFq0OgLehEQRsqMkARNKBNEYcETEOBg8hYAB9RFepjQd1LCNweAkDKCnZ7fbfH63NDcFMIdOpTqRZmXItpjI3I7BrhhgDydwg2mLGcrberBAheeOAZwUebgqrJdeoAAyngUBhnrmfnNCqkB0OykdF7pUvXQ%2FTh%2F1jKOa4D53mNwt1wVNyzI7Bh9umyUbvvC12xxLQIgSrAFaBlrxePASjIPgyAAG76CQnRxq6iYYKA0CIkUiCgVYqqpDg3SwC0IHqEg0yIDUIzUOM6BEWMoCUNkshrE6rB6NMSSKCU8CwCYeAxNK4yyiCrAnGCkBXFcggAR%2BX6gChKD9KhowDCyACOjA4Fh8K%2BtQ%2FqBmeBDRjg%2F6AUsqwbO8AAimbCieRysJ07yXEZtanOs45YLWLYPOsc59ppFHHJ5pQ3B8eSXuenmsOgT6fKJ365NC0YbNUZT%2BSUUFIii4yjA5CHwNwjBKM4oD2r07LKASGBZFIfqIoG0JjHy0aLvpDnbMKYKim5Wwnp5VWwhBNSAj176fpFshlNU0WrAlnRGv%2BaGxFiOK%2FvUHGFfihKleVAYBdo0adXy9UbI12bNfNjzuaegWpLUvLdQl4UDT%2BVBWKkA3wQw8AlEkEnICUZA6QBQEgeB8LJMY03bd1sA4C4STMQRTAEWe%2BhqOMlo8tV3WcSoiO8FRirUGQ3AxKgToskMOD2lhvCsGl4OQzUSDJHkZjEIgZBuM6OCgNwn10oisIbYUCOcNkQA%3D).
 
 In the code, `compose g f` is our `g ∘ f`, and `identity` is the identity function. `def` begins a definition, and `fun x => ...` creates a function with input `x`. A `theorem` declaration states a proposition to prove.
 
@@ -364,7 +366,7 @@ theorem identity_comp {A B : Type} (f : A → B) :
 theorem comp_identity {A B : Type} (f : A → B) :
     compose f identity = f := rfl
 
--- These rfl proofs use our definitions of function composition and identity.
+-- These rfl proofs verify associativity and the identity laws for our composition and identity functions.
 -- They do not establish the laws for a category with a different composition.
 ~~~
 
