@@ -1,0 +1,9 @@
+{{- $p := .page }}{{ $ko := eq site.Language.Lang "ko" }}
+<article class="tr-card">
+  <a class="tr-card-media" href="{{ $p.RelPermalink }}">
+    {{ partial "d/cover.html" (dict "page" $p "w" 640 "h" 400) }}
+    {{- with $p.GetTerms "series" }}<span class="tr-badge">{{ (index . 0).Title }}{{ with $p.Params.series_idx }} · {{ . }}{{ cond $ko "편" "" }}{{ end }}</span>{{ end }}
+  </a>
+  <h3 class="tr-card-title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h3>
+  <p class="tr-card-meta">{{ range $p.Params.authors }}{{ . }} {{ end }}· {{ $p.Date | time.Format "2006.01.02" }} · {{ $p.ReadingTime }}{{ cond $ko "분" " min" }}</p>
+</article>

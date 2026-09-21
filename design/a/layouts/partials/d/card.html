@@ -1,0 +1,7 @@
+<article class="ed-card">
+  <a class="ed-card-media" href="{{ .RelPermalink }}">{{ partial "d/cover.html" (dict "page" . "w" 800 "h" 500) }}</a>
+  <p class="ed-kicker">{{ partial "d/kicker.html" . }}</p>
+  <h3 class="ed-card-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+  <p class="ed-card-summary">{{ .Summary | plainify | htmlUnescape }}</p>
+  {{ partial "d/byline.html" . }}
+</article>

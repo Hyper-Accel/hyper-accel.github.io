@@ -1,0 +1,91 @@
+/* ===== Design B: Engineering index (reading list) ===== */
+body {
+  --ix-bg: #ffffff;
+  --ix-fg: #111214;
+  --ix-muted: #6b6f76;
+  --ix-faint: #9a9ea6;
+  --ix-line: #e8e9ec;
+  --ix-soft: #f4f5f7;
+  --ix-accent: #0b8fd9;
+  --ix-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ix-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--ix-sans);
+}
+[data-theme="dark"] body {
+  --ix-bg: #0e0f11;
+  --ix-fg: #e6e7ea;
+  --ix-muted: #9a9ea6;
+  --ix-faint: #6b6f76;
+  --ix-line: #23252a;
+  --ix-soft: #17181b;
+}
+body.list { background: var(--ix-bg); --main-width: 1120px; }
+.ix a { color: inherit; text-decoration: none; }
+
+/* header */
+.ix-header { border-bottom: 1px solid var(--ix-line); font-family: var(--ix-mono); font-size: 0.82rem; }
+.ix-header-in { max-width: 1168px; margin: 0 auto; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 28px; }
+.ix-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ix-fg); }
+.ix-brand span { color: var(--ix-muted); font-weight: 400; }
+.ix-nav { display: flex; gap: 18px; }
+.ix-nav a { color: var(--ix-muted); }
+.ix-nav a:hover { color: var(--ix-accent); }
+.ix-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; color: var(--ix-muted); }
+.ix-tools a:hover { color: var(--ix-accent); }
+.ix-tools #theme-toggle { background: none; border: 0; cursor: pointer; color: var(--ix-muted); display: flex; }
+.ix-tools #moon { display: none; } [data-theme="dark"] .ix-tools #moon { display: block; } [data-theme="dark"] .ix-tools #sun { display: none; }
+
+/* layout */
+.ix { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; padding-top: 28px; }
+.ix-single { grid-template-columns: minmax(0, 1fr); max-width: 820px; margin: 0 auto; }
+.ix-side { position: sticky; top: 24px; align-self: start; font-size: 0.88rem; }
+.ix-intro { color: var(--ix-muted); line-height: 1.65; margin: 0 0 32px; word-break: keep-all; }
+.ix-side-h { font-family: var(--ix-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ix-faint); margin: 24px 0 8px; font-weight: 600; }
+.ix-filters, .ix-links { list-style: none; margin: 0; padding: 0; }
+.ix-filter, .ix-links a { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 6px 8px; margin: 0 -8px; border-radius: 6px; background: none; border: 0; color: var(--ix-fg); font: inherit; text-align: left; cursor: pointer; }
+.ix-filter span, .ix-links a span { font-family: var(--ix-mono); font-size: 0.72rem; color: var(--ix-faint); }
+.ix-filter:hover, .ix-links a:hover { background: var(--ix-soft); }
+.ix-filter.is-active { background: var(--ix-fg); color: var(--ix-bg); }
+.ix-filter.is-active span { color: inherit; opacity: 0.7; }
+.ix-authors { display: flex; flex-wrap: wrap; gap: 6px; }
+.ix-authors img, .ix-authors span { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--ix-soft); font-size: 0.75rem; object-fit: cover; border: 1px solid var(--ix-line); }
+
+.ix-toolbar { display: flex; justify-content: space-between; align-items: center; font-family: var(--ix-mono); font-size: 0.78rem; color: var(--ix-muted); padding-bottom: 12px; border-bottom: 1px solid var(--ix-line); }
+.ix-count b { color: var(--ix-fg); font-weight: 600; margin-right: 3px; }
+.ix-search kbd { border: 1px solid var(--ix-line); border-radius: 4px; padding: 1px 5px; font: inherit; font-size: 0.7rem; margin-left: 4px; }
+.ix-year { font-family: var(--ix-mono); font-size: 0.78rem; color: var(--ix-faint); font-weight: 600; margin: 32px 0 4px; letter-spacing: 0.05em; }
+
+.ix-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 128px; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--ix-line); align-items: start; }
+.ix-row:hover .ix-title a { color: var(--ix-accent); }
+.ix-date { font-family: var(--ix-mono); font-size: 0.78rem; color: var(--ix-faint); padding-top: 5px; }
+.ix-title { font-size: 1.12rem; font-weight: 650; line-height: 1.4; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ix-fg); word-break: keep-all; }
+.ix-sum { margin: 0 0 8px; color: var(--ix-muted); font-size: 0.92rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+.ix-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-family: var(--ix-mono); font-size: 0.72rem; }
+.ix-tag { color: var(--ix-fg); background: var(--ix-soft); border-radius: 4px; padding: 2px 7px; }
+.ix-tag-series { color: var(--ix-accent); background: color-mix(in srgb, var(--ix-accent) 10%, transparent); }
+.ix-dim { color: var(--ix-faint); }
+.ix-thumb { border-radius: 6px; overflow: hidden; background: var(--ix-soft); aspect-ratio: 8 / 5; }
+.ix-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.85); }
+.ix-row:hover .ix-thumb img { filter: none; }
+
+.ix-page-head { padding: 24px 0 18px; border-bottom: 1px solid var(--ix-line); }
+.ix-crumb { font-family: var(--ix-mono); font-size: 0.75rem; color: var(--ix-faint); text-transform: capitalize; }
+.ix-page-head h1 { font-size: 1.9rem; letter-spacing: -0.02em; margin: 6px 0 8px; color: var(--ix-fg); }
+.ix-page-desc { color: var(--ix-muted); margin: 0 0 14px; line-height: 1.6; word-break: keep-all; }
+.ix-page-head .ix-count { font-family: var(--ix-mono); font-size: 0.78rem; color: var(--ix-muted); }
+
+@media (max-width: 860px) {
+  .ix { grid-template-columns: 1fr; gap: 20px; }
+  .ix-side { position: static; }
+  .ix-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ix-filters li { display: contents; }
+  .ix-filter { width: auto; margin: 0; border: 1px solid var(--ix-line); padding: 5px 10px; gap: 6px; }
+  .ix-links, .ix-side-h:nth-of-type(n+2), .ix-authors { display: none; }
+  .ix-nav { display: none; }
+}
+@media (max-width: 600px) {
+  .ix-header-in { padding: 0 16px; }
+  body.list .main { padding-left: 16px; padding-right: 16px; }
+  .ix-row { grid-template-columns: minmax(0, 1fr) 96px; }
+  .ix-date { display: none; }
+}

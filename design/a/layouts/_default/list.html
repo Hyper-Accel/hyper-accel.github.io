@@ -1,0 +1,11 @@
+{{- define "main" }}
+<div class="ed">
+  <header class="ed-page-head">
+    <p class="ed-kicker"><span class="d-cat">{{ if eq .Kind "term" }}{{ .Data.Singular }}{{ else }}{{ .Section }}{{ end }}</span></p>
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="ed-page-desc">{{ . }}</p>{{ end }}
+    {{ .Content }}
+  </header>
+  <div class="ed-grid">{{ range .RegularPages }}{{ partial "d/card.html" . }}{{ end }}</div>
+</div>
+{{- end }}

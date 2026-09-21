@@ -1,0 +1,52 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $colors := partial "d/colors.html" . }}
+{{- $cats := (site.GetPage "/categories").Pages }}
+<div class="tr">
+  <section class="tr-intro">
+    <h1 class="tr-headline">{{ cond $ko "칩에서 컴파일러까지,<br>우리가 만드는 것을 설명합니다." "From silicon to compilers,<br>we explain what we build." | safeHTML }}</h1>
+    <p class="tr-sub">{{ cond $ko "LPU를 만드는 HyperAccel 엔지니어들의 기술 블로그입니다. 관심 있는 트랙을 골라 읽어보세요." "The engineering blog of HyperAccel, makers of the LPU. Pick a track and start reading." }}</p>
+    <div class="tr-tracks">
+      {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
+      <a class="tr-track" href="#track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}"><i></i>{{ .Title }}<span>{{ len .Pages }}</span></a>
+      {{- end }}
+    </div>
+  </section>
+
+  <section class="tr-featured">
+    <h2 class="tr-h">{{ cond $ko "연재 시리즈" "Series" }}</h2>
+    <div class="tr-featured-grid">
+      {{- range first 3 site.Taxonomies.series.ByCount }}
+      {{- $term := .Page }}{{ $eps := $term.Pages.ByDate }}
+      {{- $first := index $eps 0 }}{{ $latest := index $eps.Reverse 0 }}
+      {{- $slug := "" }}{{ with $first.GetTerms "categories" }}{{ $slug = path.Base (index . 0).RelPermalink }}{{ end }}
+      <article class="tr-feat" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+        <span class="tr-feat-count">{{ .Count }}{{ cond $ko "편 연재" " parts" }}</span>
+        <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
+        <p>{{ $first.Summary | plainify | htmlUnescape | truncate 100 }}</p>
+        <ol class="tr-dots">{{ range $eps }}<li><a href="{{ .RelPermalink }}" title="{{ .Title }}"></a></li>{{ end }}</ol>
+        <div class="tr-feat-links">
+          <a href="{{ $first.RelPermalink }}">{{ cond $ko "1편부터 읽기" "Start from part 1" }} →</a>
+          <a href="{{ $latest.RelPermalink }}">{{ cond $ko "최신 편" "Latest" }} →</a>
+        </div>
+      </article>
+      {{- end }}
+    </div>
+  </section>
+
+  {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
+  <section class="tr-shelf" id="track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+    <header class="tr-shelf-head">
+      <div>
+        <h2 class="tr-h"><i class="tr-dot"></i>{{ .Title }}</h2>
+        <p class="tr-shelf-desc">{{ .Description }}</p>
+      </div>
+      <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
+    </header>
+    <div class="tr-scroller">
+      {{- range .Pages.ByDate.Reverse }}{{ partial "d/card.html" (dict "page" .) }}{{ end }}
+    </div>
+  </section>
+  {{- end }}
+</div>
+{{- end }}

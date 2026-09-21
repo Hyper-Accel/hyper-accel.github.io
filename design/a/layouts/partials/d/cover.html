@@ -1,0 +1,11 @@
+{{- /* usage: partial "d/cover.html" (dict "page" $p "w" 800 "h" 500) */ -}}
+{{- $p := .page }}{{ $w := .w | default 800 }}{{ $h := .h | default 500 }}
+{{- with $p.Params.cover.image }}
+{{- $img := ($p.Resources.ByType "image").GetMatch (printf "*%s*" .) }}
+{{- with $img }}
+{{- $r := .Fill (printf "%dx%d Center" $w $h) }}
+<img src="{{ $r.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" loading="lazy" alt="{{ $p.Params.cover.alt | default $p.Title }}">
+{{- else }}
+<img src="{{ . | relURL }}" loading="lazy" alt="">
+{{- end }}
+{{- end }}

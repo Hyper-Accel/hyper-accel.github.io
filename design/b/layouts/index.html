@@ -1,0 +1,64 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $pages := where site.RegularPages "Type" "posts" }}
+<div class="ix">
+  <aside class="ix-side">
+    <p class="ix-intro">{{ cond $ko "LLM 추론 가속기 LPU를 만드는 HyperAccel 엔지니어들이 반도체부터 컴파일러, 인프라까지 직접 겪은 것을 씁니다." "Engineers building the LPU write about what they learn, from silicon to compilers to infrastructure." }}</p>
+
+    <h3 class="ix-side-h">{{ cond $ko "카테고리" "Categories" }}</h3>
+    <ul class="ix-filters">
+      <li><button class="ix-filter is-active" data-filter="*">{{ cond $ko "전체" "All" }}<span>{{ len $pages }}</span></button></li>
+      {{- range (site.GetPage "/categories").Pages }}
+      <li><button class="ix-filter" data-filter="{{ path.Base .RelPermalink }}">{{ .Title }}<span>{{ len .Pages }}</span></button></li>
+      {{- end }}
+    </ul>
+
+    <h3 class="ix-side-h">{{ cond $ko "시리즈" "Series" }}</h3>
+    <ul class="ix-links">
+      {{- range site.Taxonomies.series.ByCount }}{{ if ge .Count 2 }}
+      <li><a href="{{ .Page.RelPermalink }}">{{ .Page.Title }}<span>{{ .Count }}</span></a></li>
+      {{- end }}{{ end }}
+    </ul>
+
+    <h3 class="ix-side-h">{{ cond $ko "작성자" "Authors" }}</h3>
+    <div class="ix-authors">
+      {{- range (site.GetPage "/authors").Pages }}
+      <a href="{{ .RelPermalink }}" title="{{ .Title }}">{{ with .Params.image }}<img src="{{ . }}" alt="{{ $.Title }}" width="30" height="30">{{ else }}<span>{{ substr .Title 0 1 }}</span>{{ end }}</a>
+      {{- end }}
+    </div>
+  </aside>
+
+  <section class="ix-list">
+    <div class="ix-toolbar">
+      <span class="ix-count"><b>{{ len $pages }}</b>{{ cond $ko "개의 글" " posts" }}</span>
+      <a class="ix-search" href="{{ "search" | relLangURL }}">{{ cond $ko "검색" "Search" }} <kbd>/</kbd></a>
+    </div>
+    {{- range $pages.GroupByDate "2006" }}
+    <section class="ix-group">
+      <h2 class="ix-year">{{ .Key }}</h2>
+      {{- range .Pages }}{{ partial "d/row.html" . }}{{ end }}
+    </section>
+    {{- end }}
+  </section>
+</div>
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.ix-filter');
+  var rows = document.querySelectorAll('.ix-row');
+  var groups = document.querySelectorAll('.ix-group');
+  var count = document.querySelector('.ix-count b');
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var f = b.dataset.filter, n = 0;
+      buttons.forEach(function (x) { x.classList.toggle('is-active', x === b); });
+      rows.forEach(function (r) { var show = f === '*' || r.dataset.cat === f; r.hidden = !show; if (show) n++; });
+      groups.forEach(function (g) { g.hidden = !g.querySelector('.ix-row:not([hidden])'); });
+      if (count) count.textContent = n;
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); location.href = document.querySelector('.ix-search').href; }
+  });
+})();
+</script>
+{{- end }}

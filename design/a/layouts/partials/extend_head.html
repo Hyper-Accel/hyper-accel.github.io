@@ -1,0 +1,5 @@
+{{ if or .Params.math .Site.Params.math }}
+{{ partial "math.html" . }}
+{{ partial "naver_search.html" . }}
+{{ end }}
+{{ partial "d/fonts.html" . }}

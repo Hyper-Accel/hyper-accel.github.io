@@ -1,0 +1,57 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $hero := index $pages 0 }}
+{{- $latest := first 6 (after 1 $pages) }}
+{{- $rest := after 7 $pages }}
+<div class="ed">
+  <section class="ed-hero">
+    <a class="ed-hero-media" href="{{ $hero.RelPermalink }}">{{ partial "d/cover.html" (dict "page" $hero "w" 1200 "h" 800) }}</a>
+    <div class="ed-hero-body">
+      <p class="ed-kicker">{{ partial "d/kicker.html" $hero }}</p>
+      <h1 class="ed-hero-title"><a href="{{ $hero.RelPermalink }}">{{ $hero.Title }}</a></h1>
+      <p class="ed-hero-summary">{{ $hero.Summary | plainify | htmlUnescape }}</p>
+      {{ partial "d/byline.html" $hero }}
+    </div>
+  </section>
+
+  <nav class="ed-cats" aria-label="categories">
+    <a class="ed-cat is-active" href="{{ "posts" | relLangURL }}">{{ cond $ko "전체" "All" }}<sup>{{ len $pages }}</sup></a>
+    {{- range (site.GetPage "/categories").Pages }}
+    <a class="ed-cat" href="{{ .RelPermalink }}">{{ .Title }}<sup>{{ len .Pages }}</sup></a>
+    {{- end }}
+  </nav>
+
+  <section class="ed-section">
+    <h2 class="ed-h">{{ cond $ko "최신 글" "Latest" }}</h2>
+    <div class="ed-grid">{{ range $latest }}{{ partial "d/card.html" . }}{{ end }}</div>
+  </section>
+
+  <section class="ed-section">
+    <h2 class="ed-h">{{ cond $ko "연재 시리즈" "Series" }}</h2>
+    <div class="ed-series">
+      {{- range site.Taxonomies.series.ByCount }}{{ if ge .Count 2 }}
+      {{- $latestEp := index .Page.Pages.ByDate.Reverse 0 }}
+      <a class="ed-serie" href="{{ .Page.RelPermalink }}">
+        <span class="ed-serie-count">{{ .Count }}{{ cond $ko "편" " posts" }}</span>
+        <strong>{{ .Page.Title }}</strong>
+        <span class="ed-serie-latest">{{ cond $ko "최신 · " "Latest · " }}{{ $latestEp.Title }}</span>
+      </a>
+      {{- end }}{{ end }}
+    </div>
+  </section>
+
+  <section class="ed-section">
+    <h2 class="ed-h">{{ cond $ko "모든 글" "Archive" }}</h2>
+    <ol class="ed-archive">
+      {{- range $rest }}
+      <li>
+        <time>{{ .Date | time.Format "2006.01.02" }}</time>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        <span class="ed-archive-cat">{{ with .GetTerms "categories" }}{{ (index . 0).Title }}{{ end }}</span>
+      </li>
+      {{- end }}
+    </ol>
+  </section>
+</div>
+{{- end }}

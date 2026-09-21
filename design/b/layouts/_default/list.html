@@ -1,0 +1,15 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+<div class="ix ix-single">
+  <section class="ix-list">
+    <header class="ix-page-head">
+      <span class="ix-crumb">{{ if eq .Kind "term" }}{{ .Data.Singular }}{{ else }}{{ .Section }}{{ end }} /</span>
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}<p class="ix-page-desc">{{ . }}</p>{{ end }}
+      {{ .Content }}
+      <span class="ix-count"><b>{{ len .RegularPages }}</b>{{ cond $ko "개의 글" " posts" }}</span>
+    </header>
+    {{- range .RegularPages }}{{ partial "d/row.html" . }}{{ end }}
+  </section>
+</div>
+{{- end }}

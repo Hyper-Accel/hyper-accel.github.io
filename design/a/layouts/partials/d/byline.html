@@ -1,0 +1,6 @@
+{{- $ko := eq site.Language.Lang "ko" }}
+<div class="d-byline">
+  {{- range .Params.authors }}{{ with site.GetPage (printf "/authors/%s" .) }}<a class="d-author" href="{{ .RelPermalink }}">{{ with .Params.image }}<img src="{{ . }}" alt="" width="24" height="24">{{ end }}{{ .Title }}</a>{{ end }}{{ end }}
+  <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2006.01.02" }}</time>
+  <span>{{ .ReadingTime }}{{ cond $ko "분" " min" }}</span>
+</div>

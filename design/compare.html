@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Blog design compare</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; font: 13px/1.4 -apple-system, sans-serif; background: #222; color: #ddd; }
+  header { display: flex; gap: 12px; align-items: center; padding: 8px 12px; background: #111; position: sticky; top: 0; }
+  header input { width: 320px; }
+  button { font: inherit; padding: 4px 10px; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; }
+  main.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  main.cols-1 { grid-template-columns: 1fr; }
+  section { display: flex; flex-direction: column; height: calc(100vh - 52px); }
+  main.cols-4 section, main.cols-1 section { height: calc(100vh - 52px); }
+  main:not(.cols-4):not(.cols-1) section { height: calc((100vh - 52px) / 2); }
+  section h2 { margin: 0; padding: 4px 8px; font-size: 12px; font-weight: 600; background: #333; }
+  iframe { flex: 1; border: 0; background: #fff; width: 100%; }
+</style>
+</head>
+<body>
+<header>
+  <strong>Design compare</strong>
+  <label>path <input id="path" value="/" placeholder="/categories/ai-hardware/"></label>
+  <button data-cols="2">2×2</button>
+  <button data-cols="4">4 columns</button>
+  <button data-cols="1">stack</button>
+</header>
+<main id="main">
+  <section><h2>현재 (1313)</h2><iframe data-port="1313"></iframe></section>
+  <section><h2>A · 매거진 (1314)</h2><iframe data-port="1314"></iframe></section>
+  <section><h2>B · 인덱스 (1315)</h2><iframe data-port="1315"></iframe></section>
+  <section><h2>C · 트랙 (1316)</h2><iframe data-port="1316"></iframe></section>
+</main>
+<script>
+  var frames = document.querySelectorAll('iframe'), input = document.getElementById('path');
+  function load() { frames.forEach(function (f) { f.src = 'http://localhost:' + f.dataset.port + input.value; }); }
+  input.addEventListener('change', load);
+  document.querySelectorAll('button[data-cols]').forEach(function (b) {
+    b.addEventListener('click', function () { document.getElementById('main').className = 'cols-' + b.dataset.cols; });
+  });
+  load();
+</script>
+</body>
+</html>

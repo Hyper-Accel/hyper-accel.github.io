@@ -1,0 +1,2 @@
+{{- with .GetTerms "categories" }}<a class="d-cat" href="{{ (index . 0).RelPermalink }}">{{ (index . 0).Title }}</a>{{ end }}
+{{- with .GetTerms "series" }}<span class="d-sep">·</span><a class="d-series" href="{{ (index . 0).RelPermalink }}">{{ (index . 0).Title }}{{ with $.Params.series_idx }} #{{ . }}{{ end }}</a>{{ end }}

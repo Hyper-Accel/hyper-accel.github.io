@@ -1,0 +1,19 @@
+# Design prototype overlay. Run: hugo server --config hugo.yaml,design/c/hugo.yaml -p 1316
+module:
+  mounts:
+    - source: design/c/layouts
+      target: layouts
+    - source: layouts
+      target: layouts
+    - source: design/c/assets
+      target: assets
+    - source: assets
+      target: assets
+    - source: content
+      target: content
+    - source: static
+      target: static
+    - source: i18n
+      target: i18n
+    - source: archetypes
+      target: archetypes

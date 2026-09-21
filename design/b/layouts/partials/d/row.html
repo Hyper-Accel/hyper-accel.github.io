@@ -1,0 +1,16 @@
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $cat := "" }}{{ $catSlug := "" }}
+{{- with .GetTerms "categories" }}{{ $cat = index . 0 }}{{ $catSlug = path.Base $cat.RelPermalink }}{{ end }}
+<article class="ix-row" data-cat="{{ $catSlug }}">
+  <time class="ix-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "01.02" }}</time>
+  <div class="ix-body">
+    <h3 class="ix-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    <p class="ix-sum">{{ .Summary | plainify | htmlUnescape }}</p>
+    <p class="ix-meta">
+      {{- with $cat }}<a class="ix-tag" href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{- with .GetTerms "series" }}<a class="ix-tag ix-tag-series" href="{{ (index . 0).RelPermalink }}">{{ (index . 0).Title }}{{ with $.Params.series_idx }} #{{ . }}{{ end }}</a>{{ end }}
+      <span class="ix-dim">{{ range .Params.authors }}{{ . }} {{ end }}· {{ .ReadingTime }}{{ cond $ko "분" " min" }}</span>
+    </p>
+  </div>
+  <a class="ix-thumb" href="{{ .RelPermalink }}" tabindex="-1" aria-hidden="true">{{ partial "d/cover.html" (dict "page" . "w" 320 "h" 200) }}</a>
+</article>

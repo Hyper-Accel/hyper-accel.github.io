@@ -1,0 +1,15 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $colors := partial "d/colors.html" . }}
+{{- $slug := path.Base .RelPermalink }}
+<div class="tr" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+  <header class="tr-page-head">
+    <span class="tr-crumb">{{ if eq .Kind "term" }}{{ .Data.Singular }}{{ else }}{{ .Section }}{{ end }}</span>
+    <h1><i class="tr-dot"></i>{{ .Title }}</h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
+    {{ .Content }}
+    <span class="tr-count">{{ len .RegularPages }}{{ cond $ko "편" " posts" }}</span>
+  </header>
+  <div class="tr-grid">{{ range .RegularPages }}{{ partial "d/card.html" (dict "page" .) }}{{ end }}</div>
+</div>
+{{- end }}
