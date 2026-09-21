@@ -8,8 +8,8 @@ cover:
   caption: "Transformer Architecture"
   relative: true
 authors: [Hyunjun Park]
-tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache"]
-categories: ["AI", "Deep Learning"]
+tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache", "Deep Learning"]
+categories: ["LLM and Models"]
 summary: "A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques."
 description: 'A step-by-step walkthrough of Transformer-based LLM internals: the role of Token Embedding, Attention, LM Head, and optimization techniques such as KV Cache, MHA, and GQA.'
 comments: true

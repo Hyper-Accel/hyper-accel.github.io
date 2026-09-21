@@ -8,8 +8,8 @@ cover:
   caption: "Cerebras 웨이퍼 스케일 엔진"
   relative: true
 authors: ["Donghyeon Choi"]
-tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI"]
-categories: ["AI Hardware", "Architecture", "Accelerator"]
+tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI", "Accelerator"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]
 series_idx: 5
 summary: "OpenAI와의 대형 계약 보도로 주목받은 Cerebras의 최근 근황과 WSE-3 아키텍처, 웨이퍼 스케일 칩의 장단점을 비전공자도 이해할 수 있게 정리합니다."

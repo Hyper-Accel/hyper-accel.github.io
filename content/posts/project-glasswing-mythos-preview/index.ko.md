@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["Mythos", "Glasswing", "Security", "LLM", "Agents", "Anthropic"]
-categories: ["Security", "AI"]
+categories: ["LLM and Models"]
 summary: "Anthropic의 Project Glasswing과 Claude Mythos Preview를 중심으로, 모델의 사이버보안 역량이 왜 도약했는지, 벤치마크가 어떻게 바뀌었는지, 실제 방어 사례를 정리하고, 개발자가 에이전트와 소통하는 방식이 어디로 가야 하는지까지 짚습니다."
 description: 'Project Glasswing·Mythos Preview 공개의 의미, Opus 4.6 대비 정량 지표, 벤치마크 세대 전환, OpenBSD·FFmpeg·FreeBSD 사례, 방어자·개발자 인사이트를 한글로 정리합니다.'
 comments: true

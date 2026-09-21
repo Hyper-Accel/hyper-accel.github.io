@@ -8,10 +8,10 @@ cover:
   caption: "AI 시대의 메모리 계층 구조"
   relative: true
 authors: [Seungbin Shin]
-tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
+tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV", "Semiconductor"]
 series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 1
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "메모리는 왜 여러 종류이고, HBF는 어디에 위치하는가? SRAM부터 HBF까지, 메모리 계층의 물리적 원리와 HBF의 기술 구조를 알아봅니다."
 description: "SRAM, DRAM, HBM, NAND의 셀 구조와 물리적 특성을 설명하고, HBF(High Bandwidth Flash)가 메모리 계층에서 어떤 빈 자리를 채우는지 기술적으로 분석합니다."
 comments: true

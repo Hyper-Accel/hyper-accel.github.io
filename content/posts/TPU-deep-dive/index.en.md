@@ -10,8 +10,8 @@ cover:
   caption: "TPU7X Ironwood image"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
-tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture"]
-categories: ["AI Hardware", "Computer Architecture", "Semiconductor"]
+tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 2
 summary: We explore the background of TPU's emergence and analyze Google's AI semiconductor strategy by examining its hardware and software architecture.

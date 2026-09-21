@@ -453,7 +453,7 @@ draft: false
 title: 'Post Title'
 authors: ["Author Name"]
 tags: ["Tag1", "Tag2"]
-categories: ["Category"]
+categories: ["AI Hardware"]  # exactly one; see content/posts/AGENTS.md for the list
 summary: "One-line summary"
 description: "Longer description for SEO"
 ---

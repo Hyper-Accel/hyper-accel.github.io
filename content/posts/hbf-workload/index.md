@@ -8,10 +8,10 @@ cover:
   caption: "HBF"
   relative: true
 authors: [Jaewon Lim]
-tags: ["HBF", "CAG", "H3"]
+tags: ["HBF", "CAG", "H3", "Semiconductor"]
 series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 2
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "SK하이닉스의 H³ 아키텍처를 중심으로, HBF의 약점을 극복할 수 있는 워크로드를 탐색합니다."
 description: "SK하이닉스의 H³ 아키텍처를 중심으로, HBF의 약점을 극복할 수 있는 워크로드를 탐색합니다."
 comments: true

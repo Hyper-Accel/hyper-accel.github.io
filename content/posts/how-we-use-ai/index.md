@@ -11,7 +11,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ['Taeseo Um'] # must match with content/authors
 tags: ["Agents", "AI", "Tools", "Coding"]
-categories: ["Agentic Workflow"]
+categories: ["Engineering Culture"]
 summary: [“HyperAccel의 ML 팀이 어떻게 개발 워크플로우에 AI를 도입했는가”]
 series: ["Copy & Paste에서 코딩 에이전트까지"]
 comments: true

@@ -8,8 +8,8 @@ cover:
   caption: "AMD Instinct MI300X Launch Event"
   relative: true
 authors: [Minho Park]
-tags: [AMD, ROCm, AITER, inference, kernel, MI300X, GPU]
-categories: [report]
+tags: ["AMD", "ROCm", "AITER", "inference", "kernel", "MI300X", "GPU"]
+categories: ["Compilers and Kernels"]
 summary: "AMD GPU의 inference 성능을 끌어올린 AITER(AI Tensor Engine for ROCm)를 분석합니다."
 description: "AMD가 ROCm inference 성능을 2배로 올린 AITER 커널 라이브러리를 분석합니다. 4가지 커널 백엔드 전략(Triton, CK, HIP, ASM), JIT 컴파일 파이프라인, 그리고 DeepSeek R1에서 2배 throughput 향상을 달성한 구조를 살펴봅니다."
 comments: true

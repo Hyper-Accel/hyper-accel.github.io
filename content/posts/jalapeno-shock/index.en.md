@@ -8,10 +8,10 @@ cover:
   caption: "Jalapeño, OpenAI's LLM inference accelerator"
   relative: true
 authors: [Jaewon Lim]
-tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS"]
+tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS", "Accelerator", "Computer Architecture", "Semiconductor"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 7
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 summary: "The era of using AI to build chips that run AI has arrived. Drawing on publicly released information about Jalapeño, OpenAI's custom chip, this article explores what that means."
 comments: true
 ---

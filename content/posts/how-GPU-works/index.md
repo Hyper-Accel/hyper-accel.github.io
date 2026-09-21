@@ -11,7 +11,7 @@ cover:
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
-categories: ["AI Hardware", "Architecture"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]
 series_idx: 1
 summary: "NVIDIA GPU의 역사와 Hopper 아키텍처를 통해, 어떻게 GPU가 메모리 레이턴시를 숨기는지 정리한 글입니다."

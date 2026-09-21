@@ -11,7 +11,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [] # must match with content/authors
 tags: []
-categories: []
+categories: [] # exactly one: AI Hardware | Memory and Storage | Compilers and Kernels | LLM and Models | Infra and DevOps | Engineering Culture | Conference Reports
 summary: []
 comments: true
 ---

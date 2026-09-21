@@ -10,8 +10,8 @@ cover:
   caption: "TPU7X Ironwood image"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
-tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture"]
-categories: ["AI Hardware", "Computer Architecture", "Semiconductor"]
+tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]
 series_idx: 2
 summary: TPU의 등장 배경에 대해 알아보고 하드웨어/소프트웨어 구조를 파헤쳐보면서 구글의 AI 반도체 전략에 대해 분석해봅니다. 

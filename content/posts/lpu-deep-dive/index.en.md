@@ -10,10 +10,10 @@ cover:
   caption: "groq logo"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
-tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC"]
+tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC", "Accelerator", "Semiconductor"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 3
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 summary: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
 comments: true
 description: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.

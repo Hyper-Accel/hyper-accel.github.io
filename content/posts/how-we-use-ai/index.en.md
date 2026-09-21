@@ -11,7 +11,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ['Taeseo Um'] # must match with content/authors
 tags: ["Agents", "AI", "Tools", "Coding"]
-categories: ["Agentic Workflow"]
+categories: ["Engineering Culture"]
 series: ["From Copy-Paste to Autonomous Agents"]
 summary: ["How the ML team at HyperAccel started implemented AI into our development workflow."]
 comments: true

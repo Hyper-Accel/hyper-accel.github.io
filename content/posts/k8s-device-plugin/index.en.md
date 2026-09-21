@@ -10,8 +10,8 @@ cover:
   caption: "Kubernetes and Device Plugins"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Younghoon Jun"] # must match with content/authors
-tags: [kubernetes, device-plugin, LPU, GPU, FPGA, DRA]
-categories: [kubernetes]
+tags: ["kubernetes", "device-plugin", "LPU", "GPU", "FPGA", "DRA"]
+categories: ["Infra and DevOps"]
 series: ["Building an In-House Dev Environment on Kubernetes"]
 summary: ['We share our journey of building a Kubernetes-based development environment at HyperAccel.']
 comments: true

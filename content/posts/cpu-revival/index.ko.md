@@ -8,10 +8,10 @@ cover:
   caption: "다시 떠오르는 데이터센터 CPU"
   relative: true
 authors: [Jaewon Lim]
-tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference"]
+tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference", "Accelerator", "Computer Architecture", "Semiconductor"]
 series: ["지피지기면 백전불태"]
 series_idx: 6
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
+categories: ["AI Hardware"]
 summary: "Agentic AI 워크로드에서 CPU가 추론 인프라의 병목이 된 원인을 분석하고 CPU 3사의 최신 데이터센터향 CPU 라인업을 분석해보며 Agentic AI 시대에 다시 떠오른 CPU의 중요성에 대해 알아봅니다."
 description: "Agentic AI 워크로드에서 CPU가 추론 인프라의 병목이 된 원인을 분석하고 CPU 3사의 최신 데이터센터향 CPU 라인업을 분석해보며 Agentic AI 시대에 다시 떠오른 CPU의 중요성에 대해 알아봅니다."
 comments: true

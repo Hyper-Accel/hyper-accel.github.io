@@ -3,8 +3,8 @@ date: '2026-02-12T09:30:00+09:00'
 draft: false
 title: 'Building a Dev Environment with Kubernetes Part 2: CI/CD Infrastructure Modernization with ARC'
 authors: ["Namyoon Kim"]
-tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook"]
-categories: ["Kubernetes", "DevOps"]
+tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook", "DevOps"]
+categories: ["Infra and DevOps"]
 series: ["Building a Dev Environment with Kubernetes"]
 summary: 'The complete journey of redesigning HyperAccel''s CI/CD infrastructure based on Actions Runner Controller (ARC), including Vault JWT/Kubernetes Auth dual integration, and achieving pipeline observability through a custom-built Go-based Prometheus Exporter.'
 keywords: ["Actions Runner Controller", "ARC", "GitHub Actions", "AutoScalingRunnerSet", "Self-hosted Runner", "Vault", "Container Hook", "Kubernetes Mode", "DinD", "Prometheus Exporter", "Grafana", "CI/CD Pipeline", "Kubernetes", "Rook-Ceph", "Ephemeral PVC"]

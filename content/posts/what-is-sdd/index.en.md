@@ -9,7 +9,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Seungbin Shin]
 tags: ["Spec-Driven Development", "SDD", "AI Engineering", "LLM", "Prompt Engineering"]
-categories: ["AI Engineering", "AI Trends"]
+categories: ["Engineering Culture"]
 summary: Spec-Driven Development (SDD) is a new development methodology for the AI era, moving beyond prompt engineering to spec engineering.
 comments: true
 ---

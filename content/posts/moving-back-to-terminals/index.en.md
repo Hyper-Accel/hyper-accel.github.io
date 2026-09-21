@@ -10,8 +10,8 @@ cover:
   caption: "mobile bridge between agent and development environment"
   relative: false
 authors: ['Taeseo Um']
-tags: ['AI Agents', 'Terminal', 'Vibe Coding', 'Context Engineering', 'Developer Tools']
-categories: ['AI', 'Developer Tools']
+tags: ["AI Agents", "Terminal", "Vibe Coding", "Context Engineering", "Developer Tools"]
+categories: ["Engineering Culture"]
 series: ['AI Agent Series']
 series_idx: 2
 summary: 'AI coding agents did not just change how we write code. They changed where work can happen: over SSH, inside Termux, in Kubernetes pods, and from remote machines that no longer need a full local editor setup.'

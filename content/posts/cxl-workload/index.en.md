@@ -8,10 +8,10 @@ cover:
   caption: "Three CXL workloads · AI generated image"
   relative: true
 authors: [Jaewon Lim]
-tags: ["CXL", "KV cache", "memory pooling", "memory tiering", "LLM Inference"]
+tags: ["CXL", "KV cache", "memory pooling", "memory tiering", "LLM Inference", "Semiconductor"]
 series: ["Memory in the AI Era"]
 series_idx: 5
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "We examine how CXL is used in real workloads through KV cache offload, memory pooling, and memory tiering."
 description: "We examine how CXL is used in real workloads through KV cache offload, memory pooling, and memory tiering."
 comments: true

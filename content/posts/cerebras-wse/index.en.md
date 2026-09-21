@@ -8,8 +8,8 @@ cover:
   caption: "Cerebras Wafer-Scale Engine"
   relative: true
 authors: ["Donghyeon Choi"]
-tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI"]
-categories: ["AI Hardware", "Architecture", "Accelerator"]
+tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI", "Accelerator"]
+categories: ["AI Hardware"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 5
 summary: "This post explains Cerebras's recent momentum, WSE-3 architecture, and the trade-offs of wafer-scale chips in a beginner-friendly way, following reports of a large OpenAI deal."

@@ -10,8 +10,8 @@ cover:
   caption: "Crafting Compiler Ch1.1"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 series: ["Crafting Compilers"]
 summary: [First article about building a programming language]
 comments: true

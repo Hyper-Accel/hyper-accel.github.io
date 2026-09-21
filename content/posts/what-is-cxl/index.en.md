@@ -8,10 +8,10 @@ cover:
   caption: "The seat CXL fills, between DDR and PCIe"
   relative: true
 authors: [Seungbin Shin]
-tags: ["CXL", "Compute Express Link", "memory", "memory pooling", "coherency", "PCIe", "CMM", "memory expander", "Panmnesia", "PANSWITCH"]
+tags: ["CXL", "Compute Express Link", "memory", "memory pooling", "coherency", "PCIe", "CMM", "memory expander", "Panmnesia", "PANSWITCH", "Semiconductor"]
 series: ["Memory in the AI Era"]
 series_idx: 4
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "Next to the GPU, HBM and HBF fill the gap — but there's another empty seat next to the CPU. We look at CXL, the new interface that fills the awkward gap between PCIe and DDR: its basic structure, device types, and the CXL product blueprints the big three memory vendors are drawing."
 description: "We analyze the background behind CXL (Compute Express Link), its three sub-protocols (CXL.io/.cache/.mem), the Type 1/2/3 device classification, the standard's evolution from 1.1 to 3.x, and the CXL memory product lineups of Samsung, SK hynix, and Micron."
 comments: true

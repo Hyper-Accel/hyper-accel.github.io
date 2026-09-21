@@ -10,8 +10,8 @@ cover:
   caption: "moscone center"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Minho Park] # must match with content/authors
-tags: [conference, pytorch, report]
-categories: [report]
+tags: ["conference", "pytorch", "report"]
+categories: ["Conference Reports"]
 summary: ['HyperAccel ML팀이 참관한 PyTorch Conference 2025의 주요 내용을 정리했습니다. Monarch, TorchComms, PrivateUse1, torch.accelerator 등 PyTorch의 최신 분산 학습 및 하드웨어 백엔드 기술과 vLLM, SGLang 등 LLM 추론 엔진의 동향을 소개하며, AI 칩 개발을 위한 기술적 인사이트를 공유합니다.']
 comments: true
 ---

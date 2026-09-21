@@ -10,8 +10,8 @@ cover:
   caption: ""
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
-tags: ["Pallas", "TPU", "Google", "Ironwood", "커널", "커스텀 커널", "Programming Model"]
-categories: ["AI Hardware", "Computer Architecture"]
+tags: ["Pallas", "TPU", "Google", "Ironwood", "커널", "커스텀 커널", "Programming Model", "Computer Architecture"]
+categories: ["Compilers and Kernels"]
 series: ["지피지기면 백전불태"]
 series_idx: 2.5
 summary: "TPU에서 커스텀 커널을 작성할 수 있게 해주는 Pallas 프로그래밍 모델에 대해 알아봅니다."

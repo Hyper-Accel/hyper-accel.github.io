@@ -11,7 +11,7 @@ cover:
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
-categories: ["AI Hardware", "Architecture"]
+categories: ["AI Hardware"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 1
 summary: "An overview of how NVIDIA GPUs evolved and how the Hopper architecture hides memory latency with massive parallelism."

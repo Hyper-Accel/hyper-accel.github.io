@@ -10,8 +10,8 @@ cover:
   caption: "Kubernetes Logo"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Younghoon Jun"] # must match with content/authors
-tags: [development-environment, kubernetes, container]
-categories: [kubernetes]
+tags: ["development-environment", "kubernetes", "container"]
+categories: ["Infra and DevOps"]
 series: ["Kubernetes 기반 사내 개발 환경 구축기"]
 summary: ['Kubernetes 기반으로 운영되는 HyperAccel의 개발 환경 구축에 대한 여정을 공유합니다.']
 comments: true

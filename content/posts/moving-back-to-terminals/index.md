@@ -10,8 +10,8 @@ cover:
   caption: "mobile bridge between agent and development environment"
   relative: false
 authors: ['Taeseo Um']
-tags: ['AI Agents', 'Terminal', 'Vibe Coding', 'Context Engineering', 'Developer Tools']
-categories: ['AI', 'Developer Tools']
+tags: ["AI Agents", "Terminal", "Vibe Coding", "Context Engineering", "Developer Tools"]
+categories: ["Engineering Culture"]
 series: ['AI Agent Series']
 series_idx: 2
 summary: 'AI 코딩 에이전트는 코드를 쓰는 방식만 바꾸지 않았습니다. SSH, Termux, Kubernetes pod, 원격 머신 위에서 일이 시작되는 방식까지 바꾸고 있습니다.'

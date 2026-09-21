@@ -11,7 +11,7 @@ authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
 series: ["torch.compile 해부"]
 series_idx: 1
-categories: ["AI", "Compiler"]
+categories: ["Compilers and Kernels"]
 summary: 'torch.compile을 TorchDynamo, AOTAutograd, TorchInductor 세 요소로 분해해, 각각이 무엇을 입력받아 무엇을 내놓고 어떤 원리로 동작하는지 정리합니다.'
 description: 'torch.compile의 세 구성 요소인 TorchDynamo, AOTAutograd, TorchInductor가 각각 어떤 원리로 동작하는지 설명합니다. 그래프의 개념부터 바이트코드 가로채기와 guard, graph break, 디스패처 하단에서의 연산 정규화, 원소 단위 IR과 코드 생성까지 다룹니다.'
 comments: true

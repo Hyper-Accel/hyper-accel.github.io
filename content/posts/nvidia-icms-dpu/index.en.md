@@ -10,10 +10,10 @@ cover:
   caption: "ICMS and Bluefield-4 DPU"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
-tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD"]
+tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 4
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
+categories: ["Memory and Storage"]
 summary: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 comments: true
 description: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."

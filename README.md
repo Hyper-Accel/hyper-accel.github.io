@@ -242,7 +242,7 @@ date: '2026-01-03T17:20:16+09:00'
 draft: false
 authors: [Jaewon Lim]
 tags: ["TPU", "Google", "Ironwood"]
-categories: ["AI Hardware", "Computer Architecture"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]  # 시리즈 이름 추가
 ---
 ```
@@ -319,7 +319,7 @@ series_idx: 3
 
 추가로 설정할 수 있는 메타데이터:
 - **`tags`**: 포스트 태그 (배열)
-- **`categories`**: 포스트 카테고리 (배열)
+- **`categories`**: 포스트 카테고리. **정확히 1개**만 지정합니다 (`AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` 중 택 1). 세부 주제는 `tags`에 넣습니다. 한/영 표시 이름은 `content/categories/<slug>/_index*.md`에 있습니다.
 - **`summary`**: 포스트 요약
 
 #### SEO 최적화를 위한 메타데이터
@@ -366,7 +366,7 @@ authors: ['Minho Park']
 description: 'Hugo와 PaperMod 테마를 사용한 블로그의 SEO 최적화 방법을 알아봅니다. 메타 태그, Open Graph, Schema.org 설정 등을 포함합니다.'
 keywords: ['Hugo', 'SEO', '블로그', 'PaperMod', '검색엔진최적화']
 tags: ['Hugo', 'SEO', 'Tutorial']
-categories: ['Tech']
+categories: ['Engineering Culture']
 summary: 'Hugo 블로그의 SEO 최적화 가이드입니다.'
 cover:
   image: 'seo-guide.png'

@@ -8,8 +8,8 @@ cover:
   caption: "Polyhedral Analysis"
   relative: false
 authors: [Jaewoo Kim]
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 summary: [Introduction to polyhedral analysis. Which gives simplified guide for understanding polyhedral compiler analysis & optimization.]
 series: ["Crafting Compilers"]
 comments: true

@@ -10,8 +10,8 @@ cover:
   caption: "Crafting Compiler"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 series: ["Crafting Compilers"]
 summary: [컴파일러의 작동 방식과, 컴파일러를 제작하는 전반적인 과정에 관한 포스팅 시리즈를 시작하기 위한 소개 글입니다]
 comments: true

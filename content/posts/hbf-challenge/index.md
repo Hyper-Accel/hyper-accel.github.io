@@ -8,10 +8,10 @@ cover:
   caption: "HBF 상용화 도전 과제"
   relative: true
 authors: [Jaewon Lim]
-tags: ["HBF", "High Bandwidth Flash", "NAND Flash", "memory", "LLM", "Inference", "Sparse Attention", "SanDisk", "SK Hynix"]
+tags: ["HBF", "High Bandwidth Flash", "NAND Flash", "memory", "LLM", "Inference", "Sparse Attention", "SanDisk", "SK Hynix", "Semiconductor"]
 series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
 series_idx: 3
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "HBF에게 적합한 자리는 분명히 있습니다. 하지만 memory hierarchy 피라미드에 들어가기 위해서는 아직 부족한 점이 많습니다. 최신 LLM 모델 및 추론 워크로드 트렌드, 그리고 Flash memory의 LLM 사용 방식을 살펴보며 HBF의 남은 과제와 극복 방안에 대해 살펴봅니다."
 description: "HBF에게 적합한 자리는 분명히 있습니다. 하지만 memory hierarchy 피라미드에 들어가기 위해서는 아직 부족한 점이 많습니다. 최신 LLM 모델 및 추론 워크로드 트렌드, 그리고 Flash memory의 LLM 사용 방식을 살펴보며 HBF의 남은 과제와 극복 방안에 대해 살펴봅니다."
 comments: true

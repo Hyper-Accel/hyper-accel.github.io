@@ -8,10 +8,10 @@ cover:
   caption: "HBF"
   relative: true
 authors: [Jaewon Lim]
-tags: ["HBF", "CAG", "H3"]
+tags: ["HBF", "CAG", "H3", "Semiconductor"]
 series: ["Memory in the AI Era"]
 series_idx: 2
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "Centered on SK hynix's H³ architecture, we explore workloads that can overcome HBF's weaknesses."
 description: "Centered on SK hynix's H³ architecture, we explore workloads that can overcome HBF's weaknesses."
 comments: true

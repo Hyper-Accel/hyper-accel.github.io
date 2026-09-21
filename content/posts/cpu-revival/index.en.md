@@ -8,10 +8,10 @@ cover:
   caption: "The datacenter CPU, rising again"
   relative: true
 authors: [Jaewon Lim]
-tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference"]
+tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference", "Accelerator", "Computer Architecture", "Semiconductor"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 6
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
+categories: ["AI Hardware"]
 summary: "We analyze why the CPU became the bottleneck of inference infrastructure in Agentic AI workloads, walk through the latest datacenter CPU lineups from the three CPU vendors, and explore why the CPU has risen to prominence again in the Agentic AI era."
 description: "We analyze why the CPU became the bottleneck of inference infrastructure in Agentic AI workloads, walk through the latest datacenter CPU lineups from the three CPU vendors, and explore why the CPU has risen to prominence again in the Agentic AI era."
 comments: true

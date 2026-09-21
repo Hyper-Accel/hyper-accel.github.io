@@ -8,8 +8,8 @@ cover:
   caption: "Introduction to Legato, the programming language for LPU"
   relative: true
 authors: [Jaewoo Kim]
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 series: ["Legato"]
 summary: "An introduction to Legato — HyperAccel's programming model and compiler stack for the LPU — covering what it is, why it exists, and how it is designed."
 comments: true

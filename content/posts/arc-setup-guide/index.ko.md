@@ -3,8 +3,8 @@ date: '2026-02-12T09:30:00+09:00'
 draft: false
 title: 'Kubernetes 기반 사내 개발 환경 구축기 2편: ARC와 CI/CD 인프라 고도화'
 authors: ["Namyoon Kim"]
-tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook"]
-categories: ["Kubernetes", "DevOps"]
+tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook", "DevOps"]
+categories: ["Infra and DevOps"]
 series: ["Kubernetes 기반 사내 개발 환경 구축기"]
 summary: 'HyperAccel의 CI/CD 인프라를 Actions Runner Controller(ARC) 기반으로 전면 재설계한 기술적 여정과 Vault JWT/Kubernetes Auth 이중 연동, 그리고 자체 개발한 Go 기반 Prometheus Exporter를 통한 파이프라인 관측성(Observability) 확보까지의 전 과정을 다룹니다.'
 keywords: ["Actions Runner Controller", "ARC", "GitHub Actions", "AutoScalingRunnerSet", "Self-hosted Runner", "Vault", "Container Hook", "Kubernetes Mode", "DinD", "Prometheus Exporter", "Grafana", "CI/CD Pipeline", "Kubernetes", "Rook-Ceph", "Ephemeral PVC"]

@@ -88,7 +88,7 @@ cover:
   relative: true
 authors: ["Author Name"]
 tags: ["Tag1", "Tag2"]
-categories: ["Category"]
+categories: ["AI Hardware"]  # exactly one; list in content/posts/AGENTS.md
 series: ["Korean Series Name"] # only for series posts
 series_idx: 1                  # only for ordered series posts
 summary: "One-line summary"

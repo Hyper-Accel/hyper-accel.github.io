@@ -10,8 +10,8 @@ cover:
   caption: "SGLang"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
-tags: [SGLang]
-categories: [LLM serving]
+tags: ["SGLang", "LLM serving"]
+categories: ["LLM and Models"]
 summary: [Paper review of SGLang, the high-performance LLM serving framework]
 comments: true
 ---

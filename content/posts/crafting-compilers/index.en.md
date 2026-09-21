@@ -10,8 +10,8 @@ cover:
   caption: "Crafting Compiler"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [jaewoo kim] # must match with content/authors
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 series: ["Crafting Compilers"]
 summary: [Introduction to series of posts that would guide people to journey learning about how compiler works, and how they can build their own.]
 comments: true

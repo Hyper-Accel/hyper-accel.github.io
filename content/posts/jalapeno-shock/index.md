@@ -8,10 +8,10 @@ cover:
   caption: "OpenAI의 LLM 추론 가속기 할라피뇨"
   relative: true
 authors: [Jaewon Lim]
-tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS"]
+tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS", "Accelerator", "Computer Architecture", "Semiconductor"]
 series: ["지피지기면 백전불태"]
 series_idx: 7
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 summary: "AI로 AI를 돌리는 칩을 만드는 시대가 도래했습니다. AI 회사인 OpenAI의 자체칩 할라피뇨의 공개된 정보들을 바탕으로 이를 알아봅니다."
 comments: true
 ---

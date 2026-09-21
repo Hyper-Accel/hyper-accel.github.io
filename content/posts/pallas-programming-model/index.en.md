@@ -10,8 +10,8 @@ cover:
   caption: ""
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
-tags: ["Pallas", "TPU", "Google", "Ironwood", "Kernel", "Custom Kernel", "Programming Model"]
-categories: ["AI Hardware", "Computer Architecture"]
+tags: ["Pallas", "TPU", "Google", "Ironwood", "Kernel", "Custom Kernel", "Programming Model", "Computer Architecture"]
+categories: ["Compilers and Kernels"]
 series: ["Know Your Enemy, Know Yourself"]
 series_idx: 2.5
 summary: "Learn about Pallas programming model that enables writing custom kernels on TPU."

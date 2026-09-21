@@ -14,7 +14,8 @@ Bilingual (ko+en) is the norm (~40 posts); some are single-language.
 
 ## FRONT MATTER
 Required: `date` (ISO 8601 +09:00), `title`, `draft`, `authors`, `comments`, `cover` (`image`, `alt`, `relative: true` for bundled images).
-Optional: `tags`, `categories`, `series` + `series_idx` (1-based), `summary`, `description`, `keywords`.
+Optional: `tags`, `series` + `series_idx` (1-based), `summary`, `description`, `keywords`.
+`categories`: exactly ONE of `AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` (English term; localized titles live in `content/categories/<slug>/_index*.md`). Fine-grained topics go in `tags`, not `categories`.
 
 ## CONVENTIONS
 - `authors: [Full Name]` must exactly match a directory under `content/authors/`.
