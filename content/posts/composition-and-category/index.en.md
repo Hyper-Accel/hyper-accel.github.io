@@ -91,7 +91,7 @@ The problem appears when we try to compose them as before.
 g (f a)  -- Compile error: Option B cannot be used where B is required
 ~~~
 
-![Ordinary composition matches the first function's output B to the next function's input B. Returning Option B breaks that match because the next function requires B.](option-type-mismatch.ko.svg)
+![Ordinary composition matches the first function's output B to the next function's input B. Returning Option B breaks that match because the next function requires B.](option-type-mismatch.en.svg)
 
 $f$ hands us an `Option B`—a box (or a *burrito*) accounting for possible absence—while $g$ requires a $B$ value.
 
@@ -185,7 +185,7 @@ example {B C : Type} (m : Option B) (g : B → Option C) :
   cases m <;> rfl
 ~~~
 
-![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.ko.svg)
+![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.en.svg)
 
 Here, `m : Option B` and `g : B → Option C`. `bind` provides both steps together, while `join` removes one layer from an already nested `Option`. Later, in the formal definition of a monad, we will encounter this relationship again in the general form `bind m g = join (map g m)`.
 
@@ -216,16 +216,16 @@ We will now define the three ways of connecting functions in Lean 4 and compare 
 We will define `parseNat`, which parses a string as a natural number, and `reciprocal`, which represents the reciprocal of a nonzero natural number as a string of the form `"1/n"`. The example focuses on absence and function connections, rather than numerical operations on fractions.
 
 ~~~lean
--- 모나드와 범주론 ① 함수가 이어지지 않을 때
--- Lean 4.32.1. 별도의 라이브러리 없이 실행됩니다.
+-- Monads and Category Theory ① When Functions Do Not Compose
+-- Lean 4.32.1. Runs without additional libraries.
 
--- 1. 값이 없을 수 있는 두 함수
+-- 1. Two functions that may produce no value
 def parseNat (s : String) : Option Nat :=
   s.toNat?
 
 def reciprocal (n : Nat) : Option String :=
   if n == 0 then
-    none -- 0의 역수는 나타내지 않음
+    none -- No reciprocal is represented for zero
   else
     some s!"1/{n}"
 
@@ -234,7 +234,7 @@ def reciprocal (n : Nat) : Option String :=
 We define the connecting rule as `composeOption`. For comparison, we will also write out the branching from Section 3 and the `map` followed by `join` from Section 5.
 
 ~~~lean
--- 앞의 결과에 따라 다음 함수를 호출하는 규칙
+-- Call the next function according to the previous result
 def composeOptionByMatch {A B C : Type}
     (f : A → Option B) (g : B → Option C) : A → Option C :=
   fun x =>
@@ -242,12 +242,12 @@ def composeOptionByMatch {A B C : Type}
     | none   => none
     | some b => g b
 
--- 같은 규칙을 Option.bind로 표현
+-- Express the same rule using Option.bind
 def composeOption {A B C : Type}
     (f : A → Option B) (g : B → Option C) : A → Option C :=
   fun x => (f x).bind g
 
--- map으로 적용한 뒤 join으로 한 겹 평탄화하는 같은 규칙
+-- The same rule: apply map, then flatten one layer with join
 def composeOptionByJoin {A B C : Type}
     (f : A → Option B) (g : B → Option C) : A → Option C :=
   fun x => ((f x).map g).join
@@ -268,9 +268,9 @@ Running the code lets us check an input that succeeds, along with inputs for whi
 
 ~~~lean
 #eval parseAndReciprocal "42"  -- some "1/42"
-#eval parseAndReciprocal "0"   -- none       (0의 역수는 나타내지 않음)
-#eval parseAndReciprocal "foo" -- none       (파싱 실패)
-#eval (parseNat "0").map reciprocal -- some none (join 전의 두 겹)
+#eval parseAndReciprocal "0"   -- none       (No reciprocal is represented for zero)
+#eval parseAndReciprocal "foo" -- none       (Parsing failed)
+#eval (parseNat "0").map reciprocal -- some none (Two layers before join)
 
 ~~~
 
@@ -282,7 +282,7 @@ We can also use `#guard` to check whether the three implementations produce the 
 #guard parseAndReciprocal "foo" == none
 ~~~
 
-To modify the code and run it yourself, [open this example in the Lean 4 Playground](https://live.lean-lang.org/#code=--%20%EB%AA%A8%EB%82%98%EB%93%9C%EC%99%80%20%EB%B2%94%EC%A3%BC%EB%A1%A0%20%E2%91%A0%20%ED%95%A8%EC%88%98%EA%B0%80%20%EC%9D%B4%EC%96%B4%EC%A7%80%EC%A7%80%20%EC%95%8A%EC%9D%84%20%EB%95%8C%0A--%20Lean%204.32.1.%20%EB%B3%84%EB%8F%84%EC%9D%98%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%97%86%EC%9D%B4%20%EC%8B%A4%ED%96%89%EB%90%A9%EB%8B%88%EB%8B%A4.%0A%0A--%201.%20%EA%B0%92%EC%9D%B4%20%EC%97%86%EC%9D%84%20%EC%88%98%20%EC%9E%88%EB%8A%94%20%EB%91%90%20%ED%95%A8%EC%88%98%0Adef%20parseNat%20%28s%20%3A%20String%29%20%3A%20Option%20Nat%20%3A%3D%0A%20%20s.toNat%3F%0A%0Adef%20reciprocal%20%28n%20%3A%20Nat%29%20%3A%20Option%20String%20%3A%3D%0A%20%20if%20n%20%3D%3D%200%20then%0A%20%20%20%20none%20--%200%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%0A%20%20else%0A%20%20%20%20some%20s%21%221%2F%7Bn%7D%22%0A%0A--%202.%20%EC%95%9E%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%97%90%20%EB%94%B0%EB%9D%BC%20%EB%8B%A4%EC%9D%8C%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%98%B8%EC%B6%9C%ED%95%98%EB%8A%94%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByMatch%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%0A%20%20%20%20match%20f%20x%20with%0A%20%20%20%20%7C%20none%20%20%20%3D%3E%20none%0A%20%20%20%20%7C%20some%20b%20%3D%3E%20g%20b%0A%0A--%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%EC%9D%84%20Option.bind%EB%A1%9C%20%ED%91%9C%ED%98%84%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0A--%20map%EC%9C%BC%EB%A1%9C%20%EC%A0%81%EC%9A%A9%ED%95%9C%20%EB%92%A4%20join%EC%9C%BC%EB%A1%9C%20%ED%95%9C%20%EA%B2%B9%20%ED%8F%89%ED%83%84%ED%99%94%ED%95%98%EB%8A%94%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByJoin%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28%28f%20x%29.map%20g%29.join%0A%0A--%203.%20%EB%91%90%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%95%A9%EC%84%B1%ED%95%98%EC%97%AC%20%EC%83%88%EB%A1%9C%EC%9A%B4%20%ED%95%A8%EC%88%98%20%EA%B5%AC%EC%84%B1%0Adef%20parseAndReciprocal%20%3A%20String%20%E2%86%92%20Option%20String%20%3A%3D%0A%20%20composeOption%20parseNat%20reciprocal%0A%0A--%204.%20%EC%8B%A4%ED%96%89%20%EA%B2%B0%EA%B3%BC%20%ED%99%95%EC%9D%B8%0A%23eval%20parseAndReciprocal%20%2242%22%20%20--%20some%20%221%2F42%22%0A%23eval%20parseAndReciprocal%20%220%22%20%20%20--%20none%20%20%20%20%20%20%20%280%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%29%0A%23eval%20parseAndReciprocal%20%22foo%22%20--%20none%20%20%20%20%20%20%20%28%ED%8C%8C%EC%8B%B1%20%EC%8B%A4%ED%8C%A8%29%0A%23eval%20%28parseNat%20%220%22%29.map%20reciprocal%20--%20some%20none%20%28join%20%EC%A0%84%EC%9D%98%20%EB%91%90%20%EA%B2%B9%29%0A%0A--%205.%20%EC%84%B8%20%EA%B5%AC%ED%98%84%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%99%80%20%EB%8C%80%ED%91%9C%20%EC%9E%85%EB%A0%A5%EC%9D%84%20%ED%99%95%EC%9D%B8%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20parseAndReciprocal%20%2242%22%20%3D%3D%20some%20%221%2F42%22%0A%23guard%20parseAndReciprocal%20%220%22%20%3D%3D%20none%0A%23guard%20parseAndReciprocal%20%22foo%22%20%3D%3D%20none%0A).
+To modify the code and run it yourself, [open this example in the Lean 4 Playground](https://live.lean-lang.org/#code=--%20Monads%20and%20Category%20Theory%20%E2%91%A0%20When%20Functions%20Do%20Not%20Compose%0A--%20Lean%204.32.1.%20Runs%20without%20additional%20libraries.%0A%0A--%201.%20Two%20functions%20that%20may%20produce%20no%20value%0Adef%20parseNat%20%28s%20%3A%20String%29%20%3A%20Option%20Nat%20%3A%3D%0A%20%20s.toNat%3F%0A%0Adef%20reciprocal%20%28n%20%3A%20Nat%29%20%3A%20Option%20String%20%3A%3D%0A%20%20if%20n%20%3D%3D%200%20then%0A%20%20%20%20none%20--%20No%20reciprocal%20is%20represented%20for%20zero%0A%20%20else%0A%20%20%20%20some%20s%21%221%2F%7Bn%7D%22%0A%0A--%202.%20Call%20the%20next%20function%20according%20to%20the%20previous%20result%0Adef%20composeOptionByMatch%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%0A%20%20%20%20match%20f%20x%20with%0A%20%20%20%20%7C%20none%20%20%20%3D%3E%20none%0A%20%20%20%20%7C%20some%20b%20%3D%3E%20g%20b%0A%0A--%20Express%20the%20same%20rule%20using%20Option.bind%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0A--%20The%20same%20rule%3A%20apply%20map%2C%20then%20flatten%20one%20layer%20with%20join%0Adef%20composeOptionByJoin%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28%28f%20x%29.map%20g%29.join%0A%0A--%203.%20Compose%20two%20functions%20to%20build%20a%20new%20function%0Adef%20parseAndReciprocal%20%3A%20String%20%E2%86%92%20Option%20String%20%3A%3D%0A%20%20composeOption%20parseNat%20reciprocal%0A%0A--%204.%20Check%20the%20evaluation%20results%0A%23eval%20parseAndReciprocal%20%2242%22%20%20--%20some%20%221%2F42%22%0A%23eval%20parseAndReciprocal%20%220%22%20%20%20--%20none%20%20%20%20%20%20%20%28No%20reciprocal%20is%20represented%20for%20zero%29%0A%23eval%20parseAndReciprocal%20%22foo%22%20--%20none%20%20%20%20%20%20%20%28Parsing%20failed%29%0A%23eval%20%28parseNat%20%220%22%29.map%20reciprocal%20--%20some%20none%20%28Two%20layers%20before%20join%29%0A%0A--%205.%20Check%20the%20three%20implementations%20on%20representative%20inputs.%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20parseAndReciprocal%20%2242%22%20%3D%3D%20some%20%221%2F42%22%0A%23guard%20parseAndReciprocal%20%220%22%20%3D%3D%20none%0A%23guard%20parseAndReciprocal%20%22foo%22%20%3D%3D%20none%0A).
 
 `composeOptionByMatch` explicitly handles `none` and `some b`, while `composeOptionByJoin` applies `map` followed by `join`. `Option.bind` expresses the same connection in one line. The `#guard` checks comparing these implementations on representative inputs verify examples; they do not prove equality for every input.
 
