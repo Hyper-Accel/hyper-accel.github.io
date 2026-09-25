@@ -1,392 +1,302 @@
 ---
-date: '2026-09-07T00:00:00+09:00'
+date: '2026-09-25T09:00:00+09:00'
 draft: false
-title: '모나드로 알아보는 범주론 1편: 함수 합성과 category'
+title: '모나드와 범주론 ① 함수가 이어지지 않을 때'
 cover:
-  image: "cover.jpg"
-  alt: "같은 함수들을 서로 다른 위치에서 묶은 두 합성 경로"
+  image: "composition-cover.ko.png"
+  alt: "함수가 이어지지 않을 때: 함수 f와 g 사이에 연결 규칙을 놓아 계산을 잇는 모습"
+  caption: ""
   relative: true
-  hidden: false
-  hiddenInSingle: false
-  hiddenInList: false
 authors: [Jaeho Choi]
-tags: ["category theory", "functional programming", "Lean4", "monad", "composition"]
-series: ["모나드로 알아보는 범주론"]
+tags: ["category theory", "functional programming", "Lean4", "monad", "composition", "flatMap", "Option"]
+series: ["코드에서 시작하는 모나드와 범주론"]
 series_idx: 1
 categories: ["Programming Language"]
-summary: "팀장 연락처를 찾는 코드를 나누는 문제에서 출발합니다. 함수 합성의 결합법칙과 항등법칙을 직접 계산하고, 이 구조를 일반화한 category의 정의를 알아봅니다."
-description: "직원의 팀장 연락처를 찾는 세 함수를 합성하면서, 묶는 위치를 바꾸어도 결과가 같은 이유와 항등 함수의 역할을 살펴봅니다."
+summary: "Option을 반환하는 함수들의 타입이 맞지 않아 합성이 끊기는 장면에서 출발해, 조건 분기·map·join·bind가 같은 계산을 만드는 과정을 살펴봅니다."
+description: "값이 없을 수 있는 계산을 연결하며, 모나드로 이어지는 첫 번째 합성 규칙을 만들어 봅니다."
 comments: true
-keywords: ["category theory", "범주론", "함수 합성", "결합법칙", "항등법칙", "Option", "Lean 4"]
+keywords: ["category theory", "범주론", "함수 합성", "composition", "Option", "값의 부재", "flatMap", "bind", "Lean 4", "모나드"]
 ---
 
 안녕하세요, HyperAccel Compiler팀 최재호입니다.
 
-**모나드**(monad)라는 말을 들어보셨나요? 함수형 프로그래밍을 접하며 이름을 들어본 분도, 이번에 처음 접하는 분도 계실 것입니다. 모나드는 범주론에서 정의되는 수학적 개념이면서, 프로그래밍에서 계산을 연결하는 데 쓰이는 개념이기도 합니다.
+AI 에이전트가 코드를 대신 작성해 주는 시대입니다. 프롬프트 한 줄이면 수백 줄의 함수가 순식간에 완성되고, 함수형 프로그래밍 같은 패러다임 논쟁은 이미 한물간 옛날이야기처럼 느껴지기도 합니다.
 
-수학의 정의가 어떻게 프로그램을 작성하는 방법과 이어질까요? 이번 시리즈에서는 이 연결을 구체적인 코드와 수식으로 따라가 보려 합니다. 계산을 연결하는 코드를 작성하고, 그 안에서 어떤 연산과 법칙이 필요한지 살펴보겠습니다. 그렇게 발견한 구조를 범주론의 정의와 비교하며 모나드가 무엇이고 어떤 역할을 하는지 알아보겠습니다.
+하지만 코드를 만드는 속도가 빨라질수록, 개발자에게 남는 일, 곧 그 함수들을 어떻게 조립할지 결정하는 일은 더 중요해집니다.
 
-**범주론**(category theory)은 수학적 대상 사이의 연결과, 그 연결을 이어 붙이는 방법과 법칙을 연구하는 분야입니다. 서로 다른 대상에서도 같은 구조를 찾아 공통된 언어로 다룬다는 특징이 있습니다. 모나드를 이해하는 과정은 이러한 범주론의 관점을 익히는 구체적인 기회이기도 합니다.
+> *"AI가 쏟아내는 수많은 함수들을 어떤 규칙으로 이어 붙일 것인가?"*
 
-모나드나 범주론을 미리 알고 있을 필요는 없습니다. 함수의 입력과 출력을 읽을 수 있다면, 필요한 용어와 수학 표기는 그때그때 설명하겠습니다.
+앞 함수의 결과를 다음 함수에 건넬 수 있을 때는 일이 간단합니다. 그런데 실제 코드를 쓰다 보면 그 연결이 뜻대로 되지 않는 경우도 만납니다.
 
-첫 편에서는 가장 익숙한 연결 방식인 함수 합성에서 출발하겠습니다. 직원 번호로 그 직원의 팀장 이메일 주소를 찾는 세 함수를 연결하며, 함수 합성의 결합법칙과 항등 함수의 역할을 확인하고 category의 정의로 나아가겠습니다.
+이 시리즈에서는 바로 그 연결이 막히는 곳에서 출발해 보려 합니다. 막힌 연결을 다시 잇는 방법을 코드로 만들어 낸 뒤, 그 방법이 만족하는 법칙과 그 안에 내재된 수학적 구조를 범주론(category theory)의 언어로 살펴보겠습니다. 그 과정을 따라가며 모나드(monad)가 무엇인지, 처음의 함수 연결 문제와 어떻게 이어지는지 이해해 보겠습니다.
 
-## 팀장 연락처 조회를 두 가지 방식으로 나누기
+이 순서를 택한 데에는 이유가 있습니다. 모나드를 이해하려고 자료를 찾아본 분들이라면 대개 두 가지 장벽 중 하나를 마주했을 것입니다.
 
-조직도 화면에 선택한 직원의 팀장 이메일 주소를 표시하는 프로그램을 만든다고 해보겠습니다. 직원 번호로 직원을 찾고, 그 직원의 팀장을 찾은 뒤, 팀장의 이메일 주소를 읽으면 됩니다. 각 단계를 함수로 적어 보겠습니다.
+한쪽에는 *"모나드는 자기함자 범주의 모노이드일 뿐이다(A monad is just a monoid in the category of endofunctors)"*라는 불친절한 수학적 선언이 있습니다. 원래의 맥락이 잘린 채 인용되는 외계어 같은 수학 용어들은 시작도 하기 전에 독자를 지치게 만듭니다. 반대쪽에는 *"모나드는 부리또다"*, *"모나드는 상자다"*와 같은 수많은 일상적 비유들이 있습니다. 비유를 아무리 읽어도 정작 *"모나드를 왜 배워야 하지? 그래서 내 코드에 이게 왜 필요하지?"*라는 본질적인 질문에는 명쾌한 답을 얻기 어렵습니다.
 
-~~~text
-findEmployee : Nat → Employee
-managerOf    : Employee → Employee
-emailOf      : Employee → String
-~~~
+수학적 선언과 일상적인 비유 사이에는 직접 실행해 볼 수 있는 코드가 있습니다. 계산을 직접 해 보고, 어떤 부분에서 연결이 막히는지 확인하다 보면 낯선 수학 용어가 설명하려는 대상도 조금씩 구체적인 모습을 드러낼 것입니다.
 
-`f : A → B`는 함수 `f`가 `A`를 받아 `B`를 반환한다는 뜻입니다. 함수에 값을 넣는 `f x`는 `f(x)`와 같은 표기입니다. `Nat`은 0부터 시작하는 정수 타입이고, 여기서는 직원 번호에 사용합니다. `Employee`는 직원 정보를 나타내는 타입입니다.
+이 시리즈에서는 그 코드를 [Lean 4](https://lean-lang.org/lean4/doc)로 작성하겠습니다. Lean 4는 함수형 프로그래밍 언어이면서, 수학적 명제의 증명을 검사하는 대화형 정리 증명기(interactive theorem prover, ITP)이기도 합니다. 처음에는 함수를 작성하고 실행하는 데 사용하고, 이후에는 우리가 만든 합성 규칙이 어떤 법칙을 만족하는지 같은 언어로 증명해 보겠습니다. 필요한 문법은 예제와 함께 설명하겠습니다.
 
-`findEmployee`가 반환한 직원을 `managerOf`에 넘기고, 그 결과인 팀장을 `emailOf`에 넘깁니다. 앞 함수의 반환 타입과 다음 함수의 입력 타입이 맞아떨어집니다.
+이번 편에서는 값이 없을 수 있는 두 함수를 연결하면서, 함수가 달라져도 재사용할 수 있는 합성 규칙을 직접 만들어 보겠습니다. 먼저 평범한 두 함수를 이어 붙이는 일부터 시작하겠습니다.
 
-~~~text
-emailOf (managerOf (findEmployee employeeId))
-~~~
+---
 
-이 조회의 일부를 다른 곳에서도 사용하려면 두 단계를 별도 함수로 묶을 수 있습니다. 직원 번호로 팀장을 찾는 함수를 `findManager`라고 하겠습니다.
+## 1. 함수 합성: 출력과 입력이 맞을 때
 
-~~~text
-findManager : Nat → Employee
-findManager employeeId = managerOf (findEmployee employeeId)
-~~~
+소프트웨어가 커질 때 복잡도를 낮추는 방법 중 하나는 작은 함수들을 이어 붙이는 것입니다.
 
-이제 팀장 연락처는 `emailOf (findManager employeeId)`로 구합니다. 반대로, 직원 정보에서 팀장 이메일을 얻는 두 단계를 먼저 묶을 수도 있습니다.
-
-~~~text
-managerEmailOf : Employee → String
-managerEmailOf employee = emailOf (managerOf employee)
-~~~
-
-이번에는 `managerEmailOf (findEmployee employeeId)`로 같은 연락처를 구합니다. 어느 쪽으로 나누든 직원, 팀장, 이메일 순서로 값을 구한다는 점은 같습니다. 이처럼 묶는 위치를 바꿔도 같은 함수가 되는 이유를 확인해 보겠습니다.
-
-## 결합법칙: 묶는 위치가 달라도 같은 계산
-
-두 함수를 이어 새 함수 하나를 만드는 연산을 함수 합성(function composition)이라고 합니다. 합성을 나타내는 기호 `∘`를 사용하면, 방금 만든 함수를 다음과 같이 쓸 수 있습니다.
-
-~~~text
-findManager = managerOf ∘ findEmployee
-managerEmailOf = emailOf ∘ managerOf
-~~~
-
-`managerOf ∘ findEmployee`는 먼저 `findEmployee`를 적용하고, 그 결과에 `managerOf`를 적용하는 함수입니다. 중첩 호출 `managerOf (findEmployee employeeId)`와 같은 순서로 읽으면 됩니다.
-
-함수의 이름과 타입을 일반적으로 바꿔 적어도 만드는 방법은 같습니다. `f : A → B`, `g : B → C`일 때 합성은 다음과 같이 정의합니다.
-
-~~~text
-g ∘ f : A → C
-
-(g ∘ f) x = g (f x)
-~~~
-
-중첩 호출 `g (f x)`처럼, `g ∘ f`도 오른쪽의 `f`부터 적용합니다. 합성 결과 역시 함수이므로 다른 함수와 다시 합성할 수 있습니다.
-
-이제 이 세 함수를 두 가지 방식으로 묶어 보겠습니다.
-
-~~~text
-emailOf ∘ (managerOf ∘ findEmployee)
-(emailOf ∘ managerOf) ∘ findEmployee
-~~~
-
-![세 함수의 적용 순서는 그대로 두고, 앞의 두 함수 또는 뒤의 두 함수를 묶은 비교](composition-grouping.ko.svg)
-
-첫 번째 식은 `findManager`로 직원 번호에서 팀장을 찾은 뒤 이메일을 읽습니다. 두 번째 식은 `managerEmailOf`에 `findEmployee`로 찾은 직원을 넘깁니다. 두 식에 같은 직원 번호를 넣으면 모두 `emailOf (managerOf (findEmployee employeeId))`가 되며, 전체 타입은 `Nat → String`입니다.
-
-여기서 함수가 같다는 말은 모든 입력에 대해 같은 값을 반환한다는 뜻입니다.
-
-이 계산을 임의의 함수로 일반화해 보겠습니다. 서로 이어지는 세 함수와 입력의 타입은 다음과 같습니다.
+어떤 숫자를 받아 두 배로 불려 주는 함수가 있고, 숫자를 받아 문자열로 변환하는 함수가 있다고 가정해 봅시다. 그렇다면 우리는 이 두 함수를 연달아 적용해, 숫자를 받아서 그 숫자의 두 배를 문자열로 변환하는 함수를 쉽게 만들 수 있습니다. 즉, 첫 번째 함수의 출력을 두 번째 함수의 입력으로 사용할 수 있다면, 두 함수를 하나로 묶어 더 큰 동작을 하는 새로운 함수를 만들 수 있습니다. 수학에서는 이를 **함수 합성**(composition)이라 부르고 $g \circ f$라고 적습니다.
 
 ~~~text
 f : A → B
 g : B → C
-h : C → D
-x : A
+g ∘ f : A → C
 ~~~
 
-합성의 정의를 한 번씩 펼치면 됩니다.
+함수의 타입 관점에서 생각해 보면, 앞선 함수의 반환 타입이 다음 함수의 입력 타입과 같을 때 두 함수를 하나의 함수로 묶을 수 있습니다. 이때 $g \circ f$는 입력 $a$에 먼저 $f$를 적용하고, 그 결과에 $g$를 적용하는 함수입니다.
 
-~~~text
-(h ∘ (g ∘ f)) x
-= h ((g ∘ f) x)
-= h (g (f x))
+여기서 흥미로운 건 $f$의 반환 타입과 $g$의 입력 타입이 일치하기만 한다면, 함수 내부가 어떻게 구현되었는가에 상관없이 계산들을 이어 갈 수 있다는 점입니다. 예를 들어 앞선 예시에서 $f$를 '숫자를 제곱하는 함수'나 '숫자에 1을 더하는 함수'로 바꾸어도, **숫자를 출력하는 함수**라면 숫자를 문자열로 바꾸는 $g$와 합성할 수 있습니다. 또한 문자열을 UTF-8 바이트로 인코딩하는 함수 $h$가 있다면 $h \circ g \circ f$와 같이 합성을 이어 갈 수 있습니다.
 
-((h ∘ g) ∘ f) x
-= (h ∘ g) (f x)
-= h (g (f x))
-~~~
+그런데 실제 프로그램을 작성하다 보면 이러한 조립이 생각만큼 잘 이뤄지지 않는다는 것을 알게 됩니다.
 
-입력 `x`가 무엇이든 양쪽이 같은 식이 됩니다. `f`, `g`, `h`의 내부에서 무엇을 계산하는지도 사용하지 않았습니다. 세 함수의 타입이 이어진다는 조건과 합성의 정의만 사용했습니다.
+---
 
-~~~text
-h ∘ (g ∘ f) = (h ∘ g) ∘ f
-~~~
+## 2. 출력값의 부재: 입력과 출력이 어긋나는 합성
 
-이 등식이 결합법칙(associativity)입니다. 함수들을 어디서 나누어 묶을지 바꿔도, 전체 함수는 같습니다.
+우리가 일반적으로 떠올리는 함수 $f : A \to B$는 **모든** 입력 $a \in A$에 대해 어떤 $b \in B$를 돌려줍니다($\sin x$, $e^x$, $x^2$ 등을 떠올려 보세요). 수학에서는 이런 함수를 전함수(total function)라고 부릅니다.
 
-함수를 적용하는 순서는 두 식 모두 `f`, `g`, `h`입니다. 결합법칙은 이 순서를 유지한 채 묶는 위치를 바꿀 수 있다는 뜻입니다.
+하지만 프로그램의 함수에서는 **출력값이 없는 상황**, 즉 $a$에 대응하는 $b$가 존재하지 않는 경우가 빈번하게 발생합니다.
+예를 들어 유저가 입력한 문자열을 숫자로 파싱하는 함수를 작성한다고 상상해 봅시다. 입력이 `"42"`라면 숫자 $42$를 돌려줄 수 있지만, 입력이 `"hello"`라면 유효한 숫자를 돌려줄 수 없습니다. 또 다른 예로, 회원 정보를 조회할 때 등록되지 않은 계정 ID를 입력하면 돌려줄 회원 정보가 없습니다. 이처럼 **어떤** 입력에 대해 출력이 정의되지 않은 함수를 부분 함수(partial function)라고 합니다.
 
-## 항등 함수: 합성해도 원래 함수를 바꾸지 않는 함수
+그렇다면 입력에 따라 `B` 값을 구하지 못하는 계산(부분 함수)을 모든 입력에서 정의되는 함수(전함수)로 표현할 수 있을까요? 여기서 한 가지 발상을 바꿔 보겠습니다. **값이 없다는 사실도 하나의 값으로 표현하면 어떨까요?**
 
-함수를 이어 붙일 때, 앞뒤에 붙여도 원래 함수를 바꾸지 않는 함수도 생각할 수 있습니다. 덧셈에서 0을 더해도 원래 수가 그대로인 것처럼, 함수 합성에서도 그런 역할을 하는 함수를 찾아보겠습니다.
+이를 위해 반환 타입을 `B`에서 `Option B`로 바꿉니다. `Option B`의 값은 어떤 `b : B`를 담은 `some b`이거나, **값의 부재**를 나타내는 `none`입니다. 돌려줄 `B` 값이 없어도, 그 사실을 나타내는 `none`은 돌려줄 수 있는 것입니다. Python의 `B | None`, C++의 `std::optional<B>`, Haskell의 `Maybe B`도 비슷한 역할을 합니다. (즐겨 쓰는 언어에서는 값의 부재를 어떻게 표현하는지도 찾아보세요!)
 
-`findEmployee`는 직원 번호를 받아 직원 정보를 반환합니다. 그 앞에 직원 번호를 그대로 돌려주는 함수를 하나 넣어 보겠습니다.
+이제 입력 `a`에서 값을 구했다면 `some b`를, 구하지 못했다면 `none`을 돌려주도록 함수를 정의합니다. 어느 입력에도 `Option B` 값 하나가 대응하므로, 이 함수의 타입은 `A → Option B`이고 전함수입니다. 다만 `Option`만으로는 값이 없는 이유까지 알 수 없습니다.
 
-~~~text
-identityNat : Nat → Nat
-identityNat employeeId = employeeId
+이제 이렇게 값이 없을 수 있는 계산을 두 단계 이어 보겠습니다. 먼저 입력 문자열을 자연수로 파싱하고, 그다음에는 그 수의 역수를 구하는 것입니다. 입력이 `"42"`라면 두 단계를 모두 진행할 수 있습니다. 하지만 `"hello"`라면 첫 단계에서 숫자를 구하지 못하고, `"0"`이라면 파싱에는 성공해도 두 번째 단계에서 역수를 구할 수 없습니다.
 
-findEmployee (identityNat employeeId)
-= findEmployee employeeId
-~~~
-
-직원을 찾은 뒤에는 직원 정보를 그대로 돌려주는 함수를 연결해 보겠습니다.
-
-~~~text
-identityEmployee : Employee → Employee
-identityEmployee employee = employee
-
-identityEmployee (findEmployee employeeId)
-= findEmployee employeeId
-~~~
-
-이렇게 입력을 그대로 반환하는 함수를 항등 함수(identity function)라고 합니다. 임의의 타입 `A`에 대해 다음과 같이 정의할 수 있습니다.
-
-~~~text
-id_A : A → A
-id_A x = x
-~~~
-
-첨자 `A`는 어느 타입의 항등 함수인지 표시합니다. 앞에서 만든 `identityNat`은 `id_Nat`, `identityEmployee`는 `id_Employee`라고 쓸 수 있습니다.
-
-`f : A → B` 앞에 `id_A`를 붙이거나 뒤에 `id_B`를 붙여 보겠습니다.
-
-~~~text
-(f ∘ id_A) x
-= f (id_A x)
-= f x
-
-(id_B ∘ f) x
-= id_B (f x)
-= f x
-~~~
-
-따라서 두 항등법칙(identity laws)이 성립합니다.
-
-~~~text
-f ∘ id_A = f
-id_B ∘ f = f
-~~~
-
-앞에 붙일 항등 함수는 입력 타입에, 뒤에 붙일 항등 함수는 출력 타입에 맞춰야 합니다. `findEmployee : Nat → Employee` 앞에는 `id_Nat`, 뒤에는 `id_Employee`가 들어갑니다.
-
-~~~text
-Nat --id_Nat-------> Nat      --findEmployee--> Employee
-Nat --findEmployee-> Employee --id_Employee---> Employee
-~~~
-
-## Category의 정의: 대상과 사상, 합성과 법칙
-
-지금까지 직원과 팀장 연락처를 찾는 함수를 통해 함수 합성의 결합법칙과 항등법칙을 확인했습니다. 이때 직원 번호나 각 함수의 구현을 몰라도 법칙을 확인할 수 있었습니다. 함수의 타입이 어떻게 이어지는지, 합성과 항등을 어떻게 정의했는지만 사용했기 때문입니다.
-
-수학에서도 이처럼 구체적인 내용보다 공통된 성질에 주목합니다. 사람 세 명과 사과 세 개는 서로 다르지만, 개수에 주목하면 둘 다 자연수 `3`으로 나타낼 수 있습니다. 서울 시민과 한 학교의 학생들도 각 사람의 세부 정보보다 구성원의 모임이라는 점에 주목하면 각각 하나의 집합으로 다룰 수 있습니다. 이처럼 구체적인 내용에서 관심 있는 성질이나 구조를 골라내는 것을 **추상화** 라고 합니다.
-
-Category(범주)도 이러한 추상화의 한 예입니다. 집합 사이의 함수는 합성할 수 있고, 그래프의 정점 사이를 잇는 경로는 이어 붙일 수 있습니다. 서로 다른 수학적 구조에서 이런 연결과 합성, 그리고 그 법칙을 골라내어 공통된 언어로 다루는 것이 범주론입니다.
-
-앞의 함수 예제를 통해 어떤 구조를 남기는지 살펴보겠습니다.
-
-~~~text
-Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
-~~~
-
-앞에서 사용한 타입과 함수를 category의 용어로 다시 살펴보겠습니다. 이 예제에서는 `Nat`, `Employee`, `String` 같은 타입이 **대상**(object)이고, 타입 사이의 함수가 **사상**(morphism)입니다. `findEmployee : Nat → Employee`는 대상 `Nat`에서 대상 `Employee`로 가는 사상에 해당합니다.
-
-여기서 대상은 특정 직원의 정보가 아니라, 그 값이 속하는 타입 `Employee`입니다. 그림에 두 번 나타난 `Employee`는 같은 대상이며, `managerOf`는 그 대상에서 자신으로 가는 사상입니다.
-
-두 사상을 합성하면 또 하나의 사상을 얻습니다. 예를 들어 `findEmployee`와 `managerOf`를 합성하면 `managerOf ∘ findEmployee : Nat → Employee`가 됩니다. 각 타입에는 앞에서 정의한 항등 함수도 있습니다.
-
-Category의 정의는 여기서 타입과 함수라는 구체적인 재료까지 일반화합니다. 대상과 사상이 무엇인지는 열어 두되, 각 사상에는 출발점과 도착점이 있고, 합성과 항등이 주어지며, 같은 법칙을 만족하도록 요구하는 것입니다.
-
-앞에서는 함수의 타입을 `A → B`로 적었습니다. 일반적인 사상에는 `f : A ⟶ B`라는 표기를 사용하겠습니다. 이는 `f`의 출발 대상이 `A`, 도착 대상이 `B`라는 뜻이며, 두 대상은 같을 수도 있습니다.
-
-### 정의 — Category(범주)
-
-> **Category는 다음 구성 요소와 법칙으로 이루어진 구조입니다.**[^riehl-category]
->
-> **구성 요소**
->
-> 1. **대상**(object): 이 category에서 다룰 대상들을 정합니다.
-> 2. **사상**(morphism): 각 대상 `A`, `B`에 대해 `A`에서 `B`로 가는 사상들을 정합니다. 각 사상에는 출발 대상과 도착 대상이 지정되어 있습니다.
-> 3. **항등 사상**(identity morphism): 각 대상 `A`에 사상 `id_A : A ⟶ A`를 하나 지정합니다.
-> 4. **합성**(composition): 도착 대상과 출발 대상이 맞는 모든 사상 `f : A ⟶ B`, `g : B ⟶ C`에 대해, 합성 `g ∘ f : A ⟶ C`를 지정합니다.
->
-> **만족해야 하는 법칙**
->
-> **결합법칙.** 모든 `f : A ⟶ B`, `g : B ⟶ C`, `h : C ⟶ D`에 대해 다음 등식이 성립합니다.
->
-> ~~~text
-> h ∘ (g ∘ f) = (h ∘ g) ∘ f
-> ~~~
->
-> **항등법칙.** 모든 사상 `f : A ⟶ B`에 대해 다음 두 등식이 성립합니다.
->
-> ~~~text
-> id_B ∘ f = f
-> f ∘ id_A = f
-> ~~~
-
-합성과 항등 사상을 지정하는 것과, 이들이 법칙을 만족하는지 확인하는 것은 구분해야 합니다. 위 구성 요소를 모두 정하고 두 법칙을 만족해야 category가 됩니다.
-
-앞의 타입과 함수는 이 정의를 채우는 한 사례입니다. 대상은 타입으로 정하고,[^size-level] `A`에서 `B`로 가는 사상은 순수한 전체 함수 `A → B`로 정합니다. 여기서 순수한 함수는 같은 입력에 같은 값을 반환하고 외부 상태를 바꾸지 않는 함수이며, 전체 함수는 모든 입력에 대해 반환 타입의 값을 주는 함수입니다. 합성은 `g (f x)`로, 항등은 입력을 그대로 반환하는 함수로 정하면, 앞에서 임의의 함수와 입력에 대해 확인한 계산이 바로 이 category의 법칙을 증명합니다.
-
-일반 category에서는 대상이 타입이거나 사상이 함수일 필요는 없습니다. 대상과 사상을 다른 것으로 정하더라도, 합성과 항등 사상을 주고 같은 법칙을 만족하면 됩니다. 함수가 아닌 사상으로 이루어진 예는 뒤의 글에서 살펴보겠습니다.
-
-## 결합법칙만으로는 항등 사상의 존재가 보장되지 않습니다
-
-앞에서 정의한 함수 합성에서는 결합법칙과 항등법칙이 모두 성립했습니다. 그렇다면 결합법칙을 만족하도록 연산을 정하면, 항등 역할을 하는 사상도 항상 찾을 수 있을까요?
-
-대상은 `Bool` 하나로, 사상은 `Bool → Bool`인 모든 함수로 정하겠습니다. 모든 사상의 출발점과 도착점이 같으므로, 어떤 두 사상을 골라도 연결할 타입은 맞습니다.
-
-이제 보통 함수 합성 대신, 두 함수 중 왼쪽 함수만 남기는 연산 `⋄`를 정합니다.
-
-~~~text
-g ⋄ f = g
-~~~
-
-이 연산은 두 함수를 실행하지 않고, 함수 `g` 자체를 결과로 돌려줍니다. 함수 `f`는 버립니다. 결과 역시 `Bool → Bool`이므로 사상의 타입은 맞습니다.
-
-세 함수를 묶으면 어떻게 될까요?
-
-~~~text
-h ⋄ (g ⋄ f) = h ⋄ g = h
-(h ⋄ g) ⋄ f = h ⋄ f = h
-~~~
-
-어느 쪽부터 묶어도 맨 왼쪽 함수 `h`만 남습니다. 따라서 결합법칙은 만족합니다.
-
-하지만 항등 역할을 하는 사상 `e`가 있다면, 모든 함수 `f`에 대해 `e ⋄ f = f`여야 합니다. 이를 연산의 정의와 비교해 보겠습니다.
-
-~~~text
-e ⋄ f = f    -- 항등법칙이 요구하는 값
-e ⋄ f = e    -- 연산의 정의에 따른 값
-~~~
-
-두 조건이 동시에 성립하려면 `e = f`여야 합니다. 더구나 항등 사상 하나가 **모든** 함수에 대해 작동해야 하므로, 같은 `e`가 모든 `Bool → Bool` 함수와 같아야 합니다.
-
-입력을 그대로 반환하는 `id_Bool`과, 참과 거짓을 뒤집는 `not`만 비교해도 이것이 불가능하다는 것을 알 수 있습니다.
-
-~~~text
-id_Bool true = true
-not true = false
-~~~
-
-두 함수가 서로 다르므로, 하나의 `e`가 둘 모두와 같을 수는 없습니다. 따라서 이 연산에는 항등 사상이 없습니다.
-
-같은 대상과 사상을 두더라도 어떤 합성을 정하느냐에 따라 category가 될 수도 있고 아닐 수도 있습니다. `Bool → Bool`인 함수들에 앞에서 정의한 함수 합성을 사용하면 항등 함수가 존재하고 두 법칙도 성립합니다. 하지만 `⋄`를 합성으로 사용하면 항등 역할을 하는 사상이 없습니다. `⋄`라는 연산이 금지된다는 뜻이 아니라, 이 연산을 합성으로 정한 구조가 category의 조건을 만족하지 못한다는 뜻입니다.
-
-## 앞선 예제로 돌아가기
-
-지금까지는 각 조회가 성공해 다음 단계에 필요한 값을 반환하는 것으로 설명했습니다. 하지만 번호에 해당하는 직원이 없을 수도 있고, 직원에게 팀장이 지정되지 않았을 수도 있습니다. 팀장을 찾아도 이메일 주소가 비어 있을 수 있습니다.
-
-이런 부재까지 반환값으로 나타내려면 함수의 타입을 바꿔야 합니다. `Option A`는 `A` 타입의 값이 있을 수도, 없을 수도 있음을 나타냅니다. 값 `a`가 있으면 `some a`, 없으면 `none`입니다.
-
-~~~text
-findEmployee : Nat → Option Employee
-managerOf    : Employee → Option Employee
-emailOf      : Employee → Option String
-~~~
-
-![Employee를 그대로 넘기는 처음의 연결과 Option Employee를 처리해야 하는 변경 후의 연결](option-composition.ko.svg)
-
-이제 처음처럼 `managerOf (findEmployee employeeId)`라고 쓸 수 없습니다. `findEmployee`의 반환 타입은 `Option Employee`인데, `managerOf`의 입력 타입은 `Employee`이기 때문입니다.
-
-이 함수들도 수학적인 함수입니다. `none` 역시 반환 타입의 값입니다. 달라진 것은 앞 함수의 결과를 다음 함수에 그대로 넘길 수 없다는 점입니다. 값을 찾았다면 그 안의 직원을 다음 조회에 넘기고, 찾지 못했다면 조회를 멈추는 처리가 필요합니다.
-
-그렇다면 다음 두 함수를 어떻게 연결해야 할까요?
+첫 함수를 $f$, 다음 함수를 $g$라고 하면, 둘 다 값을 구하지 못할 수 있으므로 타입은 다음과 같습니다.
 
 ~~~text
 f : A → Option B
 g : B → Option C
-
-두 함수를 연결한 결과 : A → Option C
 ~~~
 
-## 이번 편에서 확인한 것
-
-직원 조회의 세 함수를 어디서 나누어 묶어도 같은 이유는 함수 합성의 결합법칙에 있었습니다. 항등 함수는 합성에 아무 영향도 주지 않는 역할을 했습니다. Category는 대상과 사상, 합성과 항등을 정하고 이 법칙들을 요구하는 구조입니다.
-
-`Option`을 반환하도록 바꾼 조회에서도 값을 찾으면 다음 단계로 넘기고, 찾지 못하면 멈추도록 함수들을 연결할 수 있습니다. 이 처리를 하나의 합성 연산으로 만들면, 앞에서 살펴본 질문을 다시 던질 수 있습니다. 함수를 어디서 나누어 묶어도 결과가 같을까요? 이 합성에서 항등 역할을 하는 함수는 무엇일까요?
-
-모나드는 `Option`처럼 값의 부재를 함께 다루는 계산을 연결하는 데 쓰입니다. 다음 편에서는 직원 조회에 반복해서 필요한 부재 처리를 하나의 합성 연산으로 만들고, 결합법칙과 항등법칙을 확인하겠습니다. 이를 통해 모나드로 이어지는 구체적인 사례를 살펴보겠습니다.
-
-## Lean 실습: 합성의 타입과 법칙 확인하기
-
-이 절은 앞의 계산을 Lean으로 직접 확인하고 싶은 분들을 위한 선택 실습입니다. 본문의 결론은 Lean 코드를 실행하지 않아도 식 전개로 확인할 수 있습니다.
-
-함수와 증명을 함께 적을 수 있는 언어인 Lean 4를 사용합니다. 아래 코드는 조회 함수의 구현을 정하는 대신, 본문에 적은 타입의 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다. 직원 정보를 실제로 조회하는 구현은 다음 편에서 다룹니다. 이 코드는 Lean 4.32.1에서 확인하였고, [Lean playground에서 전체 코드를 열 수 있습니다](https://live.lean-lang.org/#codez=LTAEgquwMhsHZbB0O1Ayo4EVHAvPYFKbSBSewPxOAMO0AjIB3LAXKIBargGEOiCWq4IyDgPzWgDGAhgC4CmA5gPYBOATwBQIUABlOrAHagALADoAzACYFBQAujgHEHQgVTXAHuOAI1cCtQ4AmmwCdNC0IBGewCPNgDXHQASwC2ABwHtQgMdHALuOhAE6HASNXAA1XQakAI8bNLYVEwZl53XgBnTlBuUAAzDEAPnsAObscMwAwiLMBQ8YsrQB4uwAAJrMAfTtBAQAnASrHAHVXQQBKW9IaWmgrhABNOTJZEj1TQAG8AQVAAIVAAYVAyABVBN04AX1AACgyyBcAkwiWASj2RslmTufOr0BPlkgBeYVAsgFdZAA9QZ4A%2BdIXUDfU6xMROIbSdhOdiCDClQCkHYARcdAgA%2FawAAzfBABg9gA01vqWUDTDCAGoHmmFADKtFEojkAAwulDSgQB7nYAG2dAgFQJwAuq4BFyf6QxGkM40NhgimszWG22KyJDxlLzenx%2Bf0B33BYEADhOAGLXqYATltR%2BkACePwQDYPUhQIAFFtAgDZuwAy4%2F5AJg1gAFx6n6QADk3p9ASFMJ2AALTgCTguUAuGSsbicfgAUVDTgANgB9fg8fi8D5uJzSDKTGNuOO8QScNISzZbBXvXaZTMDXP5wvF0AAOQ4strBaL512oek4cjAHlLqA2%2FXW%2B46x3y3sg6x4wPpcOi7KAMrsfiZ7h3ScJJITaezka7bfjNLd3v8OdV6Q1sftzjnV7vR%2BjHdpQ9jFJpPdxueniPnzLnJe155reKzPKA%2FCZHGaqgIADTU0IAqT2AJpzZCACC1gAcaw0gB0Y4AFTW2FkAA06REb6jgtKAgA4Q1oGD2tE3piIAiaOAL1THL2A0gA9y4AGnOAC5diogsqoC%2BnsGSViCpynIAADWgIAGC2AAPd8CQXG8AGGEkR0T6%2FqBsGR4fgmrDJMkvDMGK8xLKAAAi0rrKWk67EJZDLCc5mdgcpmPJ2g7XPMm5PjpExCW%2BL5AgBfzPseex%2BWkQkblkYEQVBMGQgmCwlCM4GZGQmRSXi7RzA0mLwIAM82ACQdgCwk%2F0foBsmwaCsKcIJkeJkLCWUqifcNw%2BY%2BkXOFCMJwrF6VxYpMEjCUSWzOlmWMoAGI2ABx1RL5VioAleVMSVVpYUJrVfWijMpktTsbUyh1Kxbu%2BEwCr1IqhZc4HDXE8Vxs6gA3o4ADHU6Oy9jtPQTCALargCPLdSUnwchf3%2FchqKADOdgCOE%2BQqIGF6D30Ki5iAC6dgAxNRy7RsFwfBCNo%2BFOqAgC5k4AoV3%2BIArYutOYGCANztzpIIAm039EAA%3D%3D).
-
-코드에서 `compose g f`는 본문의 `g ∘ f`이고, `identity`는 항등 함수입니다. `def`는 정의를 시작하는 키워드이고, `fun x => ...`는 입력 `x`를 받는 함수를 만듭니다. `theorem`은 증명할 명제를 선언합니다.
-
-~~~lean
--- 모나드로 알아보는 범주론 1편: 함수 합성과 category
--- Lean 4.32.1에서 확인했습니다. 별도의 import 없이 실행할 수 있습니다.
-
--- compose g f는 본문의 g ∘ f입니다. 먼저 f를 적용한 뒤 g를 적용합니다.
-def compose {A B C : Type} (g : B → C) (f : A → B) : A → C :=
-  fun x => g (f x)
-
--- identity는 입력을 그대로 반환합니다. A는 사용할 때 함수의 타입에 맞춰 정해집니다.
-def identity {A : Type} : A → A :=
-  fun x => x
-
--- 조회 함수들을 인자로 받아 두 묶음이 같은 함수인지 확인합니다.
-theorem managerEmail_regrouping {Employee : Type}
-    (findEmployee : Nat → Employee) (managerOf : Employee → Employee)
-    (emailOf : Employee → String) :
-    compose emailOf (compose managerOf findEmployee) =
-      compose (compose emailOf managerOf) findEmployee := rfl
-
--- 결합법칙: 괄호를 옮겨도 f, g, h의 적용 순서는 같습니다.
--- 양쪽 정의를 펼치면 fun x => h (g (f x))가 되므로 rfl로 확인할 수 있습니다.
-theorem compose_assoc {A B C D : Type}
-    (h : C → D) (g : B → C) (f : A → B) :
-    compose h (compose g f) = compose (compose h g) f := rfl
-
--- id_B ∘ f = f: f가 반환한 B를 그대로 돌려줍니다.
-theorem identity_comp {A B : Type} (f : A → B) :
-    compose identity f = f := rfl
-
--- f ∘ id_A = f: f에 넘길 A를 그대로 돌려줍니다.
-theorem comp_identity {A B : Type} (f : A → B) :
-    compose f identity = f := rfl
-
--- rfl은 여기서 정의한 합성과 항등 함수가 결합법칙과 항등법칙을 만족함을 확인합니다.
--- 합성을 다르게 정한 category에서도 같은 증명이 통한다는 뜻은 아닙니다.
-~~~
-
-`managerEmail_regrouping`은 직원 조회 예제의 두 묶음이 같다는 명제입니다. `Employee`의 구체적인 필드나 세 조회 함수의 구현에 의존하지 않습니다. 본문에서 합성의 정의를 펼쳤을 때처럼, 양쪽이 같은 중첩 호출이 되는지만 확인합니다.
-
-`compose_assoc`는 임의의 타입 `A`, `B`, `C`, `D`와 함수 `f`, `g`, `h`에 대한 결합법칙입니다. `{A B C D : Type}`은 타입 매개변수를 선언하며, 중괄호는 사용할 때 Lean이 이 타입들을 추론하도록 한다는 뜻입니다. 정리에 적힌 등식은 본문의 식과 다음처럼 대응합니다.
+두 함수를 이전과 같이 이어 붙여 합성하려 하면 문제가 드러납니다.
 
 ~~~text
-compose h (compose g f) = compose (compose h g) f
-
-h ∘ (g ∘ f) = (h ∘ g) ∘ f
+g (f a)  -- 컴파일 에러: Option B를 B 자리에 넣을 수 없음
 ~~~
 
-`identity_comp`와 `comp_identity`는 각각 `id_B ∘ f = f`와 `f ∘ id_A = f`에 대응합니다. 코드에서는 두 타입의 항등을 모두 `identity`라고 쓰지만, Lean은 합성할 함수의 타입에 맞춰 어느 타입의 항등인지 추론합니다.
+![보통 합성에서는 앞 함수의 출력 B와 다음 함수의 입력 B가 맞지만, Option B를 반환하면 다음 함수가 요구하는 B와 맞지 않습니다.](option-type-mismatch.ko.svg)
 
-증명 끝의 `rfl`은 이 정의들을 계산하면 양쪽이 같은 함수가 된다는 것을 Lean이 확인하게 합니다. 항등법칙에서는 입력에 `f`를 적용하는 함수 `fun x => f x`와 `f` 자체도 같은 것으로 처리합니다. 다른 방식으로 합성과 항등을 정의했다면 별도의 증명이 필요합니다. 일반적인 category의 법칙이 모두 `rfl`로 증명된다는 뜻은 아닙니다.
+$f$는 값의 부재 가능성을 담은 `Option B`를 상자(혹은 *부리또*)로 건네는데, $g$는 $B$ 값만을 요구합니다.
 
-## 참고문헌
+결국 $f : A \to \text{Option } B$와 $g : B \to \text{Option } C$에는 보통의 합성 $g \circ f$를 그대로 정의할 수 없습니다.
 
-- Bartosz Milewski, *Category Theory for Programmers*, Ch. 1, §§1.1–1.2, pp. 3–6. 함수 합성의 표기와 결합법칙·항등법칙.
-- Emily Riehl, *Category Theory in Context*, Definition 1.1.1, p. 3; Example 1.1.3(i), p. 4. Category의 정의와 집합·함수로 이루어진 category의 사례.
+어떻게 하면 값이 없을 가능성이 있는 함수들을 합성할 수 있을까요? 프로그래머들은 보통 이 어긋남을 어떻게 해결할까요?
 
-[^riehl-category]: Riehl, Definition 1.1.1, p. 3. 원전은 항등과 결합의 두 공리로 적습니다. 여기서는 항등법칙의 좌우 등식을 각각 표시했습니다.
-[^size-level]: 모든 타입을 무제한으로 한 집합에 넣는다는 뜻은 아닙니다. 여기서는 하나의 고정된 크기 수준에서 타입을 다루며, 이 전제는 앞의 함수 계산을 바꾸지 않습니다.
+---
+
+## 3. 조건 분기로 두 계산을 이어 보면
+
+$g \circ f$를 그대로 쓸 수는 없지만, 두 함수를 이어 붙였을 때 원하는 동작은 분명합니다. $f\,a$가 `none`이면 전체 결과도 `none`이고, `some b`이면 그 $b$를 $g$에 넘겨 $g\,b$를 결과로 삼으면 됩니다. 이렇게 만든 새 합성을 잠시 $g \star f : A \to \text{Option } C$라고 적겠습니다.
+
+Lean의 분기문으로 쓰면 다음과 같습니다. 여기서는 $h : C \to \text{Option } D$까지 한 단계 더 이어 보겠습니다.
+
+~~~lean
+def runOption {A B C D : Type}
+    (f : A → Option B) (g : B → Option C) (h : C → Option D)
+    (a : A) : Option D :=
+  match f a with
+  | none => none
+  | some b =>
+    match g b with
+    | none => none
+    | some c => h c
+~~~
+
+이 코드는 원하는 결과를 정확히 계산합니다. $f\,a$가 `none`이면 첫 분기에서 멈추고, `some b`이면 $g\,b$를 실행합니다. $g\,b$도 `none`이면 멈추고, `some c`일 때만 $h\,c$로 넘어갑니다. 하나의 파이프라인을 작성하는 데에는 이 방법으로 충분합니다.
+
+다만 분기문이 담당하는 일은 $f$, $g$, $h$의 고유한 계산과 관계가 없습니다. 앞선 결과가 없으면 멈추고, 있으면 다음 함수에 넘기는 연결 규칙을 `runOption` 안에 직접 적은 것입니다. 다른 함수들을 잇거나 단계를 추가할 때도 같은 규칙이 필요합니다.
+
+이 글의 목표는 특정한 `runOption` 하나를 짧게 쓰는 것이 아니라, $f$와 $g$를 받아 다시 $A \to \text{Option } C$ 함수를 만드는 **합성 방법**을 찾는 것입니다. 그러려면 호출부에 반복되는 분기를 두 **함수 사이의 연산**으로 꺼내야 합니다. 먼저 이미 있는 연산으로 그 일을 할 수 있는지 살펴보겠습니다.
+
+---
+
+## 4. 중첩된 문맥: 왜 `map`만으로는 충분하지 않은가
+
+함수형 프로그래밍을 접해 본 개발자라면 이렇게 물을 수 있습니다.
+
+> *"컨테이너 안쪽의 값에 함수를 적용해 주는 `map`이 있지 않나요? `(f a).map g`를 쓰면 되지 않을까요?"*
+
+여기서 $α$와 $β$는 각각 임의의 타입을 나타냅니다. `Option.map`은 $α \to β$인 함수를 받아 `Option α`의 안쪽 값에 적용합니다. 타입과 두 경우의 동작을 적으면 다음과 같습니다.
+
+~~~text
+Option.map : (α → β) → Option α → Option β
+
+Option.map g none     = none
+Option.map g (some b) = some (g b)
+~~~
+
+여기서 $g : B \to \text{Option } C$이므로, `some b`에 $g$를 적용한 결과는 `some (g b)`입니다. 이 값은 `Option C`를 한 겹 더 감싼 `Option (Option C)`입니다. `f a`의 결과에 적용하면 다음과 같습니다.
+
+~~~text
+f a               : Option B
+g                 : B → Option C
+(f a).map g       : Option (Option C)
+~~~
+
+예를 들어 $f\,a = \text{some }0$이고 $g\,0 = \text{none}$이라면, `(f a).map g`는 `none`이 아니라 `some none`입니다. 값이 있긴 있는데, 그 값이 '없음'인 셈입니다. 첫 계산은 값을 돌려주었지만 두 번째 계산에서는 값이 없었다는 사실이 두 층에 남습니다.
+
+우리가 원한 것은 값이 있거나 없는 단일한 결과인 `Option C`였습니다. 그런데 손에 쥐어진 것은 껍질 속에 또 껍질이 들어 있는 `Option (Option C)`입니다.
+
+마치 상자를 열었더니 그 안에 또 상자가 들어 있는 러시아 마트료시카 인형과 같습니다. `map`은 안쪽의 알맹이 $B$를 꺼내 $g$에 넘겨주는 일까지는 하지만, $g$ 자신이 새로 만들어 낸 껍질($\text{Option } C$)까지 책임져 주지는 못합니다.
+
+또한 이 결과에 다음 연산인 $h : C \to \text{Option } D$를 바로 적용할 수도 없습니다. 바깥쪽 `Option` 안에 있는 것은 $C$가 아니라 `Option C`이기 때문입니다.
+
+---
+
+## 5. `join`과 `bind`로 합성 규칙 만들기
+
+방금 얻은 것은 `Option (Option C)`입니다. 우리가 원했던 `Option C`로 돌아가려면 바깥쪽 `Option` 층을 한 겹 제거해야 합니다. 바깥쪽이 `none`이면 `none`을 돌려주고, `some result`이면 안쪽의 `result`를 그대로 돌려주는 연산입니다. 타입은 `Option (Option C) → Option C`이고, Lean에서는 `Option.join`이라고 부릅니다. 이 연산은 중첩된 문맥을 한 겹으로 줄이므로 동작을 설명할 때는 흔히 평탄화(flatten)라고도 합니다. 여기서는 정식 연산 이름인 `join`을 사용하겠습니다.
+
+이제 4절의 `map` 결과에 `join`을 적용해 보겠습니다. $f\,a$가 `none`이면 뒤의 $g$는 실행되지 않고 결과도 `none`입니다. $f\,a$가 `some b`라면 `map`은 `some (g b)`를 만들고, `join`은 바깥쪽 `some`을 벗겨 $g\,b$를 돌려줍니다.
+
+~~~text
+((f a).map g).join : Option C
+
+f a = none    이면  none
+f a = some b  이면  g b
+~~~
+
+3절의 조건문에서 직접 적었던 두 갈래가 이 식에서 다시 나타났습니다. 특히 $g\,b$가 `none`일 때 `map`의 결과는 `some none`이지만, `join`을 거치면 `none`이 됩니다. 바깥 인형을 열었더니 안쪽 인형이 비어 있었다면, 결과도 그냥 '비어 있음'이 되는 셈입니다.
+
+안쪽 값에 함수를 적용하는 `map`과 중첩을 한 겹 줄이는 `join`을 합친 연산은 보통 `flatMap` 또는 `bind`라고 부릅니다. Lean에서는 `Option.bind`, Java와 Swift에서는 `flatMap`, Rust와 C++에서는 `and_then`이라는 이름으로 만날 수 있습니다. 이 글의 코드에서는 Lean의 이름인 `bind`를 사용하겠습니다.
+
+두 연산의 관계는 다음 등식으로 나타납니다.
+
+~~~lean
+example {B C : Type} (m : Option B) (g : B → Option C) :
+    m.bind g = (m.map g).join := by
+  cases m <;> rfl
+~~~
+
+![map g는 some b를 some (g b)로 감싸고, join은 이를 g b로 줄입니다. none은 두 연산을 거쳐도 none이며, 이 전체 연결이 bind g입니다.](option-bind-flow.ko.svg)
+
+여기서 `m : Option B`, `g : B → Option C`입니다. `bind`는 이 두 단계를 한 번에 제공하고, `join`은 이미 만들어진 중첩 `Option` 한 겹을 줄입니다. 이후 모나드의 정식 정의에서는 이 관계를 `bind m g = join (map g m)`으로 일반화해 다시 만나게 됩니다.
+
+~~~text
+Option.bind : Option B → (B → Option C) → Option C
+
+composeOption (f : A → Option B) (g : B → Option C) : A → Option C
+composeOption f g a = Option.bind (f a) g
+~~~
+
+`Option.bind`는 이미 얻은 `Option B` 값과 다음 함수를 연결합니다. 이를 이용해 **두 함수를 받아 하나의 새 함수를 만드는 연산**을 `composeOption`이라고 정의하겠습니다. 각 입력 $a$에서 $f$를 실행한 뒤, 그 결과를 `bind`로 $g$에 연결하는 것입니다. 앞서 $g \star f$라고 적어 둔 합성이 바로 `composeOption f g`입니다.
+
+여기서 눈여겨볼 점은 합성한 결과도 `A → Option C`인 함수라는 것입니다. 뒤에 `h : C → Option D`가 오더라도, 이 결과와 `h`를 같은 연산으로 다시 연결할 수 있습니다.
+
+~~~text
+composeOption f g                  : A → Option C
+composeOption (composeOption f g) h : A → Option D
+~~~
+
+함수가 하나 늘어날 때마다 분기문을 새로 작성하던 자리에, 이제는 이미 만든 합성 연산을 다시 사용할 수 있습니다. 각 함수는 자기 계산을 맡고, 값이 없으면 멈추고 있으면 다음 함수로 넘기는 일은 `composeOption`이 맡습니다.
+
+---
+
+## 6. Lean 4로 확인하는 합성
+
+이제 앞에서 살펴본 세 가지 연결 방식을 Lean 4 코드로 정의하고, 대표 입력에서 결과를 비교하겠습니다.
+
+문자열을 자연수로 파싱하는 함수(`parseNat`)와 0을 제외한 자연수의 역수를 `"1/n"` 형태의 문자열로 나타내는 함수(`reciprocal`)를 정의하겠습니다. 이 예제는 분수의 수치 연산이 아니라 값의 부재와 함수 연결에 초점을 맞춥니다.
+
+~~~lean
+-- 모나드와 범주론 ① 함수가 이어지지 않을 때
+-- Lean 4.32.1. 별도의 라이브러리 없이 실행됩니다.
+
+-- 1. 값이 없을 수 있는 두 함수
+def parseNat (s : String) : Option Nat :=
+  s.toNat?
+
+def reciprocal (n : Nat) : Option String :=
+  if n == 0 then
+    none -- 0의 역수는 나타내지 않음
+  else
+    some s!"1/{n}"
+
+~~~
+
+두 함수를 잇는 규칙은 `composeOption`으로 정의합니다. 3절에서 직접 쓴 분기와 5절의 `map` 다음 `join`도 나란히 적어 비교해 보겠습니다.
+
+~~~lean
+-- 앞의 결과에 따라 다음 함수를 호출하는 규칙
+def composeOptionByMatch {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x =>
+    match f x with
+    | none   => none
+    | some b => g b
+
+-- 같은 규칙을 Option.bind로 표현
+def composeOption {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x => (f x).bind g
+
+-- map으로 적용한 뒤 join으로 한 겹 평탄화하는 같은 규칙
+def composeOptionByJoin {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x => ((f x).map g).join
+
+~~~
+
+이제 두 함수를 합성해 보겠습니다.
+
+~~~lean
+def parseAndReciprocal : String → Option String :=
+  composeOption parseNat reciprocal
+
+~~~
+
+`parseAndReciprocal`에는 어떤 두 함수를 연결할지만 적혀 있습니다. 앞의 결과가 없을 때 멈추고, 있으면 다음 함수로 넘기는 방법은 `composeOption`이 맡습니다. 다른 함수들을 연결할 때도 같은 규칙을 그대로 사용할 수 있습니다.
+
+직접 실행하면 성공하는 입력과 각 단계에서 값이 없어지는 입력을 확인할 수 있습니다.
+
+~~~lean
+#eval parseAndReciprocal "42"  -- some "1/42"
+#eval parseAndReciprocal "0"   -- none       (0의 역수는 나타내지 않음)
+#eval parseAndReciprocal "foo" -- none       (파싱 실패)
+#eval (parseNat "0").map reciprocal -- some none (join 전의 두 겹)
+
+~~~
+
+세 구현이 같은 결과를 내는지도 `#guard`로 확인할 수 있습니다. 조건이 참이면 검사를 통과하고, 거짓이면 Lean이 오류를 보고합니다. 아래는 검사 중 일부이며, Playground에는 세 입력에 대한 전체 검사가 들어 있습니다.
+
+~~~lean
+#guard composeOptionByMatch parseNat reciprocal "42" == parseAndReciprocal "42"
+#guard composeOptionByJoin parseNat reciprocal "0" == parseAndReciprocal "0"
+#guard parseAndReciprocal "foo" == none
+~~~
+
+코드를 직접 바꿔 가며 실행해 보고 싶다면 [Lean 4 Playground에서 이 예제를 열어 보세요](https://live.lean-lang.org/#code=--%20%EB%AA%A8%EB%82%98%EB%93%9C%EC%99%80%20%EB%B2%94%EC%A3%BC%EB%A1%A0%20%E2%91%A0%20%ED%95%A8%EC%88%98%EA%B0%80%20%EC%9D%B4%EC%96%B4%EC%A7%80%EC%A7%80%20%EC%95%8A%EC%9D%84%20%EB%95%8C%0A--%20Lean%204.32.1.%20%EB%B3%84%EB%8F%84%EC%9D%98%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%97%86%EC%9D%B4%20%EC%8B%A4%ED%96%89%EB%90%A9%EB%8B%88%EB%8B%A4.%0A%0A--%201.%20%EA%B0%92%EC%9D%B4%20%EC%97%86%EC%9D%84%20%EC%88%98%20%EC%9E%88%EB%8A%94%20%EB%91%90%20%ED%95%A8%EC%88%98%0Adef%20parseNat%20%28s%20%3A%20String%29%20%3A%20Option%20Nat%20%3A%3D%0A%20%20s.toNat%3F%0A%0Adef%20reciprocal%20%28n%20%3A%20Nat%29%20%3A%20Option%20String%20%3A%3D%0A%20%20if%20n%20%3D%3D%200%20then%0A%20%20%20%20none%20--%200%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%0A%20%20else%0A%20%20%20%20some%20s%21%221%2F%7Bn%7D%22%0A%0A--%202.%20%EC%95%9E%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%97%90%20%EB%94%B0%EB%9D%BC%20%EB%8B%A4%EC%9D%8C%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%98%B8%EC%B6%9C%ED%95%98%EB%8A%94%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByMatch%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%0A%20%20%20%20match%20f%20x%20with%0A%20%20%20%20%7C%20none%20%20%20%3D%3E%20none%0A%20%20%20%20%7C%20some%20b%20%3D%3E%20g%20b%0A%0A--%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%EC%9D%84%20Option.bind%EB%A1%9C%20%ED%91%9C%ED%98%84%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0A--%20map%EC%9C%BC%EB%A1%9C%20%EC%A0%81%EC%9A%A9%ED%95%9C%20%EB%92%A4%20join%EC%9C%BC%EB%A1%9C%20%ED%95%9C%20%EA%B2%B9%20%ED%8F%89%ED%83%84%ED%99%94%ED%95%98%EB%8A%94%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByJoin%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28%28f%20x%29.map%20g%29.join%0A%0A--%203.%20%EB%91%90%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%95%A9%EC%84%B1%ED%95%98%EC%97%AC%20%EC%83%88%EB%A1%9C%EC%9A%B4%20%ED%95%A8%EC%88%98%20%EA%B5%AC%EC%84%B1%0Adef%20parseAndReciprocal%20%3A%20String%20%E2%86%92%20Option%20String%20%3A%3D%0A%20%20composeOption%20parseNat%20reciprocal%0A%0A--%204.%20%EC%8B%A4%ED%96%89%20%EA%B2%B0%EA%B3%BC%20%ED%99%95%EC%9D%B8%0A%23eval%20parseAndReciprocal%20%2242%22%20%20--%20some%20%221%2F42%22%0A%23eval%20parseAndReciprocal%20%220%22%20%20%20--%20none%20%20%20%20%20%20%20%280%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%29%0A%23eval%20parseAndReciprocal%20%22foo%22%20--%20none%20%20%20%20%20%20%20%28%ED%8C%8C%EC%8B%B1%20%EC%8B%A4%ED%8C%A8%29%0A%23eval%20%28parseNat%20%220%22%29.map%20reciprocal%20--%20some%20none%20%28join%20%EC%A0%84%EC%9D%98%20%EB%91%90%20%EA%B2%B9%29%0A%0A--%205.%20%EC%84%B8%20%EA%B5%AC%ED%98%84%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%99%80%20%EB%8C%80%ED%91%9C%20%EC%9E%85%EB%A0%A5%EC%9D%84%20%ED%99%95%EC%9D%B8%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20parseAndReciprocal%20%2242%22%20%3D%3D%20some%20%221%2F42%22%0A%23guard%20parseAndReciprocal%20%220%22%20%3D%3D%20none%0A%23guard%20parseAndReciprocal%20%22foo%22%20%3D%3D%20none%0A).
+
+`composeOptionByMatch`는 `none`과 `some b`를 직접 나누고, `composeOptionByJoin`은 `map` 다음 `join`을 적용합니다. `Option.bind`는 같은 연결을 한 줄로 표현합니다. 세 구현을 대표 입력에서 비교한 `#guard`는 예제 확인이며, 모든 입력에 대한 증명은 아닙니다.
+
+- `"42"`가 들어오면: 파싱 성공($\text{some } 42$) $\to$ 분수 표기 생성($\text{some } "1/42"$).
+- `"0"`이 들어오면: 파싱 성공($\text{some } 0$) $\to$ 두 번째 함수가 `none` 반환.
+- `"foo"`가 들어오면: 파싱 실패($\text{none}$) $\to$ 두 번째 함수는 실행조차 되지 않고 즉시 $\text{none}$ 반환.
+
+값의 부재를 매 호출마다 수동으로 검사하지 않고, 합성 규칙(`composeOption`) 안에서 처리했습니다. `join`은 바깥쪽 `none`과 안쪽이 비어 있는 `some none`을 모두 `none`으로 평탄화합니다. 그래서 최종 결과만으로는 어느 단계에서 값이 없어졌는지 알 수 없습니다.
+
+---
+
+## 7. 다음 질문: 합성 규칙의 법칙
+
+처음에는 앞 함수가 돌려준 `Option B`를 다음 함수에 그대로 넘길 수 없었습니다. 이제는 값이 없으면 멈추고, 있으면 다음 계산으로 넘기는 규칙을 `composeOption`으로 표현할 수 있습니다. 연결할 함수가 달라져도 이 규칙은 그대로 사용할 수 있습니다. 앞으로 살펴볼 모나드는 이처럼 계산을 잇는 연산과 그 연산이 지켜야 할 법칙을 함께 다루는 구조입니다.
+
+그렇다면 이 규칙을 여러 단계에 써도 결과가 일관될까요? 세 함수를 어느 괄호부터 묶어도 같은 결과가 나오는지, 입력을 `some`으로 감싸기만 하는 함수가 합성을 바꾸지 않는지 확인해야 합니다.
+
+다음 편에서는 하나의 입력에서 여러 결과를 내는 `List`의 합성을 만들어 보겠습니다. 값의 부재와 다중 결과라는 서로 다른 계산을 비교하며, 두 합성에서 무엇이 공통으로 남는지 살펴보겠습니다. 이어서 합성의 타입을 맞추는 것만으로 충분한지 묻고, `Option`의 합성이 **결합법칙**과 **항등법칙**을 만족하는지 Lean 4로 증명하겠습니다.

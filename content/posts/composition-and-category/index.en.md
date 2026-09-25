@@ -1,393 +1,303 @@
 ---
-date: '2026-09-07T00:00:00+09:00'
+date: '2026-09-25T09:00:00+09:00'
 draft: false
-title: 'Exploring Category Theory Through Monads, Part 1: Function Composition and Categories'
+title: 'Monads and Category Theory ① When Functions Do Not Compose'
 cover:
-  image: "cover.jpg"
-  alt: "Two composition paths grouping the same functions in different places"
+  image: "composition-cover.ko.png"
+  alt: "When functions do not compose: a connecting rule between functions f and g joins their computations"
+  caption: ""
   relative: true
-  hidden: false
-  hiddenInSingle: false
-  hiddenInList: false
 authors: [Jaeho Choi]
-tags: ["category theory", "functional programming", "Lean4", "monad", "composition"]
-series: ["Exploring Category Theory Through Monads"]
+tags: ["category theory", "functional programming", "Lean4", "monad", "composition", "flatMap", "Option"]
+series: ["Monads and Category Theory Starting from Code"]
 series_idx: 1
 categories: ["Programming Language"]
-summary: "Starting with a manager-contact lookup, we calculate the associativity and identity laws of function composition and generalize this structure to the definition of a category."
-description: "Compose three functions that find an employee's manager contact, examining why regrouping preserves the result and what identity functions do."
+summary: "Starting with a type mismatch between functions that return Option, we explore how branching, map, join, and bind express the same computation."
+description: "Connect computations that may produce no value and build a first composition rule on the way to understanding monads."
 comments: true
-keywords: ["category theory", "function composition", "associativity", "identity laws", "Option", "Lean 4"]
+keywords: ["category theory", "function composition", "composition", "Option", "absence of a value", "flatMap", "bind", "Lean 4", "monad"]
 ---
 
-Hello, I'm Jaeho Choi from the Compiler team at HyperAccel.
+Hello, I am Jaeho Choi from the Compiler team at HyperAccel.
 
-Have you heard the term **monad**? You may have encountered it through functional programming, or this may be your first introduction. A monad is both a mathematical concept defined in category theory and a concept used to connect computations in programming.
+We live in an age when AI agents write code for us. A single prompt can produce hundreds of lines of functions in moments, and debates over paradigms such as functional programming can feel like a thing of the past.
 
-How does a mathematical definition relate to the way we write programs? In this series, we will follow that connection through concrete code and equations. We will write code that connects computations and examine the operations and laws involved. By comparing the structures we find with their categorical definitions, we will explore what monads are and what role they play.
+Yet the faster we can produce code, the more important the work left to developers becomes: deciding how to assemble those functions.
 
-**Category theory** studies connections between mathematical objects, ways to compose those connections, and the laws they satisfy. It finds common structures across different objects and studies them in a shared language. Understanding monads also gives us a concrete opportunity to learn this perspective.
+> *“What rules should we use to connect all the functions AI produces?”*
 
-You do not need to know monads or category theory beforehand. If you can read function inputs and outputs, we will introduce the necessary terms and mathematical notation as we go.
+When we can pass one function's result to the next, the task is straightforward. In real code, though, those connections do not always work as we intend.
 
-The first article starts with a familiar way to connect computations: function composition. We will connect three functions that take an employee ID and find that employee's manager's email address. Through this example, we will examine associativity and the role of identity functions, then move to the definition of a category.
+This series begins where those connections break down. We will first write code that makes them work, then use the language of category theory to explore the laws that code satisfies and the mathematical structure within it. Along the way, we will work toward understanding what a monad is and how it relates to our original problem of connecting functions.
 
-## Two ways to split a manager-contact lookup
+There is a reason for taking this approach. If you have looked for material on monads, you have probably encountered one of two barriers.
 
-Suppose we are building a program that displays the selected employee's manager's email address on an organization-chart screen. We look up the employee by ID, find their manager, and then read the manager's email address. Let us write each step as a function.
+On one side stands the forbidding mathematical declaration, *“A monad is just a monoid in the category of endofunctors.”* Quoted without its original context, this alien vocabulary can exhaust readers before they even begin. On the other side are countless everyday analogies: *“A monad is a burrito,”* or *“A monad is a box.”* However many analogies you read, it can still be hard to find a clear answer to the basic questions: *“Why should I learn about monads? Why does my code need this?”*
 
-~~~text
-findEmployee : Nat → Employee
-managerOf    : Employee → Employee
-emailOf      : Employee → String
-~~~
+Between mathematical declarations and everyday analogies lies code we can actually run. As we carry out computations and see exactly where their connections fail, the things those unfamiliar mathematical terms describe can begin to take a more concrete shape.
 
-The notation `f : A → B` means that function `f` takes an `A` and returns a `B`. Applying a function as `f x` means the same thing as `f(x)`. `Nat` is the type of nonnegative integers, used here for employee IDs. `Employee` is the type of employee information.
+We will write that code in [Lean 4](https://lean-lang.org/lean4/doc). Lean 4 is both a functional programming language and an interactive theorem prover (ITP), which checks proofs of mathematical propositions. At first, we will use it to write and run functions. Later, we will use the same language to prove laws about the composition rules we have built. I will introduce the syntax as we need it in the examples.
 
-We pass the employee returned by `findEmployee` to `managerOf`, then pass the resulting manager to `emailOf`. Each function's return type matches the next function's input type.
+In this article, we will connect two functions that may produce no value and build a reusable composition rule that works even when the functions change. Let us begin by connecting two ordinary functions.
 
-~~~text
-emailOf (managerOf (findEmployee employeeId))
-~~~
+---
 
-To reuse part of this lookup, we can extract two steps into a separate function. Call the function that finds a manager from an employee ID `findManager`.
+## 1. Function composition: when outputs and inputs match
 
-~~~text
-findManager : Nat → Employee
-findManager employeeId = managerOf (findEmployee employeeId)
-~~~
+One way to manage complexity as software grows is to connect small functions.
 
-We can now obtain the manager's contact information with `emailOf (findManager employeeId)`. Alternatively, we can first group the two steps that obtain a manager's email from an employee.
-
-~~~text
-managerEmailOf : Employee → String
-managerEmailOf employee = emailOf (managerOf employee)
-~~~
-
-This gives the same contact information through `managerEmailOf (findEmployee employeeId)`. Either way, we obtain the employee, manager, and email in that order. Let us check why regrouping these steps gives the same function.
-
-## Associativity: the same computation with different grouping
-
-The operation of connecting two functions to make a new function is called **function composition**. Using the composition symbol `∘`, we can write the functions we just defined as follows.
-
-~~~text
-findManager = managerOf ∘ findEmployee
-managerEmailOf = emailOf ∘ managerOf
-~~~
-
-`managerOf ∘ findEmployee` applies `findEmployee` first and then `managerOf` to its result. Read it in the same order as the nested call `managerOf (findEmployee employeeId)`.
-
-The construction is the same when we use general function and type names. Given `f : A → B` and `g : B → C`, define their composition by:
-
-~~~text
-g ∘ f : A → C
-
-(g ∘ f) x = g (f x)
-~~~
-
-Like the nested call `g (f x)`, `g ∘ f` applies the right-hand function `f` first. The result of composition is itself a function, so it can be composed with another function.
-
-Now we can group our three functions in two ways.
-
-~~~text
-emailOf ∘ (managerOf ∘ findEmployee)
-(emailOf ∘ managerOf) ∘ findEmployee
-~~~
-
-![The same three functions in the same order, grouping either the first two or the last two](composition-grouping.en.svg)
-
-The first expression uses `findManager` to find a manager from an employee ID, then reads the email. The second passes the employee found by `findEmployee` to `managerEmailOf`. Applying either expression to the same employee ID gives `emailOf (managerOf (findEmployee employeeId))`. Both expressions have type `Nat → String`.
-
-Here, equality of functions means returning the same value for every input.
-
-Let us generalize this calculation to arbitrary functions. Take three functions whose types line up, and an input:
+Suppose we have one function that doubles a number and another that converts a number to a string. Applying them in sequence gives us a function that takes a number and returns a string representing twice that number. Whenever the output of the first function can serve as the input to the second, we can combine the two into a new function that performs a larger operation. In mathematics, this is called **function composition**, written $g \circ f$.
 
 ~~~text
 f : A → B
 g : B → C
-h : C → D
-x : A
+g ∘ f : A → C
 ~~~
 
-Expand the definition of composition one step at a time.
+In terms of types, we can combine two functions when the return type of the first matches the input type of the next. The function $g \circ f$ first applies $f$ to an input $a$, then applies $g$ to the result.
 
-~~~text
-(h ∘ (g ∘ f)) x
-= h ((g ∘ f) x)
-= h (g (f x))
+What is interesting here is that as long as the return type of $f$ matches the input type of $g$, we can connect the computations regardless of how either function is implemented. In our example, we could replace $f$ with a function that squares a number or adds one to it. Any **function that returns a number** can compose with our number-to-string function $g$. If we also have a function $h$ that encodes a string as UTF-8 bytes, we can continue composing: $h \circ g \circ f$.
 
-((h ∘ g) ∘ f) x
-= (h ∘ g) (f x)
-= h (g (f x))
-~~~
+When we write real programs, however, we find that this assembly does not always go so smoothly.
 
-Both sides become the same expression, whatever the input `x`. We did not use any details of what `f`, `g`, or `h` computes internally. We used only the matching types and the definition of composition.
+---
 
-~~~text
-h ∘ (g ∘ f) = (h ∘ g) ∘ f
-~~~
+## 2. Missing output: when composition's types no longer match
 
-This equation is the **associative law**, or **associativity**. Regrouping the functions leaves the overall function unchanged.
+The usual mathematical function $f : A \to B$ returns some $b \in B$ for **every** input $a \in A$. Think of $\sin x$, $e^x$, or $x^2$. Such a function is called a **total function**.
 
-Both expressions apply the functions in the same order: `f`, then `g`, then `h`. Only the choice of which two functions to compose first changes.
+In programs, however, we frequently encounter situations in which **there is no output value**: no corresponding $b$ is available for a given $a$.
 
-## Identity functions: composing without changing the original function
+Imagine writing a function that parses a user-provided string as a number. For the input `"42"`, it can return the number $42$, but for `"hello"`, it cannot return a valid number. Similarly, a lookup for a user account has no account information to return when the supplied ID is unregistered. A function whose output is undefined for **some** inputs is called a **partial function**.
 
-When connecting functions, we can also ask for a function that leaves the original function unchanged when placed before or after it. Adding 0 leaves a number unchanged; let us look for a similar role in function composition.
+Can we express a computation that cannot obtain a `B` for some inputs—a partial function—as a function defined for every input—a total function? Let us change one assumption: **what if the absence of a value were itself represented by a value?**
 
-`findEmployee` takes an employee ID and returns employee information. First, place a function that returns the ID unchanged before it.
+To do this, we change the return type from `B` to `Option B`. A value of `Option B` is either `some b`, containing a `b : B`, or `none`, representing **the absence of a value**. Even when there is no `B` to return, we can return `none` to express that fact. Python's `B | None`, C++'s `std::optional<B>`, and Haskell's `Maybe B` serve similar purposes. (Try looking up how your favorite language represents absence, too!)
 
-~~~text
-identityNat : Nat → Nat
-identityNat employeeId = employeeId
+We now define the function to return `some b` if it obtains a value for input `a`, and `none` otherwise. Every input has a corresponding `Option B` value, so this function has type `A → Option B` and is total. `Option` alone, however, does not tell us why the value is absent.
 
-findEmployee (identityNat employeeId)
-= findEmployee employeeId
-~~~
+Let us connect two stages of such a computation. First, we parse an input string as a natural number; then we take that number's reciprocal. With `"42"`, we can complete both stages. With `"hello"`, the first stage cannot obtain a number. With `"0"`, parsing succeeds, but the second stage cannot obtain a reciprocal.
 
-After finding the employee, place a function that returns employee information unchanged after `findEmployee`.
-
-~~~text
-identityEmployee : Employee → Employee
-identityEmployee employee = employee
-
-identityEmployee (findEmployee employeeId)
-= findEmployee employeeId
-~~~
-
-A function that returns its input unchanged is called an **identity function**. For any type `A`, we can define it as follows:
-
-~~~text
-id_A : A → A
-id_A x = x
-~~~
-
-The subscript `A` identifies the type. We can write `identityNat` as `id_Nat` and `identityEmployee` as `id_Employee`.
-
-Place `id_A` before `f : A → B`, or `id_B` after it.
-
-~~~text
-(f ∘ id_A) x
-= f (id_A x)
-= f x
-
-(id_B ∘ f) x
-= id_B (f x)
-= f x
-~~~
-
-This gives the two **identity laws**.
-
-~~~text
-f ∘ id_A = f
-id_B ∘ f = f
-~~~
-
-The identity function before `f` must match its input type, and the one after it must match its output type. For `findEmployee : Nat → Employee`, we need `id_Nat` before it and `id_Employee` after it.
-
-~~~text
-Nat --id_Nat-------> Nat      --findEmployee--> Employee
-Nat --findEmployee-> Employee --id_Employee---> Employee
-~~~
-
-## Defining a category: objects, morphisms, composition, and laws
-
-We have used functions that find employees and their managers’ contact information to verify the associativity and identity laws of function composition. We could check the laws without knowing the employee ID or how each function was implemented. We used only the matching types and the definitions of composition and identity.
-
-Mathematics similarly focuses on shared properties rather than concrete details. Three people and three apples are different, but focusing on their number lets us represent both by the natural number `3`. We can also treat the residents of Seoul and the students at a school as sets by focusing on collections of members rather than the details of each person. Extracting properties or structure of interest from concrete details in this way is called **abstraction**.
-
-A category is another example of abstraction. Functions between sets can be composed, and paths between vertices of a graph can be joined. Category theory extracts such connections, their composition, and the laws they satisfy from different mathematical structures and studies them in a common language.
-
-Let us return to our function example to see what structure we retain.
-
-~~~text
-Nat --findEmployee--> Employee --managerOf--> Employee --emailOf--> String
-~~~
-
-Let us describe the types and functions we have been using in the language of categories. In this example, types such as `Nat`, `Employee`, and `String` are **objects**, and functions between types are **morphisms**. The function `findEmployee : Nat → Employee` is a morphism from the object `Nat` to the object `Employee`.
-
-An object here is the type `Employee`, not a particular employee. The two occurrences of `Employee` in the diagram refer to the same object; `managerOf` is a morphism from that object to itself.
-
-Composing two morphisms gives another morphism. For example, composing `findEmployee` and `managerOf` gives `managerOf ∘ findEmployee : Nat → Employee`. Each type also has the identity function defined earlier.
-
-The definition of a category generalizes even the choice of types and functions as our ingredients. It leaves open what the objects and morphisms are, while requiring each morphism to have a source and target, specifying composition and identities, and requiring the same laws.
-
-Earlier, we wrote function types as `A → B`. For general morphisms, we will use `f : A ⟶ B`: the source of `f` is `A` and its target is `B`. These two objects may be the same.
-
-### Definition — Category
-
-> **A category consists of the following data, satisfying the laws below.**[^riehl-category]
->
-> **Data**
->
-> 1. **Objects:** Specify the objects of the category.
-> 2. **Morphisms:** For each pair of objects `A`, `B`, specify the morphisms from `A` to `B`. Each morphism has a specified source and target.
-> 3. **Identity morphisms:** For each object `A`, specify a morphism `id_A : A ⟶ A`.
-> 4. **Composition:** For every pair `f : A ⟶ B`, `g : B ⟶ C` with matching target and source, specify a composite `g ∘ f : A ⟶ C`.
->
-> **Laws**
->
-> **Associativity.** For every `f : A ⟶ B`, `g : B ⟶ C`, and `h : C ⟶ D`, the following equation holds.
->
-> ~~~text
-> h ∘ (g ∘ f) = (h ∘ g) ∘ f
-> ~~~
->
-> **Identity laws.** For every morphism `f : A ⟶ B`, both equations hold.
->
-> ~~~text
-> id_B ∘ f = f
-> f ∘ id_A = f
-> ~~~
-
-Specifying composition and identity morphisms is distinct from checking their laws. All the data above must be given and the laws must hold to form a category.
-
-Our types and functions provide one instance of this definition. Take types as objects,[^size-level] and pure total functions `A → B` as morphisms from `A` to `B`. Here, a pure function returns the same value for the same input and does not change external state; a total function returns a value of its return type for every input. Define composition by `g (f x)` and identities by returning the input unchanged. The calculations we made for arbitrary functions and inputs then prove the laws of this category.
-
-In a general category, objects need not be types, and morphisms need not be functions. Other choices also form a category when equipped with composition and identities satisfying the same laws. A later article will give an example whose morphisms are not functions.
-
-## Associativity alone does not guarantee the existence of an identity morphism
-
-The function composition defined earlier satisfies both associativity and the identity laws. If we choose an associative operation, can we always find a morphism that acts as an identity?
-
-Take `Bool` as the only object, and all functions `Bool → Bool` as morphisms. Every morphism has the same source and target, so any pair has matching types.
-
-Instead of ordinary function composition, define an operation `⋄` that keeps only the function on the left.
-
-~~~text
-g ⋄ f = g
-~~~
-
-This operation returns the function `g` itself without running either function. It discards `f`. The result still has type `Bool → Bool`, as required for a morphism.
-
-What happens when we group three functions?
-
-~~~text
-h ⋄ (g ⋄ f) = h ⋄ g = h
-(h ⋄ g) ⋄ f = h ⋄ f = h
-~~~
-
-Either grouping leaves only the leftmost function, `h`. The operation is therefore associative.
-
-But an identity morphism `e` would have to satisfy `e ⋄ f = f` for every function `f`. Compare this requirement with the definition of the operation.
-
-~~~text
-e ⋄ f = f    -- required by the identity law
-e ⋄ f = e    -- given by the definition of the operation
-~~~
-
-For both equations to hold, we need `e = f`. Moreover, a single identity morphism must work for **every** function, so the same `e` would have to equal every function `Bool → Bool`.
-
-Comparing just two functions shows why this is impossible: `id_Bool`, which returns its input, and `not`, which reverses true and false.
-
-~~~text
-id_Bool true = true
-not true = false
-~~~
-
-These functions differ, so one `e` cannot equal both. Thus this operation has no identity morphism.
-
-Even with the same objects and morphisms, the choice of composition can determine whether we get a category. With the function composition defined earlier, the functions `Bool → Bool` have an identity function and satisfy both laws. With `⋄` as composition, no morphism acts as an identity. The operation `⋄` is not forbidden; the structure obtained by choosing it as composition fails to meet the conditions for a category.
-
-## Returning to the earlier example
-
-So far, we have described each lookup as succeeding and returning the value needed by the next step. But the employee ID might not exist, the employee might have no manager assigned, or the manager's email address might be missing.
-
-To represent this absence in the return value, we need to change the function types. `Option A` represents the possible absence of an `A`. If a value `a` is present, we write `some a`; otherwise, we write `none`.
-
-~~~text
-findEmployee : Nat → Option Employee
-managerOf    : Employee → Option Employee
-emailOf      : Employee → Option String
-~~~
-
-![The original connection passes Employee directly; the revised connection needs to handle Option Employee](option-composition.en.svg)
-
-We can no longer write `managerOf (findEmployee employeeId)` as before. The return type of `findEmployee` is `Option Employee`, while the input type of `managerOf` is `Employee`.
-
-These are still mathematical functions: `none` is also a value of the return type. What has changed is that we can no longer pass one function's result directly to the next. If an employee is found, we need to pass the enclosed employee to the next lookup; otherwise, we need to stop.
-
-How, then, should we connect these two functions?
+Call the first function $f$ and the next one $g$. Since either may fail to obtain a value, their types are:
 
 ~~~text
 f : A → Option B
 g : B → Option C
-
-Result of connecting the two functions : A → Option C
 ~~~
 
-## What we established
-
-We could regroup the three employee-lookup functions because function composition is associative. Identity functions left the composed functions unchanged. A category specifies objects, morphisms, composition, and identities, and requires these laws to hold.
-
-With the lookups changed to return `Option`, we can still connect them by passing a found value to the next step and stopping when it is absent. Once we make this handling part of a composition operation, we can ask the questions from earlier again. Does regrouping preserve the result? What function acts as an identity for this composition?
-
-Monads are used to connect computations that account for the absence of a value, as `Option` does. In the next article, we will turn the repeated absence handling in our employee lookup into a composition operation and check associativity and the identity laws. This will give us a concrete example on the way to understanding monads.
-
-## Lean exercise: check the types and laws of composition
-
-This optional exercise is for readers who want to check the preceding calculations in Lean. The main conclusions follow from the equation expansions in the text without running the code.
-
-We use Lean 4, a language in which we can write both functions and proofs. Instead of implementing the lookups, the code takes functions with the types used in the article as parameters and checks that the two groupings agree. The next article implements the employee lookups. This code was checked with Lean 4.32.1; [open the complete code in the Lean playground](https://live.lean-lang.org/#codez=LTAEFEA8AcBsHsBOBLAdgc1AYQIYBcBTdJAT1ABUALA0iyxeAV3UtAFl5UcATAZwBpQABRyI8oAIwAoEKABijVAGM8yTtngBbaPF7JV6nKm7Z8RJMgK8ZYLNSUBrAiYDu%2B1gBkCR0ABYAdADMAEz%2BEv6gAHLwoMjaSHi8oKIEoKgEzs7%2BUjagSlo6vKmYAGaxSZiAGESgZWigeNTJYshKsAQAXMnQcGRlJciIvHiCDQSooOjZ3ARl%2BfFFoADeAIKgAELYoJ3kJNAEAL6gABSYnRuASYTYAJTHZZ2rl2s396CXWFsAvFKgNYqgkKAPgA%2BCa3f5XHKyZDTVCqPBkRAEPCMRCoJL6dGoaCMcSKJSUIzoLKgACSiXqu1Sq2QmJKBEQiJM%2BFA3nxoEYRSmM1iMLhZBWWwolMOL0uq3aXx%2BJT%2BAOB%2F0hYHIOCc9UaCHgDkY0F%2BygMaOSSWgohwmiR9KSRhM%2BIIjlVzIARvAGhMGFq0OgLehEQRsqMkARNKBNEYcETEOBg8hYAB9RFepjQd1LCNweAkDKCnZ7fbfH63NDcFMIdOpTqRZmXItpjI3I7BrhhgDydwg2mLGcrberBAheeOAZwUebgqrJdeoAAyngUBhnrmfnNCqkB0OykdF7pUvXQ%2FTh%2F1jKOa4D53mNwt1wVNyzI7Bh9umyUbvvC12xxLQIgSrAFaBlrxePASjIPgyAAG76CQnRxq6iYYKA0CIkUiCgVYqqpDg3SwC0IHqEg0yIDUIzUOM6BEWMoCUNkshrE6rB6NMSSKCU8CwCYeAxNK4yyiCrAnGCkBXFcggAR%2BX6gChKD9KhowDCyACOjA4Fh8K%2BtQ%2FqBmeBDRjg%2F6AUsqwbO8AAimbCieRysJ07yXEZtanOs45YLWLYPOsc59ppFHHJ5pQ3B8eSXuenmsOgT6fKJ365NC0YbNUZT%2BSUUFIii4yjA5CHwNwjBKM4oD2r07LKASGBZFIfqIoG0JjHy0aLvpDnbMKYKim5Wwnp5VWwhBNSAj176fpFshlNU0WrAlnRGv%2BaGxFiOK%2FvUHGFfihKleVAYBdo0adXy9UbI12bNfNjzuaegWpLUvLdQl4UDT%2BVBWKkA3wQw8AlEkEnICUZA6QBQEgeB8LJMY03bd1sA4C4STMQRTAEWe%2BhqOMlo8tV3WcSoiO8FRirUGQ3AxKgToskMOD2lhvCsGl4OQzUSDJHkZjEIgZBuM6OCgNwn10oisIbYUCOcNkQA%3D).
-
-In the code, `compose g f` is our `g ∘ f`, and `identity` is the identity function. `def` begins a definition, and `fun x => ...` creates a function with input `x`. A `theorem` declaration states a proposition to prove.
-
-~~~lean
--- Exploring Category Theory Through Monads, Part 1
--- Function Composition and Categories
--- Checked with Lean 4.32.1. No imports are needed.
-
--- compose g f is g ∘ f in the article: apply f first, then g.
-def compose {A B C : Type} (g : B → C) (f : A → B) : A → C :=
-  fun x => g (f x)
-
--- identity returns its input unchanged. Its type A is inferred at each use.
-def identity {A : Type} : A → A :=
-  fun x => x
-
--- Take the lookup functions as parameters and check that both groupings agree.
-theorem managerEmail_regrouping {Employee : Type}
-    (findEmployee : Nat → Employee) (managerOf : Employee → Employee)
-    (emailOf : Employee → String) :
-    compose emailOf (compose managerOf findEmployee) =
-      compose (compose emailOf managerOf) findEmployee := rfl
-
--- Associativity: regrouping preserves the application order f, then g, then h.
--- Both sides unfold to fun x => h (g (f x)), so rfl verifies their equality.
-theorem compose_assoc {A B C D : Type}
-    (h : C → D) (g : B → C) (f : A → B) :
-    compose h (compose g f) = compose (compose h g) f := rfl
-
--- id_B ∘ f = f: return the B produced by f unchanged.
-theorem identity_comp {A B : Type} (f : A → B) :
-    compose identity f = f := rfl
-
--- f ∘ id_A = f: pass the input A to f unchanged.
-theorem comp_identity {A B : Type} (f : A → B) :
-    compose f identity = f := rfl
-
--- These rfl proofs verify associativity and the identity laws for our composition and identity functions.
--- They do not establish the laws for a category with a different composition.
-~~~
-
-`managerEmail_regrouping` states that the two groupings in the employee example agree. It does not depend on the fields of `Employee` or the implementations of the three lookup functions. Just as in the equation expansions above, both sides reduce to the same nested call.
-
-`compose_assoc` states associativity for arbitrary types `A`, `B`, `C`, and `D`, and functions `f`, `g`, and `h`. The declaration `{A B C D : Type}` introduces type parameters; the braces allow Lean to infer those types at use sites. The theorem corresponds to our equation as follows.
+The problem appears when we try to compose them as before.
 
 ~~~text
-compose h (compose g f) = compose (compose h g) f
-
-h ∘ (g ∘ f) = (h ∘ g) ∘ f
+g (f a)  -- Compile error: Option B cannot be used where B is required
 ~~~
 
-`identity_comp` and `comp_identity` correspond to `id_B ∘ f = f` and `f ∘ id_A = f`, respectively. The code calls both identities `identity`, but Lean infers their types from the function being composed.
+![Ordinary composition matches the first function's output B to the next function's input B. Returning Option B breaks that match because the next function requires B.](option-type-mismatch.ko.svg)
 
-The `rfl` at the end of each proof asks Lean to check that unfolding and computing with these definitions gives the same function on both sides. For the identity laws, Lean also treats `fun x => f x` as the same function as `f`. Different definitions of composition and identity may need a different proof. This does not mean that the laws of every category can be proved with `rfl`.
+$f$ hands us an `Option B`—a box (or a *burrito*) accounting for possible absence—while $g$ requires a $B$ value.
 
-## References
+We therefore cannot directly define ordinary composition $g \circ f$ for $f : A \to \text{Option } B$ and $g : B \to \text{Option } C$.
 
-- Bartosz Milewski, *Category Theory for Programmers*, Ch. 1, §§1.1–1.2, pp. 3–6. Notation for function composition, associativity, and the identity laws.
-- Emily Riehl, *Category Theory in Context*, Definition 1.1.1, p. 3; Example 1.1.3(i), p. 4. The definition of a category and the example of sets and functions.
+How can we compose functions that may produce no value? How do programmers usually handle this mismatch?
 
-[^riehl-category]: Riehl, Definition 1.1.1, p. 3. The original states two axioms: identity and associativity. Here we display the two sides of the identity law separately.
-[^size-level]: This does not mean placing all types, without restriction, into a single set. We work at a fixed size level; this assumption does not change the function calculations above.
+---
+
+## 3. Connecting two computations with branching
+
+We cannot use $g \circ f$ directly, but the behavior we want from the connection is clear. If $f\,a$ is `none`, the overall result should be `none`. If it is `some b`, we should pass that $b$ to $g$ and use $g\,b$ as the result. For now, let us write this new composition as $g \star f : A \to \text{Option } C$.
+
+Here is how we can write it using Lean's pattern matching. We will add one more stage, $h : C \to \text{Option } D$.
+
+~~~lean
+def runOption {A B C D : Type}
+    (f : A → Option B) (g : B → Option C) (h : C → Option D)
+    (a : A) : Option D :=
+  match f a with
+  | none => none
+  | some b =>
+    match g b with
+    | none => none
+    | some c => h c
+~~~
+
+This code computes exactly the result we want. If $f\,a$ is `none`, it stops at the first branch; if it is `some b`, it runs $g\,b$. If $g\,b$ is also `none`, it stops, and only if it is `some c` does it continue to $h\,c$. This is enough to write a single pipeline.
+
+But what the branches do is independent of the particular computations performed by $f$, $g$, and $h$. We have written a connecting rule directly inside `runOption`: stop if the previous result is absent; otherwise, pass it to the next function. We need the same rule when connecting other functions or adding more stages.
+
+Our goal goes beyond shortening this particular `runOption`: we want a **method of composition** that takes $f$ and $g$ and produces another function of type $A \to \text{Option } C$. This requires extracting the repeated branching at call sites into an **operation between two functions**. Let us first see whether an existing operation can do the job.
+
+---
+
+## 4. Nested contexts: why `map` alone is not enough
+
+Developers familiar with functional programming might ask:
+
+> *“Doesn't `map` apply a function to the value inside a container? Couldn't we use `(f a).map g`?”*
+
+Here, $α$ and $β$ each stand for an arbitrary type. `Option.map` takes a function of type $α \to β$ and applies it to the value inside an `Option α`. Its type and behavior in the two cases are:
+
+~~~text
+Option.map : (α → β) → Option α → Option β
+
+Option.map g none     = none
+Option.map g (some b) = some (g b)
+~~~
+
+Since $g : B \to \text{Option } C$, applying it inside `some b` gives `some (g b)`. This wraps `Option C` in another layer, producing `Option (Option C)`. Applying it to the result of `f a` gives:
+
+~~~text
+f a               : Option B
+g                 : B → Option C
+(f a).map g       : Option (Option C)
+~~~
+
+For example, if $f\,a = \text{some }0$ and $g\,0 = \text{none}$, then `(f a).map g` is `some none`, rather than `none`. A value is present, but that value is itself “absent.” The two layers retain the fact that the first computation produced a value while the second did not.
+
+We wanted a single `Option C` result: a value is either present or absent. What we have instead is `Option (Option C)`, one wrapper inside another.
+
+It is like opening a box to find another box inside, as with Russian nesting dolls. `map` takes the inner $B$ and passes it to $g$, but does not remove the new wrapper ($\text{Option } C$) that $g$ itself produces.
+
+Nor can we directly apply the next operation, $h : C \to \text{Option } D$, to this result. The value inside the outer `Option` is an `Option C`, whereas $h$ needs a $C$.
+
+---
+
+## 5. Building a composition rule with `join` and `bind`
+
+We have just obtained an `Option (Option C)`. To return to the `Option C` we wanted, we need to remove the outer `Option` layer. If the outer value is `none`, return `none`; if it is `some result`, return the inner `result` unchanged. This operation has type `Option (Option C) → Option C` and is called `Option.join` in Lean. Because it reduces a nested context to one layer, its behavior is often described as **flattening**. We will use its operation name, `join`.
+
+Let us apply `join` to the `map` result from Section 4. If $f\,a$ is `none`, $g$ is not run and the result is `none`. If $f\,a$ is `some b`, `map` produces `some (g b)`, and `join` removes the outer `some` to return $g\,b$.
+
+~~~text
+((f a).map g).join : Option C
+
+if f a = none,    the result is none
+if f a = some b,  the result is g b
+~~~
+
+The two branches we wrote explicitly in Section 3 have reappeared in this expression. In particular, when $g\,b$ is `none`, `map` produces `some none`, but `join` turns it into `none`. If we open the outer doll and find that the inner one is empty, the final result is simply “empty.”
+
+Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
+
+The relationship between the operations is expressed by this equation.
+
+~~~lean
+example {B C : Type} (m : Option B) (g : B → Option C) :
+    m.bind g = (m.map g).join := by
+  cases m <;> rfl
+~~~
+
+![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.ko.svg)
+
+Here, `m : Option B` and `g : B → Option C`. `bind` provides both steps together, while `join` removes one layer from an already nested `Option`. Later, in the formal definition of a monad, we will encounter this relationship again in the general form `bind m g = join (map g m)`.
+
+~~~text
+Option.bind : Option B → (B → Option C) → Option C
+
+composeOption (f : A → Option B) (g : B → Option C) : A → Option C
+composeOption f g a = Option.bind (f a) g
+~~~
+
+`Option.bind` connects an existing `Option B` value to the next function. Using it, we define `composeOption`, an **operation that takes two functions and produces a new function**. For each input $a$, it runs $f$, then connects the result to $g$ using `bind`. The composition we previously wrote as $g \star f$ is exactly `composeOption f g`.
+
+Notice that the result of composition is itself a function of type `A → Option C`. If another function `h : C → Option D` follows, we can connect this result to `h` using the same operation.
+
+~~~text
+composeOption f g                  : A → Option C
+composeOption (composeOption f g) h : A → Option D
+~~~
+
+Where we previously wrote another branch for each additional function, we can now reuse the composition operation we have already built. Each function handles its own computation; `composeOption` handles stopping when a value is absent and passing it to the next function when it is present.
+
+---
+
+## 6. Checking composition in Lean 4
+
+We will now define the three ways of connecting functions in Lean 4 and compare their results on representative inputs.
+
+We will define `parseNat`, which parses a string as a natural number, and `reciprocal`, which represents the reciprocal of a nonzero natural number as a string of the form `"1/n"`. The example focuses on absence and function connections, rather than numerical operations on fractions.
+
+~~~lean
+-- 모나드와 범주론 ① 함수가 이어지지 않을 때
+-- Lean 4.32.1. 별도의 라이브러리 없이 실행됩니다.
+
+-- 1. 값이 없을 수 있는 두 함수
+def parseNat (s : String) : Option Nat :=
+  s.toNat?
+
+def reciprocal (n : Nat) : Option String :=
+  if n == 0 then
+    none -- 0의 역수는 나타내지 않음
+  else
+    some s!"1/{n}"
+
+~~~
+
+We define the connecting rule as `composeOption`. For comparison, we will also write out the branching from Section 3 and the `map` followed by `join` from Section 5.
+
+~~~lean
+-- 앞의 결과에 따라 다음 함수를 호출하는 규칙
+def composeOptionByMatch {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x =>
+    match f x with
+    | none   => none
+    | some b => g b
+
+-- 같은 규칙을 Option.bind로 표현
+def composeOption {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x => (f x).bind g
+
+-- map으로 적용한 뒤 join으로 한 겹 평탄화하는 같은 규칙
+def composeOptionByJoin {A B C : Type}
+    (f : A → Option B) (g : B → Option C) : A → Option C :=
+  fun x => ((f x).map g).join
+
+~~~
+
+Now let us compose the two functions.
+
+~~~lean
+def parseAndReciprocal : String → Option String :=
+  composeOption parseNat reciprocal
+
+~~~
+
+`parseAndReciprocal` specifies only which two functions to connect. `composeOption` handles stopping when the previous result is absent and passing it to the next function when it is present. We can use the same rule unchanged to connect other functions.
+
+Running the code lets us check an input that succeeds, along with inputs for which a value is absent at either stage.
+
+~~~lean
+#eval parseAndReciprocal "42"  -- some "1/42"
+#eval parseAndReciprocal "0"   -- none       (0의 역수는 나타내지 않음)
+#eval parseAndReciprocal "foo" -- none       (파싱 실패)
+#eval (parseNat "0").map reciprocal -- some none (join 전의 두 겹)
+
+~~~
+
+We can also use `#guard` to check whether the three implementations produce the same results. If its condition is true, the check passes; if false, Lean reports an error. Here are some of the checks; the Playground contains the full set for all three inputs.
+
+~~~lean
+#guard composeOptionByMatch parseNat reciprocal "42" == parseAndReciprocal "42"
+#guard composeOptionByJoin parseNat reciprocal "0" == parseAndReciprocal "0"
+#guard parseAndReciprocal "foo" == none
+~~~
+
+To modify the code and run it yourself, [open this example in the Lean 4 Playground](https://live.lean-lang.org/#code=--%20%EB%AA%A8%EB%82%98%EB%93%9C%EC%99%80%20%EB%B2%94%EC%A3%BC%EB%A1%A0%20%E2%91%A0%20%ED%95%A8%EC%88%98%EA%B0%80%20%EC%9D%B4%EC%96%B4%EC%A7%80%EC%A7%80%20%EC%95%8A%EC%9D%84%20%EB%95%8C%0A--%20Lean%204.32.1.%20%EB%B3%84%EB%8F%84%EC%9D%98%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%97%86%EC%9D%B4%20%EC%8B%A4%ED%96%89%EB%90%A9%EB%8B%88%EB%8B%A4.%0A%0A--%201.%20%EA%B0%92%EC%9D%B4%20%EC%97%86%EC%9D%84%20%EC%88%98%20%EC%9E%88%EB%8A%94%20%EB%91%90%20%ED%95%A8%EC%88%98%0Adef%20parseNat%20%28s%20%3A%20String%29%20%3A%20Option%20Nat%20%3A%3D%0A%20%20s.toNat%3F%0A%0Adef%20reciprocal%20%28n%20%3A%20Nat%29%20%3A%20Option%20String%20%3A%3D%0A%20%20if%20n%20%3D%3D%200%20then%0A%20%20%20%20none%20--%200%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%0A%20%20else%0A%20%20%20%20some%20s%21%221%2F%7Bn%7D%22%0A%0A--%202.%20%EC%95%9E%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%97%90%20%EB%94%B0%EB%9D%BC%20%EB%8B%A4%EC%9D%8C%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%98%B8%EC%B6%9C%ED%95%98%EB%8A%94%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByMatch%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%0A%20%20%20%20match%20f%20x%20with%0A%20%20%20%20%7C%20none%20%20%20%3D%3E%20none%0A%20%20%20%20%7C%20some%20b%20%3D%3E%20g%20b%0A%0A--%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%EC%9D%84%20Option.bind%EB%A1%9C%20%ED%91%9C%ED%98%84%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0A--%20map%EC%9C%BC%EB%A1%9C%20%EC%A0%81%EC%9A%A9%ED%95%9C%20%EB%92%A4%20join%EC%9C%BC%EB%A1%9C%20%ED%95%9C%20%EA%B2%B9%20%ED%8F%89%ED%83%84%ED%99%94%ED%95%98%EB%8A%94%20%EA%B0%99%EC%9D%80%20%EA%B7%9C%EC%B9%99%0Adef%20composeOptionByJoin%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28%28f%20x%29.map%20g%29.join%0A%0A--%203.%20%EB%91%90%20%ED%95%A8%EC%88%98%EB%A5%BC%20%ED%95%A9%EC%84%B1%ED%95%98%EC%97%AC%20%EC%83%88%EB%A1%9C%EC%9A%B4%20%ED%95%A8%EC%88%98%20%EA%B5%AC%EC%84%B1%0Adef%20parseAndReciprocal%20%3A%20String%20%E2%86%92%20Option%20String%20%3A%3D%0A%20%20composeOption%20parseNat%20reciprocal%0A%0A--%204.%20%EC%8B%A4%ED%96%89%20%EA%B2%B0%EA%B3%BC%20%ED%99%95%EC%9D%B8%0A%23eval%20parseAndReciprocal%20%2242%22%20%20--%20some%20%221%2F42%22%0A%23eval%20parseAndReciprocal%20%220%22%20%20%20--%20none%20%20%20%20%20%20%20%280%EC%9D%98%20%EC%97%AD%EC%88%98%EB%8A%94%20%EB%82%98%ED%83%80%EB%82%B4%EC%A7%80%20%EC%95%8A%EC%9D%8C%29%0A%23eval%20parseAndReciprocal%20%22foo%22%20--%20none%20%20%20%20%20%20%20%28%ED%8C%8C%EC%8B%B1%20%EC%8B%A4%ED%8C%A8%29%0A%23eval%20%28parseNat%20%220%22%29.map%20reciprocal%20--%20some%20none%20%28join%20%EC%A0%84%EC%9D%98%20%EB%91%90%20%EA%B2%B9%29%0A%0A--%205.%20%EC%84%B8%20%EA%B5%AC%ED%98%84%EC%9D%98%20%EA%B2%B0%EA%B3%BC%EC%99%80%20%EB%8C%80%ED%91%9C%20%EC%9E%85%EB%A0%A5%EC%9D%84%20%ED%99%95%EC%9D%B8%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByMatch%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%2242%22%20%3D%3D%20parseAndReciprocal%20%2242%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%220%22%20%3D%3D%20parseAndReciprocal%20%220%22%0A%23guard%20composeOptionByJoin%20parseNat%20reciprocal%20%22foo%22%20%3D%3D%20parseAndReciprocal%20%22foo%22%0A%23guard%20parseAndReciprocal%20%2242%22%20%3D%3D%20some%20%221%2F42%22%0A%23guard%20parseAndReciprocal%20%220%22%20%3D%3D%20none%0A%23guard%20parseAndReciprocal%20%22foo%22%20%3D%3D%20none%0A).
+
+`composeOptionByMatch` explicitly handles `none` and `some b`, while `composeOptionByJoin` applies `map` followed by `join`. `Option.bind` expresses the same connection in one line. The `#guard` checks comparing these implementations on representative inputs verify examples; they do not prove equality for every input.
+
+- With `"42"`: parsing succeeds ($\text{some } 42$) $\to$ a fraction representation is produced ($\text{some } "1/42"$).
+- With `"0"`: parsing succeeds ($\text{some } 0$) $\to$ the second function returns `none`.
+- With `"foo"`: parsing fails ($\text{none}$) $\to$ the second function is never run, and $\text{none}$ is returned immediately.
+
+We handled absence inside the composition rule, `composeOption`, without manually checking it at every call. `join` flattens both an outer `none` and a `some none` whose inner value is absent to `none`. Consequently, the final result alone cannot tell us which stage failed to produce a value.
+
+---
+
+## 7. The next question: laws of the composition rule
+
+At first, we could not pass the `Option B` returned by the first function directly to the next. We can now express a rule in `composeOption`: stop when a value is absent, or pass it to the next computation when it is present. The rule remains reusable even when the functions change. The monads we will study bring together operations that connect computations in this way and the laws those operations must obey.
+
+Will this rule give consistent results across multiple stages? We need to check whether either grouping of three functions gives the same result, and whether a function that simply wraps its input in `some` leaves composition unchanged.
+
+In the next article, we will build a composition for `List`, where a single input can produce multiple results. Comparing these two kinds of computation—absence and multiple results—will help us see what their compositions have in common. We will then ask whether matching the types of a composition is enough, and prove in Lean 4 that our `Option` composition satisfies **associativity** and the **identity laws**.
