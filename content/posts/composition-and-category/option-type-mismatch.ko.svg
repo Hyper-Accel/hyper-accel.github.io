@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 65 1000 410" role="img" aria-labelledby="title desc">
+<title id="title">출력과 입력의 접점이 달라집니다</title><desc id="desc">위쪽은 f의 출력 B와 g의 입력 B가 같은 접점으로 연결된다. 아래쪽은 f의 출력 Option B가 g의 입력 B와 달라 보통 합성으로 연결할 수 없다. 접점의 모양은 타입 차이를 나타내는 도식이다.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" fill="#496475"/></marker></defs>
+<rect width="1000" height="520" fill="#ffffff"/>
+<g font-family="system-ui, -apple-system, sans-serif" fill="#19394b">
+<g fill="#f0f5f7" stroke="#b7cbd4" stroke-width="2"><rect x="135" y="89" width="240" height="115" rx="8"/><rect x="625" y="89" width="240" height="115" rx="8"/></g>
+<g font-size="34" text-anchor="middle"><text x="238" y="159">f</text><text x="762" y="159">g</text></g>
+<g stroke="#496475" stroke-width="2" marker-end="url(#arrow)"><path d="M80 147H124"/><path d="M876 147H922"/></g>
+<g font-size="23"><text x="48" y="155">A</text><text x="939" y="155">C</text></g>
+<path d="M375 147H625" stroke="#3d8e8d" stroke-width="4"/>
+<g fill="#e6f3f2" stroke="#3d8e8d" stroke-width="2"><rect x="331" y="123" width="70" height="48" rx="6"/><rect x="599" y="123" width="70" height="48" rx="6"/></g>
+<g font-size="24" text-anchor="middle"><text x="366" y="155">B</text><text x="634" y="155">B</text></g>
+<path d="M40 242H960" stroke="#dce5e9"/>
+<g fill="#f0f5f7" stroke="#b7cbd4" stroke-width="2"><rect x="135" y="333" width="240" height="115" rx="8"/><rect x="625" y="333" width="240" height="115" rx="8"/></g>
+<g font-size="34" text-anchor="middle"><text x="222" y="404">f</text><text x="762" y="404">g</text></g>
+<g stroke="#496475" stroke-width="2" marker-end="url(#arrow)"><path d="M80 391H124"/><path d="M876 391H904"/></g>
+<text x="48" y="399" font-size="23">A</text><text x="914" y="384" font-size="20">Option</text><text x="943" y="410" font-size="20">C</text>
+<rect x="285" y="344" width="160" height="94" rx="9" fill="#fff2df" stroke="#b6833f" stroke-width="2"/>
+<text x="365" y="399" text-anchor="middle" font-size="23">Option B</text>
+<rect x="599" y="367" width="70" height="48" rx="6" fill="#e6f3f2" stroke="#3d8e8d" stroke-width="2"/>
+<text x="634" y="399" text-anchor="middle" font-size="24">B</text>
+<path d="M452 391H488M553 391H590" stroke="#b6833f" stroke-width="2" stroke-dasharray="5 5"/>
+<path d="m510 379 23 24m0-24-23 24" stroke="#aa6337" stroke-width="3"/>
+</g></svg>
