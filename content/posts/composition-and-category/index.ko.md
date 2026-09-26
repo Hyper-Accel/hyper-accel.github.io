@@ -176,13 +176,15 @@ f a = some b  이면  g b
 
 안쪽 값에 함수를 적용하는 `map`과 중첩을 한 겹 줄이는 `join`을 합친 연산은 보통 `flatMap` 또는 `bind`라고 부릅니다. Lean에서는 `Option.bind`, Java와 Swift에서는 `flatMap`, Rust와 C++에서는 `and_then`이라는 이름으로 만날 수 있습니다. 이 글의 코드에서는 Lean의 이름인 `bind`를 사용하겠습니다.
 
-두 연산의 관계는 다음 등식으로 나타납니다.
+두 연산의 관계는 다음 등식으로 나타납니다. 여기서는 `#eval`로 몇 가지 값을 계산하는 대신, Lean에서 이 등식을 **증명**해 보겠습니다. `example` 뒤에 증명할 등식을 적고, `by` 뒤에 그 증명을 구성하는 명령을 씁니다.
 
 ~~~lean
 example {B C : Type} (m : Option B) (g : B → Option C) :
     m.bind g = (m.map g).join := by
   cases m <;> rfl
 ~~~
+
+`cases m`은 `m`이 `none`인 경우와 `some b`인 경우를 나눕니다. `<;> rfl`은 두 경우 각각에서 등식의 양쪽을 계산하면 같은 값이 됨을 확인합니다. Lean은 두 경우의 증명이 모두 끝났는지 검사합니다. 따라서 이 코드는 몇 가지 입력을 실행해 본 예가 아니라, 임의의 `m`과 `g`에 대해 등식이 성립한다는 증명입니다.
 
 ![map g는 some b를 some (g b)로 감싸고, join은 이를 g b로 줄입니다. none은 두 연산을 거쳐도 none이며, 이 전체 연결이 bind g입니다.](option-bind-flow.ko.svg)
 

@@ -177,13 +177,15 @@ The two branches we wrote explicitly in Section 3 have reappeared in this expres
 
 Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
 
-The relationship between the operations is expressed by this equation.
+The relationship between the operations is expressed by this equation. This time, rather than using `#eval` to compute a few values, we will ask Lean to **prove** it. After `example` we write the equation to prove; after `by` we write instructions that construct its proof.
 
 ~~~lean
 example {B C : Type} (m : Option B) (g : B → Option C) :
     m.bind g = (m.map g).join := by
   cases m <;> rfl
 ~~~
+
+`cases m` splits `m` into the `none` and `some b` cases. `<;> rfl` runs `rfl` on both resulting goals; in each case, the two sides reduce to the same expression. Lean checks that both cases have been proved. Thus this code proves the equation for arbitrary `m` and `g`, rather than checking a few sample inputs.
 
 ![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.en.svg)
 
