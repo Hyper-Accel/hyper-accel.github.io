@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+<title id="title">합성해도 같은 형태로 남는 화살표</title>
+<desc id="desc">A, B, C를 꼭짓점으로 한 삼각형입니다. A에서 B로 가는 f의 실제 함수 타입은 A에서 M B, B에서 C로 가는 g의 실제 함수 타입은 B에서 M C입니다. 밑변은 합성 g 별 f이며 실제 함수 타입은 A에서 M C입니다. M은 Option 또는 List 중 하나를 고정해 나타냅니다.</desc>
+<defs>
+  <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102634"/><stop offset="1" stop-color="#213f50"/></linearGradient>
+  <linearGradient id="face" x2="1" y2="1"><stop stop-color="#426d80"/><stop offset="1" stop-color="#224858"/></linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#b7d9e4" stroke-opacity=".055"/></pattern>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#061823" flood-opacity=".55"/></filter>
+  <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#e6c286" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1200" height="600" fill="url(#bg)"/><rect width="1200" height="600" fill="url(#grid)"/>
+<g fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" marker-end="url(#arrow)"><path d="M332 389 529 204"/><path d="M671 204 868 389"/><path d="M347 445H853"/></g>
+<g filter="url(#shadow)">
+  <path d="M185 390 215 370H355L325 390Z M525 95 555 75H695L665 95Z M875 390 905 370H1045L1015 390Z" fill="#527f91"/>
+  <path d="M325 390 355 370V480L325 500Z M665 95 695 75V185L665 205Z M1015 390 1045 370V480L1015 500Z" fill="#193b4c"/>
+  <g fill="url(#face)" stroke="#82afbf" stroke-width="2"><rect x="185" y="390" width="140" height="110" rx="6"/><rect x="525" y="95" width="140" height="110" rx="6"/><rect x="875" y="390" width="140" height="110" rx="6"/></g>
+</g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="52" fill="#eff7fa"><text x="255" y="466">A</text><text x="595" y="171">B</text><text x="945" y="466">C</text></g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="31" fill="#d3e5eb"><text x="318" y="280">f : A → M B</text><text x="882" y="280">g : B → M C</text></g>
+<text x="600" y="415" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="34" fill="#fff0c5">g ⋆ f</text>
+<text x="600" y="546" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="30" fill="#d3e5eb">A → M C</text>
+</svg>
