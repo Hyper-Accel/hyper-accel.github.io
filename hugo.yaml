@@ -26,6 +26,10 @@ languages:
           name: 작성자
           url: /authors/
           weight: 10
+        - identifier: careers
+          name: 채용
+          url: https://hyperaccel.career.greetinghr.com/ko/guide
+          weight: 12
         - identifier: categories
           name: 카테고리
           url: /categories/
@@ -60,6 +64,10 @@ languages:
           name: Authors
           url: /en/authors/
           weight: 10
+        - identifier: careers
+          name: Careers
+          url: https://hyperaccel.career.greetinghr.com/en/guide
+          weight: 12
         - identifier: categories
           name: Categories
           url: /en/categories/
@@ -238,3 +246,23 @@ sitemap:
   disable: false
   filename: sitemap.xml
   priority: -1
+
+# Activate the category-tracks prototype when this branch is served normally.
+module:
+  mounts:
+    - source: design/c/layouts
+      target: layouts
+    - source: layouts
+      target: layouts
+    - source: design/c/assets
+      target: assets
+    - source: assets
+      target: assets
+    - source: content
+      target: content
+    - source: static
+      target: static
+    - source: i18n
+      target: i18n
+    - source: archetypes
+      target: archetypes
