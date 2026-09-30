@@ -4,13 +4,15 @@
 {{- $cats := (site.GetPage "/categories").Pages }}
 <div class="tr">
   <section class="tr-intro">
-    <h1 class="tr-headline">{{ cond $ko "칩에서 컴파일러까지,<br>우리가 만드는 것을 설명합니다." "From silicon to compilers,<br>we explain what we build." | safeHTML }}</h1>
-    <p class="tr-sub">{{ cond $ko "LPU를 만드는 HyperAccel 엔지니어들의 기술 블로그입니다. 관심 있는 트랙을 골라 읽어보세요." "The engineering blog of HyperAccel, makers of the LPU. Pick a track and start reading." }}</p>
-    <div class="tr-tracks">
-      {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
-      <a class="tr-track" href="#track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}"><i></i>{{ .Title }}<span>{{ len .Pages }}</span></a>
-      {{- end }}
-    </div>
+    <p class="tr-eyebrow">HYPERACCEL ENGINEERING</p>
+    <h1 class="tr-headline">{{ cond $ko "트랜지스터에서 LLM 추론까지,<br>AI 컴퓨팅의 풀스택을 만듭니다." "From transistors to LLM inference,<br>we build the full AI compute stack." | safeHTML }}</h1>
+    <p class="tr-sub">{{ cond $ko "반도체, 컴파일러, 시스템 소프트웨어와 AI 모델을 하나의 스택으로 연결하는 HyperAccel 엔지니어들의 기록입니다." "Notes from HyperAccel engineers connecting silicon, compilers, systems software, and AI models into one stack." }}</p>
+    <form class="tr-search" action="{{ "search/" | relLangURL }}" method="get" role="search">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+      <input type="search" name="q" maxlength="64" autocomplete="off" aria-label="{{ cond $ko "기술 블로그 검색" "Search the tech blog" }}" placeholder="{{ cond $ko "기술, 시리즈, 작성자를 검색하세요" "Search topics, series, and authors" }}">
+      <button type="submit">{{ cond $ko "검색" "Search" }}</button>
+    </form>
+    <p class="tr-search-hint">{{ cond $ko "제목과 본문을 함께 검색합니다" "Search across titles and article content" }}</p>
   </section>
 
   <section class="tr-featured">
@@ -20,7 +22,7 @@
       {{- $term := .Page }}{{ $eps := $term.Pages.ByDate }}
       {{- $first := index $eps 0 }}{{ $latest := index $eps.Reverse 0 }}
       {{- $slug := "" }}{{ with $first.GetTerms "categories" }}{{ $slug = path.Base (index . 0).RelPermalink }}{{ end }}
-      <article class="tr-feat" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+      <article class="tr-feat" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
         <span class="tr-feat-count">{{ .Count }}{{ cond $ko "편 연재" " parts" }}</span>
         <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
         <p>{{ $first.Summary | plainify | htmlUnescape | truncate 100 }}</p>
@@ -35,7 +37,7 @@
   </section>
 
   {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
-  <section class="tr-shelf" id="track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+  <section class="tr-shelf" id="track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
     <header class="tr-shelf-head">
       <div>
         <h2 class="tr-h"><i class="tr-dot"></i>{{ .Title }}</h2>

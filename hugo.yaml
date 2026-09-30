@@ -101,8 +101,8 @@ params:
   keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
   images: ["/images/logo.png"]
   DateFormat: "January 2, 2006"
-  defaultTheme: auto # dark, light
-  disableThemeToggle: false
+  defaultTheme: dark
+  disableThemeToggle: true
 
   ShowReadingTime: true
   ShowShareButtons: true

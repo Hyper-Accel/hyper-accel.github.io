@@ -2,7 +2,7 @@
 {{- $ko := eq site.Language.Lang "ko" }}
 {{- $colors := partial "d/colors.html" . }}
 {{- $slug := path.Base .RelPermalink }}
-<div class="tr" style="--c:{{ index $colors $slug | default "#0b8fd9" | safeCSS }}">
+<div class="tr" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
   <header class="tr-page-head">
     <span class="tr-crumb">{{ if eq .Kind "term" }}{{ .Data.Singular }}{{ else }}{{ .Section }}{{ end }}</span>
     <h1><i class="tr-dot"></i>{{ .Title }}</h1>

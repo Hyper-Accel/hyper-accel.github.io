@@ -2,6 +2,7 @@
 <article class="tr-card">
   <a class="tr-card-media" href="{{ $p.RelPermalink }}">
     {{ partial "d/cover.html" (dict "page" $p "w" 640 "h" 400) }}
+    <span class="tr-card-brand">HYPERACCEL <b>TECH BLOG</b></span>
     {{- with $p.GetTerms "series" }}<span class="tr-badge">{{ (index . 0).Title }}{{ with $p.Params.series_idx }} · {{ . }}{{ cond $ko "편" "" }}{{ end }}</span>{{ end }}
   </a>
   <h3 class="tr-card-title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h3>

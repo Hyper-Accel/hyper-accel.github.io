@@ -1,0 +1,11 @@
+{{- define "main" }}
+<section class="tr-search-page">
+  <p class="tr-eyebrow">HYPERACCEL ENGINEERING</p>
+  <h1>{{ .Title }}</h1>
+  {{ with .Description }}<p>{{ . }}</p>{{ end }}
+  <div id="searchbox">
+    <input id="searchInput" autofocus placeholder="{{ .Params.placeholder }}" aria-label="{{ .Title }}" type="search" autocomplete="off" maxlength="64">
+    <ul id="searchResults" aria-label="{{ if eq site.Language.Lang "ko" }}검색 결과{{ else }}Search results{{ end }}"></ul>
+  </div>
+</section>
+{{- end }}
