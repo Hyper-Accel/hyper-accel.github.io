@@ -3,6 +3,9 @@
 {{- $colors := partial "d/colors.html" . }}
 {{- $slug := path.Base .RelPermalink }}
 <div class="tr" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
+  {{- if eq .Data.Singular "author" }}
+  {{- partial "d/author_profile.html" . }}
+  {{- else }}
   <header class="tr-page-head">
     <span class="tr-crumb">{{ if eq .Kind "term" }}{{ .Data.Singular }}{{ else }}{{ .Section }}{{ end }}</span>
     <h1><i class="tr-dot"></i>{{ .Title }}</h1>
@@ -10,6 +13,7 @@
     {{ .Content }}
     <span class="tr-count">{{ len .RegularPages }}{{ cond $ko "편" " posts" }}</span>
   </header>
+  {{- end }}
   <div class="tr-grid">{{ range .RegularPages }}{{ partial "d/card.html" (dict "page" .) }}{{ end }}</div>
 </div>
 {{- end }}

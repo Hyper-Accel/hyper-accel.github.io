@@ -91,6 +91,20 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-count { font-size: 0.85rem; color: var(--tr-muted); font-weight: 600; }
 .tr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 20px; }
 
+/* author profile */
+.tr-author-profile { display: grid; grid-template-columns: 144px minmax(0, 1fr); gap: 32px; padding: 52px 0 36px; border-bottom: 1px solid var(--tr-line); }
+.tr-author-avatar img, .tr-author-avatar span { display: flex; width: 144px; height: 144px; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--tr-cyan) 38%, var(--tr-line)); border-radius: 22px; background: var(--tr-card); color: var(--tr-cyan); object-fit: cover; font-size: 3rem; font-weight: 800; }
+.tr-author-copy h1 { margin: 5px 0 6px; color: var(--tr-fg); font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.035em; }
+.tr-author-role { margin: 0; color: var(--tr-cyan); font-size: 0.88rem; font-weight: 700; }
+.tr-author-bio { max-width: 680px; margin: 16px 0 0; color: var(--tr-muted); font-size: 1rem; line-height: 1.7; }
+.tr-author-expertise { display: flex; flex-wrap: wrap; gap: 7px; margin: 16px 0 0; padding: 0; list-style: none; }
+.tr-author-expertise li { padding: 5px 10px; border: 1px solid var(--tr-line); border-radius: 999px; color: var(--tr-muted); font-size: 0.76rem; }
+.tr-author-links { display: flex; gap: 14px; margin-top: 18px; }
+.tr-author-links a { color: var(--tr-cyan); font-size: 0.84rem; font-weight: 700; }
+.tr-author-longform { max-width: 720px; margin-top: 24px; color: var(--tr-muted); line-height: 1.75; }
+.tr-author-posts-title { margin: 32px 0 18px; color: var(--tr-fg); font-size: 1.25rem; }
+.tr-author-posts-title span { margin-left: 5px; color: var(--tr-cyan); font-size: 0.78em; }
+
 /* search page */
 .tr-search-page { max-width: 860px; margin: 0 auto; padding: 56px 0; }
 .tr-search-page h1 { margin: 0 0 10px; color: var(--tr-fg); font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.035em; }
@@ -120,4 +134,6 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
   .tr-search-hint { margin-left: 4px; }
   .tr-shelf-head { flex-direction: column; align-items: flex-start; }
   .tr-brand span { display: none; }
+  .tr-author-profile { grid-template-columns: 84px minmax(0, 1fr); gap: 18px; padding-top: 32px; }
+  .tr-author-avatar img, .tr-author-avatar span { width: 84px; height: 84px; border-radius: 14px; }
 }

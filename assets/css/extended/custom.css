@@ -1,77 +1,181 @@
 /* /assets/css/extended/custom.css */
 
-/* 포스트 헤더의 작성자 정보 박스 */
-.post-author {
-    margin-top: 20px;
+/* Author profile cards below posts */
+.post-authors {
+    margin: 3.5rem 0 2.5rem;
+    padding-top: 2rem;
     border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 15px 0;
+}
+
+.post-authors-header {
+    margin-bottom: 1.25rem;
+}
+
+.post-authors-kicker {
+    color: #12bde3;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.post-authors-header h2 {
+    margin: 0.3rem 0 0;
+    font-size: 1.45rem;
+    letter-spacing: -0.025em;
+}
+
+.post-authors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 1rem;
 }
 
 .author-box {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* 아바타와 상세정보 사이 간격 */
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--code-bg) 82%, transparent);
 }
 
-.author-avatar img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; /* 원형 프로필 사진 */
+.author-avatar img,
+.author-avatar span {
+    display: flex;
+    width: 96px;
+    height: 96px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, #12bde3 38%, var(--border));
+    border-radius: 0.85rem;
+    background: var(--theme);
+    color: #12bde3;
     object-fit: cover;
+    font-size: 2rem;
+    font-weight: 800;
 }
 
 .author-details {
+    min-width: 0;
+}
+
+.author-heading {
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 .author-name {
-    font-size: 1.1rem;
-    font-weight: bold;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 750;
+    line-height: 1.3;
 }
 
-.author-name a {
-    text-decoration: none;
-    color: var(--primary); /* 테마 기본 링크 색상 사용 */
-    border-bottom: none !;
-}
-
+.author-name a,
 .author-name a:hover {
-    text-decoration: none ;
-    border-bottom: none !;
+    color: var(--primary);
+    border-bottom: 0;
+    text-decoration: none;
+}
+
+.author-role {
+    margin: 0.3rem 0 0;
+    color: #12bde3;
+    font-size: 0.78rem;
+    font-weight: 650;
 }
 
 .author-bio {
+    margin: 0.85rem 0 0;
+    color: var(--secondary);
     font-size: 0.9rem;
-    color: var(--secondary); /* 테마 보조 텍스트 색상 사용 */
-    margin: 5px 0 0 0;
+    line-height: 1.65;
 }
 
 .author-social-icons {
     display: flex;
-    align-items: center;
-    gap: 10px; /* 아이콘 사이의 간격 */
-    margin-top: 4px; /* 이름과의 상단 간격 */
+    flex: 0 0 auto;
+    gap: 0.45rem;
 }
 
 .author-social-icons a {
-    text-decoration: none ;
-    color: var(--secondary); /* 아이콘 기본 색상 */
-    display: inline-block;
-    border-bottom: none ;
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--secondary);
+    text-decoration: none;
 }
 
 .author-social-icons a:hover {
-    color: var(--primary); /* 마우스 올렸을 때 색상 */
-    text-decoration: none ;
-    border-bottom: none ;
+    border-color: #12bde3;
+    color: #12bde3;
 }
 
-/* 아이콘 SVG 크기 조절 */
 .author-social-icons svg {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
+}
+
+.author-website {
+    font-weight: 800;
+}
+
+.author-expertise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.85rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.author-expertise li {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid color-mix(in srgb, #12bde3 24%, var(--border));
+    border-radius: 999px;
+    color: var(--secondary);
+    font-size: 0.72rem;
+}
+
+.author-profile-link {
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-top: 1rem;
+    border-bottom: 0 !important;
+    color: var(--primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none !important;
+}
+
+.author-profile-link:hover {
+    color: #12bde3;
+}
+
+@media (max-width: 560px) {
+    .author-box {
+        grid-template-columns: 68px minmax(0, 1fr);
+        padding: 1.1rem;
+    }
+
+    .author-avatar img,
+    .author-avatar span {
+        width: 68px;
+        height: 68px;
+        border-radius: 0.7rem;
+    }
+
+    .author-heading {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
 }
 
 /* Posts 2 columns grid layout */
