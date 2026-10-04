@@ -101,7 +101,7 @@ How can we compose functions that may produce no value? How do programmers usual
 
 ## 3. Connecting two computations with branching
 
-We cannot use $g \circ f$ directly, but the behavior we want from the connection is clear. If $f\,a$ is `none`, the overall result should be `none`. If it is `some b`, we should pass that $b$ to $g$ and use $g\,b$ as the result. For now, let us write this new composition as $g \star f : A \to \text{Option } C$.
+We cannot use $g \circ f$ directly, but the behavior we want from the connection is clear. If $f\\,a$ is `none`, the overall result should be `none`. If it is `some b`, we should pass that $b$ to $g$ and use $g\\,b$ as the result. For now, let us write this new composition as $g \star f : A \to \text{Option } C$.
 
 Here is how we can write it using Lean's pattern matching. We will add one more stage, $h : C \to \text{Option } D$.
 
@@ -117,7 +117,7 @@ def runOption {A B C D : Type}
     | some c => h c
 ~~~
 
-This code computes exactly the result we want. If $f\,a$ is `none`, it stops at the first branch; if it is `some b`, it runs $g\,b$. If $g\,b$ is also `none`, it stops, and only if it is `some c` does it continue to $h\,c$. This is enough to write a single pipeline.
+This code computes exactly the result we want. If $f\\,a$ is `none`, it stops at the first branch; if it is `some b`, it runs $g\\,b$. If $g\\,b$ is also `none`, it stops, and only if it is `some c` does it continue to $h\\,c$. This is enough to write a single pipeline.
 
 But what the branches do is independent of the particular computations performed by $f$, $g$, and $h$. We have written a connecting rule directly inside `runOption`: stop if the previous result is absent; otherwise, pass it to the next function. We need the same rule when connecting other functions or adding more stages.
 
@@ -148,7 +148,7 @@ g                 : B → Option C
 (f a).map g       : Option (Option C)
 ~~~
 
-For example, if $f\,a = \text{some }0$ and $g\,0 = \text{none}$, then `(f a).map g` is `some none`, rather than `none`. A value is present, but that value is itself “absent.” The two layers retain the fact that the first computation produced a value while the second did not.
+For example, if $f\\,a = \text{some }0$ and $g\\,0 = \text{none}$, then `(f a).map g` is `some none`, rather than `none`. A value is present, but that value is itself “absent.” The two layers retain the fact that the first computation produced a value while the second did not.
 
 We wanted a single `Option C` result: a value is either present or absent. What we have instead is `Option (Option C)`, one wrapper inside another.
 
@@ -162,7 +162,7 @@ Nor can we directly apply the next operation, $h : C \to \text{Option } D$, to t
 
 We have just obtained an `Option (Option C)`. To return to the `Option C` we wanted, we need to remove the outer `Option` layer. If the outer value is `none`, return `none`; if it is `some result`, return the inner `result` unchanged. This operation has type `Option (Option C) → Option C` and is called `Option.join` in Lean. Because it reduces a nested context to one layer, its behavior is often described as **flattening**. We will use its operation name, `join`.
 
-Let us apply `join` to the `map` result from Section 4. If $f\,a$ is `none`, $g$ is not run and the result is `none`. If $f\,a$ is `some b`, `map` produces `some (g b)`, and `join` removes the outer `some` to return $g\,b$.
+Let us apply `join` to the `map` result from Section 4. If $f\\,a$ is `none`, $g$ is not run and the result is `none`. If $f\\,a$ is `some b`, `map` produces `some (g b)`, and `join` removes the outer `some` to return $g\\,b$.
 
 ~~~text
 ((f a).map g).join : Option C
@@ -171,7 +171,7 @@ if f a = none,    the result is none
 if f a = some b,  the result is g b
 ~~~
 
-The two branches we wrote explicitly in Section 3 have reappeared in this expression. In particular, when $g\,b$ is `none`, `map` produces `some none`, but `join` turns it into `none`. If we open the outer doll and find that the inner one is empty, the final result is simply “empty.”
+The two branches we wrote explicitly in Section 3 have reappeared in this expression. In particular, when $g\\,b$ is `none`, `map` produces `some none`, but `join` turns it into `none`. If we open the outer doll and find that the inner one is empty, the final result is simply “empty.”
 
 Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
 
