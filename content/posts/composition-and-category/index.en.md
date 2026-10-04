@@ -20,21 +20,19 @@ keywords: ["category theory", "function composition", "composition", "Option", "
 
 Hello, I am Jaeho Choi from the Compiler team at HyperAccel.
 
-We live in an age when AI agents write code for us. A single prompt can produce hundreds of lines of functions in moments, and debates over paradigms such as functional programming can feel like a thing of the past.
+A monad has a reputation in functional programming as a concept that is unusually difficult to explain. Even if you have heard the name, it can be hard to say what it is and why we use it.
 
-Yet the faster we can produce code, the more important the work left to developers becomes: deciding how to assemble those functions.
+My reason for introducing monads is the beauty of function composition. We connect small functions to build a larger function, then connect that function to others. Being able to assemble a larger computation while understanding what each function does is one of the appeals of functional programming.
 
-> *“What rules should we use to connect all the functions AI produces?”*
+When we can pass one function's result to the next, the task is straightforward. In real code, though, those connections do not always work as we intend. A function may produce no value or several results. We may also need to pass an updated state to the next step, or connect operations that interact with the outside world, such as reading a file. Can we preserve the ability to compose functions in sequence for these computations too?
 
-When we can pass one function's result to the next, the task is straightforward. In real code, though, those connections do not always work as we intend.
-
-This series begins where those connections break down. We will first write code that makes them work, then use the language of category theory to explore the laws that code satisfies and the mathematical structure within it. Along the way, we will work toward understanding what a monad is and how it relates to our original problem of connecting functions.
+This series begins where those connections break down. We will first write code that makes them work, then use the language of category theory to explore the laws that code satisfies and the mathematical structure within it. Along the way, we will work toward understanding what a monad is and how it lets us continue composing functions even when computations may produce no value or multiple results.
 
 There is a reason for taking this approach. If you have looked for material on monads, you have probably encountered one of two barriers.
 
-On one side stands the forbidding mathematical declaration, *“A monad is just a monoid in the category of endofunctors.”* Quoted without its original context, this alien vocabulary can exhaust readers before they even begin. On the other side are countless everyday analogies: *“A monad is a burrito,”* or *“A monad is a box.”* However many analogies you read, it can still be hard to find a clear answer to the basic questions: *“Why should I learn about monads? Why does my code need this?”*
+On one side stands the forbidding mathematical declaration, *“A monad is just a monoid in the category of endofunctors.”* Quoted without its original context, this unfamiliar mathematical vocabulary can exhaust readers before they even begin. On the other side are countless everyday analogies: *“A monad is a burrito,”* or *“A monad is a box.”* However many analogies you read, it can still be hard to find a clear answer to the basic questions: *“Why should I learn about monads? Why does my code need this?”*
 
-Between mathematical declarations and everyday analogies lies code we can actually run. As we carry out computations and see exactly where their connections fail, the things those unfamiliar mathematical terms describe can begin to take a more concrete shape.
+Between mathematical declarations and everyday analogies lies code we can actually run. As we carry out computations and see exactly where their connections fail, the things those unfamiliar mathematical terms describe can begin to take a more concrete shape. By following the code, we will work toward reading a once-distant mathematical definition as a description of the connections we have built ourselves.
 
 We will write that code in [Lean 4](https://lean-lang.org/lean4/doc). Lean 4 is both a functional programming language and an interactive theorem prover (ITP), which checks proofs of mathematical propositions. At first, we will use it to write and run functions. Later, we will use the same language to prove laws about the composition rules we have built. I will introduce the syntax as we need it in the examples.
 
