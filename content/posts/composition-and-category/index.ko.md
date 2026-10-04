@@ -174,7 +174,9 @@ f a = some b  이면  g b
 
 안쪽 값에 함수를 적용하는 `map`과 중첩을 한 겹 줄이는 `join`을 합친 연산은 보통 `flatMap` 또는 `bind`라고 부릅니다. Lean에서는 `Option.bind`, Java와 Swift에서는 `flatMap`, Rust와 C++에서는 `and_then`이라는 이름으로 만날 수 있습니다. 이 글의 코드에서는 Lean의 이름인 `bind`를 사용하겠습니다.
 
-두 연산의 관계는 다음 등식으로 나타납니다. 여기서는 `#eval`로 몇 가지 값을 계산하는 대신, Lean에서 이 등식을 **증명**해 보겠습니다. `example` 뒤에 증명할 등식을 적고, `by` 뒤에 그 증명을 구성하는 명령을 씁니다.
+두 연산의 관계는 다음 등식으로 나타납니다. 이 등식은 어떤 `Option` 값 `m`과 다음 함수 `g`를 선택하더라도, `bind`의 결과와 `map` 다음 `join`의 결과가 같다는 주장입니다.
+
+이런 주장을 확인하려면 몇 가지 입력을 실행해 결과를 비교하는 것만으로는 충분하지 않습니다. 모든 경우에 등식이 성립하는 이유를 제시해야 하는데, 이것이 여기서 하려는 **증명**입니다. Lean에서는 그 이유를 코드로 작성할 수 있고, Lean이 각 단계가 올바른지 검사합니다. 아래 코드에서 `example` 뒤에는 증명할 등식을, `by` 뒤에는 그 증명을 구성하는 명령을 적습니다.
 
 ~~~lean
 example {B C : Type} (m : Option B) (g : B → Option C) :
@@ -263,7 +265,7 @@ def parseAndReciprocal : String → Option String :=
 
 `parseAndReciprocal`에는 어떤 두 함수를 연결할지만 적혀 있습니다. 앞의 결과가 없을 때 멈추고, 있으면 다음 함수로 넘기는 방법은 `composeOption`이 맡습니다. 다른 함수들을 연결할 때도 같은 규칙을 그대로 사용할 수 있습니다.
 
-직접 실행하면 성공하는 입력과 각 단계에서 값이 없어지는 입력을 확인할 수 있습니다.
+`#eval`은 뒤에 적은 식을 실행하고 계산 결과를 보여 주는 Lean 명령입니다. 이를 이용하면 성공하는 입력과 각 단계에서 값이 없어지는 입력의 결과를 직접 확인할 수 있습니다.
 
 ~~~lean
 #eval parseAndReciprocal "42"  -- some "1/42"
@@ -273,7 +275,9 @@ def parseAndReciprocal : String → Option String :=
 
 ~~~
 
-세 구현이 같은 결과를 내는지도 `#guard`로 확인할 수 있습니다. 조건이 참이면 검사를 통과하고, 거짓이면 Lean이 오류를 보고합니다. 아래는 검사 중 일부이며, Playground에는 세 입력에 대한 전체 검사가 들어 있습니다.
+`#eval`로 계산 결과를 확인했다면, 이제 `#guard`로 그 결과가 우리가 기대한 조건을 만족하는지 검사해 보겠습니다. `#guard`는 뒤에 적은 조건이 참이면 오류 없이 통과하고, 거짓이면 Lean이 오류를 보고하게 하는 명령입니다. 여기서 `==`는 두 계산 결과가 같은지 비교합니다.
+
+아래 첫 줄은 입력 `"42"`에 대해 조건 분기로 구현한 `composeOptionByMatch`와 `bind`로 구현한 `parseAndReciprocal`의 결과가 같은지 검사합니다. 나머지 줄도 같은 방식으로 다른 구현의 결과나 예상한 결과와 비교합니다. 아래는 검사 중 일부이며, Playground에는 세 입력에 대한 전체 검사가 들어 있습니다.
 
 ~~~lean
 #guard composeOptionByMatch parseNat reciprocal "42" == parseAndReciprocal "42"

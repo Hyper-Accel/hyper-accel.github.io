@@ -175,7 +175,9 @@ The two branches we wrote explicitly in Section 3 have reappeared in this expres
 
 Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
 
-The relationship between the operations is expressed by this equation. This time, rather than using `#eval` to compute a few values, we will ask Lean to **prove** it. After `example` we write the equation to prove; after `by` we write instructions that construct its proof.
+The relationship between the operations is expressed by this equation. It states that for any `Option` value `m` and next function `g`, the result of `bind` equals the result of `map` followed by `join`.
+
+Running a few inputs and comparing their results is not enough to establish this claim. We need to give a reason why the equation holds in every case; this is the **proof** we will construct here. In Lean, we can write that reasoning as code, and Lean checks that each step is valid. In the code below, we write the equation to prove after `example`, and the instructions that construct its proof after `by`.
 
 ~~~lean
 example {B C : Type} (m : Option B) (g : B → Option C) :
@@ -264,7 +266,7 @@ def parseAndReciprocal : String → Option String :=
 
 `parseAndReciprocal` specifies only which two functions to connect. `composeOption` handles stopping when the previous result is absent and passing it to the next function when it is present. We can use the same rule unchanged to connect other functions.
 
-Running the code lets us check an input that succeeds, along with inputs for which a value is absent at either stage.
+`#eval` is a Lean command that executes the expression after it and displays the result. We can use it to inspect an input that succeeds, along with inputs for which a value is absent at either stage.
 
 ~~~lean
 #eval parseAndReciprocal "42"  -- some "1/42"
@@ -274,7 +276,9 @@ Running the code lets us check an input that succeeds, along with inputs for whi
 
 ~~~
 
-We can also use `#guard` to check whether the three implementations produce the same results. If its condition is true, the check passes; if false, Lean reports an error. Here are some of the checks; the Playground contains the full set for all three inputs.
+Having inspected the results with `#eval`, we will now use `#guard` to check whether they satisfy the conditions we expect. `#guard` passes without an error when the condition after it is true, and makes Lean report an error when it is false. Here, `==` compares two computed results for equality.
+
+The first line below checks whether `composeOptionByMatch`, implemented with branching, and `parseAndReciprocal`, implemented using `bind`, produce the same result for the input `"42"`. The remaining lines similarly compare against another implementation or an expected result. These are some of the checks; the Playground contains the full set for all three inputs.
 
 ~~~lean
 #guard composeOptionByMatch parseNat reciprocal "42" == parseAndReciprocal "42"
