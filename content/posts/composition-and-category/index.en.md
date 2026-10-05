@@ -175,17 +175,13 @@ The two branches we wrote explicitly in Section 3 have reappeared in this expres
 
 Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
 
-The relationship between the operations is expressed by this equation. It states that for any `Option` value `m` and next function `g`, the result of `bind` equals the result of `map` followed by `join`.
+We can express the relationship between the operations as follows.
 
-Running a few inputs and comparing their results is not enough to establish this claim. We need to give a reason why the equation holds in every case; this is the **proof** we will construct here. In Lean, we can write that reasoning as code, and Lean checks that each step is valid. In the code below, we write the equation to prove after `example`, and the instructions that construct its proof after `by`.
-
-~~~lean
-example {B C : Type} (m : Option B) (g : B → Option C) :
-    m.bind g = (m.map g).join := by
-  cases m <;> rfl
+~~~text
+m.bind g = (m.map g).join
 ~~~
 
-`cases m` splits `m` into the `none` and `some b` cases. `<;> rfl` runs `rfl` on both resulting goals; in each case, the two sides reduce to the same expression. Lean checks that both cases have been proved. Thus this code proves the equation for arbitrary `m` and `g`, rather than checking a few sample inputs.
+If `m` is `none`, both sides produce `none`. If it is `some b`, `bind` returns `g b` directly. On the right, `map` produces `some (g b)`, which `join` reduces to `g b`. Thus the two computations produce the same result for any `Option` value `m` and next function `g`.
 
 ![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.en.svg)
 
@@ -295,6 +291,20 @@ To modify the code and run it yourself, [open this example in the Lean 4 Playgro
 - With `"foo"`: parsing fails ($\text{none}$) $\to$ the second function is never run, and $\text{none}$ is returned immediately.
 
 We handled absence inside the composition rule, `composeOption`, without manually checking it at every call. `join` flattens both an outer `none` and a `some none` whose inner value is absent to `none`. Consequently, the final result alone cannot tell us which stage failed to produce a value.
+
+### An aside: proving an equation in Lean
+
+So far, we have run specific inputs and checked their results. With Lean, we can go a step further and prove that two computations agree for any input and function. Let us prove `m.bind g = (m.map g).join`, the equation we checked by considering both cases in Section 5.
+
+This uses the interactive theorem prover capability introduced earlier. In Lean, we can write both a claim and the reasoning that establishes it. As we write the steps of a proof, Lean checks that each step is valid and tells us what remains to be proved. In the code below, `example` declares the claim to prove, and the commands after `by` construct its proof.
+
+~~~lean
+example {B C : Type} (m : Option B) (g : B → Option C) :
+    m.bind g = (m.map g).join := by
+  cases m <;> rfl
+~~~
+
+`cases m` splits the proof into the cases where `m` is `none` and where it is `some b`. `<;>` applies the following `rfl` to both cases. `rfl` checks that both sides of the equation reduce to the same expression according to their definitions. Since both cases are proved without choosing a specific `b` or `g`, Lean can verify that the equation holds for arbitrary `m` and `g`.
 
 ---
 
