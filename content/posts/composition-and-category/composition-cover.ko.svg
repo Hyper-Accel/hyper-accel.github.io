@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">함수가 이어지지 않을 때</title><desc id="desc">높이와 모양이 다른 두 함수의 접점을 황금빛 경로가 이어 준다. 계산을 잇는 규칙을 상징하는 표지.</desc>
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102634"/><stop offset="1" stop-color="#213f50"/></linearGradient>
+ <linearGradient id="face" x2="1" y2="1"><stop stop-color="#426d80"/><stop offset="1" stop-color="#224858"/></linearGradient>
+ <linearGradient id="bridge" x2="1"><stop stop-color="#c89751"/><stop offset=".5" stop-color="#ffe0a0"/><stop offset="1" stop-color="#d9ad68"/></linearGradient>
+ <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#b7d9e4" stroke-opacity=".055"/></pattern>
+ <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#061823" flood-opacity=".55"/></filter>
+</defs>
+<rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+<g font-family="system-ui, -apple-system, sans-serif"><text x="1136" y="69" text-anchor="end" font-size="24" fill="#e6c286">01</text></g>
+<g filter="url(#shadow)">
+ <path d="M130 228 196 187H416L350 228Z" fill="#527f91"/><path d="M350 228 416 187V377L350 418Z" fill="#193b4c"/>
+ <rect x="130" y="228" width="220" height="190" rx="7" fill="url(#face)" stroke="#82afbf"/>
+ <path d="M804 320 870 279H1090L1024 320Z" fill="#527f91"/><path d="M1024 320 1090 279V469L1024 510Z" fill="#193b4c"/>
+ <rect x="804" y="320" width="220" height="190" rx="7" fill="url(#face)" stroke="#82afbf"/>
+</g>
+<g font-family="Georgia, serif" font-size="94" font-style="italic" fill="#eff7fa" text-anchor="middle"><text x="240" y="350">f</text><text x="915" y="439">g</text></g>
+<rect x="365" y="266" width="58" height="93" rx="9" fill="#244d5f" stroke="#95c9d5" stroke-width="3"/>
+<rect x="775" y="397" width="29" height="29" rx="4" fill="#153241" stroke="#95c9d5" stroke-width="3"/>
+<path d="M428 313H554Q600 313 600 359V366Q600 412 646 412H765" fill="none" stroke="#091d28" stroke-width="26" opacity=".6" transform="translate(0 9)"/>
+<path d="M428 313H554Q600 313 600 359V366Q600 412 646 412H765" fill="none" stroke="url(#bridge)" stroke-width="14" stroke-linecap="round"/>
+<path d="m747 398 19 14-19 14" fill="none" stroke="#f7d998" stroke-width="4"/>
+<g fill="none" stroke="#88afc0" stroke-opacity=".4" stroke-width="2" stroke-dasharray="5 9"><path d="M428 278H765"/><path d="M428 350H765"/></g>
+<circle cx="428" cy="313" r="7" fill="#fff0c5"/><circle cx="766" cy="412" r="7" fill="#fff0c5"/>
+</svg>

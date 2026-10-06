@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 60 1000 620" role="img" aria-labelledby="title desc">
+<title id="title">map이 만든 바깥 some을 join이 제거합니다</title><desc id="desc">some b에 map g를 적용하면 g b라는 Option C 결과를 바깥 some이 감싼다. join은 바깥 some을 제거해 g b를 남긴다. 입력 none은 두 단계 모두 none이다. g b가 none인 경우에도 some none은 join 뒤 none이 된다.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" fill="#496475"/></marker></defs>
+<rect width="1000" height="690" fill="#fff"/>
+<g font-family="system-ui, -apple-system, sans-serif" fill="#19394b">
+<g font-size="19" fill="#607785" text-anchor="middle"><text x="135" y="92">Option B</text><text x="488" y="92">Option (Option C)</text><text x="850" y="92">Option C</text></g>
+<rect x="42" y="118" width="186" height="170" rx="9" fill="#eaf4f6" stroke="#4b96a5" stroke-width="2"/>
+<text x="59" y="150" font-size="20" fill="#337f90">some</text>
+<rect x="85" y="171" width="100" height="76" rx="4" fill="#fff" stroke="#b7cbd4"/>
+<text x="135" y="219" text-anchor="middle" font-size="28">b</text>
+<rect x="350" y="118" width="276" height="170" rx="9" fill="#eaf4f6" stroke="#4b96a5" stroke-width="2"/>
+<text x="368" y="150" font-size="20" fill="#337f90">some</text>
+<rect x="382" y="165" width="212" height="95" rx="6" fill="#fff2df" stroke="#b6833f" stroke-width="2"/>
+<text x="488" y="221" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="26">g b</text>
+<rect x="744" y="165" width="212" height="95" rx="6" fill="#fff2df" stroke="#b6833f" stroke-width="2"/>
+<text x="850" y="221" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="26">g b</text>
+<g stroke="#496475" stroke-width="2" marker-end="url(#arrow)"><path d="M242 206H335"/><path d="M640 206H729"/></g>
+<g font-size="23" text-anchor="middle"><text x="288" y="187">map g</text><text x="684" y="187">join</text></g>
+<g font-family="ui-monospace, Menlo, monospace" font-size="25" text-anchor="middle"><text x="135" y="348">none</text><text x="488" y="348">none</text><text x="850" y="348">none</text></g>
+<g stroke="#496475" stroke-width="2" marker-end="url(#arrow)"><path d="M242 340H335"/><path d="M640 340H729"/></g>
+<g font-size="19" text-anchor="middle"><text x="288" y="325">map g</text><text x="684" y="325">join</text></g>
+<path d="M80 377v12H920v-12" fill="none" stroke="#7f9aa8" stroke-width="2"/>
+<text x="500" y="425" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="25">m.bind g = (m.map g).join</text>
+<path d="M36 461H964" stroke="#dce5e9"/>
+<rect x="190" y="531" width="238" height="128" rx="9" fill="#eaf4f6" stroke="#4b96a5" stroke-width="2"/>
+<text x="207" y="560" font-size="20" fill="#337f90">some</text>
+<rect x="232" y="579" width="154" height="55" rx="5" fill="#fff2df" stroke="#b6833f" stroke-width="2"/>
+<text x="309" y="615" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="24">none</text>
+<path d="M450 600H617" fill="none" stroke="#496475" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="533" y="582" text-anchor="middle" font-size="23">join</text>
+<rect x="642" y="573" width="154" height="55" rx="5" fill="#fff2df" stroke="#b6833f" stroke-width="2"/>
+<text x="719" y="609" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="24">none</text>
+</g></svg>
