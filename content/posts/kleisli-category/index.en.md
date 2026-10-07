@@ -20,11 +20,11 @@ keywords: ["category theory", "Kleisli category", "associativity", "identity", "
 
 Hello, I am Jaeho Choi from the Compiler team at HyperAccel.
 
-In part 1, we used `Option.bind` to define `composeOption`, an operation that joins two functions. `composeOption f g` applies `f` to its input and passes the result, together with `g`, to `Option.bind`. If that result is `none`, `Option.bind` returns `none`; if it is `some b`, it computes `g b`. We can therefore replace `f` and `g` with any functions of the right types without rewriting the check for an absent value each time.
+In part 1, we defined `composeOption` to join two functions whose results might be absent. `Option.bind` handles the connection between the first function's result and the next function. The composite is itself a function returning `Option`, so we can connect another function after it. Even with possible absence, we can keep building larger functions out of smaller ones.
 
 Does this approach work only for `Option` and missing values? Here we will build `composeList`, a composition operation for functions that return `List`.
 
-Putting `composeOption` and `composeList` side by side will reveal a similar shape beneath their different ways of handling results. We will then ask what laws these operations need when we connect several functions, and prove those laws for `composeOption` in Lean 4. Finally, we will see whether the arrows and composition we built form a **category**.
+After finding the common shape of these compositions, we will connect longer sequences of functions. What lets us group consecutive steps differently without changing the result, and account for a sequence with no steps at all? These questions lead us to associativity and the identity laws. We will use Lean 4 to check why `composeOption` satisfies them, then read the structure we have built through the definition of a **category**.
 
 ---
 
@@ -47,7 +47,7 @@ g (f sentence)  -- type error: g expects String, not List String
 
 $f$ returns a **list of words**, `List String`, while $g$ accepts **one word**, a `String`. Merely checking whether a value exists will not connect them. We need to apply $g$ to every word in the list and collect its results.
 
-Let us make the functions concrete in Lean. We define `splitWords` and give `String.toList` the name `wordChars`. These are the $f$ and $g$ above.
+Let us make the functions concrete in Lean. We define `splitWords` and give `String.toList` the name `wordChars`. These are the $f$ and $g$ above. `#eval` runs the expression that follows it and displays the result.
 
 ~~~lean
 def splitWords (s : String) : List String := s.splitOn " "
@@ -119,9 +119,9 @@ def composeList {A B C : Type}
 -- ['h', 'i', 'o', 'k']
 ~~~
 
-To discuss `composeOption` and `composeList` together, let $M$ stand for either `Option` or `List`. We will use the notation $g \star f$ from part 1 in both cases: when $M$ is `Option`, it means `composeOption f g`; when $M$ is `List`, it means `composeList f g`.
+To discuss `composeOption` and `composeList` together, let $M$ stand for either `Option` or `List`. We write the new composition as $\star$ to distinguish it from ordinary function composition $\circ$. The expression $g \star f$ runs $f$ first, then connects $g$: when $M$ is `Option`, it means `composeOption f g`; when $M$ is `List`, it means `composeList f g`.
 
-Consider $f : A \to M B$ and $g : B \to M C$ in this notation. Ordinary composition $g \circ f$ would evaluate `g (f a)` on input `a`. But `f a` has type `M B`, while $g$ expects a `B`; the expression is ill typed. The new composition $g \star f$ instead passes `f a` to `bind` or `flatMap` along with $g$. `Option` passes its value to $g$ when one exists, and `List` passes each element to $g$. Thus `(g ⋆ f) a : M C`. **Two functions that ordinary composition could not connect now form one function of type `A → M C`.**
+Consider $f : A \to M\\,B$ and $g : B \to M\\,C$ in this notation. Ordinary composition $g \circ f$ would evaluate `g (f a)` on input `a`. But `f a` has type `M B`, while $g$ expects a `B`; the expression is ill typed. The new composition $g \star f$ instead passes `f a` to `bind` or `flatMap` along with $g$. `Option` passes its value to $g$ when one exists, and `List` passes each element to $g$. Thus $(g \star f)(a) : M\\,C$. **Two functions that ordinary composition could not connect now form one function of type `A → M C`.**
 
 Let us draw **arrows** according to this new composition. A function `A → M B` is an arrow from $A$ to $B$, and `B → M C` is an arrow from $B$ to $C$. We choose $B$ as the destination of the first arrow because that is the type accepted by the next function. Their composite also has the form `A → M C`, so it is an arrow from $A$ to $C$.
 
@@ -131,7 +131,7 @@ The diagram shows the same relationship for either choice of $M$.
 
 ![With M fixed to Option or List, f has type A → M B, g has type B → M C, and their composite g ⋆ f has type A → M C.](kleisli-triangle.en.svg)
 
-Call a sequence of composable arrows a **path**. Its length is the number of arrows it contains, so a single arrow is a path of length one. In the diagram, $f$ followed by $g$ is a path of length two; the lower arrow $g \star f$ is its composite. Because this composite has type `A → M C`, we can append $h : C \to M D$ and apply the same operation again.
+Call a sequence of composable arrows a **path**. Its length is the number of arrows it contains, so a single arrow is a path of length one. In the diagram, $f$ followed by $g$ is a path of length two; the lower arrow $g \star f$ is its composite. Because this composite has type `A → M C`, we can append $h : C \to M\\,D$ and apply the same operation again.
 
 Having defined $g \star f$ for two arrows, we would like to write the result for three as $h \star g \star f$. But $\star$ combines only two arrows at a time, so we must first choose a pair. Combining $f$ and $g$ gives $h \star (g \star f)$; combining $g$ and $h$ gives $(h \star g) \star f$. If these differ, the unparenthesized expression $h \star g \star f$ does not name a unique composite unless we specify a grouping. Let us ask when the two results coincide.
 
@@ -147,7 +147,7 @@ g : B → M C
 h : C → M D
 ~~~
 
-Joining $f$ and $g$ first gives $g \star f : A \to M C$; joining $g$ and $h$ first gives $h \star g : B \to M D$. The diagram includes both choices.
+Joining $f$ and $g$ first gives $g \star f : A \to M\\,C$; joining $g$ and $h$ first gives $h \star g : B \to M\\,D$. The diagram includes both choices.
 
 ![With M fixed to Option or List, the upper path composes f with h ⋆ g; the lower path composes g ⋆ f with h.](associativity-diamond.en.svg)
 
@@ -160,6 +160,8 @@ h ⋆ (g ⋆ f) = (h ⋆ g) ⋆ f
 ~~~
 
 As a concrete example, append `duplicateChar : Char → List Char`, which repeats a character, to `splitWords` and `wordChars`. If we compose `splitWords` with `wordChars` first, we gather all characters and then repeat each one. If we compose `wordChars` with `duplicateChar` first, we repeat the characters within each word and then collect the results. Let us compare both computations on `"hi ok"`.
+
+The arguments to `composeList` are written in execution order. The first expression below groups the first two functions, while the second groups the last two; both still run `splitWords`, `wordChars`, and `duplicateChar` in that order. `#guard` checks that the following condition is true and reports an error if it is false. Here, `==` compares the computed result with the expected list.
 
 ~~~lean
 def duplicateChar (c : Char) : List Char := [c, c]
@@ -178,9 +180,11 @@ If associativity holds, three arrows in the same order give the same result rega
 
 ## 4. Identity laws: what does “do nothing” mean?
 
-So far, every path has contained at least one arrow. A path with one arrow has that arrow as its composite. For longer paths, we repeatedly compose arrows; if associativity holds, the grouping does not matter. What should be the composite of an **empty path** that starts at $A$ and traverses no arrows?
+We can now handle a path consisting of `f` alone, a path that follows `f` and then `g`, one that continues through `h`, and, more generally, a path containing $n$ arrows. With one arrow, we take that arrow itself as the result; with two or more, we compose them in turn. Associativity ensures that a fixed sequence of arrows has the same composite regardless of which part we group first.
 
-For ordinary function composition, the answer is `id_A : A → A`, which returns its input unchanged. Composing `id_A` before a function $p : A \to B$, or `id_B` after it, leaves $p$ unchanged:
+Can we take this one step further and handle a path of length zero in the same way? Just as we have assigned a composite arrow to each path, we want to assign an arrow to an **empty path** that traverses no arrows. A path that starts at $A$ and stays at $A$ must correspond to an arrow whose source and destination are both $A$. Placing an empty path before or after another path adds no computation steps, so composing this arrow must leave the original result unchanged.
+
+For ordinary function composition, `id_A : A → A`, which returns its input unchanged, plays this role. Composing `id_A` before a function $p : A \to B$, or `id_B` after it, leaves $p$ unchanged:
 
 ~~~text
 p ∘ id_A = p
@@ -211,6 +215,15 @@ For `List`, let us check both directions using `wordChars : String → List Char
 
 In the opposite direction, running `wordChars "hi"` first yields `['h', 'i']`. Wrapping each character with `pureList` produces `[['h'], ['i']]`; concatenating these lists gives `['h', 'i']` again. Putting `pureList` after the computation also preserves the result. The same reasoning applies to empty and longer result lists: each element is wrapped once and then concatenated. Absence and multiplicity are different kinds of computation, but each needs a way to preserve a computation on both sides of composition.
 
+We can check both directions in Lean:
+
+~~~lean
+def pureList {A : Type} (x : A) : List A := [x]
+
+#eval (pureList "hi").flatMap wordChars   -- ['h', 'i']
+#eval (wordChars "hi").flatMap pureList   -- ['h', 'i']
+~~~
+
 Like $0$ for addition or $1$ for multiplication, `pureOption` and `pureList` provide an element that leaves their respective compositions unchanged.
 
 ---
@@ -218,6 +231,8 @@ Like $0$ for addition or $1$ for multiplication, `pureOption` and `pureList` pro
 ## 5. From checking examples to proving the laws
 
 In section 3, we compared two `List` composites on one input. In section 4, we chose candidate identity arrows for `Option` and `List`. Associativity and the identity laws, however, must hold for arbitrary types, functions, and inputs. Let us return to the `Option` composition from part 1 and prove its laws. An `Option` result is either `none` or `some b`, so we can inspect those two cases.
+
+Instead of running chosen inputs with `#eval` or `#guard`, we will state that the two expressions agree for any choice of functions and explain why. Lean checks the claim together with the reasoning. A proof here covers every possible case for an arbitrary input, rather than substituting one particular input.
 
 First, we repeat the definition of `composeOption` and define its candidate identity arrow `pureOption`.
 
@@ -233,7 +248,11 @@ def pureOption {A : Type} (x : A) : Option A :=
 
 ### 5.1. Associativity: the two groupings define the same function
 
-In the notation of section 2, `composeOption f g` is $g \star f$. The two sides of the theorem group the first two functions and the last two functions, respectively. This is a statement that the resulting **functions themselves** are equal, beyond checking a particular input.
+In the notation of section 2, `composeOption f g` is $g \star f$. We want to prove that grouping `f` with `g` gives the same function as grouping `g` with `h`. To show that two functions are equal, it suffices to show that they return the same result for every input. This principle is **function extensionality**.
+
+Take an arbitrary input `x` and split on the first result `f x`. If it is `none`, both groupings return `none`. If it is `some b`, both compute `g b`, stop if its result is absent, and pass its value to `h` otherwise. The two groupings reduce to the same computation, so they agree for every input.
+
+The code below expresses this argument in a form Lean can check. After `theorem`, we write the theorem's name and its arbitrary types and functions; after `:`, we state the equality to prove. The commands after `by` construct its proof.
 
 ~~~lean
 -- Associativity
@@ -248,13 +267,11 @@ theorem composeOption_assoc {A B C D : Type}
   | some b => rfl
 ~~~
 
-`funext x` applies function extensionality: two functions are equal if they return the same result for every input `x`. We unfold `composeOption`, then split the first result `f x` into its `none` and `some b` cases with `cases f x`.
-
-If it is `none`, both groupings return `none`. If it is `some b`, both groupings stop when `g b` is absent and pass its value to `h` when one is present. Evaluating the two branches of `Option.bind` makes the sides equal, so `rfl` closes each case.
+`funext x` uses function extensionality to turn an equality of functions into an equality of their results on an arbitrary input `x`. `unfold composeOption` expands the definition of composition, and `cases f x` splits on the first result. Finally, `rfl` asks Lean to check that both sides reduce to the same expression using the definitions. Each command corresponds to a step of the argument above.
 
 ### 5.2. Identity laws: inserting an identity leaves a function unchanged
 
-First, connect `pureOption` after `f`. In composition notation, `pureOption ⋆ f = f`; this is called the left identity law.
+First, connect `pureOption` after `f`. When `f x` is `none`, it remains `none`; when it is `some b`, `pureOption b` returns `some b` again. Both cases preserve the original result. In composition notation, this is `pureOption ⋆ f = f`. The identity arrow appears on the left of the symbol, so this is called the left identity law.
 
 ~~~lean
 -- Left identity
@@ -268,9 +285,9 @@ theorem composeOption_left_id {A B : Type} (f : A → Option B) :
   | some b => rfl
 ~~~
 
-When `f x` is `none`, it remains `none`; when it is `some b`, `pureOption b` returns `some b` again. Both cases preserve the original result.
+The proof likewise splits on the two cases of `f x`; evaluation of the definitions establishes each equality.
 
-What about running `pureOption` first, then connecting `f`?
+Now run `pureOption` first, then connect `f`. Because `pureOption x` is always `some x`, passing it to `Option.bind` immediately gives `f x`. In composition notation, this is `f ⋆ pureOption = f`. This time the identity arrow appears on the right, giving the right identity law.
 
 ~~~lean
 -- Right identity
@@ -282,11 +299,11 @@ theorem composeOption_right_id {A B : Type} (f : A → Option B) :
   rfl
 ~~~
 
-`pureOption x` is always `some x`, so unfolding composition immediately gives `f x`. This time no case split is needed.
+The first result is always `some x`, so this proof needs no case split.
 
-These three theorems are more than checks on selected inputs. They prove the laws for every type and function admitted by the declarations. We could prove the general laws for `List` as well, but that requires induction over list traversal and concatenation. Here we focus on the three `Option` laws.
+These three theorems prove the laws for every type and function admitted by the declarations. We can also prove the general laws for `List`. A direct proof uses **induction**: establish the law for the empty list, then use the result for the rest of a list to establish it after adding one element. Here we focus on the two-case proofs for `Option`.
 
-You can run the [complete example and proofs in the Lean 4 Playground](https://live.lean-lang.org/#code=--%20Monads%20and%20Category%20Theory%20%E2%91%A1%20Different%20Computations%2C%20the%20Same%20Composition%0A--%20Lean%204.32.1.%20Runs%20without%20additional%20libraries.%0A%0Adef%20splitWords%20%28s%20%3A%20String%29%20%3A%20List%20String%20%3A%3D%20s.splitOn%20%22%20%22%0Adef%20wordChars%20%3A%20String%20%E2%86%92%20List%20Char%20%3A%3D%20String.toList%0A%0A%23eval%20splitWords%20%22hi%20ok%22%20%20%20--%20%5B%22hi%22%2C%20%22ok%22%5D%0A%23eval%20wordChars%20%22hi%22%20%20%20%20%20%20%20--%20%5B%27h%27%2C%20%27i%27%5D%0A%23eval%20wordChars%20%22ok%22%20%20%20%20%20%20%20--%20%5B%27o%27%2C%20%27k%27%5D%0A%0Adef%20sentenceCharsByMatch%20%28sentence%20%3A%20String%29%20%3A%20List%20Char%20%3A%3D%0A%20%20let%20rec%20collect%20%28words%20%3A%20List%20String%29%20%3A%20List%20Char%20%3A%3D%0A%20%20%20%20match%20words%20with%0A%20%20%20%20%7C%20%5B%5D%20%3D%3E%20%5B%5D%0A%20%20%20%20%7C%20word%20%3A%3A%20rest%20%3D%3E%20wordChars%20word%20%2B%2B%20collect%20rest%0A%20%20collect%20%28splitWords%20sentence%29%0A%0A%23eval%20sentenceCharsByMatch%20%22hi%20ok%22%20--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0A%23eval%20%28splitWords%20%22hi%20ok%22%29.map%20wordChars%0A--%20%5B%5B%27h%27%2C%20%27i%27%5D%2C%20%5B%27o%27%2C%20%27k%27%5D%5D%0A%0A%23eval%20%28%28splitWords%20%22hi%20ok%22%29.map%20wordChars%29.flatten%0A--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0Adef%20composeList%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20List%20B%29%20%28g%20%3A%20B%20%E2%86%92%20List%20C%29%20%3A%20A%20%E2%86%92%20List%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.flatMap%20g%0A%0A%23eval%20composeList%20splitWords%20wordChars%20%22hi%20ok%22%0A--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0Adef%20duplicateChar%20%28c%20%3A%20Char%29%20%3A%20List%20Char%20%3A%3D%20%5Bc%2C%20c%5D%0A%0A%23guard%20composeList%20%28composeList%20splitWords%20wordChars%29%20duplicateChar%20%22hi%20ok%22%0A%20%20%20%20%3D%3D%20%5B%27h%27%2C%20%27h%27%2C%20%27i%27%2C%20%27i%27%2C%20%27o%27%2C%20%27o%27%2C%20%27k%27%2C%20%27k%27%5D%0A%23guard%20composeList%20splitWords%20%28composeList%20wordChars%20duplicateChar%29%20%22hi%20ok%22%0A%20%20%20%20%3D%3D%20%5B%27h%27%2C%20%27h%27%2C%20%27i%27%2C%20%27i%27%2C%20%27o%27%2C%20%27o%27%2C%20%27k%27%2C%20%27k%27%5D%0A%0A--%20Option%20composition%20and%20its%20candidate%20identity%20arrow%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0Adef%20pureOption%20%7BA%20%3A%20Type%7D%20%28x%20%3A%20A%29%20%3A%20Option%20A%20%3A%3D%0A%20%20some%20x%0A%0A--%20Associativity%0A--%20h%20%E2%8B%86%20%28g%20%E2%8B%86%20f%29%20%3D%20%28h%20%E2%8B%86%20g%29%20%E2%8B%86%20f%0Atheorem%20composeOption_assoc%20%7BA%20B%20C%20D%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%28h%20%3A%20C%20%E2%86%92%20Option%20D%29%20%3A%0A%20%20%20%20composeOption%20%28composeOption%20f%20g%29%20h%20%3D%20composeOption%20f%20%28composeOption%20g%20h%29%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%0A%20%20cases%20f%20x%20with%0A%20%20%7C%20none%20%3D%3E%20rfl%0A%20%20%7C%20some%20b%20%3D%3E%20rfl%0A%0A--%20Left%20identity%0A--%20pure%20%E2%8B%86%20f%20%3D%20f%0Atheorem%20composeOption_left_id%20%7BA%20B%20%3A%20Type%7D%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%3A%0A%20%20%20%20composeOption%20f%20pureOption%20%3D%20f%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%20pureOption%0A%20%20cases%20f%20x%20with%0A%20%20%7C%20none%20%3D%3E%20rfl%0A%20%20%7C%20some%20b%20%3D%3E%20rfl%0A%0A--%20Right%20identity%0A--%20f%20%E2%8B%86%20pure%20%3D%20f%0Atheorem%20composeOption_right_id%20%7BA%20B%20%3A%20Type%7D%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%3A%0A%20%20%20%20composeOption%20pureOption%20f%20%3D%20f%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%20pureOption%0A%20%20rfl%0A).
+You can run the [complete example and proofs in the Lean 4 Playground](https://live.lean-lang.org/#code=--%20Monads%20and%20Category%20Theory%20%E2%91%A1%20Different%20Computations%2C%20the%20Same%20Composition%0A--%20Lean%204.32.1.%20Runs%20without%20additional%20libraries.%0A%0Adef%20splitWords%20%28s%20%3A%20String%29%20%3A%20List%20String%20%3A%3D%20s.splitOn%20%22%20%22%0Adef%20wordChars%20%3A%20String%20%E2%86%92%20List%20Char%20%3A%3D%20String.toList%0A%0A%23eval%20splitWords%20%22hi%20ok%22%20%20%20--%20%5B%22hi%22%2C%20%22ok%22%5D%0A%23eval%20wordChars%20%22hi%22%20%20%20%20%20%20%20--%20%5B%27h%27%2C%20%27i%27%5D%0A%23eval%20wordChars%20%22ok%22%20%20%20%20%20%20%20--%20%5B%27o%27%2C%20%27k%27%5D%0A%0Adef%20sentenceCharsByMatch%20%28sentence%20%3A%20String%29%20%3A%20List%20Char%20%3A%3D%0A%20%20let%20rec%20collect%20%28words%20%3A%20List%20String%29%20%3A%20List%20Char%20%3A%3D%0A%20%20%20%20match%20words%20with%0A%20%20%20%20%7C%20%5B%5D%20%3D%3E%20%5B%5D%0A%20%20%20%20%7C%20word%20%3A%3A%20rest%20%3D%3E%20wordChars%20word%20%2B%2B%20collect%20rest%0A%20%20collect%20%28splitWords%20sentence%29%0A%0A%23eval%20sentenceCharsByMatch%20%22hi%20ok%22%20--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0A%23eval%20%28splitWords%20%22hi%20ok%22%29.map%20wordChars%0A--%20%5B%5B%27h%27%2C%20%27i%27%5D%2C%20%5B%27o%27%2C%20%27k%27%5D%5D%0A%0A%23eval%20%28%28splitWords%20%22hi%20ok%22%29.map%20wordChars%29.flatten%0A--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0Adef%20composeList%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20List%20B%29%20%28g%20%3A%20B%20%E2%86%92%20List%20C%29%20%3A%20A%20%E2%86%92%20List%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.flatMap%20g%0A%0A%23eval%20composeList%20splitWords%20wordChars%20%22hi%20ok%22%0A--%20%5B%27h%27%2C%20%27i%27%2C%20%27o%27%2C%20%27k%27%5D%0A%0Adef%20duplicateChar%20%28c%20%3A%20Char%29%20%3A%20List%20Char%20%3A%3D%20%5Bc%2C%20c%5D%0A%0A%23guard%20composeList%20%28composeList%20splitWords%20wordChars%29%20duplicateChar%20%22hi%20ok%22%0A%20%20%20%20%3D%3D%20%5B%27h%27%2C%20%27h%27%2C%20%27i%27%2C%20%27i%27%2C%20%27o%27%2C%20%27o%27%2C%20%27k%27%2C%20%27k%27%5D%0A%23guard%20composeList%20splitWords%20%28composeList%20wordChars%20duplicateChar%29%20%22hi%20ok%22%0A%20%20%20%20%3D%3D%20%5B%27h%27%2C%20%27h%27%2C%20%27i%27%2C%20%27i%27%2C%20%27o%27%2C%20%27o%27%2C%20%27k%27%2C%20%27k%27%5D%0A%0Adef%20pureList%20%7BA%20%3A%20Type%7D%20%28x%20%3A%20A%29%20%3A%20List%20A%20%3A%3D%20%5Bx%5D%0A%0A%23eval%20%28pureList%20%22hi%22%29.flatMap%20wordChars%20%20%20--%20%5B%27h%27%2C%20%27i%27%5D%0A%23eval%20%28wordChars%20%22hi%22%29.flatMap%20pureList%20%20%20--%20%5B%27h%27%2C%20%27i%27%5D%0A%0A--%20Option%20composition%20and%20its%20candidate%20identity%20arrow%0Adef%20composeOption%20%7BA%20B%20C%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%3A%20A%20%E2%86%92%20Option%20C%20%3A%3D%0A%20%20fun%20x%20%3D%3E%20%28f%20x%29.bind%20g%0A%0Adef%20pureOption%20%7BA%20%3A%20Type%7D%20%28x%20%3A%20A%29%20%3A%20Option%20A%20%3A%3D%0A%20%20some%20x%0A%0A--%20Associativity%0A--%20h%20%E2%8B%86%20%28g%20%E2%8B%86%20f%29%20%3D%20%28h%20%E2%8B%86%20g%29%20%E2%8B%86%20f%0Atheorem%20composeOption_assoc%20%7BA%20B%20C%20D%20%3A%20Type%7D%0A%20%20%20%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%28g%20%3A%20B%20%E2%86%92%20Option%20C%29%20%28h%20%3A%20C%20%E2%86%92%20Option%20D%29%20%3A%0A%20%20%20%20composeOption%20%28composeOption%20f%20g%29%20h%20%3D%20composeOption%20f%20%28composeOption%20g%20h%29%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%0A%20%20cases%20f%20x%20with%0A%20%20%7C%20none%20%3D%3E%20rfl%0A%20%20%7C%20some%20b%20%3D%3E%20rfl%0A%0A--%20Left%20identity%0A--%20pure%20%E2%8B%86%20f%20%3D%20f%0Atheorem%20composeOption_left_id%20%7BA%20B%20%3A%20Type%7D%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%3A%0A%20%20%20%20composeOption%20f%20pureOption%20%3D%20f%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%20pureOption%0A%20%20cases%20f%20x%20with%0A%20%20%7C%20none%20%3D%3E%20rfl%0A%20%20%7C%20some%20b%20%3D%3E%20rfl%0A%0A--%20Right%20identity%0A--%20f%20%E2%8B%86%20pure%20%3D%20f%0Atheorem%20composeOption_right_id%20%7BA%20B%20%3A%20Type%7D%20%28f%20%3A%20A%20%E2%86%92%20Option%20B%29%20%3A%0A%20%20%20%20composeOption%20pureOption%20f%20%3D%20f%20%3A%3D%20by%0A%20%20funext%20x%0A%20%20unfold%20composeOption%20pureOption%0A%20%20rfl%0A).
 
 ---
 
@@ -341,7 +358,9 @@ Choosing `List` instead gives a separate Kleisli category with the same types as
 
 ---
 
-## 7. The next question: describing a type without inspecting its internals
+## 7. The structure we found in composition, and the next question
+
+In part 1, we wanted to connect functions whose results might be absent. Here we extended composition to functions with multiple results and established why regrouping steps can preserve a longer computation. Starting with code that assembles individual functions, we can now describe the mathematical structure supporting that assembly as a category.
 
 In part 3, we will return to $\mathbf{Type}$, whose morphisms are ordinary functions `A → B`. The category definition above says nothing about a type's fields or how many values it contains. Yet in programming, we make types that hold two values together, as in a `struct`, or one of several alternatives, as in an `enum`. Can we describe these types by the relationships among functions entering and leaving them, rather than by their internal representation?
 
