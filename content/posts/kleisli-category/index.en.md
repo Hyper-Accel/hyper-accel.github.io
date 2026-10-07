@@ -348,7 +348,7 @@ Now keep the same types as objects but use the `Option` arrows and composition w
 - **Composition**: join `f : A → Option B` and `g : B → Option C` as `composeOption f g`, or $g \star f : A \to \text{Option } C$, evaluating `(f a).bind g` on input `a`.
 - **Identity morphism**: `pureOption_A : A → Option A` at each type $A$, wrapping `a` as `some a`.
 
-Writing $A \to_K B$ does not change the actual return type of the function, which remains `Option B`. The diagram shows the difference: the very same function `f : A → Option B` is a morphism from $A$ to `Option B` in $\mathbf{Type}$, but a morphism from $A$ to $B$ in the new category.
+Calling `f : A → Option B` a morphism from $A$ to $B$ in this category does not mean changing its return type. `f` still returns `Option B`. The diagram shows the difference: the very same function `f : A → Option B` is a morphism from $A$ to `Option B` in $\mathbf{Type}$, but a morphism from $A$ to $B$ in the new category.
 
 ![In Type, f : A → Option B goes from A to Option B. In the Option Kleisli category, the same function is a morphism from A to B.](kleisli-arrows.en.svg)
 

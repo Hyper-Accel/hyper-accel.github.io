@@ -350,7 +350,7 @@ id_B ∘ f = f                  -- 좌측 항등법칙
 - **합성**: `f : A → Option B`와 `g : B → Option C`를 `composeOption f g`, 즉 $g \star f : A \to \text{Option } C$로 이음. 입력 `a`에서 `(f a).bind g`를 계산함
 - **항등 사상**: 각 타입 $A$의 `pureOption_A : A → Option A`. 입력 `a`를 `some a`로 감쌈
 
-$A \to_K B$로 적어도 사상으로 삼은 함수의 반환 타입은 여전히 `Option B`입니다. 아래 그림은 같은 함수 `f : A → Option B`를 $\mathbf{Type}$에서는 $A$에서 `Option B`로 가는 사상으로, 지금 만든 범주에서는 $A$에서 $B$로 가는 사상으로 읽는 차이를 보여 줍니다.
+이 범주에서 `f : A → Option B`를 $A$에서 $B$로 가는 사상으로 부르는 것은, 함수의 반환 타입을 바꾼다는 뜻이 아닙니다. `f`는 여전히 `Option B`를 반환합니다. 아래 그림은 같은 함수 `f : A → Option B`를 $\mathbf{Type}$에서는 $A$에서 `Option B`로 가는 사상으로, 지금 만든 범주에서는 $A$에서 $B$로 가는 사상으로 읽는 차이를 보여 줍니다.
 
 ![Type에서는 A에서 Option B로 가는 함수 f를, Option의 Kleisli 범주에서는 A에서 B로 가는 사상으로 삼습니다.](kleisli-arrows.ko.svg)
 
