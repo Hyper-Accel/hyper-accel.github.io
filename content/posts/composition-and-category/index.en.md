@@ -20,21 +20,19 @@ keywords: ["category theory", "function composition", "composition", "Option", "
 
 Hello, I am Jaeho Choi from the Compiler team at HyperAccel.
 
-We live in an age when AI agents write code for us. A single prompt can produce hundreds of lines of functions in moments, and debates over paradigms such as functional programming can feel like a thing of the past.
+A monad has a reputation in functional programming as a concept that is unusually difficult to explain. Even if you have heard the name, it can be hard to say what it is and why we use it.
 
-Yet the faster we can produce code, the more important the work left to developers becomes: deciding how to assemble those functions.
+My reason for introducing monads is the beauty of function composition. We connect small functions to build a larger function, then connect that function to others. Being able to assemble a larger computation while understanding what each function does is one of the appeals of functional programming.
 
-> *“What rules should we use to connect all the functions AI produces?”*
+When we can pass one function's result to the next, the task is straightforward. In real code, though, those connections do not always work as we intend. A function may produce no value or several results. We may also need to pass an updated state to the next step, or connect operations that interact with the outside world, such as reading a file. Can we preserve the ability to compose functions in sequence for these computations too?
 
-When we can pass one function's result to the next, the task is straightforward. In real code, though, those connections do not always work as we intend.
-
-This series begins where those connections break down. We will first write code that makes them work, then use the language of category theory to explore the laws that code satisfies and the mathematical structure within it. Along the way, we will work toward understanding what a monad is and how it relates to our original problem of connecting functions.
+This series begins where those connections break down. We will first write code that makes them work, then use the language of category theory to explore the laws that code satisfies and the mathematical structure within it. Along the way, we will work toward understanding what a monad is and how it lets us continue composing functions even when computations may produce no value or multiple results.
 
 There is a reason for taking this approach. If you have looked for material on monads, you have probably encountered one of two barriers.
 
-On one side stands the forbidding mathematical declaration, *“A monad is just a monoid in the category of endofunctors.”* Quoted without its original context, this alien vocabulary can exhaust readers before they even begin. On the other side are countless everyday analogies: *“A monad is a burrito,”* or *“A monad is a box.”* However many analogies you read, it can still be hard to find a clear answer to the basic questions: *“Why should I learn about monads? Why does my code need this?”*
+On one side stands the forbidding mathematical declaration, *“A monad is just a monoid in the category of endofunctors.”* Quoted without its original context, this unfamiliar mathematical vocabulary can exhaust readers before they even begin. On the other side are countless everyday analogies: *“A monad is a burrito,”* or *“A monad is a box.”* However many analogies you read, it can still be hard to find a clear answer to the basic questions: *“Why should I learn about monads? Why does my code need this?”*
 
-Between mathematical declarations and everyday analogies lies code we can actually run. As we carry out computations and see exactly where their connections fail, the things those unfamiliar mathematical terms describe can begin to take a more concrete shape.
+Between mathematical declarations and everyday analogies lies code we can actually run. As we carry out computations and see exactly where their connections fail, the things those unfamiliar mathematical terms describe can begin to take a more concrete shape. By following the code, we will work toward reading a once-distant mathematical definition as a description of the connections we have built ourselves.
 
 We will write that code in [Lean 4](https://lean-lang.org/lean4/doc). Lean 4 is both a functional programming language and an interactive theorem prover (ITP), which checks proofs of mathematical propositions. At first, we will use it to write and run functions. Later, we will use the same language to prove laws about the composition rules we have built. I will introduce the syntax as we need it in the examples.
 
@@ -103,7 +101,7 @@ How can we compose functions that may produce no value? How do programmers usual
 
 ## 3. Connecting two computations with branching
 
-We cannot use $g \circ f$ directly, but the behavior we want from the connection is clear. If $f\,a$ is `none`, the overall result should be `none`. If it is `some b`, we should pass that $b$ to $g$ and use $g\,b$ as the result. For now, let us write this new composition as $g \star f : A \to \text{Option } C$.
+We cannot use $g \circ f$ directly, but the behavior we want from the connection is clear. If $f\\,a$ is `none`, the overall result should be `none`. If it is `some b`, we should pass that $b$ to $g$ and use $g\\,b$ as the result. For now, let us write this new composition as $g \star f : A \to \text{Option } C$.
 
 Here is how we can write it using Lean's pattern matching. We will add one more stage, $h : C \to \text{Option } D$.
 
@@ -119,7 +117,7 @@ def runOption {A B C D : Type}
     | some c => h c
 ~~~
 
-This code computes exactly the result we want. If $f\,a$ is `none`, it stops at the first branch; if it is `some b`, it runs $g\,b$. If $g\,b$ is also `none`, it stops, and only if it is `some c` does it continue to $h\,c$. This is enough to write a single pipeline.
+This code computes exactly the result we want. If $f\\,a$ is `none`, it stops at the first branch; if it is `some b`, it runs $g\\,b$. If $g\\,b$ is also `none`, it stops, and only if it is `some c` does it continue to $h\\,c$. This is enough to write a single pipeline.
 
 But what the branches do is independent of the particular computations performed by $f$, $g$, and $h$. We have written a connecting rule directly inside `runOption`: stop if the previous result is absent; otherwise, pass it to the next function. We need the same rule when connecting other functions or adding more stages.
 
@@ -150,7 +148,7 @@ g                 : B → Option C
 (f a).map g       : Option (Option C)
 ~~~
 
-For example, if $f\,a = \text{some }0$ and $g\,0 = \text{none}$, then `(f a).map g` is `some none`, rather than `none`. A value is present, but that value is itself “absent.” The two layers retain the fact that the first computation produced a value while the second did not.
+For example, if $f\\,a = \text{some }0$ and $g\\,0 = \text{none}$, then `(f a).map g` is `some none`, rather than `none`. A value is present, but that value is itself “absent.” The two layers retain the fact that the first computation produced a value while the second did not.
 
 We wanted a single `Option C` result: a value is either present or absent. What we have instead is `Option (Option C)`, one wrapper inside another.
 
@@ -164,7 +162,7 @@ Nor can we directly apply the next operation, $h : C \to \text{Option } D$, to t
 
 We have just obtained an `Option (Option C)`. To return to the `Option C` we wanted, we need to remove the outer `Option` layer. If the outer value is `none`, return `none`; if it is `some result`, return the inner `result` unchanged. This operation has type `Option (Option C) → Option C` and is called `Option.join` in Lean. Because it reduces a nested context to one layer, its behavior is often described as **flattening**. We will use its operation name, `join`.
 
-Let us apply `join` to the `map` result from Section 4. If $f\,a$ is `none`, $g$ is not run and the result is `none`. If $f\,a$ is `some b`, `map` produces `some (g b)`, and `join` removes the outer `some` to return $g\,b$.
+Let us apply `join` to the `map` result from Section 4. If $f\\,a$ is `none`, $g$ is not run and the result is `none`. If $f\\,a$ is `some b`, `map` produces `some (g b)`, and `join` removes the outer `some` to return $g\\,b$.
 
 ~~~text
 ((f a).map g).join : Option C
@@ -173,19 +171,17 @@ if f a = none,    the result is none
 if f a = some b,  the result is g b
 ~~~
 
-The two branches we wrote explicitly in Section 3 have reappeared in this expression. In particular, when $g\,b$ is `none`, `map` produces `some none`, but `join` turns it into `none`. If we open the outer doll and find that the inner one is empty, the final result is simply “empty.”
+The two branches we wrote explicitly in Section 3 have reappeared in this expression. In particular, when $g\\,b$ is `none`, `map` produces `some none`, but `join` turns it into `none`. If we open the outer doll and find that the inner one is empty, the final result is simply “empty.”
 
 Combining `map`, which applies a function to an inner value, with `join`, which removes one layer of nesting, gives an operation commonly called `flatMap` or `bind`. You will encounter it as `Option.bind` in Lean, `flatMap` in Java and Swift, and `and_then` in Rust and C++. In our code, we will use Lean's name, `bind`.
 
-The relationship between the operations is expressed by this equation. This time, rather than using `#eval` to compute a few values, we will ask Lean to **prove** it. After `example` we write the equation to prove; after `by` we write instructions that construct its proof.
+We can express the relationship between the operations as follows.
 
-~~~lean
-example {B C : Type} (m : Option B) (g : B → Option C) :
-    m.bind g = (m.map g).join := by
-  cases m <;> rfl
+~~~text
+m.bind g = (m.map g).join
 ~~~
 
-`cases m` splits `m` into the `none` and `some b` cases. `<;> rfl` runs `rfl` on both resulting goals; in each case, the two sides reduce to the same expression. Lean checks that both cases have been proved. Thus this code proves the equation for arbitrary `m` and `g`, rather than checking a few sample inputs.
+If `m` is `none`, both sides produce `none`. If it is `some b`, `bind` returns `g b` directly. On the right, `map` produces `some (g b)`, which `join` reduces to `g b`. Thus the two computations produce the same result for any `Option` value `m` and next function `g`.
 
 ![map g wraps some b as some (g b), and join reduces it to g b. none remains none through both operations. The complete connection is bind g.](option-bind-flow.en.svg)
 
@@ -266,7 +262,7 @@ def parseAndReciprocal : String → Option String :=
 
 `parseAndReciprocal` specifies only which two functions to connect. `composeOption` handles stopping when the previous result is absent and passing it to the next function when it is present. We can use the same rule unchanged to connect other functions.
 
-Running the code lets us check an input that succeeds, along with inputs for which a value is absent at either stage.
+`#eval` is a Lean command that executes the expression after it and displays the result. We can use it to inspect an input that succeeds, along with inputs for which a value is absent at either stage.
 
 ~~~lean
 #eval parseAndReciprocal "42"  -- some "1/42"
@@ -276,7 +272,9 @@ Running the code lets us check an input that succeeds, along with inputs for whi
 
 ~~~
 
-We can also use `#guard` to check whether the three implementations produce the same results. If its condition is true, the check passes; if false, Lean reports an error. Here are some of the checks; the Playground contains the full set for all three inputs.
+Having inspected the results with `#eval`, we will now use `#guard` to check whether they satisfy the conditions we expect. `#guard` passes without an error when the condition after it is true, and makes Lean report an error when it is false. Here, `==` compares two computed results for equality.
+
+The first line below checks whether `composeOptionByMatch`, implemented with branching, and `parseAndReciprocal`, implemented using `bind`, produce the same result for the input `"42"`. The remaining lines similarly compare against another implementation or an expected result. These are some of the checks; the Playground contains the full set for all three inputs.
 
 ~~~lean
 #guard composeOptionByMatch parseNat reciprocal "42" == parseAndReciprocal "42"
@@ -293,6 +291,20 @@ To modify the code and run it yourself, [open this example in the Lean 4 Playgro
 - With `"foo"`: parsing fails ($\text{none}$) $\to$ the second function is never run, and $\text{none}$ is returned immediately.
 
 We handled absence inside the composition rule, `composeOption`, without manually checking it at every call. `join` flattens both an outer `none` and a `some none` whose inner value is absent to `none`. Consequently, the final result alone cannot tell us which stage failed to produce a value.
+
+### An aside: proving an equation in Lean
+
+So far, we have run specific inputs and checked their results. With Lean, we can go a step further and prove that two computations agree for any input and function. Let us prove `m.bind g = (m.map g).join`, the equation we checked by considering both cases in Section 5.
+
+This uses the interactive theorem prover capability introduced earlier. In Lean, we can write both a claim and the reasoning that establishes it. As we write the steps of a proof, Lean checks that each step is valid and tells us what remains to be proved. In the code below, `example` declares the claim to prove, and the commands after `by` construct its proof.
+
+~~~lean
+example {B C : Type} (m : Option B) (g : B → Option C) :
+    m.bind g = (m.map g).join := by
+  cases m <;> rfl
+~~~
+
+`cases m` splits the proof into the cases where `m` is `none` and where it is `some b`. `<;>` applies the following `rfl` to both cases. `rfl` checks that both sides of the equation reduce to the same expression according to their definitions. Since both cases are proved without choosing a specific `b` or `g`, Lean can verify that the equation holds for arbitrary `m` and `g`.
 
 ---
 
