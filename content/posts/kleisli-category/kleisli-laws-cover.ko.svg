@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">같은 화살표 경로의 두 가지 묶음</title>
+<desc id="desc">위아래에 같은 A, B, C, D 화살표 경로가 있습니다. 위는 f와 g를, 아래는 g와 h를 먼저 묶습니다. 두 경로 사이의 등호는 결합법칙을 나타냅니다.</desc>
+<defs>
+  <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102634"/><stop offset="1" stop-color="#213f50"/></linearGradient>
+  <linearGradient id="face" x2="1" y2="1"><stop stop-color="#426d80"/><stop offset="1" stop-color="#224858"/></linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#b7d9e4" stroke-opacity=".055"/></pattern>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#061823" flood-opacity=".55"/></filter>
+</defs>
+<rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+<rect x="83" y="78" width="744" height="205" rx="20" fill="#4b96a5" fill-opacity=".08" stroke="#82bdcb" stroke-width="3"/>
+<rect x="373" y="347" width="744" height="205" rx="20" fill="#d9ad68" fill-opacity=".06" stroke="#d9ad68" stroke-width="3"/>
+
+<g filter="url(#shadow)"><path d="M118 151 146 133H262L234 151Z" fill="#527f91"/><path d="M234 151 262 133V237L234 255Z" fill="#193b4c"/><rect x="118" y="151" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="176" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">A</text>
+<g filter="url(#shadow)"><path d="M388 151 416 133H532L504 151Z" fill="#527f91"/><path d="M504 151 532 133V237L504 255Z" fill="#193b4c"/><rect x="388" y="151" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="446" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">B</text>
+<g filter="url(#shadow)"><path d="M658 151 686 133H802L774 151Z" fill="#527f91"/><path d="M774 151 802 133V237L774 255Z" fill="#193b4c"/><rect x="658" y="151" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="716" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">C</text>
+<g filter="url(#shadow)"><path d="M928 151 956 133H1072L1044 151Z" fill="#527f91"/><path d="M1044 151 1072 133V237L1044 255Z" fill="#193b4c"/><rect x="928" y="151" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="986" y="222" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">D</text>
+<path d="M280 203H362m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="321" y="168" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">f</text>
+<path d="M550 203H632m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="591" y="168" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">g</text>
+<path d="M820 203H902m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="861" y="168" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">h</text>
+<g filter="url(#shadow)"><path d="M118 421 146 403H262L234 421Z" fill="#527f91"/><path d="M234 421 262 403V507L234 525Z" fill="#193b4c"/><rect x="118" y="421" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="176" y="492" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">A</text>
+<g filter="url(#shadow)"><path d="M388 421 416 403H532L504 421Z" fill="#527f91"/><path d="M504 421 532 403V507L504 525Z" fill="#193b4c"/><rect x="388" y="421" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="446" y="492" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">B</text>
+<g filter="url(#shadow)"><path d="M658 421 686 403H802L774 421Z" fill="#527f91"/><path d="M774 421 802 403V507L774 525Z" fill="#193b4c"/><rect x="658" y="421" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="716" y="492" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">C</text>
+<g filter="url(#shadow)"><path d="M928 421 956 403H1072L1044 421Z" fill="#527f91"/><path d="M1044 421 1072 403V507L1044 525Z" fill="#193b4c"/><rect x="928" y="421" width="116" height="104" rx="6" fill="url(#face)" stroke="#82afbf" stroke-width="2"/></g>
+<text x="986" y="492" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="53" fill="#eff7fa">D</text>
+<path d="M280 473H362m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="321" y="438" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">f</text>
+<path d="M550 473H632m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="591" y="438" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">g</text>
+<path d="M820 473H902m-16-14 16 14-16 14" fill="none" stroke="#e6c286" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="861" y="438" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="41" fill="#fff0c5">h</text>
+<text x="600" y="337" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="56" fill="#e6c286">=</text></svg>
