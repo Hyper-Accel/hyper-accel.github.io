@@ -12,9 +12,11 @@
 </defs>
 <rect width="1200" height="720" fill="url(#bg)"/><rect width="1200" height="720" fill="url(#grid)"/>
 <g fill="none" stroke-width="7" stroke-linecap="round">
-  <path d="M210 318 454 185 M586 185 974 318" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
-  <path d="M210 402 454 535 M586 535 974 402" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
-  <path d="M520 211V508" stroke="#b9cdd4" marker-end="url(#mid-arrow)"/>
+  <path d="M210 318 435 195" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M630 200 954 318" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M210 402 435 525" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
+  <path d="M630 520 954 402" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
+  <path d="M520 222V480" stroke="#b9cdd4" marker-end="url(#mid-arrow)"/>
 </g>
 <g filter="url(#shadow)">
   <path d="M90 310 120 290H250L220 310Z M450 100 480 80H610L580 100Z M450 520 480 500H610L580 520Z M970 310 1000 290H1130L1100 310Z" fill="#527f91"/>
