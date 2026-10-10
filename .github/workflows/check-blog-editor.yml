@@ -1,0 +1,162 @@
+name: Check blog editor
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/check-blog-editor.yml"
+      - "tools/editor/**"
+      - "themes/PaperMod"
+      - "hugo.yaml"
+      - "content/**"
+      - "layouts/**"
+      - "assets/**"
+      - "i18n/**"
+      - "archetypes/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/check-blog-editor.yml"
+      - "tools/editor/**"
+      - "themes/PaperMod"
+      - "hugo.yaml"
+      - "content/**"
+      - "layouts/**"
+      - "assets/**"
+      - "i18n/**"
+      - "archetypes/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blog-editor-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Check and build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/editor
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check formatting, types, and unit tests
+        run: bun run check
+
+      - name: Build editor
+        run: bun run build
+
+  e2e:
+    name: Browser E2E (Ubuntu)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+        working-directory: tools/editor
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.0
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@2752ce1d29631191ea3f27c23495fa06139a5b78 # v3.2.1
+        with:
+          hugo-version: "0.152.2"
+          extended: true
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chrome for Playwright
+        run: bunx playwright install --with-deps chrome
+
+      - name: Run browser E2E
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+
+          log_file="${RUNNER_TEMP}/editor.log"
+          bunx concurrently --kill-others --names api,web,hugo \
+            "bun src/server/index.ts" \
+            "bunx vite --host 127.0.0.1" \
+            "hugo server -s ../.. --bind 127.0.0.1 --port 1413 --disableFastRender" \
+            >"$log_file" 2>&1 &
+          server_pid=$!
+
+          cleanup() {
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          ready=0
+          for _ in $(seq 1 90); do
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              echo "An editor server exited before startup completed."
+              wait "$server_pid" 2>/dev/null || true
+              cat "$log_file"
+              exit 1
+            fi
+
+            if curl --fail --silent --connect-timeout 1 --max-time 2 http://127.0.0.1:4173/ >/dev/null \
+              && curl --fail --silent --connect-timeout 1 --max-time 2 http://127.0.0.1:1413/ >/dev/null \
+              && curl --fail --silent --connect-timeout 1 --max-time 2 http://127.0.0.1:4174/api/posts >/dev/null \
+              && kill -0 "$server_pid" 2>/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [[ "$ready" -ne 1 ]]; then
+            echo "Editor servers did not become ready."
+            cat "$log_file"
+            exit 1
+          fi
+
+          if ! bun run e2e; then
+            cat "$log_file"
+            exit 1
+          fi
+
+      - name: Upload E2E diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: blog-editor-e2e-diagnostics
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/editor.log
+            ${{ runner.temp }}/hyperaccel-blog-editor-e2e
+            ${{ runner.temp }}/hyperaccel-blog-editor-agent-ui-e2e
