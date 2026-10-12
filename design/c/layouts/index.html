@@ -17,16 +17,23 @@
     </div>
 
     <div class="tr-stack-area">
+      {{- $levels := dict "ai-hardware" "L1 · Hardware" "memory-and-storage" "L2 · Memory" "compilers-and-kernels" "L3 · Compiler" "infra-and-devops" "L4 · Infra" "llm-and-models" "L5 · Model" }}
+      {{- $logo := "/images/logo-transparent.png" | relURL }}
       <nav class="tr-stack" aria-label="{{ cond $ko "기술 스택별 카테고리" "Categories by stack layer" }}" style="--n:{{ len $stack }}">
         {{- range $i, $slug := $stack }}
         {{- with site.GetPage (printf "/categories/%s" $slug) }}
         <a class="tr-layer" href="{{ .RelPermalink }}" data-layer="{{ $slug }}" style="--i:{{ sub (len $stack) (add $i 1) }};{{ partial "d/catvars.html" $slug }}">
-          <svg viewBox="0 0 240 152" aria-hidden="true">
-            <polygon class="f-l" points="0,69 120,138 120,152 0,83"/>
-            <polygon class="f-r" points="120,138 240,69 240,83 120,152"/>
-            <polygon class="f-t" points="120,0 240,69 120,138 0,69"/>
+          <span class="tr-hit" aria-hidden="true"></span>
+          <svg viewBox="0 0 240 92" aria-hidden="true">
+            <polygon class="f-l" points="0,40 120,80 120,92 0,52"/>
+            <polygon class="f-r" points="120,80 240,40 240,52 120,92"/>
+            <polygon class="f-t" points="120,0 240,40 120,80 0,40"/>
+            <g transform="matrix(120 40 -120 40 120 0)">
+              <path class="f-grid" vector-effect="non-scaling-stroke" d="M.08 .08H.92V.92H.08Z M.08 .36H.92 M.08 .64H.92 M.36 .08V.92 M.64 .08V.92"/>
+              <image class="f-logo" href="{{ $logo }}" x=".2" y=".2" width=".6" height=".6" preserveAspectRatio="xMidYMid meet"/>
+            </g>
           </svg>
-          <span class="tr-layer-label"><b>{{ .Title }}</b><small>{{ len .Pages }}{{ cond $ko "편" " posts" }}</small></span>
+          <span class="tr-layer-label"><em>{{ index $levels $slug }}</em><b>{{ .Title }} <small>{{ len .Pages }}{{ cond $ko "편" "" }}</small></b></span>
         </a>
         {{- end }}
         {{- end }}
@@ -35,7 +42,7 @@
       <div class="tr-panels" aria-live="polite">
         <div class="tr-panel" data-panel="">
           <p class="tr-panel-kicker">FULL-STACK AI</p>
-          <p class="tr-panel-hint">{{ cond $ko "레이어에 마우스를 올리면 분야별 최신 글을 볼 수 있습니다." "Hover a layer to see the latest posts in that part of the stack." }}</p>
+          <p class="tr-panel-hint">{{ cond $ko "트랜지스터(L1)부터 LLM(L5)까지, 레이어에 마우스를 올리면 분야별 최신 글을 볼 수 있습니다." "From transistors (L1) to LLMs (L5). Hover a layer to see the latest posts in that part of the stack." }}</p>
           <p class="tr-panel-kicker">{{ cond $ko "스택 밖의 이야기" "Beyond the stack" }}</p>
           <div class="tr-panel-chips">
             {{- range $cats }}{{ $slug := path.Base .RelPermalink }}{{ if not (in $stack $slug) }}
@@ -45,15 +52,26 @@
         </div>
         {{- range $stack }}
         {{- with site.GetPage (printf "/categories/%s" .) }}
-        <div class="tr-panel" data-panel="{{ path.Base .RelPermalink }}" style="{{ partial "d/catvars.html" (path.Base .RelPermalink) }}" hidden>
-          <p class="tr-panel-kicker"><i class="tr-dot"></i>{{ .Title }}</p>
+        {{- $slug := path.Base .RelPermalink }}
+        <div class="tr-panel" data-panel="{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}" hidden>
+          <header class="tr-panel-head">
+            <p class="tr-panel-kicker"><i class="tr-dot"></i>{{ index $levels $slug }} · {{ .Title }}</p>
+            <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
+            <button class="tr-panel-close" type="button" aria-label="{{ cond $ko "닫기" "Close" }}">×</button>
+          </header>
           <p class="tr-panel-desc">{{ .Description }}</p>
           <ul>
             {{- range first 3 .Pages.ByDate.Reverse }}{{ $t := partial "d/titleparts.html" . }}
-            <li><a href="{{ .RelPermalink }}">{{ with $t.tag }}<span class="tr-part">{{ . }}</span>{{ end }}{{ $t.text }}</a></li>
+            <li><a href="{{ .RelPermalink }}">
+              <span class="tr-thumb">{{ partial "d/cover.html" (dict "page" . "w" 192 "h" 144) }}</span>
+              <span class="tr-pi">
+                <span class="tr-pi-meta">{{ with $t.tag }}<span class="tr-part">{{ . }}</span> · {{ end }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2006.01.02" }}</time></span>
+                <b>{{ $t.text }}</b>
+                <span class="tr-pi-sum">{{ .Summary | plainify | htmlUnescape | truncate 80 }}</span>
+              </span>
+            </a></li>
             {{- end }}
           </ul>
-          <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
         </div>
         {{- end }}
         {{- end }}
@@ -110,20 +128,52 @@
 (() => {
   const area = document.querySelector('.tr-stack-area');
   if (!area) return;
-  const layers = area.querySelectorAll('.tr-layer');
+  const layers = [...area.querySelectorAll('.tr-layer')];
   const panels = area.querySelectorAll('.tr-panel');
   const touch = matchMedia('(hover: none)');
+  const OPEN_MS = 120, CLOSE_MS = 600, FOCUS_MS = 200;
+  let openTimer, closeTimer, focusTimer, current = '';
+
   const show = (slug) => {
+    clearTimeout(focusTimer);
+    current = slug;
     panels.forEach((p) => { p.hidden = p.dataset.panel !== slug; });
     layers.forEach((l) => l.classList.toggle('on', l.dataset.layer === slug));
     area.classList.toggle('has-active', !!slug);
   };
+  const setOpen = (open) => {
+    clearTimeout(openTimer); clearTimeout(closeTimer);
+    area.classList.toggle('open', open);
+  };
+
+  area.addEventListener('mouseenter', () => {
+    clearTimeout(closeTimer);
+    openTimer = setTimeout(() => setOpen(true), OPEN_MS);
+  });
+  area.addEventListener('mouseleave', () => {
+    clearTimeout(openTimer); clearTimeout(focusTimer);
+    closeTimer = setTimeout(() => setOpen(false), CLOSE_MS);
+  });
+
   layers.forEach((l) => {
-    l.addEventListener('mouseenter', () => show(l.dataset.layer));
-    l.addEventListener('focus', () => show(l.dataset.layer));
-    l.addEventListener('click', (e) => {
-      if (touch.matches && !l.classList.contains('on')) { e.preventDefault(); show(l.dataset.layer); }
+    const slug = l.dataset.layer;
+    l.addEventListener('mouseenter', () => {
+      if (touch.matches) return;
+      clearTimeout(focusTimer);
+      if (slug !== current) focusTimer = setTimeout(() => { setOpen(true); show(slug); }, FOCUS_MS);
     });
+    l.addEventListener('mouseleave', () => clearTimeout(focusTimer));
+    l.addEventListener('focus', () => { setOpen(true); show(slug); });
+    l.addEventListener('click', (e) => {
+      if (touch.matches && current !== slug) { e.preventDefault(); show(slug); }
+    });
+  });
+
+  area.querySelectorAll('.tr-panel-close').forEach((b) => b.addEventListener('click', () => show('')));
+  document.addEventListener('click', (e) => {
+    if (!touch.matches || !current) return;
+    if (e.target.closest('.tr-layer, .tr-panel')) return;
+    show('');
   });
 })();
 </script>
