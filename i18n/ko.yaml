@@ -24,7 +24,7 @@
   translation: "홈"
 
 - id: edit_post
-  translation: "편집"
+  translation: "수정 제안"
 
 - id: code_copy
   translation: "복사"

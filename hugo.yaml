@@ -12,6 +12,8 @@ languages:
     languageName: 한국어
     weight: 1
     title: HyperAccel Tech Blog
+    params:
+      DateFormat: "2006.01.02"
     menu:
       main:
         - identifier: about
@@ -50,6 +52,8 @@ languages:
     languageName: English
     weight: 2
     title: HyperAccel Tech Blog
+    params:
+      DateFormat: "January 2, 2006"
     menu:
       main:
         - identifier: about
@@ -179,7 +183,6 @@ params:
 
   editPost:
     URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/blob/main/content"
-    Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
   # for search

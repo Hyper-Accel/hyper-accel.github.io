@@ -62,7 +62,10 @@
   </section>
 
   <section class="tr-latest">
-    <h2 class="tr-h">{{ cond $ko "최신 글" "Latest" }}</h2>
+    <header class="tr-section-head">
+      <h2 class="tr-h">{{ cond $ko "최신 글" "Latest" }}</h2>
+      <a class="tr-more" href="{{ "posts/" | relLangURL }}">{{ cond $ko (printf "전체 %d편" (len $posts)) (printf "All %d posts" (len $posts)) }} →</a>
+    </header>
     <div class="tr-latest-grid">
       {{- range first 3 $posts }}{{ partial "d/card.html" (dict "page" . "summary" true) }}{{ end }}
     </div>
