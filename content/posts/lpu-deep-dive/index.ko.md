@@ -1,7 +1,7 @@
 ---
 date: '2026-02-03T11:24:57+09:00'
 draft: false
-title: '지피지기면 백전불태 3편 : 엔비디아가 200억 달러에 인수한 그록의 LPU'
+title: '[지피지기 - Part 03] 엔비디아가 200억 달러에 인수한 그록의 LPU'
 cover:
   image: "images/groq_logo.jpg"
   # can also paste direct link from external site
@@ -11,15 +11,13 @@ cover:
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC", "Accelerator", "Semiconductor"]
-series: ["지피지기면 백전불태"]
+series: ['지피지기면 백전불태']
 series_idx: 3
 categories: ["AI Hardware"]
 summary:  그록과 LPU의 탄생 배경과 그들의 하드웨어 / 소프트웨어 설계 철학에 대해 알아보고 엔비디아가 그록을 인수한 의도에 대해 분석해봅니다.
 comments: true
 description: 그록과 LPU의 탄생 배경과 그들의 하드웨어 / 소프트웨어 설계 철학에 대해 알아보고 엔비디아가 그록을 인수한 의도에 대해 분석해봅니다.
 ---
-
-# 지피지기면 백전불태 3편 : 엔비디아가 200억 달러에 인수한 그록의 LPU
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  
 > 이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.  

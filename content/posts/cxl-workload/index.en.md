@@ -1,7 +1,7 @@
 ---
 date: '2026-08-12T17:39:35+09:00'
 draft: false
-title: 'Memory in the AI Era, Part 5: Exploring CXL Workloads'
+title: '[Memory in the AI Era - Part 05] Exploring CXL Workloads'
 cover:
   image: "cxl-workload-cover.webp"
   alt: "KV cache offload from GPU HBM to CXL memory, followed by memory pooling across servers and memory tiering"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Jaewon Lim]
 tags: ["CXL", "KV cache", "memory pooling", "memory tiering", "LLM Inference", "Semiconductor"]
-series: ["Memory in the AI Era"]
+series: ['Memory in the AI Era']
 series_idx: 5
 categories: ["Memory and Storage"]
 summary: "We examine how CXL is used in real workloads through KV cache offload, memory pooling, and memory tiering."

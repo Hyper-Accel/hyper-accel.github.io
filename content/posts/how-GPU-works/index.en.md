@@ -1,7 +1,7 @@
 ---
 date: '2025-12-29T10:54:53+09:00'
 draft: false
-title: 'Know Your Enemy, Know Yourself, Part 1: GPU History and Fundamentals'
+title: '[Know Your Enemy - Part 01] GPU History and Fundamentals'
 cover:
   image: "images/01-gpu-hopper.png"
   # can also paste direct link from external site
@@ -12,7 +12,7 @@ cover:
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
 categories: ["AI Hardware"]
-series: ["Know Your Enemy, Know Yourself"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 1
 summary: "An overview of how NVIDIA GPUs evolved and how the Hopper architecture hides memory latency with massive parallelism."
 comments: true
@@ -24,8 +24,6 @@ keywords: [
   "memory latency", "CUDA programming", "AI accelerator"
 ]
 ---
-
-# Know Your Enemy, Know Yourself, Part 1: GPU History and Fundamentals
 
 > **Know Your Enemy, Know Yourself**  
 If you know the enemy and know yourself, you need not fear the result of a hundred battles.  
@@ -44,7 +42,7 @@ NVIDIA was founded in 1993 and entered the graphics market in 1995 with the NV1.
 With RIVA 128 (1997) and GeForce 256 (1999), the company firmly established itself in the PC graphics card market,  
 but then hit a major crisis when the GeForce FX series failed.
 
-![Jensen Huang holding a GPU](images/03-jensen-huang-with-gpu.png)
+![Jensen Huang holding a GPU](images/03-jensen-huang-with-gpu.png#side)
 
 From that failure, NVIDIA rebuilt its GPU architecture, introducing the G80 Tesla architecture and CUDA.  
 That pivot turned the GPU from "just" a graphics chip into a platform that could also dominate the HPC and GPGPU markets.
@@ -196,9 +194,9 @@ Now let's look more closely at the CUDA programming model on top of a modern GPU
 * Shares common resources for graphics (e.g., raster engines) and, in Hopper, forms the boundary for thread‑block clusters.  
 * Within a GPC, high‑bandwidth links connect SMs, enabling Distributed Shared Memory (DSMEM) access.
 
-![Hopper GH100 single SM](images/12-hopper-sm.png)
-
 ### SM (Streaming Multiprocessor)
+
+![Hopper GH100 single SM](images/12-hopper-sm.png#side)
 
 * The main compute building block of the GPU – the place where thread blocks actually run.  
   It is analogous to a CPU core but designed to keep **many more threads in flight**.
@@ -246,9 +244,9 @@ If threads in a warp branch in different directions (branch divergence), the har
 To get good performance, you want threads within a warp to follow the same control path.  
 The warp scheduler rapidly context‑switches between warps to hide memory latency.
 
-![Thread block allocation in the CUDA model](images/14-thdblk-alloc.png)
-
 ### Thread Block (CTA)
+
+![Thread block allocation in the CUDA model](images/14-thdblk-alloc.png#side)
 
 - The unit of cooperation and shared memory
 

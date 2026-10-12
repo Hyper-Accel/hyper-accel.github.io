@@ -1,7 +1,7 @@
 ---
 date: '2026-06-28T16:17:48+09:00'
 draft: false
-title: 'Legato, A Programming Language for HyperAccel LPU'
+title: '[Legato - Part 01] A Programming Language for HyperAccel LPU'
 cover:
   image: "Bertha.jpeg"
   alt: "Legato programming language"
@@ -10,7 +10,8 @@ cover:
 authors: [Jaewoo Kim]
 tags: ["compiler"]
 categories: ["Compilers and Kernels"]
-series: ["Legato"]
+series: ['Legato']
+series_idx: 1
 summary: "An introduction to Legato — HyperAccel's programming model and compiler stack for the LPU — covering what it is, why it exists, and how it is designed."
 comments: true
 ---

@@ -1,7 +1,7 @@
 ---
 date: '2026-07-02T14:33:50+09:00'
 draft: false
-title: '지피지기면 백전불태 6편 : Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작'
+title: '[지피지기 - Part 06] Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작'
 cover:
   image: "images/cover.png"
   alt: "Agentic AI 시대 데이터센터 CPU 3강 — Intel, AMD, NVIDIA"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Jaewon Lim]
 tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference", "Accelerator", "Computer Architecture", "Semiconductor"]
-series: ["지피지기면 백전불태"]
+series: ['지피지기면 백전불태']
 series_idx: 6
 categories: ["AI Hardware"]
 summary: "Agentic AI 워크로드에서 CPU가 추론 인프라의 병목이 된 원인을 분석하고 CPU 3사의 최신 데이터센터향 CPU 라인업을 분석해보며 Agentic AI 시대에 다시 떠오른 CPU의 중요성에 대해 알아봅니다."
@@ -21,8 +21,6 @@ keywords: [
   "NVIDIA Vera", "Vera Rubin", "AMX", "LLM 추론 병목"
 ]
 ---
-
-# 지피지기면 백전불태 6편 : Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  
 > 이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.  

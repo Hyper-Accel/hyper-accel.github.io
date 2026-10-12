@@ -1,7 +1,7 @@
 ---
 date: '2026-02-19T14:16:04+09:00'
 draft: false
-title: 'Copy & Paste에서 코딩 에이전트까지: 조용한 변화의 시작'
+title: '[AI Agent - Part 01] Copy & Paste에서 코딩 에이전트까지: 조용한 변화의 시작'
 cover:
   image: "images/using-ai.png"
   # can also paste direct link from external site
@@ -13,11 +13,10 @@ authors: ['Taeseo Um'] # must match with content/authors
 tags: ["Agents", "AI", "Tools", "Coding"]
 categories: ["Engineering Culture"]
 summary: [“HyperAccel의 ML 팀이 어떻게 개발 워크플로우에 AI를 도입했는가”]
-series: ["Copy & Paste에서 코딩 에이전트까지"]
+series: ['AI Agent Series']
+series_idx: 1
 comments: true
 ---
-
-# Copy & Paste에서 자율 코딩 에이전트까지: 조용한 변화의 시작
 
 안녕하세요, 하이퍼엑셀 ML 팀 엔지니어 엄태서입니다.
 

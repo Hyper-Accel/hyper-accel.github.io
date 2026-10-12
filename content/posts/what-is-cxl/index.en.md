@@ -1,7 +1,7 @@
 ---
 date: '2026-06-04T10:12:00+09:00'
 draft: false
-title: 'Memory in the AI Era, Part 4: Understanding CXL'
+title: '[Memory in the AI Era - Part 04] Understanding CXL'
 cover:
   image: "01-cxl-position.webp"
   alt: "Where CXL sits in the memory hierarchy — a memory pool next to the CPU and accelerator coherency"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Seungbin Shin]
 tags: ["CXL", "Compute Express Link", "memory", "memory pooling", "coherency", "PCIe", "CMM", "memory expander", "Panmnesia", "PANSWITCH", "Semiconductor"]
-series: ["Memory in the AI Era"]
+series: ['Memory in the AI Era']
 series_idx: 4
 categories: ["Memory and Storage"]
 summary: "Next to the GPU, HBM and HBF fill the gap — but there's another empty seat next to the CPU. We look at CXL, the new interface that fills the awkward gap between PCIe and DDR: its basic structure, device types, and the CXL product blueprints the big three memory vendors are drawing."

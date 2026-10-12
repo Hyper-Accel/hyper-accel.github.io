@@ -22,7 +22,8 @@
         <ul class="series-list">
           {{- range $sortedItems -}}
             <li class="series-item{{ if eq .page.Permalink $.Permalink }} current{{ end }}">
-              <a href="{{ .page.Permalink }}">{{ .page.Title }}</a>
+              {{- $t := partial "d/titleparts.html" .page }}
+              <a href="{{ .page.Permalink }}">{{ with $t.tag }}<span class="series-part">{{ replaceRE `^.* - ` "" . }}</span>{{ end }}{{ $t.text }}</a>
             </li>
           {{- end -}}
           {{- if $unweighted -}}

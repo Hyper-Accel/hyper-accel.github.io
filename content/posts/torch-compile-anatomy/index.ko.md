@@ -1,7 +1,7 @@
 ---
 date: '2026-08-04T18:00:00+09:00'
 draft: false
-title: 'torch.compile 해부 1편: TorchDynamo, AOTAutograd, TorchInductor'
+title: '[torch.compile 해부 - Part 01] TorchDynamo, AOTAutograd, TorchInductor'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch 로고"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
-series: ["torch.compile 해부"]
+series: ['torch.compile 해부']
 series_idx: 1
 categories: ["Compilers and Kernels"]
 summary: 'torch.compile을 TorchDynamo, AOTAutograd, TorchInductor 세 요소로 분해해, 각각이 무엇을 입력받아 무엇을 내놓고 어떤 원리로 동작하는지 정리합니다.'

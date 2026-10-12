@@ -1,7 +1,7 @@
 ---
 date: '2026-01-03T17:20:16+09:00'
 draft: false
-title: 'Know Your Enemy, Know Yourself, Part 2 : TPU Emergence and Rise'
+title: '[Know Your Enemy - Part 02] TPU Emergence and Rise'
 cover:
   image: "tpu-deep-dive.webp"
   # can also paste direct link from external site
@@ -12,7 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture", "Semiconductor"]
 categories: ["AI Hardware"]
-series: ["Know Your Enemy, Know Yourself"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 2
 summary: We explore the background of TPU's emergence and analyze Google's AI semiconductor strategy by examining its hardware and software architecture.
 comments: true
@@ -21,7 +21,6 @@ keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI Accelerator", "TensorFlow", "JAX"
 ]
 ---
-# Know Your Enemy, Know Yourself, Part 2 : TPU Emergence and Rise
 [Know Your Enemy, Know Yourself, Part 1: GPU History and Fundamentals](https://hyper-accel.github.io/en/posts/how-gpu-works/)
 
 >**Know Your Enemy, Know Yourself**  

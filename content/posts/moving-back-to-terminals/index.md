@@ -1,7 +1,7 @@
 ---
 date: '2026-06-16T10:00:00+09:00'
 draft: false
-title: '터미널로 돌아가자: 에이전트가 원격 개발을 자연스럽게 만든 방식'
+title: '[AI Agent - Part 02] 터미널로 돌아가자: 에이전트가 원격 개발을 자연스럽게 만든 방식'
 cover:
   image: "images/thumbnai.png"
   # can also paste direct link from external site

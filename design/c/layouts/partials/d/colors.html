@@ -1,8 +1,9 @@
+{{- /* Brand palette from Pantone 2925C. "on" = readable text color on a solid fill. */ -}}
 {{- return (dict
-  "ai-hardware" "#12bde3"
-  "memory-and-storage" "#22d3ee"
-  "compilers-and-kernels" "#38bdf8"
-  "llm-and-models" "#06b6d4"
-  "infra-and-devops" "#0ea5e9"
-  "engineering-culture" "#67e8f9"
-  "conference-reports" "#0891b2") -}}
+  "ai-hardware"           (dict "c" "#009EE2" "on" "#02121c" "name" "Brand Cyan")
+  "memory-and-storage"    (dict "c" "#5BC5F6" "on" "#02121c" "name" "Sky Blue")
+  "compilers-and-kernels" (dict "c" "#0052CC" "on" "#ffffff" "name" "Indigo Blue")
+  "llm-and-models"        (dict "c" "#00C2A8" "on" "#02121c" "name" "Teal")
+  "infra-and-devops"      (dict "c" "#003A70" "on" "#ffffff" "name" "Navy")
+  "engineering-culture"   (dict "c" "#8EE8E0" "on" "#02121c" "name" "Mint")
+  "conference-reports"    (dict "c" "#A7C4FF" "on" "#02121c" "name" "Periwinkle")) -}}

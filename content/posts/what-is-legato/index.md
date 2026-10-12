@@ -1,7 +1,7 @@
 ---
 date: '2026-06-28T16:17:48+09:00'
 draft: false
-title: 'Legato: HyperAccel LPU를 위한 프로그래밍 언어'
+title: '[Legato - Part 01] HyperAccel LPU를 위한 프로그래밍 언어'
 cover:
   image: "Bertha.jpeg"
   alt: "Legato programming language"
@@ -10,7 +10,8 @@ cover:
 authors: [Jaewoo Kim]
 tags: ["compiler"]
 categories: ["Compilers and Kernels"]
-series: ["Legato"]
+series: ['Legato']
+series_idx: 1
 summary: "LPU를 위한 HyperAccel의 프로그래밍 모델이자 컴파일러 스택인 Legato를 소개하며, 이것이 무엇이고 왜 존재하며 어떻게 설계되었는지 다룹니다."
 comments: true
 ---

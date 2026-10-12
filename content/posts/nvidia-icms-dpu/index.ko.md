@@ -1,7 +1,7 @@
 ---
 date: '2026-02-24T21:04:44+09:00'
 draft: false
-title: '지피지기면 백전불태 4편 : 메모리 용량 병목과 NVIDIA ICMS'
+title: '[지피지기 - Part 04] 메모리 용량 병목과 NVIDIA ICMS'
 cover:
   image: "images/icms_dpu.png"
   # can also paste direct link from external site
@@ -11,15 +11,13 @@ cover:
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
-series: ["지피지기면 백전불태"]
+series: ['지피지기면 백전불태']
 series_idx: 4
 categories: ["Memory and Storage"]
 summary: "LLM의 새로운 병목인 KV 캐시 용량 문제를 해결하기 위해 NVIDIA가 제시한 새로운 계층의 스토리지인 ICMS와 이를 관리하는 Bluefield-4 DPU의 기술적 원리를 살펴봅니다." 
 comments: true
 description: "LLM의 새로운 병목인 KV 캐시 용량 문제를 해결하기 위해 NVIDIA가 제시한 새로운 계층의 스토리지인 ICMS와 이를 관리하는 Bluefield-4 DPU의 기술적 원리를 살펴봅니다." 
 ---
-
-# 지피지기면 백전불태 4편 : 메모리 용량 병목과 NVIDIA ICMS
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  
 > 이 시리즈는 AI 가속기 설계를 위해 경쟁사들의 하드웨어를 깊이 이해하는 것을 목표로 합니다.  

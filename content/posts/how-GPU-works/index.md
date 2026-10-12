@@ -1,7 +1,7 @@
 ---
 date: '2025-12-29T10:53:16+09:00'
 draft: false
-title: '지피지기면 백전불태 1편: GPU의 역사와 기초'
+title: '[지피지기 - Part 01] GPU의 역사와 기초'
 cover:
   image: "images/01-gpu-hopper.png"
   # can also paste direct link from external site
@@ -12,7 +12,7 @@ cover:
 authors: ["Donghyeon Choi"] # must match with content/authors
 tags: ["GPU", "NVIDIA", "Hopper", "CUDA", "GPGPU", "Architecture"]
 categories: ["AI Hardware"]
-series: ["지피지기면 백전불태"]
+series: ['지피지기면 백전불태']
 series_idx: 1
 summary: "NVIDIA GPU의 역사와 Hopper 아키텍처를 통해, 어떻게 GPU가 메모리 레이턴시를 숨기는지 정리한 글입니다."
 comments: true
@@ -24,8 +24,6 @@ keywords: [
   "메모리 레이턴시", "CUDA 프로그래밍", "AI 가속기"
 ]
 ---
-
-# 지피지기면 백전불태 1편: GPU의 역사와 기초
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  
 상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다는 뜻입니다.  
@@ -45,7 +43,7 @@ NVIDIA는 1993년 설립되어 1995년 NV1로 그래픽 시장에 진입했습�
 RIVA 128(1997)과 GeForce 256(1999)으로 PC 그래픽 카드 시장에 자리를 잡았지만,  
 GeForce FX 시리즈 실패로 큰 위기를 맞았습니다.
 
-![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png)
+![GPU를 자랑하는 젠슨 황](images/03-jensen-huang-with-gpu.png#side)
 
 이 실패를 딛고 NVIDIA는 GPU 아키텍처를 재구축하며 G80 Tesla 아키텍처와 CUDA를 선보였습니다.  
 이 전환으로 GPU는 "그냥" 그래픽 칩에서 벗어나 HPC와 GPGPU 시장까지 지배할 수 있는 플랫폼이 되었습니다.
@@ -199,9 +197,9 @@ Tesla 아키텍처와 CUDA 프로그래밍 모델을 통해 GPU는 진정한 GPG
 * Hopper 아키텍처에서는 스레드 블록 클러스터(Cluster)가 실행되는 경계가 됩니다.
 * GPC 내부에는 SM 간의 초고속 연결망이 있어 Distributed Shared Memory(DSMEM) 접근이 가능합니다.(Hopper 이상)
 
-![Hopper GH100 단일 SM 아키텍처](images/12-hopper-sm.png)
-
 ### SM (Streaming Multiprocessor)
+
+![Hopper GH100 단일 SM 아키텍처](images/12-hopper-sm.png#side)
 
 * GPU의 핵심 연산 블록(Building Block)이자, 스레드 블록(Block)이 실행되는 물리적 공간입니다.
 * CPU의 코어(Core)와 유사한 개념이지만 훨씬 더 많은 스레드를 동시에 처리합니다.
@@ -247,9 +245,9 @@ Tesla 아키텍처와 CUDA 프로그래밍 모델을 통해 GPU는 진정한 GPG
     * 따라서 동일 워프 내 스레드들의 실행 경로를 일치시키는 것이 **성능의 핵심**입니다.
 * SM 내부의 Warp Scheduler는 실행 가능한 상태의 워프를 빠르게 교체(Context Switching)하며 **메모리 대기 시간(Latency)을 숨깁니다**.
 
-![CUDA 프로그래밍 모델의 thread block 할당 방식](images/14-thdblk-alloc.png)
-
 ### 스레드 블록 (Thread Block / Cooperative Thread Association)
+
+![CUDA 프로그래밍 모델의 thread block 할당 방식](images/14-thdblk-alloc.png#side)
 
 **협력과 공유의 단위**
 

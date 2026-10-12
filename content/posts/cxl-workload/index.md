@@ -1,7 +1,7 @@
 ---
 date: '2026-08-12T17:39:35+09:00'
 draft: false
-title: 'AI 시대의 필수 소비재, 메모리 이해하기 5편: CXL Workload 알아보기'
+title: '[메모리 이해하기 - Part 05] CXL Workload 알아보기'
 cover:
   image: "cxl-workload-cover.webp"
   alt: "GPU HBM의 KV cache가 CXL 메모리로 offload되고, 여러 서버의 메모리 pooling과 메모리 tiering으로 이어지는 모습"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Jaewon Lim]
 tags: ["CXL", "KV cache", "메모리 pooling", "메모리 tiering", "LLM Inference", "Semiconductor"]
-series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
+series: ['AI 시대의 필수 소비재, 메모리 이해하기']
 series_idx: 5
 categories: ["Memory and Storage"]
 summary: "KV cache offload, 메모리 풀링, 메모리 tiering을 통해 CXL이 실제 워크로드에서 어떻게 쓰이는지 살펴봅니다."

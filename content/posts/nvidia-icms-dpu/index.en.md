@@ -1,7 +1,7 @@
 ---
 date: '2026-02-24T21:04:00+09:00'
 draft: false
-title: 'Know Your Enemy, Know Yourself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS'
+title: '[Know Your Enemy - Part 04] Memory Capacity Bottleneck and NVIDIA ICMS'
 cover:
   image: "images/icms_dpu.png"
   # can also paste direct link from external site
@@ -11,15 +11,13 @@ cover:
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["DPU", "ICMS", "NVIDIA", "KV cache", "context memory", "SSD", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
-series: ["Know Your Enemy, Know Yourself"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 4
 categories: ["Memory and Storage"]
 summary: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 comments: true
 description: "We explore the technical principles behind NVIDIA's ICMS — a new storage tier designed to solve the KV cache capacity bottleneck in LLMs — and the Bluefield-4 DPU that manages it."
 ---
-
-# Know Your Enemy, Know Yourself, Part 4: Memory Capacity Bottleneck and NVIDIA ICMS
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**  
 > This series aims to deeply understand competitors' hardware for the purpose of AI accelerator design.  

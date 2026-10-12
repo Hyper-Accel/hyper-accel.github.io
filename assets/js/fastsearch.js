@@ -1,6 +1,6 @@
-import * as params from '@params';
 
-let fuse;
+
+let ready = false;
 let first;
 let last;
 let currentElement = null;
@@ -29,55 +29,101 @@ function updateURL(query) {
   window.history.replaceState({}, '', url);
 }
 
+const isKo = (document.documentElement.lang || '').startsWith('ko');
+const MAX_RESULTS = 30;
+let docs = [];
+let status;
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlight(text, terms) {
+  const pattern = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'gi');
+  return text.split(pattern).map((part, i) => (i % 2 ? `<mark>${escapeHTML(part)}</mark>` : escapeHTML(part))).join('');
+}
+
+function snippet(doc, terms) {
+  const phrase = terms.join(' ');
+  const candidates = terms.length > 1 ? [phrase, ...terms] : terms;
+  const anchor = [candidates[0], ...[...candidates.slice(1)].sort((a, b) => b.length - a.length)].find((t) => doc.lc.includes(t));
+  if (!anchor) return compact(doc.summary, 150);
+  const pos = doc.lc.indexOf(anchor);
+  let start = Math.max(0, pos - 60);
+  let end = Math.min(doc.text.length, pos + anchor.length + 110);
+  if (start > 0) start = doc.text.indexOf(' ', start) + 1 || start;
+  const lastSpace = doc.text.lastIndexOf(' ', end);
+  if (end < doc.text.length && lastSpace > pos + anchor.length) end = lastSpace;
+  return `${start > 0 ? '…' : ''}${doc.text.slice(start, end).trim()}${end < doc.text.length ? '…' : ''}`;
+}
+
+function countOf(haystack, needle) {
+  let n = 0;
+  for (let i = haystack.indexOf(needle); i !== -1 && n < 99; i = haystack.indexOf(needle, i + needle.length)) n += 1;
+  return n;
+}
+
+function renderStatus(query, count) {
+  if (!status) {
+    status = document.createElement('p');
+    status.className = 'search-status';
+    status.setAttribute('role', 'status');
+    resultList.before(status);
+  }
+  if (!query) status.textContent = '';
+  else if (!count) status.textContent = isKo ? `‘${query}’가 포함된 글이 없습니다.` : `No posts contain “${query}”.`;
+  else status.textContent = isKo ? `‘${query}’ 검색 결과 ${count}건` : `${count} result${count > 1 ? 's' : ''} for “${query}”`;
+}
+
 function runSearch() {
-  if (!fuse) return;
+  if (!ready) return;
   const query = searchInput.value.trim();
   updateURL(query);
+  const terms = [...new Set(query.toLowerCase().split(/\s+/).filter(Boolean))];
 
-  if (!query) {
+  if (!terms.length) {
     resultList.innerHTML = '';
+    renderStatus('', 0);
     resultsAvailable = false;
     return;
   }
 
-  const options = params.fuseOpts ? { limit: params.fuseOpts.limit } : undefined;
-  const results = fuse.search(query, options);
-  resultList.innerHTML = results.map(({ item }) => `
-    <li class="post-entry">
-      <header class="entry-header">${escapeHTML(item.title)}&nbsp;→</header>
-      <div class="entry-summary">${escapeHTML(compact(item.summary, 150))}</div>
-      <a href="${escapeHTML(item.permalink)}" aria-label="${escapeHTML(item.title)}"></a>
-    </li>`).join('');
+  const results = docs
+    .filter((doc) => terms.every((t) => doc.lt.includes(t) || doc.lc.includes(t)))
+    .map((doc) => ({
+      doc,
+      score: terms.reduce((s, t) => s + (doc.lt.includes(t) ? 50 : 0) + Math.min(countOf(doc.lc, t), 20), 0)
+        + (terms.length > 1 ? Math.min(countOf(doc.lc, terms.join(' ')), 20) * 3 : 0)
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  renderStatus(query, results.length);
+  resultList.innerHTML = results.slice(0, MAX_RESULTS).map(({ doc }) => {
+    const hits = terms.reduce((s, t) => s + countOf(doc.lc, t), 0);
+    const meta = [doc.category, doc.date, hits ? (isKo ? `본문 ${hits}곳` : `${hits} in text`) : '']
+      .filter(Boolean).map((m, i) => (i === 0 && doc.category ? `<span class="tr-cat">${escapeHTML(m)}</span>` : `<span>${escapeHTML(m)}</span>`)).join('');
+    return `
+    <li class="post-entry" style="${escapeHTML(doc.style || '')}">
+      <div class="entry-meta">${meta}</div>
+      <header class="entry-header">${highlight(doc.title, terms)}&nbsp;→</header>
+      <div class="entry-summary">${highlight(snippet(doc, terms), terms)}</div>
+      <a href="${escapeHTML(doc.permalink)}" aria-label="${escapeHTML(doc.title)}"></a>
+    </li>`;
+  }).join('');
   resultsAvailable = results.length > 0;
-  first = resultList.firstChild;
-  last = resultList.lastChild;
+  first = resultList.firstElementChild;
+  last = resultList.lastElementChild;
 }
 
 window.addEventListener('load', () => {
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function () {
     if (xhr.readyState !== 4 || xhr.status !== 200) return;
-    const data = JSON.parse(xhr.responseText);
-    const defaults = {
-      distance: 100,
-      threshold: 0.4,
-      ignoreLocation: true,
-      keys: ['title', 'permalink', 'summary', 'content']
-    };
-    const configured = params.fuseOpts ? {
-      isCaseSensitive: params.fuseOpts.iscasesensitive ?? false,
-      includeScore: params.fuseOpts.includescore ?? false,
-      includeMatches: params.fuseOpts.includematches ?? false,
-      minMatchCharLength: params.fuseOpts.minmatchcharlength ?? 1,
-      shouldSort: params.fuseOpts.shouldsort ?? true,
-      findAllMatches: params.fuseOpts.findallmatches ?? false,
-      keys: params.fuseOpts.keys ?? defaults.keys,
-      location: params.fuseOpts.location ?? 0,
-      threshold: params.fuseOpts.threshold ?? defaults.threshold,
-      distance: params.fuseOpts.distance ?? defaults.distance,
-      ignoreLocation: params.fuseOpts.ignorelocation ?? true
-    } : defaults;
-    fuse = new Fuse(data, configured);
+    docs = JSON.parse(xhr.responseText).map((item) => {
+      const text = String(item.content || '').replace(/\s+/g, ' ').trim();
+      return { ...item, text, lc: text.toLowerCase(), lt: String(item.title || '').toLowerCase() };
+    });
+    ready = true;
     searchInput.value = new URLSearchParams(window.location.search).get('q') || '';
     runSearch();
   };

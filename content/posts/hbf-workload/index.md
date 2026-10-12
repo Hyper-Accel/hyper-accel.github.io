@@ -1,7 +1,7 @@
 ---
 date: '2026-04-29T02:00:00+09:00'
 draft: false
-title: 'AI 시대의 필수 소비재, 메모리 이해하기 2편: HBF의 잠재 workload 찾아보기'
+title: '[메모리 이해하기 - Part 02] HBF의 잠재 workload 찾아보기'
 cover:
   image: "images/cover.jpg"
   alt: "HBF 워크로드 커버 이미지"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Jaewon Lim]
 tags: ["HBF", "CAG", "H3", "Semiconductor"]
-series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
+series: ['AI 시대의 필수 소비재, 메모리 이해하기']
 series_idx: 2
 categories: ["Memory and Storage"]
 summary: "SK하이닉스의 H³ 아키텍처를 중심으로, HBF의 약점을 극복할 수 있는 워크로드를 탐색합니다."

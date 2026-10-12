@@ -1,7 +1,7 @@
 ---
 date: '2026-06-16T10:00:00+09:00'
 draft: false
-title: 'Back to the Terminal: How Agents Made Remote Development Feel Native'
+title: '[AI Agent - Part 02] Back to the Terminal: How Agents Made Remote Development Feel Native'
 cover:
   image: "images/thumbnai.png"
   # can also paste direct link from external site

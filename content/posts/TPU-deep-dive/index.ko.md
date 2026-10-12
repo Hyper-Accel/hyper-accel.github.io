@@ -1,7 +1,7 @@
 ---
 date: '2026-01-03T17:20:16+09:00'
 draft: false
-title: '지피지기면 백전불태 2편: TPU의 등장과 부상'
+title: '[지피지기 - Part 02] TPU의 등장과 부상'
 cover:
   image: "tpu-deep-dive.webp"
   # can also paste direct link from external site
@@ -12,7 +12,7 @@ cover:
 authors: [Jaewon Lim] # must match with content/authors
 tags: ["TPU", "Google", "Ironwood", "TensorFlow", "JAX", "computer architecture", "Semiconductor"]
 categories: ["AI Hardware"]
-series: ["지피지기면 백전불태"]
+series: ['지피지기면 백전불태']
 series_idx: 2
 summary: TPU의 등장 배경에 대해 알아보고 하드웨어/소프트웨어 구조를 파헤쳐보면서 구글의 AI 반도체 전략에 대해 분석해봅니다. 
 comments: true
@@ -21,7 +21,6 @@ keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI 가속기", "TensorFlow", "JAX"
 ]
 ---
-# 지피지기면 백전불태 2편: TPU의 등장과 부상
 [지피지기면 백전불태 1편: GPU의 역사와 기초](https://hyper-accel.github.io/posts/how-gpu-works/)
 
 >**지피지기면 백전불태(知彼知己 百戰不殆)**  

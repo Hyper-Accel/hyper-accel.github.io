@@ -1,7 +1,7 @@
 ---
 date: '2026-03-27T10:38:13+09:00'
 draft: false
-title: 'Kubernetes 기반 사내 개발 환경 구축기 3편: LPU를 위한 Kubernetes Device Plugin'
+title: '[K8s 개발 환경 구축기 - Part 03] LPU를 위한 Kubernetes Device Plugin'
 cover:
   image: "images/kubernetes_with_devices.png"
   # can also paste direct link from external site
@@ -12,7 +12,8 @@ cover:
 authors: ["Younghoon Jun"] # must match with content/authors
 tags: ["kubernetes", "device-plugin", "LPU", "GPU", "FPGA", "DRA"]
 categories: ["Infra and DevOps"]
-series: ["Kubernetes 기반 사내 개발 환경 구축기"]
+series: ['Kubernetes 기반 사내 개발 환경 구축기']
+series_idx: 3
 summary: ['Kubernetes 기반으로 운영되는 HyperAccel의 개발 환경 구축에 대한 여정을 공유합니다.']
 comments: true
 description: ""
@@ -21,8 +22,6 @@ keywords: [
   "LPU", "FPGA", "GPU", "gRPC"
 ]
 ---
-
-# Kubernetes 기반 사내 개발 환경 구축기 3편: LPU를 위한 Kubernetes Device Plugin
 
 안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.
 

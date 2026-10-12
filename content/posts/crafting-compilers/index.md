@@ -1,7 +1,7 @@
 ---
 date: '2025-11-16T15:10:31+09:00'
 draft: false
-title: 'Crafting Compilers'
+title: '[Crafting Compilers - Part 01] 시리즈 소개'
 cover:
   image: "486.jpeg"
   # can also paste direct link from external site
@@ -12,12 +12,11 @@ cover:
 authors: [Jaewoo Kim] # must match with content/authors
 tags: ["compiler"]
 categories: ["Compilers and Kernels"]
-series: ["Crafting Compilers"]
+series: ['Crafting Compilers']
+series_idx: 1
 summary: [컴파일러의 작동 방식과, 컴파일러를 제작하는 전반적인 과정에 관한 포스팅 시리즈를 시작하기 위한 소개 글입니다]
 comments: true
 ---
-
-# Crafting compilers
 
 ## Compilers
 

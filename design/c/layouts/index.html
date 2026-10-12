@@ -1,18 +1,71 @@
 {{- define "main" }}
 {{- $ko := eq site.Language.Lang "ko" }}
-{{- $colors := partial "d/colors.html" . }}
 {{- $cats := (site.GetPage "/categories").Pages }}
+{{- $stack := slice "llm-and-models" "infra-and-devops" "compilers-and-kernels" "memory-and-storage" "ai-hardware" }}
+{{- $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
 <div class="tr">
-  <section class="tr-intro">
-    <p class="tr-eyebrow">HYPERACCEL ENGINEERING</p>
-    <h1 class="tr-headline">{{ cond $ko "트랜지스터에서 LLM 추론까지,<br>AI 컴퓨팅의 풀스택을 만듭니다." "From transistors to LLM inference,<br>we build the full AI compute stack." | safeHTML }}</h1>
-    <p class="tr-sub">{{ cond $ko "반도체, 컴파일러, 시스템 소프트웨어와 AI 모델을 하나의 스택으로 연결하는 HyperAccel 엔지니어들의 기록입니다." "Notes from HyperAccel engineers connecting silicon, compilers, systems software, and AI models into one stack." }}</p>
-    <form class="tr-search" action="{{ "search/" | relLangURL }}" method="get" role="search">
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-      <input type="search" name="q" maxlength="64" autocomplete="off" aria-label="{{ cond $ko "기술 블로그 검색" "Search the tech blog" }}" placeholder="{{ cond $ko "기술, 시리즈, 작성자를 검색하세요" "Search topics, series, and authors" }}">
-      <button type="submit">{{ cond $ko "검색" "Search" }}</button>
-    </form>
-    <p class="tr-search-hint">{{ cond $ko "제목과 본문을 함께 검색합니다" "Search across titles and article content" }}</p>
+  <section class="tr-hero">
+    <div class="tr-hero-copy">
+      <p class="tr-eyebrow">HYPERACCEL TECH BLOG</p>
+      <h1 class="tr-headline">{{ cond $ko "트랜지스터부터 LLM Inference까지,<br>Full-Stack AI 기술을 이야기합니다." "From transistors to LLM inference,<br>we write about full-stack AI." | safeHTML }}</h1>
+      <p class="tr-sub">{{ cond $ko "칩 설계, 메모리, 컴파일러, 인프라, 모델까지. HyperAccel 엔지니어들이 AI 스택 전 층위에서 배운 것을 기록합니다." "Chip design, memory, compilers, infrastructure, and models. HyperAccel engineers write down what they learn across every layer of the AI stack." }}</p>
+      <form class="tr-search" action="{{ "search/" | relLangURL }}" method="get" role="search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <input type="search" name="q" maxlength="64" autocomplete="off" aria-label="{{ cond $ko "기술 블로그 검색" "Search the tech blog" }}" placeholder="{{ cond $ko "제목과 본문에서 검색" "Search titles and content" }}">
+        <button type="submit">{{ cond $ko "검색" "Search" }}</button>
+      </form>
+    </div>
+
+    <div class="tr-stack-area">
+      <nav class="tr-stack" aria-label="{{ cond $ko "기술 스택별 카테고리" "Categories by stack layer" }}" style="--n:{{ len $stack }}">
+        {{- range $i, $slug := $stack }}
+        {{- with site.GetPage (printf "/categories/%s" $slug) }}
+        <a class="tr-layer" href="{{ .RelPermalink }}" data-layer="{{ $slug }}" style="--i:{{ sub (len $stack) (add $i 1) }};{{ partial "d/catvars.html" $slug }}">
+          <svg viewBox="0 0 240 152" aria-hidden="true">
+            <polygon class="f-l" points="0,69 120,138 120,152 0,83"/>
+            <polygon class="f-r" points="120,138 240,69 240,83 120,152"/>
+            <polygon class="f-t" points="120,0 240,69 120,138 0,69"/>
+          </svg>
+          <span class="tr-layer-label"><b>{{ .Title }}</b><small>{{ len .Pages }}{{ cond $ko "편" " posts" }}</small></span>
+        </a>
+        {{- end }}
+        {{- end }}
+      </nav>
+
+      <div class="tr-panels" aria-live="polite">
+        <div class="tr-panel" data-panel="">
+          <p class="tr-panel-kicker">FULL-STACK AI</p>
+          <p class="tr-panel-hint">{{ cond $ko "레이어에 마우스를 올리면 분야별 최신 글을 볼 수 있습니다." "Hover a layer to see the latest posts in that part of the stack." }}</p>
+          <p class="tr-panel-kicker">{{ cond $ko "스택 밖의 이야기" "Beyond the stack" }}</p>
+          <div class="tr-panel-chips">
+            {{- range $cats }}{{ $slug := path.Base .RelPermalink }}{{ if not (in $stack $slug) }}
+            <a href="{{ .RelPermalink }}" style="{{ partial "d/catvars.html" $slug }}"><i class="tr-dot"></i>{{ .Title }}</a>
+            {{- end }}{{ end }}
+          </div>
+        </div>
+        {{- range $stack }}
+        {{- with site.GetPage (printf "/categories/%s" .) }}
+        <div class="tr-panel" data-panel="{{ path.Base .RelPermalink }}" style="{{ partial "d/catvars.html" (path.Base .RelPermalink) }}" hidden>
+          <p class="tr-panel-kicker"><i class="tr-dot"></i>{{ .Title }}</p>
+          <p class="tr-panel-desc">{{ .Description }}</p>
+          <ul>
+            {{- range first 3 .Pages.ByDate.Reverse }}{{ $t := partial "d/titleparts.html" . }}
+            <li><a href="{{ .RelPermalink }}">{{ with $t.tag }}<span class="tr-part">{{ . }}</span>{{ end }}{{ $t.text }}</a></li>
+            {{- end }}
+          </ul>
+          <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
+        </div>
+        {{- end }}
+        {{- end }}
+      </div>
+    </div>
+  </section>
+
+  <section class="tr-latest">
+    <h2 class="tr-h">{{ cond $ko "최신 글" "Latest" }}</h2>
+    <div class="tr-latest-grid">
+      {{- range first 3 $posts }}{{ partial "d/card.html" (dict "page" . "summary" true) }}{{ end }}
+    </div>
   </section>
 
   <section class="tr-featured">
@@ -21,8 +74,7 @@
       {{- range first 3 site.Taxonomies.series.ByCount }}
       {{- $term := .Page }}{{ $eps := $term.Pages.ByDate }}
       {{- $first := index $eps 0 }}{{ $latest := index $eps.Reverse 0 }}
-      {{- $slug := "" }}{{ with $first.GetTerms "categories" }}{{ $slug = path.Base (index . 0).RelPermalink }}{{ end }}
-      <article class="tr-feat" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
+      <article class="tr-feat" style="{{ partial "d/catvars.html" $first }}">
         <span class="tr-feat-count">{{ .Count }}{{ cond $ko "편 연재" " parts" }}</span>
         <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
         <p>{{ $first.Summary | plainify | htmlUnescape | truncate 100 }}</p>
@@ -37,7 +89,7 @@
   </section>
 
   {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
-  <section class="tr-shelf" id="track-{{ $slug }}" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
+  <section class="tr-shelf" id="track-{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}">
     <header class="tr-shelf-head">
       <div>
         <h2 class="tr-h"><i class="tr-dot"></i>{{ .Title }}</h2>
@@ -51,4 +103,25 @@
   </section>
   {{- end }}
 </div>
+<script>
+(() => {
+  const area = document.querySelector('.tr-stack-area');
+  if (!area) return;
+  const layers = area.querySelectorAll('.tr-layer');
+  const panels = area.querySelectorAll('.tr-panel');
+  const touch = matchMedia('(hover: none)');
+  const show = (slug) => {
+    panels.forEach((p) => { p.hidden = p.dataset.panel !== slug; });
+    layers.forEach((l) => l.classList.toggle('on', l.dataset.layer === slug));
+    area.classList.toggle('has-active', !!slug);
+  };
+  layers.forEach((l) => {
+    l.addEventListener('mouseenter', () => show(l.dataset.layer));
+    l.addEventListener('focus', () => show(l.dataset.layer));
+    l.addEventListener('click', (e) => {
+      if (touch.matches && !l.classList.contains('on')) { e.preventDefault(); show(l.dataset.layer); }
+    });
+  });
+})();
+</script>
 {{- end }}

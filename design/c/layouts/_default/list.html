@@ -1,8 +1,7 @@
 {{- define "main" }}
 {{- $ko := eq site.Language.Lang "ko" }}
-{{- $colors := partial "d/colors.html" . }}
 {{- $slug := path.Base .RelPermalink }}
-<div class="tr" style="--c:{{ index $colors $slug | default "#12bde3" | safeCSS }}">
+<div class="tr" style="{{ partial "d/catvars.html" $slug }}">
   {{- if eq .Data.Singular "author" }}
   {{- partial "d/author_profile.html" . }}
   {{- else }}
