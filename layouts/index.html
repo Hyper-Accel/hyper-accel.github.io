@@ -145,7 +145,10 @@
   const open = () => { clearTimeout(closeTimer); area.classList.add('open'); };
   const closeSoon = () => {
     clearTimeout(closeTimer);
-    closeTimer = setTimeout(() => area.classList.remove('open'), CLOSE_MS);
+    closeTimer = setTimeout(() => {
+      area.classList.remove('open');
+      show('');
+    }, CLOSE_MS);
   };
 
   area.addEventListener('mouseenter', open);
