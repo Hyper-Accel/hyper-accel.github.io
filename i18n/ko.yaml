@@ -4,6 +4,12 @@
 - id: next_page
   translation: "다음 페이지"
 
+- id: prev_post
+  translation: "이전 글"
+
+- id: next_post
+  translation: "다음 글"
+
 - id: read_time
   translation:
     one : "1 분"
