@@ -27,6 +27,7 @@ comments: true
 
 Hello, I'm Yujeon Chang from the HyperAccel DV team.
 This post is about how we decide what counts as the "right answer" when verifying a **Large Language Model (LLM)** inference chip.
+We'll use HyperAccel's actual verification flow as the example.
 
 When an AI model and the chip's design code (RTL) give different answers, who is wrong?
 
@@ -324,6 +325,10 @@ The answer depends on which comparison the mismatch appeared in.
 This kind of judgment is possible for two reasons.
 We separated the source of the ground truth at each level, and we kept each comparison down to one difference where possible.
 This structure is the backbone of verification that keeps us from having to manufacture the chip again.
+
+This principle isn't limited to chip verification.
+The same question comes up when you port a model to another framework, quantize it, or move it to new hardware.
+Decide first what the ground truth is, then change only one thing at a time when you compare, and when results diverge you'll know where to look.
 
 But top-level simulation is slow.
 Running a long LLM workload to completion takes far too long.
