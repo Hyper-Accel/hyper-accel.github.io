@@ -30,7 +30,13 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-nav { display: flex; min-width: 0; gap: 2px; overflow-x: auto; scrollbar-width: none; }
 .tr-nav::-webkit-scrollbar { display: none; }
 .tr-nav a { flex: 0 0 auto; padding: 6px 9px; border-radius: 999px; color: var(--tr-muted); font-weight: 600; font-size: 0.82rem; white-space: nowrap; }
-.tr-nav a:hover { background: color-mix(in srgb, var(--tr-cyan) 12%, transparent); color: var(--tr-cyan-soft); }
+.tr-nav a:hover, .tr-nav a[aria-current] { background: color-mix(in srgb, var(--tr-cyan) 12%, transparent); color: var(--tr-cyan-soft); }
+.tr-catbar { border-top: 1px solid var(--tr-line); }
+.tr-catbar-in { max-width: 1440px; margin: 0 auto; padding: 0 24px; min-height: 42px; display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.tr-catbar-in::-webkit-scrollbar { display: none; }
+.tr-catbar a { flex: 0 0 auto; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; color: var(--tr-muted); font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.tr-catbar .tr-dot { width: 8px; height: 8px; margin-right: 7px; border-radius: 3px; vertical-align: 0; }
+.tr-catbar a:hover, .tr-catbar a[aria-current] { background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--tr-fg); }
 .tr-tools { margin-left: auto; flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 .tr-pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--tr-line); font-size: 0.82rem; font-weight: 600; color: var(--tr-muted); }
 .tr-pill:hover { border-color: var(--tr-cyan); color: var(--tr-cyan-soft); }
@@ -39,8 +45,9 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-pill-careers:hover { background: var(--tr-cyan-soft); color: #031117; border-color: var(--tr-cyan-soft); }
 
 /* hero: copy + full-stack layers */
-/* The hero breaks out of the 1200px column so the stack preview has room beside the copy. */
-.tr-hero { --hero-w: min(1360px, calc(100vw - 48px)); width: var(--hero-w); margin-left: calc(50% - var(--hero-w) / 2); box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 36px; padding: 40px 0 28px; }
+/* Home runs wider than the 1200px column so the stack preview has room beside the copy. */
+.tr-home { --home-w: min(1360px, calc(100vw - 48px)); width: var(--home-w); margin-left: calc(50% - var(--home-w) / 2); box-sizing: border-box; }
+.tr-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 36px; padding: 40px 0 28px; }
 .tr-eyebrow { margin: 0 0 12px; color: var(--tr-cyan); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.14em; }
 .tr-headline { font-size: clamp(1.6rem, 2.9vw, 2.35rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.25; margin: 0 0 14px; color: var(--tr-fg); word-break: keep-all; }
 .tr-sub { color: var(--tr-muted); font-size: 0.98rem; line-height: 1.7; margin: 0 0 22px; max-width: 560px; word-break: keep-all; }
@@ -201,7 +208,8 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-search-page #searchResults .entry-summary { margin-top: 6px; color: var(--tr-muted); font-size: 0.88rem; line-height: 1.55; }
 
 @media (max-width: 1300px) {
-  .tr-hero { --hero-w: 100%; grid-template-columns: 1fr; gap: 28px; }
+  .tr-home { --home-w: 100%; }
+  .tr-hero { grid-template-columns: 1fr; gap: 28px; }
   .tr-stack-area { grid-template-columns: 390px minmax(0, 1fr); }
 }
 @media (hover: none) {
@@ -215,11 +223,11 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
   .tr-latest-grid > :first-child { grid-column: 1 / -1; }
   .tr-header-in { flex-wrap: wrap; gap: 0 14px; padding-top: 8px; padding-bottom: 8px; }
   .tr-nav { order: 3; flex-basis: 100%; margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--tr-line); }
-  .tr-nav { -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 30px), transparent 100%); mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 30px), transparent 100%); }
+  .tr-nav, .tr-catbar-in { -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 30px), transparent 100%); mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 30px), transparent 100%); }
   .tr-scroller { grid-auto-columns: 240px; }
 }
 @media (max-width: 600px) {
-  .tr-header-in { padding: 0 16px; }
+  .tr-header-in, .tr-catbar-in { padding: 0 16px; }
   body.list .main { padding-left: 16px; padding-right: 16px; }
   .tr-featured-grid, .tr-grid, .tr-latest-grid { grid-template-columns: 1fr; }
   .tr-hero { padding-top: 24px; }

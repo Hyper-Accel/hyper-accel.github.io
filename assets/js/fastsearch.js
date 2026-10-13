@@ -1,5 +1,3 @@
-
-
 let ready = false;
 let first;
 let last;
@@ -124,7 +122,8 @@ window.addEventListener('load', () => {
       return { ...item, text, lc: text.toLowerCase(), lt: String(item.title || '').toLowerCase() };
     });
     ready = true;
-    searchInput.value = new URLSearchParams(window.location.search).get('q') || '';
+    const initial = new URLSearchParams(window.location.search).get('q');
+    if (initial && !searchInput.value) searchInput.value = initial;
     runSearch();
   };
   xhr.open('GET', '../index.json');

@@ -24,6 +24,10 @@ languages:
           name: 포스트
           url: /posts/
           weight: 10
+        - identifier: series
+          name: 시리즈
+          url: /series/
+          weight: 9
         - identifier: authors
           name: 작성자
           url: /authors/
@@ -64,6 +68,10 @@ languages:
           name: Posts
           url: /en/posts/
           weight: 10
+        - identifier: series
+          name: Series
+          url: /en/series/
+          weight: 9
         - identifier: authors
           name: Authors
           url: /en/authors/
@@ -185,17 +193,6 @@ params:
     URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/blob/main/content"
     appendFilePath: true # to append file path to Edit link
 
-  # for search
-  # https://fusejs.io/api/options.html
-  fuseOpts:
-    isCaseSensitive: false
-    shouldSort: true
-    location: 0
-    distance: 1000
-    threshold: 0.4
-    minMatchCharLength: 0
-    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
-    keys: ["title", "permalink", "summary", "content"]
   math: true
 
   giscus:
@@ -249,23 +246,3 @@ sitemap:
   disable: false
   filename: sitemap.xml
   priority: -1
-
-# Activate the category-tracks prototype when this branch is served normally.
-module:
-  mounts:
-    - source: design/c/layouts
-      target: layouts
-    - source: layouts
-      target: layouts
-    - source: design/c/assets
-      target: assets
-    - source: assets
-      target: assets
-    - source: content
-      target: content
-    - source: static
-      target: static
-    - source: i18n
-      target: i18n
-    - source: archetypes
-      target: archetypes

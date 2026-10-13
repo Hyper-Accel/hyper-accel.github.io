@@ -3,7 +3,7 @@
 {{- $cats := (site.GetPage "/categories").Pages }}
 {{- $stack := slice "llm-and-models" "infra-and-devops" "compilers-and-kernels" "memory-and-storage" "ai-hardware" }}
 {{- $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
-<div class="tr">
+<div class="tr tr-home">
   <section class="tr-hero">
     <div class="tr-hero-copy">
       <p class="tr-eyebrow">HYPERACCEL TECH BLOG</p>
@@ -39,7 +39,7 @@
         {{- end }}
       </nav>
 
-      <div class="tr-panels" aria-live="polite">
+      <div class="tr-panels">
         <div class="tr-panel" data-panel="">
           <p class="tr-panel-kicker">FULL-STACK AI</p>
           <p class="tr-panel-hint">{{ cond $ko "트랜지스터(L1)부터 LLM(L5)까지, 레이어에 마우스를 올리면 분야별 최신 글을 볼 수 있습니다." "From transistors (L1) to LLMs (L5). Hover a layer to see the latest posts in that part of the stack." }}</p>
@@ -93,8 +93,8 @@
     <h2 class="tr-h">{{ cond $ko "연재 시리즈" "Series" }}</h2>
     <div class="tr-featured-grid">
       {{- range first 3 site.Taxonomies.series.ByCount }}
-      {{- $term := .Page }}{{ $eps := $term.Pages.ByDate }}
-      {{- $first := index $eps 0 }}{{ $latest := index $eps.Reverse 0 }}
+      {{- $term := .Page }}{{ $eps := sort $term.Pages "Params.series_idx" }}
+      {{- $first := index $eps 0 }}{{ $latest := index $term.Pages.ByDate.Reverse 0 }}
       <article class="tr-feat" style="{{ partial "d/catvars.html" $first }}">
         <span class="tr-feat-count">{{ .Count }}{{ cond $ko "편 연재" " parts" }}</span>
         <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
@@ -131,39 +131,31 @@
   const layers = [...area.querySelectorAll('.tr-layer')];
   const panels = area.querySelectorAll('.tr-panel');
   const touch = matchMedia('(hover: none)');
-  const OPEN_MS = 120, CLOSE_MS = 600, FOCUS_MS = 200;
-  let openTimer, closeTimer, focusTimer, current = '';
+  // Short grace so a cursor that slips off the edge for a moment does not collapse the stack.
+  const CLOSE_MS = 250;
+  let closeTimer, current = '';
 
   const show = (slug) => {
-    clearTimeout(focusTimer);
+    if (slug === current) return;
     current = slug;
     panels.forEach((p) => { p.hidden = p.dataset.panel !== slug; });
     layers.forEach((l) => l.classList.toggle('on', l.dataset.layer === slug));
     area.classList.toggle('has-active', !!slug);
   };
-  const setOpen = (open) => {
-    clearTimeout(openTimer); clearTimeout(closeTimer);
-    area.classList.toggle('open', open);
+  const open = () => { clearTimeout(closeTimer); area.classList.add('open'); };
+  const closeSoon = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => area.classList.remove('open'), CLOSE_MS);
   };
 
-  area.addEventListener('mouseenter', () => {
-    clearTimeout(closeTimer);
-    openTimer = setTimeout(() => setOpen(true), OPEN_MS);
-  });
-  area.addEventListener('mouseleave', () => {
-    clearTimeout(openTimer); clearTimeout(focusTimer);
-    closeTimer = setTimeout(() => setOpen(false), CLOSE_MS);
-  });
+  area.addEventListener('mouseenter', open);
+  area.addEventListener('mouseleave', closeSoon);
+  area.addEventListener('focusout', (e) => { if (!area.contains(e.relatedTarget)) closeSoon(); });
 
   layers.forEach((l) => {
     const slug = l.dataset.layer;
-    l.addEventListener('mouseenter', () => {
-      if (touch.matches) return;
-      clearTimeout(focusTimer);
-      if (slug !== current) focusTimer = setTimeout(() => { setOpen(true); show(slug); }, FOCUS_MS);
-    });
-    l.addEventListener('mouseleave', () => clearTimeout(focusTimer));
-    l.addEventListener('focus', () => { setOpen(true); show(slug); });
+    l.addEventListener('mouseenter', () => { if (!touch.matches) { open(); show(slug); } });
+    l.addEventListener('focus', () => { open(); show(slug); });
     l.addEventListener('click', (e) => {
       if (touch.matches && current !== slug) { e.preventDefault(); show(slug); }
     });
@@ -175,6 +167,14 @@
     if (e.target.closest('.tr-layer, .tr-panel')) return;
     show('');
   });
+
+  // The phone bottom sheet is fixed to the viewport, so drop it once the hero scrolls away.
+  const hero = area.closest('.tr-hero');
+  if (hero && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && touch.matches) show('');
+    }).observe(hero);
+  }
 })();
 </script>
 {{- end }}

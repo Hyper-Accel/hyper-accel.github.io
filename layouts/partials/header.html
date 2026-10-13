@@ -1,0 +1,50 @@
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $here := .RelPermalink }}
+{{- $cat := "" }}{{ with .GetTerms "categories" }}{{ $cat = (index . 0).RelPermalink }}{{ end }}
+{{- if eq .Kind "term" }}{{ $cat = .RelPermalink }}{{ end }}
+<a class="tr-skip" href="#main-content">{{ cond $ko "본문 바로가기" "Skip to content" }}</a>
+<header class="tr-header">
+  <div class="tr-header-in">
+    <a class="tr-brand" href="{{ "" | relLangURL }}"><img src="{{ "/images/logo-transparent.png" | relURL }}" alt="" width="28" height="28"><span>HyperAccel <b>Tech Blog</b></span></a>
+    <nav class="tr-nav" aria-label="{{ cond $ko "사이트 메뉴" "Site menu" }}">
+      {{- range site.Menus.main }}
+      {{- if not (in (slice "categories" "careers" "search") .Identifier) }}
+      {{- $external := hasPrefix .URL "http" }}
+      <a href="{{ .URL }}"{{ if $external }} target="_blank" rel="noopener"{{ else if hasPrefix $here .URL }} aria-current="page"{{ end }}>{{ .Name }}{{ if $external }} ↗{{ end }}</a>
+      {{- end }}
+      {{- end }}
+    </nav>
+    <div class="tr-tools">
+      <a class="tr-pill tr-search-link" href="{{ "search/" | relLangURL }}" aria-label="{{ cond $ko "검색" "Search" }}" title="{{ cond $ko "검색" "Search" }}">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+      </a>
+      <a class="tr-pill tr-pill-careers" href="https://hyperaccel.career.greetinghr.com/{{ cond $ko "ko" "en" }}/guide" target="_blank" rel="noopener">{{ cond $ko "채용" "Careers" }} ↗</a>
+      {{- with .Translations }}
+        {{- range . }}<a class="tr-pill" href="{{ .Permalink }}">{{ .Language.LanguageName }}</a>{{ end }}
+      {{- else }}
+        {{- with site.Home.Translations }}{{ range . }}{{ if ne .Lang site.Language.Lang }}<a class="tr-pill" href="{{ .Permalink }}">{{ .Language.LanguageName }}</a>{{ end }}{{ end }}{{ end }}
+      {{- end }}
+    </div>
+  </div>
+  <nav class="tr-catbar" aria-label="{{ cond $ko "카테고리" "Categories" }}">
+    <div class="tr-catbar-in">
+      {{- range (site.GetPage "/categories").Pages }}
+      <a href="{{ .RelPermalink }}" style="{{ partial "d/catvars.html" (path.Base .RelPermalink) }}"{{ if eq .RelPermalink $cat }} aria-current="page"{{ end }}><i class="tr-dot"></i>{{ .Title }}</a>
+      {{- end }}
+    </div>
+  </nav>
+</header>
+<script>
+(() => {
+  const skip = document.querySelector('.tr-skip');
+  if (!skip) return;
+  skip.addEventListener('click', (event) => {
+    const main = document.getElementById('main-content');
+    if (!main) return;
+    event.preventDefault();
+    main.focus({ preventScroll: true });
+    main.scrollIntoView({ block: 'start' });
+    history.replaceState(null, '', '#main-content');
+  });
+})();
+</script>
