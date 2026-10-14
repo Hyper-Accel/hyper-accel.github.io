@@ -1,6 +1,6 @@
 ---
 date: '2026-10-12T18:00:00+09:00'
-draft: true
+draft: false
 title: 'torch.compile 해부 2편: 왜 세 단계로 나눴을까'
 cover:
   image: "images/pytorch.jpg"
