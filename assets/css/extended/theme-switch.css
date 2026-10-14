@@ -1,0 +1,40 @@
+/* Shared header control and the light counterpart of the existing dark design. */
+.tr-tools button#theme-toggle {
+  display: inline-flex;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  color: var(--tr-fg);
+}
+.tr-tools button#theme-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+[data-theme="light"] body {
+  --tr-bg: #f6f8fb;
+  --tr-fg: #172b3a;
+  --tr-muted: #526779;
+  --tr-line: #d5e0e7;
+  --tr-card: #ffffff;
+  --tr-cyan-soft: #006d9c;
+  color-scheme: light;
+}
+[data-theme="light"] body,
+[data-theme="light"] [style*="--c:"] {
+  --c-ink: color-mix(in oklab, var(--c) 50%, #172b3a);
+}
+[data-theme="light"] .tr-search { background: var(--tr-card); border-color: var(--tr-line); }
+[data-theme="light"] .tr-search input::placeholder,
+[data-theme="light"] .tr-search-hint { color: var(--tr-muted); }
+/* Thumbnail badges sit over photographs on a deliberately dark surface. */
+[data-theme="light"] .tr-card-brand b { color: #5bc5f6; }
+[data-theme="light"] .tr-layer .f-grid { stroke: #173746; }
+[data-theme="light"] .tr-layer .f-t { stroke: #3e738b; }
+[data-theme="light"] .tr-layer:focus-visible .f-t { stroke: var(--tr-fg); }
+@media (max-width: 640px) {
+  [data-theme="light"] .tr-panel:not([data-panel=""]) { background: var(--tr-card); }
+}
+@media print {
+  .tr-tools button#theme-toggle { display: none; }
+}
