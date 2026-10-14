@@ -33,7 +33,7 @@ One reason PyTorch won so many people over is eager execution — you run one li
 
 So PyTorch has long been looking for a way to keep Python's character while recovering that performance: `TorchScript`, `torch.jit.trace`, `torch.fx`, and others. After many attempts, `torch.compile()` is what came out of that line of work.
 
-There's more here than fits in one post, so this is a two-parter. This first one takes `torch.compile()` apart piece by piece. The second will look at how NPU companies — including us — are climbing aboard the `torch.compile()` ecosystem.
+There's more here than fits in one post, so this is a three-part series. This first one takes `torch.compile()` apart piece by piece. The second will look at why `torch.compile()` is split into three stages in the first place, and who gains what from that split. The third will share what I took away from attending PyTorch Conference 2026.
 
 ---
 
@@ -87,7 +87,7 @@ Here's what each component hands to the next:
 
 The **FX graph** in that table is the name of the data structure PyTorch actually stores the graph from Part 0 in. We'll look at its structure in Part 2.
 
-And these three components are **independently replaceable**. `torch.compile(backend=...)` lets you drop in a compiler other than Inductor — which is exactly what we do with our Legato backend. More on that next time.
+And these three components are **independently replaceable**. `torch.compile(backend=...)` lets you drop in a compiler other than Inductor — which is exactly what we do with our Legato backend. Why that replaceability matters is the subject of the next post.
 
 ---
 
@@ -174,11 +174,7 @@ Now run the expression `y[i] = floor(x[i])` in the perfectly ordinary way. Strin
 
 What I find more interesting, though, is that `torch.compile()`'s real character is its **structure** — one built with extensibility in mind. As you saw in Part 4, Inductor produced both Triton and C++ by changing nothing but a set of rules. So: **what happens if you plug a code generator for entirely different hardware into that slot?** And what does it mean, for someone trying to attach new hardware, that the decomposition from Part 3 sharply reduces the number of operations you must implement?
 
-I think PyTorch is designing for that extensibility deliberately — holding a door open for accelerators that aren't CUDA, for NPUs to walk into the PyTorch ecosystem, and in doing so keeping its place as the standard framework across the whole AI hardware market.
-
-Next time we'll look at what that door actually looks like: the extension points PyTorch leaves open for third-party accelerators, and how different NPU companies, facing the same problem, arrived at **different answers**.
-
-And finally, where our own [Legato]({{< ref "/posts/what-is-legato" >}}) is aiming to plug into this ecosystem, and why that particular spot.
+I think PyTorch designed for that extensibility deliberately. Next time we'll step one question further back: why is `torch.compile()` split into three stages in the first place? And if each stage can be swapped, who swaps what, and what do they gain? Starting from how PyTorch has grown its ecosystem, we'll look at the compilers and hardware that plug in at each stage boundary, including companies building chips that aren't GPUs.
 
 ## Reference
 
