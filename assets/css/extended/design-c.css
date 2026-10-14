@@ -121,6 +121,10 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-featured .tr-h { margin-bottom: 16px; }
 .tr-featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .tr-feat { position: relative; border-radius: 18px; padding: 24px; background: linear-gradient(145deg, color-mix(in srgb, var(--c) 18%, var(--tr-card)), var(--tr-card) 70%); border: 1px solid color-mix(in srgb, var(--c) 30%, var(--tr-line)); display: flex; flex-direction: column; gap: 10px; }
+.tr-feat-main { position: relative; display: flex; flex-direction: column; flex: 1; gap: 10px; margin: -24px -24px -10px; padding: 24px 24px 10px; }
+.tr-feat-main h3 a::after { content: ""; position: absolute; inset: 0; border-radius: 18px 18px 0 0; }
+.tr-feat-main h3 a:focus-visible::after { outline: 2px solid var(--c-ink); outline-offset: -4px; }
+.tr-feat-main .tr-dots a { position: relative; z-index: 1; }
 .tr-feat-count { font-size: 0.75rem; font-weight: 700; color: var(--c-ink); letter-spacing: 0.04em; text-transform: uppercase; }
 .tr-feat h3 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--tr-fg); word-break: keep-all; }
 .tr-feat p { margin: 0; color: var(--tr-muted); font-size: 0.9rem; line-height: 1.6; word-break: keep-all; }
