@@ -1,6 +1,6 @@
 ---
 date: '2026-08-04T18:00:00+09:00'
-title: '[Anatomy of torch.compile - Part 01] TorchDynamo, AOTAutograd, TorchInductor'
+title: '[Exploring torch.compile() - Part 01] The Three Components'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch logo"
@@ -8,7 +8,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
-series: ['Anatomy of torch.compile']
+series: ['Exploring torch.compile()']
 series_idx: 1
 categories: ["Compilers and Kernels"]
 summary: 'We take torch.compile apart into its three components — TorchDynamo, AOTAutograd, and TorchInductor — and walk through what each one takes in, what it hands back, and how it actually works.'

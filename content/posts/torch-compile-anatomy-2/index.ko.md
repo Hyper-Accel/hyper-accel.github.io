@@ -1,7 +1,7 @@
 ---
 date: '2026-10-12T18:00:00+09:00'
 draft: false
-title: 'torch.compile 해부 2편: 왜 세 단계로 나눴을까'
+title: 'torch.compile() 알아보기 2편: 왜 세 단계로 나눠 설계했을까'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch 로고"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "PrivateUse1", "Compiler"]
-series: ["torch.compile 해부"]
+series: ["torch.compile() 알아보기"]
 series_idx: 2
 categories: ["AI", "Compiler"]
 summary: 'torch.compile은 왜 Dynamo, AOTAutograd, Inductor 세 단계로 나뉘어 있을까요? PyTorch가 생태계를 키워 온 흐름에서 출발해, 각 단계의 경계를 누가 어떻게 활용하고 어떤 이득을 얻는지 정리합니다.'

@@ -1,7 +1,7 @@
 ---
 date: '2026-10-12T18:00:00+09:00'
 draft: false
-title: 'Anatomy of torch.compile, Part 2: Why Three Stages?'
+title: 'Exploring torch.compile(), Part 2: Why Split It into Three Stages?'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch logo"
@@ -9,7 +9,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "PrivateUse1", "Compiler"]
-series: ["Anatomy of torch.compile"]
+series: ["Exploring torch.compile()"]
 series_idx: 2
 categories: ["AI", "Compiler"]
 summary: 'Why is torch.compile split into Dynamo, AOTAutograd, and Inductor? Starting from how PyTorch grew its ecosystem, we look at who uses each stage boundary, how, and what they gain from it.'
