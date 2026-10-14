@@ -23,6 +23,12 @@
 - id: toc
   translation: "목차"
 
+- id: close_toc
+  translation: "목차 닫기"
+
+- id: toc_short
+  translation: "목차"
+
 - id: translations
   translation: "번역"
 

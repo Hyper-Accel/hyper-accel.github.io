@@ -1,4 +1,9 @@
 {{- define "main" }}
+{{- $isPost := eq .Type "posts" }}
+{{- $hasReadingToc := and $isPost (.Param "ShowToc") (gt (len (findRE `href="#` (.Fragments.ToHTML 2 2 false))) 0) }}
+{{- if $isPost }}
+<div class="post-reading-layout{{ if $hasReadingToc }} has-toc{{ end }}">
+{{- end }}
 
 <article class="post-single">
   <header class="post-header">
@@ -36,10 +41,12 @@
     {{- end }}
   </header>
   {{- partial "reaction_summary.html" . }}
+  {{- if not $isPost }}
   {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
   {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
   {{- if (.Param "ShowToc") }}
-  {{- partial "toc.html" . }}
+    {{- partial "toc.html" . }}
+  {{- end }}
   {{- end }}
 
   {{- if .Content }}
@@ -71,5 +78,9 @@
   {{- partial "comments.html" . }}
   {{- end }}
 </article>
+{{- if $hasReadingToc }}
+  {{- partial "reading_toc.html" . }}
+{{- end }}
+{{- if $isPost }}</div>{{ end }}
 
 {{- end }}{{/* end main */}}

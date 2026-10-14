@@ -1,0 +1,10 @@
+<aside class="reading-toc" id="reading-toc" aria-labelledby="reading-toc-title">
+  <div class="reading-toc-header">
+    <h2 id="reading-toc-title">{{ i18n "toc" }}</h2>
+    <button class="reading-toc-close" type="button" aria-label="{{ i18n "close_toc" }}">×</button>
+  </div>
+  <div class="reading-toc-links">{{ .Fragments.ToHTML 2 2 false }}</div>
+</aside>
+
+{{- $script := resources.Get "js/reading-toc.js" | minify | fingerprint }}
+<script defer src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"></script>

@@ -23,6 +23,12 @@
 - id: toc
   translation: "Table of Contents"
 
+- id: close_toc
+  translation: "Close table of contents"
+
+- id: toc_short
+  translation: "Contents"
+
 - id: translations
   translation: "Translations"
 

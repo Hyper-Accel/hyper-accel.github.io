@@ -19,7 +19,7 @@
 {{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) }}
 <body class="list" id="top">
 {{- else }}
-<body id="top">
+<body{{ if eq .Type "posts" }} class="reading-page"{{ end }} id="top">
 {{- end }}
     {{ partialCached "header.html" . .Page -}}
     <main class="main" id="main-content" tabindex="-1">
