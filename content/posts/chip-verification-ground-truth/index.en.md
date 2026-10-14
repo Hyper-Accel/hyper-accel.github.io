@@ -187,7 +187,7 @@ So we use fsim, a software model that mimics the chip's behavior.
 fsim also splits the large gap between the HF golden and the RTL into two steps, which helps narrow down the cause when results diverge.
 
 fsim is built by the simulator team.
-That is a third team, separate from both design and verification.
+It is another team, separate from both design and verification.
 Like the verification team, the simulator team builds fsim from the spec document.
 In effect, there is one more independent implementation that starts from the same spec.
 
