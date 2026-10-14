@@ -12,7 +12,7 @@ tags: ["Verification", "RTL", "Reference Model", "bit-exact", "LLM Inference"]
 categories: ["AI Hardware", "Semiconductor"]
 series: ["Verifying an LLM Inference Chip"]
 series_idx: 1
-summary: "When an AI model and the chip's design code (RTL) disagree, who is wrong? This post covers where the ground truth comes from at each level of LLM inference chip verification, and how splitting the comparisons makes it clear who owns a mismatch."
+summary: "When an AI model and the chip's RTL disagree, who is wrong? This post covers where the ground truth comes from at each level of LLM inference chip verification, and how splitting the comparisons makes it clear who owns a mismatch."
 description: "Where does the ground truth come from in LLM inference chip verification? We explain why the block level treats the spec document as ground truth, why the top level uses the AI model's output, and what each comparison in between catches."
 comments: true
 ---
@@ -27,7 +27,7 @@ Hello, I'm Yujeon Chang from the HyperAccel DV team.
 Using HyperAccel's actual verification flow as the example, this post looks at how we decide what counts as the "right answer" when verifying a **Large Language Model (LLM)** inference chip.
 
 Let's start with a question.
-When an AI model and the chip's design code (RTL) give different answers, who is actually wrong?
+When an AI model and the chip's RTL give different answers, who is actually wrong?
 
 Say we feed the same prompt into the AI model running in PyTorch and into the chip we designed.
 If dozens of tokens come out identical and then one position differs, is the chip wrong, or is the model?
@@ -50,11 +50,12 @@ This post comes down to two key points.
 
 First, a few terms used throughout this post.
 
-- **Register Transfer Level (RTL)**: The design code that describes how the chip behaves. It is written in a hardware description language such as Verilog and run in a simulator such as Synopsys VCS.
+- **Register Transfer Level (RTL)**: A design level that describes a digital circuit's behavior in terms of data transfers and operations between registers. It is usually written in a hardware description language such as Verilog or SystemVerilog, and its function and behavior are verified with a simulator such as Synopsys VCS. Design code written at this level is called RTL code, and this post simply calls it RTL.
 - **Block and Top**: A chip is divided into blocks. Block-level verification checks one block in isolation. Top-level verification checks the whole chip with all blocks connected.
 - **Reference model**: Software that takes the same input as the RTL and computes the expected output. We check whether the RTL's output matches it.
 - **functional simulator (fsim)**: A simulator that models the chip's architecture at the functional level. It is used to quickly verify instruction-level accuracy and to develop the software stack.
 - **bit-exact**: Two results match down to the last bit. No error is tolerated at all.
+- **tolerance**: A comparison criterion that treats two results as matching as long as their difference stays within a set range. Such differences come not from a wrong implementation but from differences in how the computation is done, such as the order of floating-point additions or numeric precision. A typical example is the same model giving slightly different results on a CPU and a GPU.
 
 Verification comes down to comparison.
 You feed the same input into two implementations and compare the outputs.
@@ -62,7 +63,7 @@ If they differ, something is wrong somewhere.
 But what you compare against determines which problems you can find.
 
 <!-- Diagram source: images/comparison-chain.en.svg (re-export to webp after editing) -->
-![At the block level, the block RTL and the reference model, both derived from the spec document, are compared bit-exact. At the top level, five comparisons connect the HF model's CPU and GPU goldens, fsim's torch and rtl modes, the RTL on ZeBu, and the Top RTL in top-level simulation](images/comparison-chain.en.webp)
+![At the block level, the Block RTL and the reference model, both derived from the spec document, are compared bit-exact. At the top level, five comparisons connect the HF model's CPU and GPU goldens, fsim's torch and rtl modes, the RTL on ZeBu, and the Top RTL in top-level simulation](images/comparison-chain.en.webp)
 
 The table below lists every comparison covered in this post.
 
@@ -94,7 +95,7 @@ More precisely, it is a reference model that a verifier builds separately, using
 At HyperAccel, RTL design and verification are handled by separate, independent teams.
 Block-level reference models are built by verifiers.
 They are based on the RTL spec document.
-Verifiers do not look at the RTL code to build the reference model.
+Verifiers do not look at the RTL to build the reference model.
 
 Why go to this trouble?
 If the same person implements something twice with the same thinking, they tend to repeat the same mistakes.
@@ -116,7 +117,7 @@ In general, in the following three cases, separate teams still end up sharing th
 
 1. **Using the designer's model as-is**: The verification team adopts a model built by the designer as its reference.
 2. **Asking the designer about an ambiguous spec**: The verifier asks the designer about an unclear part of the spec and builds the testbench from that answer.
-3. **Deriving expected values from the RTL**: The verifier reads the RTL code instead of the spec to compute expected values.
+3. **Deriving expected values from the RTL**: The verifier reads the RTL instead of the spec to compute expected values.
 
 In all three cases, the designer's interpretation leaks into verification.
 At that point, the two implementations are no longer independent.
@@ -275,8 +276,7 @@ Look at the criterion column in the comparison table again.
 Every comparison that directly involves the RTL is bit-exact.
 The only places that tolerate error are the two comparisons between fsim and the HF golden (③, ④).
 That's because fsim and the HF golden can both be correct and still differ in the last bits.
-Even PyTorch gives slightly different results on a CPU and a GPU.
-Floating-point results depend on the order of addition, and CPUs and GPUs differ in the order and method of their arithmetic.
+As we saw in the glossary, even PyTorch gives slightly different results on a CPU and a GPU.
 
 Tolerating error makes the comparison possible.
 But it comes at a cost.
@@ -302,11 +302,11 @@ Comparisons against the HF golden catch spec errors, but they can miss small err
 ## Conclusion: When Results Diverge, What Do You Suspect?
 
 Let's go back to the opening question.
-When an AI model and the RTL give different answers, who is wrong?
+When an AI model and the chip's RTL give different answers, who is wrong?
 
 The answer depends on which comparison the mismatch appeared in.
 
-- If the block RTL and the reference model differ, the implementation deviates from the spec.
+- If the Block RTL and the reference model differ, the implementation deviates from the spec.
 - If the Top RTL and fsim differ in top-level simulation, suspect integration between blocks or spec interpretation.
 - If fsim and the HF golden differ, suspect the spec or algorithm, the compiler, or fsim, and narrow it down layer by layer.
 - If the RTL on ZeBu and rtl-mode fsim differ, suspect the RTL or rtl-mode fsim.
