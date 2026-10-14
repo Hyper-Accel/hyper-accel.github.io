@@ -1,6 +1,6 @@
 ---
-date: '2026-10-08T16:00:00+09:00'
-draft: true
+date: '2026-10-14T10:35:01+09:00'
+draft: false
 title: 'Verifying an LLM Inference Chip, Part 1: Where Does the Ground Truth Come From?'
 cover:
   image: "images/cover.en.webp"
@@ -17,8 +17,6 @@ description: "Where does the ground truth come from in LLM inference chip verifi
 comments: true
 ---
 
-<!-- Translated from index.ko.md. Keep both files in sync. -->
-
 > This post is Part 1 of the **Verifying an LLM Inference Chip** series.
 > Part 1 covers where the "ground truth" in verification comes from.
 > Part 2 will cover how an emulator gets past the limits of slow simulation, and when you can say verification is done.
@@ -26,32 +24,24 @@ comments: true
 ## Introduction
 
 Hello, I'm Yujeon Chang from the HyperAccel DV team.
-This post is about how we decide what counts as the "right answer" when verifying a **Large Language Model (LLM)** inference chip.
-We'll use HyperAccel's actual verification flow as the example.
+Using HyperAccel's actual verification flow as the example, this post looks at how we decide what counts as the "right answer" when verifying a **Large Language Model (LLM)** inference chip.
 
-When an AI model and the chip's design code (RTL) give different answers, who is wrong?
+Let's start with a question.
+When an AI model and the chip's design code (RTL) give different answers, who is actually wrong?
 
-Say we feed the same prompt into two places.
-One is the AI model running in PyTorch. The other is the chip we designed.
-Dozens of tokens come out identical, and then one position differs.
-Is the chip wrong, or is the model?
-Or are both right?
+Say we feed the same prompt into the AI model running in PyTorch and into the chip we designed.
+If dozens of tokens come out identical and then one position differs, is the chip wrong, or is the model?
+It's even possible that both are right.
 
-If it were a software bug, you would fix it and redeploy.
-Chips don't work that way.
-Once a chip is manufactured, its circuits cannot be changed.
-Fixing a bug means changing the design and manufacturing the chip again.
-That costs months and a lot of money.
+A software bug can be fixed and redeployed, but chips are a different story.
+Once a chip is manufactured its circuits cannot be changed, so fixing a bug means changing the design and manufacturing the chip again, which costs months and a lot of money.
+That's why we have to make as sure as we can that the design is correct before manufacturing, and this work is called **verification**.
 
-So before manufacturing, we have to make as sure as we can that the design is correct.
-This work is called **verification**.
+When people hear "verification," they often think first of testbench languages or tools like the **Universal Verification Methodology (UVM)**.
+This post, however, sets the tools aside and asks a more basic question.
+What do you have to compare against before you can say something is "correct"? In other words, where does a chip's **ground truth** come from?
 
-When people hear "verification," they often think of testbench languages or tools like the **Universal Verification Methodology (UVM)**.
-This post skips the tools and asks a more basic question.
-What do you compare against before you can say something is "correct"?
-In other words, where does a chip's **ground truth** come from?
-
-This post makes two claims.
+This post comes down to two key points.
 
 1. There is no single ground truth. Each verification level gets its ground truth from a different source.
 2. Each comparison changes only one thing where possible. That way, just knowing which comparison failed tells you whose problem it is.
@@ -60,9 +50,10 @@ This post makes two claims.
 
 First, a few terms used throughout this post.
 
-- **Register Transfer Level (RTL)**: The design code that describes how the chip behaves. It is written in a hardware description language such as Verilog and can be run in a simulator.
+- **Register Transfer Level (RTL)**: The design code that describes how the chip behaves. It is written in a hardware description language such as Verilog and run in a simulator such as Synopsys VCS.
 - **Block and Top**: A chip is divided into blocks. Block-level verification checks one block in isolation. Top-level verification checks the whole chip with all blocks connected.
 - **Reference model**: Software that takes the same input as the RTL and computes the expected output. We check whether the RTL's output matches it.
+- **functional simulator (fsim)**: A simulator that models the chip's architecture at the functional level. It is used to quickly verify instruction-level accuracy and to develop the software stack.
 - **bit-exact**: Two results match down to the last bit. No error is tolerated at all.
 
 Verification comes down to comparison.
@@ -84,7 +75,7 @@ The table below lists every comparison covered in this post.
 | ⑤ | RTL (ZeBu) ↔ fsim (rtl) | bit-exact | Differences between rtl mode and the RTL, errors in the RTL itself |
 
 There is one important principle here.
-**Each comparison changes only one thing where possible.**
+**Each comparison axis changes only one thing where possible.**
 
 If you are a software engineer, think of `git bisect`.
 `git bisect` halves a range of commits until it finds the one that introduced a bug.
@@ -200,10 +191,8 @@ torch mode is used for fast debugging and functional verification.
 rtl mode is a C model (cmodel) that follows the chip's behavior exactly, aiming to produce results identical to the RTL down to the bit.
 
 To run an AI model on the chip, a compiler has to turn the model into a program the chip can execute.
-HyperAccel is moving this work to its own compiler, [Legato](/en/posts/what-is-legato/).
-Before Legato, we used RefAsm (reference assembly), assembly written by hand.
-In this post, we refer to both as "the compiler."
-fsim and the RTL on ZeBu both run the program produced by this compiler.
+At HyperAccel, this is the job of our own compiler, [Legato](/en/posts/what-is-legato/).
+fsim and the RTL on ZeBu both run the program produced by Legato.
 
 ### Top-Level Simulation (②): Do the Values Match fsim?
 
@@ -339,6 +328,6 @@ It will also discuss when you can say that "verification is done."
 
 To avoid manufacturing a chip twice, someone has to keep asking, "Is this really right?" all the way to the end.
 At HyperAccel, the design, verification, simulator, and compiler teams each bring their own ground truth to look at the same chip.
-If you're interested in tracing where the ground truth comes from and designing the chain of comparisons, please apply anytime!
+If you're interested in tracing where the ground truth comes from and designing the comparison axes, please apply anytime!
 
 **Careers**: https://hyperaccel.career.greetinghr.com/en/guide

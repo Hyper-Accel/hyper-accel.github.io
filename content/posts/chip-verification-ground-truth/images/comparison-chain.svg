@@ -39,7 +39,7 @@
   <rect x="20" y="330" width="1160" height="530" rx="16" fill="#F7F4FA" stroke="#DDD5E6"/>
   <text x="44" y="368" font-size="22" font-weight="700" fill="#222">Top 레벨</text>
   <text x="152" y="368" font-size="18" fill="#555">정답 = AI 모델의 결과 (HF golden)</text>
-  <text x="44" y="398" font-size="15" fill="#777">fsim과 ZeBu의 RTL은 같은 컴파일러 결과(Legato 또는 RefAsm)를 실행합니다</text>
+  <text x="44" y="398" font-size="15" fill="#777">fsim과 ZeBu의 RTL은 같은 컴파일러(Legato) 결과를 실행합니다</text>
 
   <rect x="60" y="425" width="240" height="76" rx="10" fill="#EEE6F7" stroke="#7D4BB3" stroke-width="2"/>
   <text x="180.0" y="458" font-size="21" font-weight="700" text-anchor="middle" fill="#222">HF 모델 (CPU)</text>
