@@ -37,7 +37,7 @@ A software bug can be fixed and redeployed, but chips are a different story.
 Once a chip is manufactured its circuits cannot be changed, so fixing a bug means changing the design and manufacturing the chip again, which costs months and a lot of money.
 That's why we have to make as sure as we can that the design is correct before manufacturing, and this work is called **verification**.
 
-When people hear "verification," they often think first of testbench languages or tools like the **Universal Verification Methodology (UVM)**.
+When people hear "verification," they often think first of testbench languages or tools like the Universal Verification Methodology (UVM).
 This post, however, sets the tools aside and asks a more basic question.
 What do you have to compare against before you can say something is "correct"? In other words, where does a chip's **ground truth** come from?
 
