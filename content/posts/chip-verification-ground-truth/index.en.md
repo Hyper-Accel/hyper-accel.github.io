@@ -233,7 +233,7 @@ This comparison also tolerates a small error.
 ### Step 3 (⑤): The RTL on ZeBu and rtl Mode, Down to the Bit
 
 Finally, the same compiler output runs on the actual RTL.
-The RTL runs on **ZeBu**, an emulator from Synopsys.
+The RTL runs on ZeBu, an emulator from Synopsys.
 An emulator loads the RTL onto dedicated hardware and runs it far faster than a simulator.
 Part 2 will cover emulators in more detail.
 
