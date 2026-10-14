@@ -25,13 +25,13 @@ keywords: [
 
 ### Introduction
 
-Hello! I'm Hyunjun Park from the CL (Compute Library) team at HyperAccel. In [Part 1]({{< ref "/posts/torch-compile-anatomy" >}}) we took `torch.compile()` apart into three components: TorchDynamo, AOTAutograd, and TorchInductor (Dynamo and Inductor from here on). Dynamo pulls a graph out of Python code, AOTAutograd tidies that graph up, and Inductor turns the tidied graph into kernels.
+Hello! I'm Hyunjun Park from the CL (Compute Library) team at HyperAccel. In [Part 1]({{< ref "/posts/torch-compile-anatomy" >}}) we took `torch.compile()` apart into three components: TorchDynamo, AOTAutograd, and TorchInductor (Dynamo and Inductor from here on). Dynamo pulls a graph out of Python code, AOTAutograd tidies that graph up, and Inductor turns the tidied graph into kernels. (Part 1 covers what a graph is, if you need a refresher.)
 
-At the end of Part 1, I stressed that these three components are **independently replaceable**. This post starts from there. Taking Python code in and handing kernels out could have been done by a single compiler. So why did PyTorch bother splitting it into three stages? And if each stage can be swapped out, **who swaps what, and what do they get out of it?**
+Part 1 established that `torch.compile()` is made of three main components. This post starts from a question: why did PyTorch bother splitting it into three stages? What do you gain from that split, and who is it for?
 
-I think the answer has less to do with technology than with ecosystems. So Part 1 looks at how PyTorch drew people in and built its ecosystem, and which direction it has been widening that ecosystem since 2.0. Part 2 covers what passes across each stage boundary and who uses each boundary, and how. Part 3 looks at the companies building AI chips that aren't GPUs, as the case that uses this structure most broadly.
+I think the answer has less to do with technology than with ecosystems. So we'll first look at how PyTorch drew people in and built its ecosystem, and which direction it has been widening that ecosystem since 2.0. Then we'll go through what passes across each stage boundary and who uses each boundary, and how, and close with the cases that use this structure most broadly.
 
-This series runs to three parts. The third and final part will share what I took away from attending PyTorch Conference 2026.
+This series runs to three parts. I'll be attending PyTorch Conference 2026 in October 2026, and the third part will cover the latest trends I learn there and what I take away from it.
 
 ---
 
@@ -39,35 +39,31 @@ This series runs to three parts. The third and final part will share what I took
 
 ### Software is an ecosystem game
 
-Think about how you pick a messenger app. What you look at first isn't the feature list; it's **where your friends are**. A slightly better app with none of your friends on it isn't worth using.
-
-But a messenger that gathers enough people also gathers features. Gifting, payments, reservations: features that only make sense with lots of users show up, and those features pull in more people. **People bring features, and features bring more people.** Once that loop gets going, a latecomer can hardly catch up on features alone.
+Think about how you pick a messenger app. What you look at first isn't the feature list; it's **where your friends are**. Even when a new messenger with better features comes out, we end up staying on the one where more people already are. And a messenger with lots of people also gathers features. Gifting, payments, reservations: features that only make sense with lots of users show up, and those features pull in more people. People bring features, and features bring more people. Once that loop gets going, it gets harder and harder for other messengers to win.
 
 Deep learning frameworks work the same way. For users, the rational choice is the framework with the most examples, answered questions, and published models. An environment where one search gets you unstuck is productivity in itself. The same goes for people building libraries and tools: build on the framework with the most users, and your work gets used. For both sides, **choosing what most people already use is the most rational choice.**
 
+![The ecosystem flywheel around PyTorch. Starting from easy eager execution, researchers and developers gather, paper code and Hugging Face models pile up, tools such as vLLM, SGLang, compilers, and hardware plug in, and more people choose PyTorch, with arrows closing the loop](images/00-ecosystem-flywheel-en.png)
+
 ### How PyTorch drew people in
 
-The framework that spun this loop best is PyTorch. As we saw in Part 1, PyTorch lowered the barrier to entry dramatically with eager execution, running one line at a time. You could write a model the way you write Python code and print intermediate values to debug it. Researchers came first, drawn by that convenience.
-
-Once researchers arrived, the rest followed. Code for new papers was released in PyTorch, and developers who wanted to use that code right away followed. Model hubs like Hugging Face and inference engines like vLLM and SGLang were built on top of PyTorch. The number of compilers and hardware platforms running PyTorch grew, one by one.
+The framework that spun this loop best is PyTorch. As we saw in Part 1, PyTorch lowered the barrier to entry dramatically by running code one line at a time (what we call eager execution). You could write a model the way you write Python code and print intermediate values to debug it. Developers came first, drawn by that convenience, and once they arrived the rest followed. Model hubs like Hugging Face and inference engines like vLLM and SGLang were built on top of PyTorch, and it became harder and harder for developers to find an alternative to PyTorch.
 
 ### What torch.compile had to protect
 
-In March 2023, `torch.compile()` arrived with PyTorch 2.0. It keeps the convenience of eager execution while capturing a graph to boost performance.
+In March 2023, `torch.compile()` arrived with PyTorch 2.0. It keeps the convenience of eager execution while boosting performance.
 
 By then, though, PyTorch was already a huge ecosystem. It wasn't just a lot of user code. Tools that take PyTorch models and optimize them their own way were already established. NVIDIA's TensorRT turned PyTorch models into fast inference engines, and Google's PyTorch/XLA was the path for running PyTorch code on TPUs.
 
-I think a new compiler had to protect two things to avoid breaking that ecosystem. First, users should barely have to change their code. Second, tools like these should be able to come inside `torch.compile()`. Had `torch.compile()` been a closed design that only used PyTorch's own compiler and Triton, users would have had to pick between `torch.compile()` and the tools they already relied on, and the ecosystem would have split. The first was solved by Dynamo, which we saw in Part 1. The second is the subject of this post.
+I think a new compiler had to protect two things to avoid breaking that ecosystem. First, users should barely have to change their code. Second, tools like these should be able to come inside `torch.compile()`. Had `torch.compile()` been a closed design that only used PyTorch's own compiler and Triton, users would have had to pick between `torch.compile()` and the tools they already relied on, and the ecosystem would have split.
 
 ![Timeline of extension features for outside hardware and compilers from PyTorch 2.0 to 2.13: torch.compile and rename_privateuse1_backend in 2.0, automatic dynamic shapes and the Inductor device registration API in 2.1, custom_op in 2.4, device extension autoloading and Intel GPU support in 2.5, torch.accelerator in 2.6, the OpenReg rewrite, Accelerator Integration docs, and Stable ABI in 2.9, expanded integration docs in 2.10, and set_default_backend in 2.13](images/01-release-timeline-en.png)
 
-At launch, Inductor could generate two kinds of code: Triton for GPUs and C++ for CPUs. But look at the releases since, and a large share of the new features **widen the room for compilers and hardware from outside PyTorch to plug in**: device code generator registration (2.1), Python custom ops (2.4), device extension autoloading and Intel GPU support (2.5), the device-agnostic `torch.accelerator` API (2.6), and official accelerator integration docs (2.9).
-
 ### Pointing outward
 
-Instead of building everything itself, PyTorch has been moving toward **widening the room for outside compilers and hardware to come in**. Most of that room already existed in 2.0 and 2.1. What changed with each version was less the number of entry points than **how official they became**: approaches you once had to dig through internal code to find turned into public APIs and documentation.
+At launch, Inductor could generate two kinds of code: Triton for GPUs and C++ for CPUs. But look at the releases since, and a large share of the new features **open paths for compilers and hardware from outside PyTorch to plug in**: device code generator registration (2.1), Python custom ops (2.4), device extension autoloading and Intel GPU support (2.5), the device-agnostic `torch.accelerator` API (2.6), and official accelerator integration docs (2.9).
 
-In messenger terms, this is the stage where a platform with enough people starts making room for outsiders to add features. And in `torch.compile()`, what created that room is the three-stage structure itself.
+In short, instead of building everything itself, PyTorch has been moving toward **adding more paths for outside compilers and hardware to come in**. With each release, there are more public APIs and documents for connecting outside modules. And these paths are possible inside `torch.compile()` because `torch.compile()` was split into three stages in the first place. Part 2 looks at why.
 
 ---
 
@@ -75,92 +71,106 @@ In messenger terms, this is the stage where a platform with enough people starts
 
 ### If it were one piece
 
-Let's imagine the opposite: `torch.compile()` as a single monolithic compiler that takes Python code and emits Triton code.
+Let's imagine the opposite: `torch.compile()` as a single monolithic compiler that takes Python code and emits Triton code. A team that wants another compiler like TensorRT would have to do graph capture themselves, interpreting bytecode and setting up guards. A company bringing up new hardware would have to rebuild everything from graph capture to code generation. And when PyTorch improved graph capture, outside users wouldn't get the benefit.
 
-A team that wants another compiler like TensorRT would have to do graph capture themselves, interpreting bytecode and setting up guards. A company bringing up new hardware would have to rebuild everything from graph capture to code generation. And when PyTorch improved graph capture, outside users wouldn't get the benefit.
+Split it into three stages and connect them with **data in a defined format**, though, and the story changes. Whoever needs a given format can pick it up at that boundary, and whoever wants to replace just one stage can keep using the rest as is. You use `torch.compile()` as far as you need, then branch off at the boundary you want and attach your own tool.
 
-Split into three stages, the story changes. Each stage outputs **data in a defined format**. Whoever needs that format can pick it up at that boundary, and whoever wants to replace just one stage can reuse the rest as is. The boundaries between stages become a kind of contract.
-
-![The three stages of torch.compile and who uses each boundary. Python code passes through TorchDynamo, AOTAutograd, and TorchInductor to become kernel code. Dynamo's output, an FX graph plus guards, is consumed by other compiler backends such as TensorRT, OpenVINO, and XLA, and by torch.export. AOTAutograd's output, a core ATen graph, is consumed by backends with their own graph compiler. Inductor's output, kernel code, goes to NVIDIA, AMD, and Intel GPUs through Triton backends, or to new chips through a swapped code generator. Underneath, the dispatcher and PrivateUse1 form the floor for eager execution](images/02-three-stages-en.png)
+![The three stages of torch.compile and who uses each boundary. Python code passes through TorchDynamo, AOTAutograd, and TorchInductor to become kernel code. Dynamo's output, an FX graph plus guards, is consumed by other compiler backends such as TensorRT, OpenVINO, and XLA, and by torch.export. AOTAutograd's output, a core ATen graph, is consumed by backends with their own graph compiler. Inductor's output, kernel code, goes to NVIDIA, AMD, and Intel GPUs through Triton backends, or to new chips through a swapped code generator. Underneath, the dispatcher and PrivateUse1 run the ops that aren't compiled (fallback) eagerly](images/02-three-stages-en.png)
 
 ### Boundary ①: Dynamo's output, for anyone who needs a graph
 
-Dynamo produces an FX graph and guards. PyTorch solved the hardest part, extracting a graph, once, and lets everyone share it. The main users of this boundary are other compilers. Pass a function to `backend` and the graph Dynamo extracted is handed to that function. NVIDIA's TensorRT (`backend="torch_tensorrt"`), Intel's OpenVINO (`backend="openvino"`), and Google's XLA (`backend="openxla"`) all plug in here. For users, changing one string changes the compiler.
+Dynamo produces an FX graph and guards. PyTorch solved the hardest part, extracting a graph, once, and lets everyone share it.
 
-`torch.export`, a deployment tool that extracts a model so it can run without Python, also captures graphs with Dynamo in strict mode.
+The main users of this boundary are **other compilers**. By "other compilers" I mean separate compilers that, like Inductor, take a graph and do the whole job of optimizing it and generating code to run. NVIDIA's TensorRT (`backend="torch_tensorrt"`), Intel's OpenVINO (`backend="openvino"`), and Google's XLA (`backend="openxla"`) are the main examples. Pass the name to `backend`, and the graph Dynamo extracted goes to that compiler, which takes over from there. In other words, it does what AOTAutograd and Inductor would do (cleaning up ops, grouping them, laying out memory, generating kernels) in its own way. Some of them borrow just AOTAutograd's cleanup when they need it.
 
-Let's see it directly. Here is a small model that applies relu after a linear layer and then adds 1 to the result in place.
+That is a different scope from boundary ③, which we'll see later. Boundary ③ keeps Inductor's decisions about which ops to group and how to use memory, and only changes how the code gets written at the end. A compiler at boundary ① makes all of those decisions itself.
+
+So why have a separate compiler instead of using PyTorch's Inductor? These compilers existed before `torch.compile()`, and each has been tuned for years for particular hardware or uses. TensorRT has kernels built for inference on NVIDIA GPUs and quantization optimizations such as INT8 and FP8; OpenVINO has optimizations for Intel CPUs and GPUs. XLA is the compiler for TPUs, where Triton doesn't run. They are also independent tools that take models from other frameworks like TensorFlow, JAX, and ONNX, not just PyTorch. Rather than rebuilding an already good compiler inside Inductor, it's more natural to hand it the graph and use it as is. For users, changing one string changes the compiler.
+
+Let's see it directly by passing `backend` a function that just prints the graph it receives.
 
 ```python
 import torch
+import torch.nn.functional as F
+
+
+def show_graph(gm, example_inputs):
+    print(gm.code)      # print the graph the backend received
+    return gm.forward   # run it unchanged
+
+
+def f(x, w, b):
+    return F.relu(F.linear(x, w, b))
+
+
+x, w, b = torch.randn(2, 16), torch.randn(16, 16), torch.randn(16)
+torch.compile(f, backend=show_graph)(x, w, b)
+```
+
+Here are the key lines of the output (PyTorch 2.10).
+
+```text
+linear = torch._C._nn.linear(l_x_, l_w_, l_b_)
+relu = torch.nn.functional.relu(linear)
+```
+
+The `F.linear` and `F.relu` the user wrote come through as a graph, as written. Whoever receives it doesn't have to interpret Python; they just process the ops they're given in their own way.
+
+### Boundary ②: AOTAutograd's output, fewer ops
+
+Now let's receive the same function after AOTAutograd. Just wrap the `show_graph` from above in `aot_autograd`.
+
+```python
 from torch._dynamo.backends.common import aot_autograd
 from torch._decomp import core_aten_decompositions
 
-
-class M(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc = torch.nn.Linear(16, 16)
-
-    def forward(self, x):
-        return torch.relu(self.fc(x)).add_(1)
-
-
-def show_dynamo_graph(gm, example_inputs):
-    print(gm.code)  # Boundary ①: the graph Dynamo extracted
-    return gm.forward
-
-
-def show_aten_graph(gm, example_inputs):
-    print(gm.code)  # Boundary ②: the graph AOTAutograd tidied up
-    return gm.forward
-
-
-aten_backend = aot_autograd(
-    fw_compiler=show_aten_graph,
-    decompositions=core_aten_decompositions(),  # rules for lowering to core ATen
-)
-
-x = torch.randn(2, 16)
-with torch.no_grad():  # inference example, so no backward graph is built
-    torch.compile(M(), backend=show_dynamo_graph)(x)
-    torch.compile(M(), backend=aten_backend)(x)
+aten_backend = aot_autograd(fw_compiler=show_graph, decompositions=core_aten_decompositions())
+torch.compile(f, backend=aten_backend)(x, w, b)
 ```
-
-Running this on PyTorch 2.10 prints the graph each backend received. Here are the key lines.
 
 ```text
-# Graph received at boundary ①
-linear = torch._C._nn.linear(l_x_, weight, bias)
-relu = torch.relu(linear)
-add_ = relu.add_(1)
-
-# Graph received at boundary ②
-permute = torch.ops.aten.permute.default(arg0_1, [1, 0])
-addmm = torch.ops.aten.addmm.default(arg1_1, arg2_1, permute)
+permute = torch.ops.aten.permute.default(arg1_1, [1, 0])
+addmm = torch.ops.aten.addmm.default(arg2_1, arg0_1, permute)
 relu = torch.ops.aten.relu.default(addmm)
-add = torch.ops.aten.add.Tensor(relu, 1)
 ```
 
-The graph at boundary ① keeps the user's code as written, including a composite op like `linear` and an in-place op like `add_`. Whoever receives it has to handle all of those forms, but in exchange is free to do anything.
+`linear` has been broken into a transpose (`permute`) and a fused matrix multiply-add (`addmm`), and every op now carries a name from **core ATen**, PyTorch's set of basic ops. This is the decomposition we saw in Part 1.
 
-### Boundary ②: AOTAutograd's output, a tidy graph plus backward
-
-After AOTAutograd, every op is expressed in the names of **ATen**, PyTorch's operator library. `linear` has been broken into `permute` and `addmm`, and the in-place `add_` has become `add`, which creates a new tensor. This is the result of the functionalization and decomposition we saw in Part 1.
-
-The value of this boundary is clear from the numbers. As of PyTorch 2.14, ATen has more than 2,500 ops counting overloads, but core ATen has about 190. AOTAutograd also builds the backward graph needed for training. That's why backends with their own graph compiler usually choose this boundary. Just wrap your backend in `aot_autograd` as in the example above, and you reuse PyTorch's graph capture, cleanup, and backward pass without Inductor.
+The value of this boundary is clear from the numbers. PyTorch has more than 2,500 ops counting overloads (as of 2.14), but core ATen has about 190. Take the graph at this boundary and you **only have to handle about 190 ops instead of 2,500-plus.** That's why backends with their own graph compiler usually choose this boundary.
 
 ### Boundary ③: Inductor's output, swapping only the code generator
 
-The last boundary sits inside Inductor. In Part 1, Inductor built kernel source by **swapping each primitive operation in an expression like `y[i] = floor(x[i])` for a function that returns a string**. Plug in Triton rules and you get Triton code; plug in C++ rules and you get C++ code.
+The last boundary sits inside Inductor. Say we compile `y = x * 2 + 1`. Inductor first rewrites the computation as a per-element expression, `y[i] = x[i] * 2 + 1`. Grouping the multiply and the add into one kernel, that is, fusion, is also done at this point. **Which language to write that expression in** is decided at the very end.
 
-The most natural users of this boundary are GPUs. The Triton compiler turns Inductor's Triton code into actual GPU code, so any GPU that Triton supports benefits with almost no changes to Inductor. AMD GPUs and the Intel GPU support added in 2.5 work this way.
+Written for a GPU, it becomes Triton code (key lines only).
 
-Hardware that Triton doesn't fit swaps the rules themselves. Register a code generator for your device with `register_backend_for_device`, and Inductor hands you its loop-level **Intermediate Representation (IR)** after lowering, fusion, and memory planning are done. The vendor only has to build the part that prints that result in its own language. That said, Inductor's IR and scheduler were designed with GPUs and CPUs in mind, and this registration API is still private. If even the unit of fusion has to be decided around the hardware, it's better to take the graph at boundary ② and compile it yourself.
+```python
+tmp0 = tl.load(in_ptr0 + x0)      # read x[i]
+tmp2 = tmp0 * 2.0                 # * 2
+tmp4 = tmp2 + 1.0                 # + 1
+tl.store(out_ptr0 + x0, tmp4)     # write y[i]
+```
 
-### Beneath the three stages: the dispatcher and PrivateUse1
+Written for a CPU, the same expression becomes C++. Here is a trimmed version of what PyTorch 2.10 actually generated on a CPU.
 
-Regions split off by graph breaks and ops the compiler doesn't support run eagerly. So new hardware also needs **a floor that takes eager execution**, separate from compilation. The dispatcher we saw in Part 1 picks a kernel based on which device a tensor lives on, and PyTorch reserves a dispatch key called **PrivateUse1** for devices outside the core. Name it with `torch.utils.rename_privateuse1_backend("npu")`, register a kernel for each ATen op, and `tensor.to("npu")`, `torch.accelerator`, and autograd all work on that device.
+```cpp
+auto tmp0 = Vectorized<float>::loadu(in_ptr0 + x0);  // read x[i]
+auto tmp3 = tmp0 * Vectorized<float>(2.0);           // * 2
+auto tmp6 = tmp3 + Vectorized<float>(1.0);           // + 1
+tmp6.store(out_ptr0 + x0);                           // write y[i]
+```
+
+The two snippets are the same computation written in different languages. The order of reading, multiplying, adding, and writing was already decided by Inductor. Whoever uses this boundary replaces only this **"writing" part** with their own.
+
+GPU vendors barely need to change even that. The Triton compiler turns the Triton code above into machine code for each GPU, so AMD and Intel GPUs that Triton supports use the same code as is. A new chip that Triton doesn't fit builds a third way of writing it and registers it with `register_backend_for_device`. Then the same `y[i] = x[i] * 2 + 1` comes out in that chip's language.
+
+That said, the way Inductor groups ops was designed around GPUs and CPUs, and this registration API is still private. If the grouping itself has to be decided around the chip, it's better to take the graph at boundary ② and compile it yourself.
+
+### What doesn't get compiled: fallback and PrivateUse1
+
+`torch.compile()` can't compile everything. Regions split off by graph breaks and ops the compiler doesn't support aren't compiled; they run the original eager way instead. This is called **fallback**. For new hardware to be really usable, that fallback has to run on the hardware too.
+
+PrivateUse1 solves the fallback. The dispatcher we saw in Part 1 picks a kernel based on which device a tensor lives on, and PyTorch reserves a dispatch key called **PrivateUse1** for devices outside the core. Name it with `torch.utils.rename_privateuse1_backend("npu")` and register a kernel for each ATen op, and fallback ops run on that device too. `tensor.to("npu")`, `torch.accelerator`, and autograd come along with it.
 
 Ops that aren't in ATen are defined with `torch.library.custom_op`. If you also register a fake implementation that only reports the output's shape and dtype, Dynamo can **keep the op as a single node in the graph**, so it works in both eager and compiled code.
 
@@ -168,42 +178,38 @@ Ops that aren't in ATen are defined with `torch.library.custom_op`. If you also 
 
 | Boundary | What it hands over | Who uses it | What they gain |
 | --- | --- | --- | --- |
-| **① Dynamo's output** | FX graph + guards | Compiler backends like TensorRT, OpenVINO, XLA, plus `torch.export` | A graph without interpreting Python themselves |
-| **② AOTAutograd's output** | core ATen graph (+ backward graph) | Backends with their own graph compiler | About 190 ops to cover, and training support comes along |
-| **③ Inductor's output** | Kernel code | GPUs supported by Triton, new hardware with a swapped code generator | Reuse of fusion, scheduling, and memory planning |
-| **Floor: the dispatcher** | One op (eager call) | Every device | Eager execution, autograd, and shared APIs |
+| **① Dynamo's output** | A graph of the ops exactly as the user wrote them | Compiler backends like TensorRT, OpenVINO, XLA, plus `torch.export` | No need to interpret Python code |
+| **② AOTAutograd's output** | A graph with only core ATen ops left | Backends with their own graph compiler | Ops to handle drop from 2,500+ to about 190 |
+| **③ Inductor's output** | A per-element expression with grouping already done | GPUs supported by Triton, new chips with a swapped code generator | Only the "writing" part needs to be built |
+| **Fallback: the dispatcher** | One op that wasn't compiled (eager call) | Every device | Non-compiled parts still run on that device |
 
 ---
 
 ## Part 3. How chips that aren't GPUs use this structure {#part3}
 
-The companies that use this structure most broadly are the ones building AI chips that aren't GPUs, commonly called **Neural Processing Units (NPUs)**. Triton often doesn't fit them as is, so they have to come in directly at boundary ② or ③, and they have to build the floor themselves too.
+The companies that use this structure most broadly are the ones building AI chips that aren't GPUs, commonly called **Neural Processing Units (NPUs)**. Triton often doesn't fit them as is, so they have to come in directly at boundary ② or ③, and they have to handle fallback themselves too. Part 3 takes a quick look at three companies that actively use `torch.compile()`.
 
-### Huawei Ascend: a path at every boundary
+### Huawei Ascend: both boundary ② and ③
 
-Huawei's Ascend is the case that uses the most boundaries at once. The `torch_npu` package covers the floor by naming PrivateUse1 `npu`. On the compile side there are two paths. **TorchAir** takes the graph at boundary ②, after AOTAutograd with NPU-specific decompositions, and hands it to Ascend's **Graph Engine (GE)**. At the same time, `torch_npu` registers an `npu` device with Inductor and generates code at boundary ③ through Triton-Ascend and others.
+Huawei's Ascend uses **both boundary ② and ③**. At boundary ②, a backend called TorchAir takes the tidied graph and hands it to Ascend's own graph engine. At boundary ③, it registers an Ascend code generator with Inductor. The device is connected by naming PrivateUse1 `npu`.
 
-The strategy is to have Ascend there whichever way the user comes in. The cost is keeping several paths in step with each PyTorch release.
+### Intel Gaudi: boundary ②
 
-### Intel Gaudi: take the graph at boundary ② and use its own compiler
+Intel Gaudi uses **boundary ②**. A backend called `hpu_backend` takes the tidied graph and hands it to Gaudi's own graph compiler, without going through Inductor. The `hpu` device isn't PrivateUse1 but a device type built into PyTorch core.
 
-Intel Gaudi chose boundary ②. Its `hpu_backend` calls `aot_autograd` right away, receives an ATen graph that has also gone through Gaudi-specific decompositions, and passes it to Gaudi's own graph compiler. Gaudi's docs state that `backend="inductor"` is not supported. The choice is to let Gaudi's own compiler, which knows the hardware best, decide how to group ops and lay out memory. The floor is a little unusual: Gaudi's `hpu` isn't a PrivateUse1 name but a device type built into PyTorch core.
+### IBM Spyre: boundary ③
 
-### IBM Spyre: swap only the code generator at boundary ③
-
-IBM's Spyre chose boundary ③. The open-source `torch-spyre` repository names PrivateUse1 `spyre` and registers a code generator for the `spyre` device with Inductor, **extending Inductor from the outside**. What Inductor emits is a Spyre intermediate representation rather than Triton, and IBM's own compiler produces the final binary. The line is drawn so that Inductor handles fusion and scheduling, and only chip-specific optimization happens afterward.
-
-Interestingly, Spyre used to rely on a `sendnn` backend that bypassed Inductor. According to the [PyTorch Conference Europe 2026 talk abstract](https://pytorchconferenceeu2026.sched.com/event/2Hiqa), moving to an Inductor-based design let them remove a large part of their own compiler code. It's a case where the choice of boundary changed how much code they have to maintain.
+IBM's Spyre uses **boundary ③**. It registers a Spyre code generator with Inductor, so the computation Inductor grouped is written out as Spyre code, and IBM's own compiler handles the final step. The device is connected by naming PrivateUse1 `spyre`. Spyre used to bypass Inductor, and according to a [talk abstract](https://pytorchconferenceeu2026.sched.com/event/2Hiqa), moving to boundary ③ let them cut a large part of their own compiler code.
 
 ### Side by side
 
-| | Boundary used | Floor (device) | What they built | Gains / costs |
-| --- | --- | --- | --- | --- |
-| **Huawei Ascend** | ② (TorchAir) + ③ (Inductor) | PrivateUse1 `npu` | GE integration, code generation backends such as Triton-Ascend | Covers every path / several paths to maintain |
-| **Intel Gaudi** | ② | Built-in `hpu` | Graph compiler, compiled-graph cache | Makes its own optimization decisions / doesn't use Inductor's fusion |
-| **IBM Spyre** | ③ | PrivateUse1 `spyre` | Scheduling and wrapper codegen classes, dedicated lowering, final compiler | Less in-house compiler code / must follow Inductor IR and private APIs |
+| | Boundary used | How it connects | Device |
+| --- | --- | --- | --- |
+| **Huawei Ascend** | ② + ③ | ②: TorchAir → its own graph engine / ③: code generator registered with Inductor | PrivateUse1 `npu` |
+| **Intel Gaudi** | ② | `hpu_backend` → its own graph compiler | Built-in `hpu` |
+| **IBM Spyre** | ③ | Code generator registered with Inductor → its own compiler | PrivateUse1 `spyre` |
 
-All three reuse boundary ①'s graph capture as is and have a floor in place. Where they differ is between boundaries ② and ③, that is, **"how many hardware decisions to leave to Inductor."** The more you leave to it, the less you build; the less you leave, the more you decide for your hardware yourself.
+All three reuse boundary ①'s graph capture as is and handle fallback on their own devices. Where they differ is between boundaries ② and ③, that is, **"how many hardware decisions to leave to Inductor."** The more you leave to it, the less you build; the less you leave, the more you decide for your hardware yourself.
 
 For reference, HyperAccel's LPU takes the graph at boundary ② like Gaudi does, and builds kernels with our own language, [Legato]({{< ref "/posts/what-is-legato" >}}). See the [Legato documentation](https://legato-docs.hyperaccel.net/latest/) for details.
 
@@ -213,7 +219,7 @@ For reference, HyperAccel's LPU takes the graph at boundary ② like Gaudi does,
 
 Back to the opening question: why is `torch.compile()` split into three stages?
 
-I think it's because each boundary is an entry point for a different kind of participant. Compilers and deployment tools that need a graph come in at boundary ①, those with their own graph compiler at boundary ②, and new hardware at boundary ③. Underneath sits the dispatcher, holding up eager execution. Anyone can come in at the boundary they need and reuse the rest, and users enjoy the result while barely changing their code.
+I think it's because each boundary is an entry point for a different kind of participant. Compilers and deployment tools that need a graph come in at boundary ①, those with their own graph compiler at boundary ②, and new hardware at boundary ③. And whatever isn't compiled falls back to the dispatcher and PrivateUse1. Anyone can come in at the boundary they need and reuse the rest, and users enjoy the result while barely changing their code.
 
 In messenger terms, this is a platform with plenty of people making room for features. Room brings features, and features bring more people. The more room PyTorch makes, the more firmly it holds the position of "whatever compiler, whatever hardware, you use it through PyTorch," and those who come in don't have to win users over from scratch.
 
