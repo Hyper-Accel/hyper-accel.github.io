@@ -1,6 +1,5 @@
 ---
 date: '2026-02-19T14:16:19+09:00'
-draft: false
 title: '[AI Agent - Part 01] From Copy-Paste to Autonomous Agents: A Subtle Introduction'
 cover:
   image: "images/using-ai.png"

@@ -1,6 +1,5 @@
 ---
 date: '2025-11-10T09:38:03+09:00'
-draft: false
 title: 'Pytorchcon2025 Report'
 cover:
   image: "moscone_center.JPG"

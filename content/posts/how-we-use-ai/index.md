@@ -1,6 +1,5 @@
 ---
 date: '2026-02-19T14:16:04+09:00'
-draft: false
 title: '[AI Agent - Part 01] Copy & Paste에서 코딩 에이전트까지: 조용한 변화의 시작'
 cover:
   image: "images/using-ai.png"

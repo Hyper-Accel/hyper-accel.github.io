@@ -1,6 +1,5 @@
 ---
 date: '2025-11-10T09:38:03+09:00'
-draft: false
 title: 'Pytorchcon 2025 참관기'
 cover:
   image: "moscone_center.JPG"

@@ -1,6 +1,5 @@
 ---
 date: '2026-06-04T10:12:00+09:00'
-draft: false
 title: '[메모리 이해하기 - Part 04] CXL 이해하기'
 cover:
   image: "01-cxl-position.webp"

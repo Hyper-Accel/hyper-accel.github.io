@@ -1,6 +1,5 @@
 ---
 date: '2026-03-27T10:38:13+09:00'
-draft: false
 title: '[K8s 개발 환경 구축기 - Part 03] LPU를 위한 Kubernetes Device Plugin'
 cover:
   image: "images/kubernetes_with_devices.png"

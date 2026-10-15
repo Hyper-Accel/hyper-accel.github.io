@@ -1,6 +1,5 @@
 ---
 date: '2026-05-28T13:42:34+09:00'
-draft: false
 title: '[Memory in the AI Era - Part 03] The Remaining Challenges of HBF'
 cover:
   image: "images/cover.png"

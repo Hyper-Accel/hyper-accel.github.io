@@ -1,6 +1,5 @@
 ---
 date: '2026-04-27T10:00:00+09:00'
-draft: false
 title: '[지피지기 - Part 05] Cerebras와 웨이퍼 스케일 엔진'
 cover:
   image: "images/00-cover-cerebras-wse.png"

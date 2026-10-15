@@ -1,6 +1,5 @@
 ---
 date: '2025-12-26T10:38:13+09:00'
-draft: false
 title: '기술 블로그 시작기'
 cover:
   image: "timeline.png"

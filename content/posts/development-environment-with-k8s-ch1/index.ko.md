@@ -1,6 +1,5 @@
 ---
 date: '2026-02-09T10:38:13+09:00'
-draft: false
 title: '[K8s 개발 환경 구축기 - Part 01] 왜 Kubernetes인가?'
 cover:
   image: "images/kubernetes_logo.png"

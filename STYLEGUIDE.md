@@ -440,7 +440,7 @@ TPU는 Systolic Array 구조를 사용합니다. 이 구조는...
 **Rules**:
 - All posts must have frontmatter with required fields
 - `date` should be in ISO 8601 format: `'2026-01-03T17:20:16+09:00'`
-- `draft: false` for published posts
+- Do not add a `draft` field; a post is published when its PR merges to `main`
 - `title` should be descriptive and match the H1 heading
 - `tags` should be relevant and consistent (use existing tags when possible)
 - `authors` must match entries in `content/authors/`
@@ -453,7 +453,6 @@ TPU는 Systolic Array 구조를 사용합니다. 이 구조는...
 ```yaml
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: false
 title: 'Post Title'
 authors: ["Author Name"]
 tags: ["Tag1", "Tag2"]
@@ -517,7 +516,6 @@ TPU는 Systolic Array라는 특별한 연산 유닛을 사용합니다. 이는 �
 ```markdown
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: false
 title: '[지피지기 - Part 02] TPU의 등장과 부상'
 authors: ["Jaewon Lim"]
 tags: ["TPU", "Google", "Ironwood"]

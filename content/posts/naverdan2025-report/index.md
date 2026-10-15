@@ -1,6 +1,5 @@
 ---
 date: '2025-12-05T13:22:41+09:00'
-draft: false
 title: 'NAVER DAN 2025 참관기'
 cover:
   image: "dan25_poster.png"

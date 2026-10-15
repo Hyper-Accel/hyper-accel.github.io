@@ -1,6 +1,5 @@
 ---
 date: '2025-12-13T15:10:28+09:00'
-draft: false
 title: '[Crafting Compilers - Part 02] Building a Programming Language'
 cover:
   image: "macintosh.jpeg"

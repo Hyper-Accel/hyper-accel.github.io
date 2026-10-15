@@ -1,6 +1,5 @@
 ---
 date: '2026-04-29T02:00:00+09:00'
-draft: false
 title: '[메모리 이해하기 - Part 02] HBF의 잠재 workload 찾아보기'
 cover:
   image: "images/cover.jpg"

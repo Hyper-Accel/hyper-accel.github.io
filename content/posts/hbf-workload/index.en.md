@@ -1,6 +1,5 @@
 ---
 date: '2026-04-29T02:00:00+09:00'
-draft: false
 title: '[Memory in the AI Era - Part 02] Where Does HBF Actually Fit?'
 cover:
   image: "images/cover.jpg"

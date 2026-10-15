@@ -1,6 +1,5 @@
 ---
 date: '2026-06-16T10:00:00+09:00'
-draft: false
 title: '[AI Agent - Part 02] Back to the Terminal: How Agents Made Remote Development Feel Native'
 cover:
   image: "images/thumbnai.png"

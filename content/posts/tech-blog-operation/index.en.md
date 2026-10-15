@@ -1,6 +1,5 @@
 ---
 date: '2025-12-26T10:38:16+09:00'
-draft: false
 title: 'Starting Our Tech Blog'
 cover:
   image: "timeline.png"

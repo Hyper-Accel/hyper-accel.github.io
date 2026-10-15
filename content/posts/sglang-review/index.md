@@ -1,6 +1,5 @@
 ---
 date: '2025-11-29T15:10:28+09:00'
-draft: false
 title: 'SGLang paper review'
 cover:
   image: "sglang.png"

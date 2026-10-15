@@ -1,6 +1,5 @@
 ---
 date: '2026-08-12T17:39:35+09:00'
-draft: false
 title: '[메모리 이해하기 - Part 05] CXL Workload 알아보기'
 cover:
   image: "cxl-workload-cover.webp"

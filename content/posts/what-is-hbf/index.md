@@ -1,6 +1,5 @@
 ---
 date: '2026-04-23T12:34:00+09:00'
-draft: false
 title: '[메모리 이해하기 - Part 01] HBF 이해하기'
 cover:
   image: "01-memory-hierarchy-pyramid.jpg"

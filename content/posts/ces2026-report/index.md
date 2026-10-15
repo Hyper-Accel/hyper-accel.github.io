@@ -1,6 +1,5 @@
 ---
 date: '2026-01-12T10:00:00+09:00'
-draft: false
 title: '2025년에 바라보는 CES 2026 핵심 정리 (feat. SAMSUNG, SK, LG)'
 cover:
   image: "images/ces2026-cover.jpg"

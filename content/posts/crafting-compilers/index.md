@@ -1,6 +1,5 @@
 ---
 date: '2025-11-16T15:10:31+09:00'
-draft: false
 title: '[Crafting Compilers - Part 01] 시리즈 소개'
 cover:
   image: "486.jpeg"

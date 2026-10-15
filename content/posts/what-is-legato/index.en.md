@@ -1,6 +1,5 @@
 ---
 date: '2026-06-28T16:17:48+09:00'
-draft: false
 title: '[Legato - Part 01] A Programming Language for HyperAccel LPU'
 cover:
   image: "Bertha.jpeg"

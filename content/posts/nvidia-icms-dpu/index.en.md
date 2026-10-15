@@ -1,6 +1,5 @@
 ---
 date: '2026-02-24T21:04:00+09:00'
-draft: false
 title: '[Know Your Enemy - Part 04] Memory Capacity Bottleneck and NVIDIA ICMS'
 cover:
   image: "images/icms_dpu.png"

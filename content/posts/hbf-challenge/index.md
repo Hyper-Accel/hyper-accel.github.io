@@ -1,6 +1,5 @@
 ---
 date: '2026-05-28T13:42:34+09:00'
-draft: false
 title: '[메모리 이해하기 - Part 03] HBF가 풀어야 할 과제'
 cover:
   image: "images/cover.png"

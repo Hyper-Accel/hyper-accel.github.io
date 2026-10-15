@@ -1,6 +1,5 @@
 ---
 date: '2026-02-03T11:24:57+09:00'
-draft: false
 title: '[Know Your Enemy - Part 03] Groq''s LPU (Acquired by NVIDIA for $20B)'
 cover:
   image: "images/groq_logo.jpg"

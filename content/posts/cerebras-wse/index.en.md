@@ -1,6 +1,5 @@
 ---
 date: '2026-04-27T10:00:00+09:00'
-draft: false
 title: '[Know Your Enemy - Part 05] Cerebras and the Wafer-Scale Engine'
 cover:
   image: "images/00-cover-cerebras-wse.png"

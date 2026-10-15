@@ -1,6 +1,5 @@
 ---
 date: '2026-02-03T10:17:33+09:00'
-draft: false
 title: 'Specs are All You Need: What is Spec-Driven Development (SDD)?'
 cover:
   image: "sdd.png"

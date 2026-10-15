@@ -13,7 +13,7 @@ Each post = one page bundle: `content/posts/<kebab-case-slug>/` with per-languag
 Bilingual (ko+en) is the norm (~40 posts); some are single-language.
 
 ## FRONT MATTER
-Required: `date` (ISO 8601 +09:00), `title`, `draft`, `authors`, `comments`, `cover` (`image`, `alt`, `relative: true` for bundled images).
+Required: `date` (ISO 8601 +09:00), `title`, `authors`, `comments`, `cover` (`image`, `alt`, `relative: true` for bundled images).
 Optional: `tags`, `series` + `series_idx` (1-based), `summary`, `description`, `keywords`.
 Series titles: `[<short series name> - Part 0N] <title>` (side story: `번외편` / `Extra`); templates split the bracket into a colored label, so keep the format exact.
 `categories`: exactly ONE of `AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` (English term; localized titles live in `content/categories/<slug>/_index*.md`). Fine-grained topics go in `tags`, not `categories`.
@@ -35,7 +35,7 @@ Series titles: `[<short series name> - Part 0N] <title>` (side story: `번외편
 - **New posts must ship both ko + en versions** (README mandate); same slug so Hugo links translations.
 
 ## ANTI-PATTERNS
-- No `draft: true` in merged PRs - CI blocks the merge.
+- No `draft` field: posts publish when the PR merges to `main` (CI still rejects `draft: true`).
 - No external hotlinked cover images unless `relative: false` is set deliberately.
 - No author names in front matter that lack a profile directory (breaks author_info partial).
 - New authors need both `_index.md` and `_index.en.md` under `content/authors/<Name>/`.

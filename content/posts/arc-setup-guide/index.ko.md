@@ -1,6 +1,5 @@
 ---
 date: '2026-02-12T09:30:00+09:00'
-draft: false
 title: '[K8s 개발 환경 구축기 - Part 02] ARC와 CI/CD 인프라 고도화'
 authors: ["Namyoon Kim"]
 tags: ["ARC", "GitHub Actions", "Vault", "Prometheus", "Grafana", "CI/CD", "Kubernetes", "DinD", "Container Hook", "DevOps"]

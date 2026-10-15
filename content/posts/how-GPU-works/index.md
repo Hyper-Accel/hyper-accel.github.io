@@ -1,6 +1,5 @@
 ---
 date: '2025-12-29T10:53:16+09:00'
-draft: false
 title: '[지피지기 - Part 01] GPU의 역사와 기초'
 cover:
   image: "images/01-gpu-hopper.png"

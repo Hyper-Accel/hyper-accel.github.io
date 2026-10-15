@@ -1,6 +1,5 @@
 ---
 date: '2026-08-12T17:39:35+09:00'
-draft: false
 title: '[Memory in the AI Era - Part 05] Exploring CXL Workloads'
 cover:
   image: "cxl-workload-cover.webp"

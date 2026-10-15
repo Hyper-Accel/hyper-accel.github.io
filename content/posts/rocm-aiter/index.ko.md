@@ -1,6 +1,5 @@
 ---
 date: '2026-03-17T10:00:00+09:00'
-draft: false
 title: 'AITER 분석: AMD가 ROCm inference 성능을 2배로 올린 방법'
 cover:
   image: "images/mi300x-launch.jpg"

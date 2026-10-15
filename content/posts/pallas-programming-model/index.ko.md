@@ -1,6 +1,5 @@
 ---
 date: '2026-02-25T14:50:09+09:00'
-draft: false
 title: '[지피지기 - 번외편] Pallas Programming Model'
 cover:
   image: "images/00-main-image.png"

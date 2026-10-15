@@ -1,6 +1,5 @@
 ---
 date: '2026-07-02T14:33:50+09:00'
-draft: false
 title: '[지피지기 - Part 06] Agentic AI 시대, CPU의 부활과 CPU 삼국지의 시작'
 cover:
   image: "images/cover.png"

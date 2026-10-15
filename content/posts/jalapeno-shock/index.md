@@ -1,6 +1,5 @@
 ---
 date: '2026-09-08T09:42:25+09:00'
-draft: false
 title: '[지피지기 - Part 07] GPU로 만든 모델이 GPU보다 좋은 칩을 만들다'
 cover:
   image: "images/cover.webp"

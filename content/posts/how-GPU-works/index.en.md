@@ -1,6 +1,5 @@
 ---
 date: '2025-12-29T10:54:53+09:00'
-draft: false
 title: '[Know Your Enemy - Part 01] GPU History and Fundamentals'
 cover:
   image: "images/01-gpu-hopper.png"

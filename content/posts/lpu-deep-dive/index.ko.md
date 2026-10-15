@@ -1,6 +1,5 @@
 ---
 date: '2026-02-03T11:24:57+09:00'
-draft: false
 title: '[지피지기 - Part 03] 엔비디아가 200억 달러에 인수한 그록의 LPU'
 cover:
   image: "images/groq_logo.jpg"

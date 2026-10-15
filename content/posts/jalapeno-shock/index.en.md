@@ -1,6 +1,5 @@
 ---
 date: '2026-09-08T09:42:25+09:00'
-draft: false
 title: '[Know Your Enemy - Part 07] A Model Trained on GPUs Builds a Better Chip Than GPUs'
 cover:
   image: "images/cover.webp"

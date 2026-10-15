@@ -1,6 +1,5 @@
 ---
 date: '2026-04-17T10:00:00+09:00'
-draft: false
 title: 'Project Glasswing: Claude Mythos Preview'
 cover:
   image: "images/anthropic.jpg"

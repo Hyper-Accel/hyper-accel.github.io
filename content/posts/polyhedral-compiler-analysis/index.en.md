@@ -1,6 +1,5 @@
 ---
 date: '2026-01-29T15:10:28+09:00'
-draft: false
 title: '[Crafting Compilers - Part 03] Polyhedral Analysis'
 cover:
   image: "title.png"

@@ -1,6 +1,5 @@
 ---
 date: '2026-03-05T10:00:00+09:00'
-draft: false
 title: 'Transformer World: LLM의 기본 구조 뜯어보기'
 cover:
   image: "images/transformer-cover.png"

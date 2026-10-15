@@ -1,6 +1,5 @@
 ---
 date: '2026-02-09T10:38:13+09:00'
-draft: false
 title: '[K8s Dev Environment - Part 01] Why Kubernetes?'
 cover:
   image: "images/kubernetes_logo.png"

@@ -1,6 +1,5 @@
 ---
 date: '2026-03-05T10:00:00+09:00'
-draft: false
 title: 'Transformer World: A Deep Dive into the Building Blocks of LLMs'
 cover:
   image: "images/transformer-cover.png"

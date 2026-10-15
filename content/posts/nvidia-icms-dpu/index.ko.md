@@ -1,6 +1,5 @@
 ---
 date: '2026-02-24T21:04:44+09:00'
-draft: false
 title: '[지피지기 - Part 04] 메모리 용량 병목과 NVIDIA ICMS'
 cover:
   image: "images/icms_dpu.png"

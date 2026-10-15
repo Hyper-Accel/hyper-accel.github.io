@@ -1,6 +1,5 @@
 ---
 date: '2026-03-27T10:38:13+09:00'
-draft: false
 title: '[K8s Dev Environment - Part 03] Kubernetes Device Plugin for LPU'
 cover:
   image: "images/kubernetes_with_devices.png"
