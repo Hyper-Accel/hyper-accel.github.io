@@ -11,7 +11,6 @@
       {{- end }}
     </nav>
     <div class="tr-tools">
-      {{- if not site.Params.disableThemeToggle }}{{ partial "theme_toggle.html" . }}{{ end }}
       <a class="tr-pill tr-search-link" href="{{ "search/" | relLangURL }}" aria-label="{{ cond $ko "검색" "Search" }}" title="{{ cond $ko "검색" "Search" }}">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
       </a>

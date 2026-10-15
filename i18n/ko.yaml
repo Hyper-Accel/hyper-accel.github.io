@@ -10,12 +10,6 @@
 - id: next_post
   translation: "다음 글"
 
-- id: switch_to_light
-  translation: "라이트 모드로 전환"
-
-- id: switch_to_dark
-  translation: "다크 모드로 전환"
-
 - id: read_time
   translation:
     one : "1 분"

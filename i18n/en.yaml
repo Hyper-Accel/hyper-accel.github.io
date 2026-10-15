@@ -10,12 +10,6 @@
 - id: next_post
   translation: "Next post"
 
-- id: switch_to_light
-  translation: "Switch to light mode"
-
-- id: switch_to_dark
-  translation: "Switch to dark mode"
-
 - id: read_time
   translation:
     one : "1 min"
