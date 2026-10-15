@@ -1,8 +1,6 @@
 let ready = false;
-let first;
-let last;
-let currentElement = null;
 let resultsAvailable = false;
+const searchbox = document.getElementById('searchbox');
 const resultList = document.getElementById('searchResults');
 const searchInput = document.getElementById('searchInput');
 
@@ -87,10 +85,10 @@ function runSearch() {
   }
 
   const results = docs
-    .filter((doc) => terms.every((t) => doc.lt.includes(t) || doc.lc.includes(t)))
+    .filter((doc) => terms.every((t) => doc.lt.includes(t) || doc.lm.includes(t) || doc.lc.includes(t)))
     .map((doc) => ({
       doc,
-      score: terms.reduce((s, t) => s + (doc.lt.includes(t) ? 50 : 0) + Math.min(countOf(doc.lc, t), 20), 0)
+      score: terms.reduce((s, t) => s + (doc.lt.includes(t) ? 50 : 0) + (doc.lm.includes(t) ? 30 : 0) + Math.min(countOf(doc.lc, t), 20), 0)
         + (terms.length > 1 ? Math.min(countOf(doc.lc, terms.join(' ')), 20) * 3 : 0)
     }))
     .sort((a, b) => b.score - a.score);
@@ -98,7 +96,7 @@ function runSearch() {
   renderStatus(query, results.length);
   resultList.innerHTML = results.slice(0, MAX_RESULTS).map(({ doc }) => {
     const hits = terms.reduce((s, t) => s + countOf(doc.lc, t), 0);
-    const meta = [doc.category, doc.date, hits ? (isKo ? `본문 ${hits}곳` : `${hits} in text`) : '']
+    const meta = [doc.category, doc.authors.join(', '), doc.date, hits ? (isKo ? `본문 ${hits}곳` : `${hits} in text`) : '']
       .filter(Boolean).map((m, i) => (i === 0 && doc.category ? `<span class="tr-cat">${escapeHTML(m)}</span>` : `<span>${escapeHTML(m)}</span>`)).join('');
     return `
     <li class="post-entry" style="${escapeHTML(doc.style || '')}">
@@ -109,8 +107,6 @@ function runSearch() {
     </li>`;
   }).join('');
   resultsAvailable = results.length > 0;
-  first = resultList.firstElementChild;
-  last = resultList.lastElementChild;
 }
 
 window.addEventListener('load', () => {
@@ -119,7 +115,9 @@ window.addEventListener('load', () => {
     if (xhr.readyState !== 4 || xhr.status !== 200) return;
     docs = JSON.parse(xhr.responseText).map((item) => {
       const text = String(item.content || '').replace(/\s+/g, ' ').trim();
-      return { ...item, text, lc: text.toLowerCase(), lt: String(item.title || '').toLowerCase() };
+      const authors = item.authors || [];
+      const lm = [...authors, ...(item.series || [])].join(' ').toLowerCase();
+      return { ...item, authors, text, lc: text.toLowerCase(), lt: String(item.title || '').toLowerCase(), lm };
     });
     ready = true;
     const initial = new URLSearchParams(window.location.search).get('q');
@@ -133,30 +131,42 @@ window.addEventListener('load', () => {
 searchInput.addEventListener('input', runSearch);
 searchInput.addEventListener('search', runSearch);
 
-function focusResult(element) {
-  document.querySelectorAll('.focus').forEach((item) => item.classList.remove('focus'));
-  if (!element) return;
-  element.focus();
-  currentElement = element;
-  element.parentElement.classList.add('focus');
+function clearFocus() {
+  resultList.querySelectorAll('.focus').forEach((item) => item.classList.remove('focus'));
 }
 
+function focusResult(item) {
+  clearFocus();
+  item.classList.add('focus');
+  item.lastElementChild.focus();
+}
+
+// Keys drive the results only while focus is inside the search box, as in PaperMod;
+// elsewhere on the page arrows scroll and Escape does nothing to the search.
 document.addEventListener('keydown', (event) => {
+  if (!searchbox.contains(document.activeElement)) return;
   if (event.key === 'Escape') {
+    clearFocus();
     searchInput.value = '';
     runSearch();
     searchInput.focus();
     return;
   }
   if (!resultsAvailable) return;
-  const active = document.activeElement === searchInput ? searchInput : currentElement;
+  const item = document.activeElement === searchInput ? null : document.activeElement.closest('li');
   if (event.key === 'ArrowDown') {
     event.preventDefault();
-    focusResult(active === searchInput ? first.lastElementChild : active.parentElement.nextElementSibling?.lastElementChild);
-  } else if (event.key === 'ArrowUp' && active !== searchInput) {
+    const next = item ? item.nextElementSibling : resultList.firstElementChild;
+    if (next) focusResult(next);
+  } else if (event.key === 'ArrowUp' && item) {
     event.preventDefault();
-    focusResult(active.parentElement === first ? searchInput : active.parentElement.previousElementSibling?.lastElementChild);
-  } else if (event.key === 'ArrowRight' && active !== searchInput) {
-    active.click();
+    const previous = item.previousElementSibling;
+    if (previous) focusResult(previous);
+    else {
+      clearFocus();
+      searchInput.focus();
+    }
+  } else if (event.key === 'ArrowRight' && item) {
+    document.activeElement.click();
   }
 });

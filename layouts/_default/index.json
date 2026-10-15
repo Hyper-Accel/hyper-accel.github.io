@@ -2,7 +2,7 @@
 {{- range site.RegularPages -}}
   {{- if and (not .Params.searchHidden) (ne .Layout `archives`) (ne .Layout `search`) }}
   {{- $cat := "" }}{{ with .GetTerms "categories" }}{{ $cat = (index . 0).Title }}{{ end }}
-  {{- $index = $index | append (dict "title" .Title "content" .Plain "permalink" .Permalink "summary" (.Summary | plainify) "date" (.Date | time.Format "2006.01.02") "category" $cat "style" (partial "d/catvars.html" .)) -}}
+  {{- $index = $index | append (dict "title" .Title "content" .Plain "permalink" .Permalink "summary" (.Summary | plainify) "date" (.Date | time.Format "2006.01.02") "category" $cat "authors" (.Params.authors | default slice) "series" (.Params.series | default slice) "style" (partial "d/catvars.html" .)) -}}
   {{- end }}
 {{- end -}}
 {{- $index | jsonify -}}
