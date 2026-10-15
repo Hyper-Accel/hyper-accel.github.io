@@ -24,10 +24,6 @@ languages:
           name: 포스트
           url: /posts/
           weight: 10
-        - identifier: series
-          name: 시리즈
-          url: /series/
-          weight: 9
         - identifier: authors
           name: 작성자
           url: /authors/
@@ -68,10 +64,6 @@ languages:
           name: Posts
           url: /en/posts/
           weight: 10
-        - identifier: series
-          name: Series
-          url: /en/series/
-          weight: 9
         - identifier: authors
           name: Authors
           url: /en/authors/

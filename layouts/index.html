@@ -3,7 +3,7 @@
 {{- $cats := (site.GetPage "/categories").Pages }}
 {{- $stack := slice "llm-and-models" "infra-and-devops" "compilers-and-kernels" "memory-and-storage" "ai-hardware" }}
 {{- $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
-<div class="tr tr-home">
+<div class="tr">
   <section class="tr-hero">
     <div class="tr-hero-copy">
       <p class="tr-eyebrow">HYPERACCEL TECH BLOG</p>
@@ -16,13 +16,13 @@
       </form>
     </div>
 
+    {{- $levels := dict "ai-hardware" "L1 · Hardware" "memory-and-storage" "L2 · Memory" "compilers-and-kernels" "L3 · Compiler" "infra-and-devops" "L4 · Infra" "llm-and-models" "L5 · Model" }}
+    {{- $logo := "/images/logo-transparent.png" | relURL }}
     <div class="tr-stack-area">
-      {{- $levels := dict "ai-hardware" "L1 · Hardware" "memory-and-storage" "L2 · Memory" "compilers-and-kernels" "L3 · Compiler" "infra-and-devops" "L4 · Infra" "llm-and-models" "L5 · Model" }}
-      {{- $logo := "/images/logo-transparent.png" | relURL }}
       <nav class="tr-stack" aria-label="{{ cond $ko "기술 스택별 카테고리" "Categories by stack layer" }}" style="--n:{{ len $stack }}">
         {{- range $i, $slug := $stack }}
         {{- with site.GetPage (printf "/categories/%s" $slug) }}
-        <a class="tr-layer" href="{{ .RelPermalink }}" data-layer="{{ $slug }}" style="--i:{{ sub (len $stack) (add $i 1) }};{{ partial "d/catvars.html" $slug }}">
+        <a class="tr-layer" href="{{ .RelPermalink }}" data-layer="{{ $slug }}" aria-controls="tr-drawer" aria-expanded="false" style="--i:{{ sub (len $stack) (add $i 1) }};{{ partial "d/catvars.html" $slug }}">
           <span class="tr-hit" aria-hidden="true"></span>
           <svg viewBox="0 0 240 92" aria-hidden="true">
             <polygon class="f-l" points="0,40 120,80 120,92 0,52"/>
@@ -39,43 +39,33 @@
         {{- end }}
       </nav>
 
-      <div class="tr-panels">
-        <div class="tr-panel" data-panel="">
-          <p class="tr-panel-kicker">FULL-STACK AI</p>
-          <p class="tr-panel-hint">{{ cond $ko "트랜지스터(L1)부터 LLM(L5)까지, 레이어에 마우스를 올리면 분야별 최신 글을 볼 수 있습니다." "From transistors (L1) to LLMs (L5). Hover a layer to see the latest posts in that part of the stack." }}</p>
-          <p class="tr-panel-kicker">{{ cond $ko "스택 밖의 이야기" "Beyond the stack" }}</p>
-          <div class="tr-panel-chips">
-            {{- range $cats }}{{ $slug := path.Base .RelPermalink }}{{ if not (in $stack $slug) }}
-            <a href="{{ .RelPermalink }}" style="{{ partial "d/catvars.html" $slug }}"><i class="tr-dot"></i>{{ .Title }}</a>
-            {{- end }}{{ end }}
+      <p class="tr-stack-hint">{{ cond $ko "레이어를 누르면 분야별 글이 아래로 펼쳐집니다" "Click a layer to unfold its posts below" }}</p>
+    </div>
+  </section>
+
+  <section class="tr-drawer" id="tr-drawer" aria-label="{{ cond $ko "선택한 분야의 글" "Posts in the selected layer" }}">
+    <div class="tr-drawer-in">
+      {{- range $stack }}
+      {{- with site.GetPage (printf "/categories/%s" .) }}
+      {{- $slug := path.Base .RelPermalink }}
+      <div class="tr-drawer-panel" data-drawer="{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}" hidden>
+        <header class="tr-drawer-head">
+          <div>
+            <p class="tr-drawer-kicker"><i class="tr-dot"></i>{{ index $levels $slug }}</p>
+            <h2 class="tr-h">{{ .Title }}</h2>
+            <p class="tr-drawer-desc">{{ .Description }}</p>
           </div>
-        </div>
-        {{- range $stack }}
-        {{- with site.GetPage (printf "/categories/%s" .) }}
-        {{- $slug := path.Base .RelPermalink }}
-        <div class="tr-panel" data-panel="{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}" hidden>
-          <header class="tr-panel-head">
-            <p class="tr-panel-kicker"><i class="tr-dot"></i>{{ index $levels $slug }} · {{ .Title }}</p>
+          <div class="tr-drawer-actions">
             <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
-            <button class="tr-panel-close" type="button" aria-label="{{ cond $ko "닫기" "Close" }}">×</button>
-          </header>
-          <p class="tr-panel-desc">{{ .Description }}</p>
-          <ul>
-            {{- range first 3 .Pages.ByDate.Reverse }}{{ $t := partial "d/titleparts.html" . }}
-            <li><a href="{{ .RelPermalink }}">
-              <span class="tr-thumb">{{ partial "d/cover.html" (dict "page" . "w" 192 "h" 144) }}</span>
-              <span class="tr-pi">
-                <span class="tr-pi-meta">{{ with $t.tag }}<span class="tr-part">{{ . }}</span> · {{ end }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2006.01.02" }}</time></span>
-                <b>{{ $t.text }}</b>
-                <span class="tr-pi-sum">{{ .Summary | plainify | htmlUnescape | truncate 80 }}</span>
-              </span>
-            </a></li>
-            {{- end }}
-          </ul>
+            <button class="tr-drawer-close" type="button" aria-label="{{ cond $ko "접기" "Collapse" }}">×</button>
+          </div>
+        </header>
+        <div class="tr-drawer-row">
+          {{- range .Pages.ByDate.Reverse }}{{ partial "d/card.html" (dict "page" . "summary" true) }}{{ end }}
         </div>
-        {{- end }}
-        {{- end }}
       </div>
+      {{- end }}
+      {{- end }}
     </div>
   </section>
 
@@ -129,18 +119,18 @@
 <script>
 (() => {
   const area = document.querySelector('.tr-stack-area');
-  if (!area) return;
+  const drawer = document.querySelector('.tr-drawer');
+  if (!area || !drawer) return;
   const layers = [...area.querySelectorAll('.tr-layer')];
-  const panels = area.querySelectorAll('.tr-panel');
+  const panels = [...drawer.querySelectorAll('[data-drawer]')];
   const touch = matchMedia('(hover: none)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
   // Short grace so a cursor that slips off the edge for a moment does not collapse the stack.
   const CLOSE_MS = 250;
-  let closeTimer, current = '';
+  let closeTimer, hovered = '', selected = '';
 
-  const show = (slug) => {
-    if (slug === current) return;
-    current = slug;
-    panels.forEach((p) => { p.hidden = p.dataset.panel !== slug; });
+  const paint = () => {
+    const slug = hovered || selected;
     layers.forEach((l) => l.classList.toggle('on', l.dataset.layer === slug));
     area.classList.toggle('has-active', !!slug);
   };
@@ -149,9 +139,51 @@
     clearTimeout(closeTimer);
     closeTimer = setTimeout(() => {
       area.classList.remove('open');
-      show('');
+      hovered = '';
+      paint();
     }, CLOSE_MS);
   };
+
+  // Each new pick folds the open box first and then unfolds it again, so every click reads as a fresh open.
+  const SWITCH_FALLBACK_MS = 500;
+  let switchToken = 0;
+  const reveal = (slug) => {
+    panels.forEach((p) => { p.hidden = p.dataset.drawer !== slug; });
+    const row = drawer.querySelector(`[data-drawer="${slug}"] .tr-drawer-row`);
+    if (row) row.scrollLeft = 0;
+    drawer.classList.add('is-open');
+    const top = drawer.getBoundingClientRect().top;
+    if (top > innerHeight * 0.75) {
+      scrollBy({ top: top - 140, behavior: calm.matches ? 'auto' : 'smooth' });
+    }
+  };
+  const expand = (slug) => {
+    const token = ++switchToken;
+    const wasOpen = drawer.classList.contains('is-open');
+    selected = slug;
+    layers.forEach((l) => l.setAttribute('aria-expanded', String(l.dataset.layer === slug)));
+    paint();
+    if (!wasOpen || calm.matches) { reveal(slug); return; }
+    drawer.classList.remove('is-open');
+    let done = false;
+    const go = () => {
+      if (done || token !== switchToken) return;
+      done = true;
+      drawer.removeEventListener('transitionend', onEnd);
+      reveal(slug);
+    };
+    const onEnd = (e) => { if (e.target === drawer) go(); };
+    drawer.addEventListener('transitionend', onEnd);
+    setTimeout(go, SWITCH_FALLBACK_MS);
+  };
+  const collapse = () => {
+    switchToken++;
+    selected = '';
+    layers.forEach((l) => l.setAttribute('aria-expanded', 'false'));
+    drawer.classList.remove('is-open');
+    paint();
+  };
+  const toggle = (slug) => (selected === slug ? collapse() : expand(slug));
 
   area.addEventListener('mouseenter', open);
   area.addEventListener('mouseleave', closeSoon);
@@ -159,27 +191,21 @@
 
   layers.forEach((l) => {
     const slug = l.dataset.layer;
-    l.addEventListener('mouseenter', () => { if (!touch.matches) { open(); show(slug); } });
-    l.addEventListener('focus', () => { open(); show(slug); });
-    l.addEventListener('click', (e) => {
-      if (touch.matches && current !== slug) { e.preventDefault(); show(slug); }
-    });
+    l.setAttribute('role', 'button');
+    l.addEventListener('mouseenter', () => { if (!touch.matches) { open(); hovered = slug; paint(); } });
+    l.addEventListener('focus', () => { open(); hovered = slug; paint(); });
+    l.addEventListener('click', (e) => { e.preventDefault(); toggle(slug); });
+    l.addEventListener('keydown', (e) => { if (e.key === ' ') { e.preventDefault(); toggle(slug); } });
   });
 
-  area.querySelectorAll('.tr-panel-close').forEach((b) => b.addEventListener('click', () => show('')));
-  document.addEventListener('click', (e) => {
-    if (!touch.matches || !current) return;
-    if (e.target.closest('.tr-layer, .tr-panel')) return;
-    show('');
+  drawer.querySelectorAll('.tr-drawer-close').forEach((b) => b.addEventListener('click', () => {
+    const owner = layers.find((l) => l.dataset.layer === selected);
+    collapse();
+    owner?.focus({ preventScroll: true });
+  }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && selected && (drawer.contains(document.activeElement) || area.contains(document.activeElement))) collapse();
   });
-
-  // The phone bottom sheet is fixed to the viewport, so drop it once the hero scrolls away.
-  const hero = area.closest('.tr-hero');
-  if (hero && 'IntersectionObserver' in window) {
-    new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting && touch.matches) show('');
-    }).observe(hero);
-  }
 })();
 </script>
 {{- end }}
