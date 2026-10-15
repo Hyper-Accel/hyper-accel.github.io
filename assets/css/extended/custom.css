@@ -324,3 +324,43 @@ body .posts-grid-container .post-entry {
 .post-content table tbody tr:hover {
     background-color: var(--code-bg) !important;
 }
+
+/* columns shortcode: side-by-side blocks in post bodies */
+.post-content .md-columns {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin: 0 0 var(--content-gap);
+}
+
+.post-content .md-columns .md-column {
+    min-width: 0;
+}
+
+.post-content .md-columns .md-column > :last-child {
+    margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .post-content .md-columns {
+        grid-auto-flow: row;
+    }
+}
+
+/* figure shortcode class="full-width": stretch the image to the post body width */
+.post-content figure.full-width img {
+    width: 100%;
+    height: auto;
+}
+
+/* Markdown tables (render-table hook): fill the post width, scroll when wider */
+.post-content .table-wrapper {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+.post-content .table-wrapper > table {
+    display: table;
+    margin: 0 !important;
+}
