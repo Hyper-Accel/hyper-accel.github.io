@@ -12,7 +12,7 @@ tags: ["Verification", "RTL", "Reference Model", "bit-exact", "LLM Inference"]
 categories: ["AI Hardware", "Semiconductor"]
 series: ["Verifying an LLM Inference Chip"]
 series_idx: 1
-summary: "When an AI model and the chip's RTL disagree, who is wrong? This post covers where the ground truth comes from at each level of LLM inference chip verification, and how splitting the comparisons makes it clear who owns a mismatch."
+summary: "When the same AI model gives different answers on a GPU or CPU and on the LPU's RTL, who is wrong? This post covers where the ground truth comes from at each level of LLM inference chip verification, and how splitting the comparisons makes it clear who owns a mismatch."
 description: "Where does the ground truth come from in LLM inference chip verification? We explain why the block level treats the spec document as ground truth, why the top level uses the AI model's output, and what each comparison in between catches."
 comments: true
 ---
@@ -27,10 +27,10 @@ Hello, I'm Yujeon Chang from the HyperAccel DV team.
 Using HyperAccel's actual verification flow as the example, this post looks at how we decide what counts as the "right answer" when verifying a **Large Language Model (LLM)** inference chip.
 
 Let's start with a question.
-When an AI model and the chip's RTL give different answers, who is actually wrong?
+When the same AI model gives one answer on a GPU or CPU and another on the RTL of the **LLM Processing Unit (LPU)**, who is actually wrong?
 
-Say we feed the same prompt into the AI model running in PyTorch and into the chip we designed.
-If dozens of tokens come out identical and then one position differs, is the chip wrong, or is the model?
+Say we feed the same prompt to the same model, running it in PyTorch on a GPU or CPU on one side and on the LPU's RTL on the other.
+If dozens of tokens come out identical and then one position differs, is the LPU wrong, or is the GPU or CPU?
 It's even possible that both are right.
 
 A software bug can be fixed and redeployed, but chips are a different story.
@@ -302,7 +302,7 @@ Comparisons against the HF golden catch spec errors, but they can miss small err
 ## Conclusion: When Results Diverge, What Do You Suspect?
 
 Let's go back to the opening question.
-When an AI model and the chip's RTL give different answers, who is wrong?
+When the same AI model gives different answers on a GPU or CPU and on the LPU's RTL, who is wrong?
 
 The answer depends on which comparison the mismatch appeared in.
 
