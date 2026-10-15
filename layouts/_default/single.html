@@ -1,6 +1,6 @@
 {{- define "main" }}
 {{- $isPost := eq .Type "posts" }}
-{{- $hasReadingToc := and $isPost (.Param "ShowToc") (gt (len (findRE `href="#` (.Fragments.ToHTML 2 2 false))) 0) }}
+{{- $hasReadingToc := partialCached "d/has_reading_toc.html" . .Page }}
 {{- if $isPost }}
 <div class="post-reading-layout{{ if $hasReadingToc }} has-toc{{ end }}">
 {{- end }}

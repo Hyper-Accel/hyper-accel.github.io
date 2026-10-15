@@ -1,0 +1,7 @@
+{{- /* Input: a page. True for a post with ShowToc and at least one h2 to list.
+     The header's TOC button and the post layout's TOC panel both ask this, so they always agree. */ -}}
+{{- $has := false }}
+{{- if and (eq .Type "posts") (.Param "ShowToc") }}
+{{- $has = gt (len (findRE `href="#` (.Fragments.ToHTML 2 2 false))) 0 }}
+{{- end }}
+{{- return $has -}}

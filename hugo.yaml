@@ -14,80 +14,12 @@ languages:
     title: HyperAccel Tech Blog
     params:
       DateFormat: "2006.01.02"
-    menu:
-      main:
-        - identifier: about
-          name: 소개
-          url: /about/
-          weight: 5
-        - identifier: posts
-          name: 포스트
-          url: /posts/
-          weight: 10
-        - identifier: authors
-          name: 작성자
-          url: /authors/
-          weight: 10
-        - identifier: careers
-          name: 채용
-          url: https://hyperaccel.career.greetinghr.com/ko/guide
-          weight: 12
-        - identifier: categories
-          name: 카테고리
-          url: /categories/
-          weight: 15
-        - identifier: tags
-          name: 태그
-          url: /tags/
-          weight: 20
-        - identifier: search
-          name: 검색
-          url: /search/
-          weight: 25
-        - identifier: baseurl
-          name: HyperAccel
-          url: https://hyperaccel.ai/
-          weight: 30
   en:
     languageName: English
     weight: 2
     title: HyperAccel Tech Blog
     params:
       DateFormat: "January 2, 2006"
-    menu:
-      main:
-        - identifier: about
-          name: About
-          url: /en/about/
-          weight: 5
-        - identifier: posts
-          name: Posts
-          url: /en/posts/
-          weight: 10
-        - identifier: authors
-          name: Authors
-          url: /en/authors/
-          weight: 10
-        - identifier: careers
-          name: Careers
-          url: https://hyperaccel.career.greetinghr.com/en/guide
-          weight: 12
-        - identifier: categories
-          name: Categories
-          url: /en/categories/
-          weight: 15
-        - identifier: tags
-          name: Tags
-          url: /en/tags/
-          weight: 20
-        - identifier: search
-          name: Search
-          url: /en/search/
-          weight: 25
-        - identifier: baseurl
-          name: HyperAccel
-          url: https://hyperaccel.ai/
-          weight: 30
 
 enableRobotsTXT: true
 buildDrafts: false

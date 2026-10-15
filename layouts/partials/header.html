@@ -22,7 +22,7 @@
       {{- end }}
     </div>
   </div>
-  {{- if and (eq .Type "posts") (.Param "ShowToc") (gt (len (findRE `href="#` (.Fragments.ToHTML 2 2 false))) 0) }}
+  {{- if partialCached "d/has_reading_toc.html" . .Page }}
     {{- partial "reading_toc_toggle.html" . }}
   {{- end }}
 </header>

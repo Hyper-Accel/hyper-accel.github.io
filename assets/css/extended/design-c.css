@@ -106,7 +106,6 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-search input::placeholder { color: #708894; }
 .tr-search button { align-self: stretch; padding: 0 24px; border: 0; border-radius: 12px; background: var(--tr-cyan); color: #031117; font: inherit; font-weight: 700; cursor: pointer; }
 .tr-search button:hover { background: var(--tr-cyan-soft); }
-.tr-search-hint { margin: 10px 0 0 20px; color: #647b87; font-size: 0.78rem; }
 
 .tr-h { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: var(--tr-fg); }
 
@@ -231,9 +230,8 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
   .tr-stack { --gap: 44px; --max-gap: 44px; --lw: 200px; --lh: 77px; --cy: 33px; width: 340px; max-width: 100%; margin: 0 auto; }
   .tr-hit { width: calc(var(--lw) + 130px); }
   .tr-layer-label { opacity: 1; transform: none; pointer-events: auto; }
-    .tr-search { min-height: 56px; padding-left: 14px; }
+  .tr-search { min-height: 56px; padding-left: 14px; }
   .tr-search button { padding: 0 16px; }
-  .tr-search-hint { margin-left: 4px; }
   .tr-shelf-head { flex-direction: column; align-items: flex-start; }
   .tr-brand span { display: none; }
   .tr-author-profile { grid-template-columns: 84px minmax(0, 1fr); gap: 18px; padding-top: 32px; }

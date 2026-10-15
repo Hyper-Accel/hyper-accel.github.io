@@ -3,5 +3,5 @@
 {{- if ne (printf "%T" .) "string" }}
 {{- $slug = "" }}{{ with .GetTerms "categories" }}{{ $slug = path.Base (index . 0).RelPermalink }}{{ end }}
 {{- end }}
-{{- $m := index (partial "d/colors.html" "") $slug | default (dict "c" "#009EE2" "on" "#02121c") }}
+{{- $m := index (partialCached "d/colors.html" "") $slug | default (dict "c" "#009EE2" "on" "#02121c") }}
 {{- return (printf "--c:%s;--on:%s" $m.c $m.on | safeCSS) -}}
