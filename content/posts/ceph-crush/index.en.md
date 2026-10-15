@@ -418,12 +418,14 @@ B1(1)  B2(2)
 > - Each bucket algorithm trades off **placement computation cost** against **cluster change cost**.
 > - Choosing an algorithm that fits the bucket keeps both costs low.
 
+{{< fulltable >}}
 | Bucket | Mapping Cost | Addition | Removal |
 |--------|--------------|----------|---------|
 | Uniform | `O(1)` | Poor | Poor |
 | List | `O(n)` | Optimal | Poor |
 | Tree | `O(log n)` | Good | Good |
 | Straw | `O(n)` | Optimal | Optimal |
+{{< /fulltable >}}
 
 ### Uniform
 

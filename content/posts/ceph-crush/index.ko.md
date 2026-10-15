@@ -418,12 +418,14 @@ B1(1)  B2(2)
 > - 각 Bucket Algorithm은 **Placement 계산 비용** 과 **Cluster 변경 비용** 에 따라 Trade-off가 있습니다.
 > - Bucket의 특성에 따라 적절한 알고리즘을 선택하면 계산 비용과 변경 비용을 최소화할 수 있습니다.
 
+{{< fulltable >}}
 | Bucket | Mapping Cost | Addition | Removal |
 |--------|--------------|----------|---------|
 | Uniform | `O(1)` | Poor | Poor |
 | List | `O(n)` | Optimal | Poor |
 | Tree | `O(log n)` | Good | Good |
 | Straw | `O(n)` | Optimal | Optimal |
+{{< /fulltable >}}
 
 ### Uniform
 

@@ -354,7 +354,7 @@ body .posts-grid-container .post-entry {
     height: auto;
 }
 
-/* Markdown tables (render-table hook): fill the post width, scroll when wider */
+/* fulltable shortcode: opt-in table that fills the post width, scrolls when wider */
 .post-content .table-wrapper {
     overflow-x: auto;
     margin: 1.5rem 0;
