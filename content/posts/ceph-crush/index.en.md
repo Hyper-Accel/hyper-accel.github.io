@@ -1,6 +1,6 @@
 ---
 date: '2026-10-15T10:00:00+09:00'
-draft: true
+draft: false
 title: 'Ceph Deep-Dive Part 1: CRUSH'
 cover:
   image: "images/en/cover.webp"

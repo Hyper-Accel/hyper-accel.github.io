@@ -1,6 +1,6 @@
 ---
 date: '2026-10-15T10:00:00+09:00'
-draft: true
+draft: false
 title: 'Ceph 뜯어먹기 1편: CRUSH'
 cover:
   image: "images/ko/cover.webp"
