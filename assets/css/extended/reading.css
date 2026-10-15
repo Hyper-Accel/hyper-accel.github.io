@@ -113,8 +113,9 @@ body.reading-page {
     font-weight: 650;
   }
   .reading-toc-toggle:hover, .reading-toc-toggle[aria-expanded="true"] { border-color: var(--tr-cyan-soft); }
-  .reading-toc-ready .tr-catbar { padding-right: 104px; }
-  .reading-toc-ready .tr-catbar-in { min-height: 44px; }
+  /* The TOC toggle sits at the bottom-right of the header, so categories move to their own row beside it. */
+  .reading-toc-ready .tr-header-in { flex-wrap: wrap; row-gap: 0; }
+  .reading-toc-ready .tr-nav { order: 3; flex-basis: 100%; max-width: calc(100% - 104px); min-height: 44px; border-top: 1px solid var(--tr-line); }
   .reading-toc-close {
     display: block;
     flex: 0 0 44px;
