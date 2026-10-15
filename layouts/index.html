@@ -81,13 +81,16 @@
 
   <section class="tr-featured">
     <h2 class="tr-h">{{ cond $ko "연재 시리즈" "Series" }}</h2>
+    {{- /* Every series, most recently updated first. */}}
+    {{- $series := slice }}
+    {{- range site.Taxonomies.series }}{{ $series = $series | append (dict "term" .Page "count" .Count "updated" (index .Pages.ByDate.Reverse 0).Date) }}{{ end }}
     <div class="tr-featured-grid">
-      {{- range first 3 site.Taxonomies.series.ByCount }}
-      {{- $term := .Page }}{{ $eps := sort $term.Pages "Params.series_idx" }}
+      {{- range sort $series "updated" "desc" }}
+      {{- $term := .term }}{{ $eps := sort $term.Pages "Params.series_idx" }}
       {{- $first := index $eps 0 }}{{ $latest := index $term.Pages.ByDate.Reverse 0 }}
       <article class="tr-feat" style="{{ partial "d/catvars.html" $first }}">
         <div class="tr-feat-main">
-          <span class="tr-feat-count">{{ .Count }}{{ cond $ko "편 연재" " parts" }}</span>
+          <span class="tr-feat-count">{{ .count }}{{ cond $ko "편 연재" " parts" }}</span>
           <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
           <p>{{ $first.Summary | plainify | htmlUnescape | truncate 100 }}</p>
           <ol class="tr-dots">{{ range $eps }}<li><a href="{{ .RelPermalink }}" title="{{ .Title }}"></a></li>{{ end }}</ol>

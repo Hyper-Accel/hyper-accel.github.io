@@ -31,7 +31,7 @@ const baseURL = process.argv[2] || 'http://localhost:1394/';
             insideViewport: bounds.x >= 0 && bounds.right <= innerWidth,
           };
         }));
-        assert.equal(results.length, 3);
+        assert.ok(results.length > 3, `every series is listed, got ${results.length}`);
         for (const card of results) {
           assert.equal(card.top, card.href, 'Card top should link to the series');
           assert.equal(card.aboveFooter, card.href, 'Upper area above footer should link to the series');
