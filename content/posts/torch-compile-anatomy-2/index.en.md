@@ -1,7 +1,6 @@
 ---
 date: '2026-10-12T18:00:00+09:00'
-draft: false
-title: 'Exploring torch.compile(), Part 2: Why Split It into Three Stages?'
+title: '[Exploring torch.compile() - Part 02] Why Split It into Three Stages?'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch logo"
@@ -9,9 +8,9 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "PrivateUse1", "Compiler"]
-series: ["Exploring torch.compile()"]
+series: ['Exploring torch.compile()']
 series_idx: 2
-categories: ["AI", "Compiler"]
+categories: ["Compilers and Kernels"]
 summary: 'Why is torch.compile split into Dynamo, AOTAutograd, and Inductor? Starting from how PyTorch grew its ecosystem, we look at who uses the output of each stage, how, and what they gain from it.'
 description: 'An ecosystem view of why torch.compile is split into three stages. We trace how PyTorch drew people in by being as easy to use as plain Python and how it has opened up since 2.0, then look at how compiler backends like TensorRT, OpenVINO, and XLA, torch.export, GPUs, and new AI chips each use the outputs of the Dynamo, AOTAutograd, and Inductor stages. Huawei Ascend, Intel Gaudi, and IBM Spyre are compared along the way.'
 comments: true
