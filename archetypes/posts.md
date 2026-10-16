@@ -1,6 +1,5 @@
 ---
 date: '{{ .Date }}'
-draft: true
 title: '{{ replace .File.ContentBaseName "-" " " | title }}'
 cover:
   image: "<image path/url>"
@@ -11,7 +10,9 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [] # must match with content/authors
 tags: []
-categories: []
+categories: [] # exactly one: AI Hardware | Memory and Storage | Compilers and Kernels | LLM and Models | Infra and DevOps | Engineering Culture | Conference Reports
+# series: ["<series name>"]   # series posts only; then title: '[<short series name> - Part 01] <title>'
+# series_idx: 1
 summary: []
 comments: true
 ---

@@ -1,7 +1,6 @@
 ---
 date: '2025-11-16T15:10:28+09:00'
-draft: false
-title: 'Crafting Compilers'
+title: '[Crafting Compilers - Part 01] Series Introduction'
 cover:
   image: "486.jpeg"
   # can also paste direct link from external site
@@ -10,14 +9,13 @@ cover:
   caption: "Crafting Compiler"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [jaewoo kim] # must match with content/authors
-tags: [compiler]
-categories: [compiler]
-series: ["Crafting Compilers"]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
+series: ['Crafting Compilers']
+series_idx: 1
 summary: [Introduction to series of posts that would guide people to journey learning about how compiler works, and how they can build their own.]
 comments: true
 ---
-
-# Crafting Compilers
 
 ## Compilers
 

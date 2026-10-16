@@ -1,6 +1,5 @@
 ---
 date: '2026-03-05T10:00:00+09:00'
-draft: false
 title: 'Transformer World: LLM의 기본 구조 뜯어보기'
 cover:
   image: "images/transformer-cover.png"
@@ -8,8 +7,8 @@ cover:
   caption: "Transformer Architecture"
   relative: true
 authors: [Hyunjun Park]
-tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache"]
-categories: ["AI", "Deep Learning"]
+tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache", "Deep Learning"]
+categories: ["LLM and Models"]
 summary: 'Transformer 기반 LLM의 내부 구조를 하나하나 뜯어보며, 각 모듈이 갖는 의미와 최적화 기법까지 정리합니다.'
 description: 'Transformer 기반 LLM의 내부 구조를 단계별로 살펴보고, Token Embedding·Attention·LM Head 등 각 모듈의 의미와 KV Cache·MHA·GQA 등 최적화 기법을 정리합니다.'
 comments: true

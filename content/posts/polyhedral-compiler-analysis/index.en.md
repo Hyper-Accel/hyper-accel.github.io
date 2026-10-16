@@ -1,17 +1,17 @@
 ---
 date: '2026-01-29T15:10:28+09:00'
-draft: false
-title: 'Polyhedral Analysis'
+title: '[Crafting Compilers - Part 03] Polyhedral Analysis'
 cover:
   image: "title.png"
   alt: "Polyhedral Analysis"
   caption: "Polyhedral Analysis"
   relative: false
 authors: [Jaewoo Kim]
-tags: [compiler]
-categories: [compiler]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
 summary: [Introduction to polyhedral analysis. Which gives simplified guide for understanding polyhedral compiler analysis & optimization.]
-series: ["Crafting Compilers"]
+series: ['Crafting Compilers']
+series_idx: 3
 comments: true
 description: "A concise walk-through of polyhedral compiler basics, covering affine concepts, polyhedra and Farkas lemma, iteration/schedule vectors, parallelism analysis, and polyhedral transformation."
 keywords: [

@@ -12,70 +12,14 @@ languages:
     languageName: 한국어
     weight: 1
     title: HyperAccel Tech Blog
-    menu:
-      main:
-        - identifier: about
-          name: 소개
-          url: /about/
-          weight: 5
-        - identifier: posts
-          name: 포스트
-          url: /posts/
-          weight: 10
-        - identifier: authors
-          name: 작성자
-          url: /authors/
-          weight: 10
-        - identifier: categories
-          name: 카테고리
-          url: /categories/
-          weight: 15
-        - identifier: tags
-          name: 태그
-          url: /tags/
-          weight: 20
-        - identifier: search
-          name: 검색
-          url: /search/
-          weight: 25
-        - identifier: baseurl
-          name: HyperAccel
-          url: https://hyperaccel.ai/
-          weight: 30
+    params:
+      DateFormat: "2006.01.02"
   en:
     languageName: English
     weight: 2
     title: HyperAccel Tech Blog
-    menu:
-      main:
-        - identifier: about
-          name: About
-          url: /en/about/
-          weight: 5
-        - identifier: posts
-          name: Posts
-          url: /en/posts/
-          weight: 10
-        - identifier: authors
-          name: Authors
-          url: /en/authors/
-          weight: 10
-        - identifier: categories
-          name: Categories
-          url: /en/categories/
-          weight: 15
-        - identifier: tags
-          name: Tags
-          url: /en/tags/
-          weight: 20
-        - identifier: search
-          name: Search
-          url: /en/search/
-          weight: 25
-        - identifier: baseurl
-          name: HyperAccel
-          url: https://hyperaccel.ai/
-          weight: 30
+    params:
+      DateFormat: "January 2, 2006"
 
 enableRobotsTXT: true
 buildDrafts: false
@@ -93,8 +37,8 @@ params:
   keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
   images: ["/images/logo.png"]
   DateFormat: "January 2, 2006"
-  defaultTheme: auto # dark, light
-  disableThemeToggle: false
+  defaultTheme: dark
+  disableThemeToggle: true
 
   ShowReadingTime: true
   ShowShareButtons: true
@@ -171,20 +115,8 @@ params:
 
   editPost:
     URL: "https://github.com/Hyper-Accel/hyper-accel.github.io/blob/main/content"
-    Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
-  # for search
-  # https://fusejs.io/api/options.html
-  fuseOpts:
-    isCaseSensitive: false
-    shouldSort: true
-    location: 0
-    distance: 1000
-    threshold: 0.4
-    minMatchCharLength: 0
-    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
-    keys: ["title", "permalink", "summary", "content"]
   math: true
 
   giscus:

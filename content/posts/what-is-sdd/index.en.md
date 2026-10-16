@@ -1,6 +1,5 @@
 ---
 date: '2026-02-03T10:17:33+09:00'
-draft: false
 title: 'Specs are All You Need: What is Spec-Driven Development (SDD)?'
 cover:
   image: "sdd.png"
@@ -9,7 +8,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Seungbin Shin]
 tags: ["Spec-Driven Development", "SDD", "AI Engineering", "LLM", "Prompt Engineering"]
-categories: ["AI Engineering", "AI Trends"]
+categories: ["Engineering Culture"]
 summary: Spec-Driven Development (SDD) is a new development methodology for the AI era, moving beyond prompt engineering to spec engineering.
 comments: true
 ---

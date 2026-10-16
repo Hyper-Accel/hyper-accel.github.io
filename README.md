@@ -204,7 +204,6 @@ content/posts/
 ---
 title: '나의 첫 포스트'
 date: '2025-01-15T10:00:00+09:00'
-draft: false
 authors: ['Minho Park']
 ---
 
@@ -218,7 +217,6 @@ authors: ['Minho Park']
 ---
 title: 'My First Post'
 date: '2025-01-15T10:00:00+09:00'
-draft: false
 authors: ['Minho Park']
 ---
 
@@ -239,10 +237,9 @@ This is the English version.
 ---
 title: '지피지기면 백전불태 2편: TPU의 등장과 부상'
 date: '2026-01-03T17:20:16+09:00'
-draft: false
 authors: [Jaewon Lim]
 tags: ["TPU", "Google", "Ironwood"]
-categories: ["AI Hardware", "Computer Architecture"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]  # 시리즈 이름 추가
 ---
 ```
@@ -309,7 +306,6 @@ series_idx: 3
 포스트 생성 시 자동으로 생성되는 메타데이터 필드들:
 
 - **`date`**: 포스트 작성일 (자동 생성)
-- **`draft`**: 초안 여부 (`true`: 초안, `false`: 발행)
 - **`title`**: 포스트 제목 (파일명에서 자동 생성, 수정 가능)
 - **`cover`**: 커버 이미지 설정
   - `image`: 이미지 경로 또는 URL
@@ -319,7 +315,7 @@ series_idx: 3
 
 추가로 설정할 수 있는 메타데이터:
 - **`tags`**: 포스트 태그 (배열)
-- **`categories`**: 포스트 카테고리 (배열)
+- **`categories`**: 포스트 카테고리. **정확히 1개**만 지정합니다 (`AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` 중 택 1). 세부 주제는 `tags`에 넣습니다. 한/영 표시 이름은 `content/categories/<slug>/_index*.md`에 있습니다.
 - **`summary`**: 포스트 요약
 
 #### SEO 최적화를 위한 메타데이터
@@ -361,12 +357,11 @@ series_idx: 3
 date: '2025-01-15T10:00:00+09:00'
 lastmod: '2025-01-20T15:30:00+09:00'
 title: 'Hugo 블로그 SEO 가이드'
-draft: false
 authors: ['Minho Park']
 description: 'Hugo와 PaperMod 테마를 사용한 블로그의 SEO 최적화 방법을 알아봅니다. 메타 태그, Open Graph, Schema.org 설정 등을 포함합니다.'
 keywords: ['Hugo', 'SEO', '블로그', 'PaperMod', '검색엔진최적화']
 tags: ['Hugo', 'SEO', 'Tutorial']
-categories: ['Tech']
+categories: ['Engineering Culture']
 summary: 'Hugo 블로그의 SEO 최적화 가이드입니다.'
 cover:
   image: 'seo-guide.png'
@@ -504,9 +499,9 @@ PR 또는 `main`에 push할 때 [Check large files](.github/workflows/check-larg
 
 ## 📤 포스트 배포
 
-### 1. 포스트 완성 후 초안 해제
+### 1. 포스트 완성 확인
 
-포스트 파일에서 `draft: true`를 `draft: false`로 변경합니다.
+`draft` 필드는 쓰지 않습니다. PR이 `main`에 머지되면 바로 발행되므로, 공개할 준비가 된 글만 머지합니다.
 
 ### 2. 새 브랜치 생성 및 변경사항 커밋
 

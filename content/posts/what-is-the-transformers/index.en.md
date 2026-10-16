@@ -1,6 +1,5 @@
 ---
 date: '2026-03-05T10:00:00+09:00'
-draft: false
 title: 'Transformer World: A Deep Dive into the Building Blocks of LLMs'
 cover:
   image: "images/transformer-cover.png"
@@ -8,8 +7,8 @@ cover:
   caption: "Transformer Architecture"
   relative: true
 authors: [Hyunjun Park]
-tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache"]
-categories: ["AI", "Deep Learning"]
+tags: ["Transformer", "LLM", "Attention", "GPT", "LLaMA", "KV Cache", "Deep Learning"]
+categories: ["LLM and Models"]
 summary: "A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques."
 description: 'A step-by-step walkthrough of Transformer-based LLM internals: the role of Token Embedding, Attention, LM Head, and optimization techniques such as KV Cache, MHA, and GQA.'
 comments: true

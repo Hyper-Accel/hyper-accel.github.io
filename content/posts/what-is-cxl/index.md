@@ -1,17 +1,16 @@
 ---
 date: '2026-06-04T10:12:00+09:00'
-draft: false
-title: 'AI 시대의 필수 소비재, 메모리 이해하기 4편: CXL 이해하기'
+title: '[메모리 이해하기 - Part 04] CXL 이해하기'
 cover:
   image: "01-cxl-position.webp"
   alt: "CXL이 메모리 계층에서 차지하는 위치 - CPU 옆 메모리 풀과 가속기 코히런스"
   caption: "DDR과 PCIe 사이, CXL이 채우는 자리"
   relative: true
 authors: [Seungbin Shin]
-tags: ["CXL", "Compute Express Link", "memory", "memory pooling", "coherency", "PCIe", "CMM", "memory expander", "Panmnesia", "PANSWITCH"]
-series: ["AI 시대의 필수 소비재, 메모리 이해하기"]
+tags: ["CXL", "Compute Express Link", "memory", "memory pooling", "coherency", "PCIe", "CMM", "memory expander", "Panmnesia", "PANSWITCH", "Semiconductor"]
+series: ['AI 시대의 필수 소비재, 메모리 이해하기']
 series_idx: 4
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "GPU 옆은 HBM과 HBF가 채우지만, CPU 옆에는 또 다른 빈 자리가 있습니다. PCIe와 DDR 사이의 어색한 틈을 메우는 새로운 인터페이스, CXL의 기본 구조와 디바이스 타입, 그리고 메모리 3사가 그리는 CXL 제품 청사진을 살펴봅니다."
 description: "CXL(Compute Express Link)의 등장 배경, CXL.io/.cache/.mem 세 가지 sub-protocol, Type 1/2/3 디바이스 분류, 1.1부터 3.x까지의 표준 진화, 그리고 삼성·SK하이닉스·마이크론의 CXL 메모리 제품군을 기술적으로 분석합니다."
 comments: true

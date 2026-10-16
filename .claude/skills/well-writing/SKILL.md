@@ -67,6 +67,7 @@ These should usually block publication until resolved:
 - unknown `authors` values that do not appear to match `content/authors/<author_id>/`
 - missing multilingual pair for a new publish-ready post, or paired files that do not share the same slug
 - placeholder metadata such as `<text>`, `<image path/url>`, empty `authors`, empty `tags`, empty `categories`, or empty `summary`
+- `categories` with more than one value, or a value not listed in `content/posts/AGENTS.md`
 - unresolved factual, legal, reputational, or contentious claims that are too risky to publish without verification
 
 ### House-Style Conformance

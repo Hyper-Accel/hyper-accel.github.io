@@ -4,6 +4,12 @@
 - id: next_page
   translation: "Next"
 
+- id: prev_post
+  translation: "Previous post"
+
+- id: next_post
+  translation: "Next post"
+
 - id: read_time
   translation:
     one : "1 min"
@@ -17,6 +23,12 @@
 - id: toc
   translation: "Table of Contents"
 
+- id: close_toc
+  translation: "Close table of contents"
+
+- id: toc_short
+  translation: "Contents"
+
 - id: translations
   translation: "Translations"
 
@@ -24,7 +36,7 @@
   translation: "Home"
 
 - id: edit_post
-  translation: "Edit"
+  translation: "Suggest changes"
 
 - id: code_copy
   translation: "copy"

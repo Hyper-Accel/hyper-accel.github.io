@@ -1,7 +1,6 @@
 ---
 date: '2026-02-25T14:50:09+09:00'
-draft: false
-title: '지피지기면 백전불태 번외편: Pallas Programming Model'
+title: '[지피지기 - 번외편] Pallas Programming Model'
 cover:
   image: "images/00-main-image.png"
   # can also paste direct link from external site
@@ -10,9 +9,9 @@ cover:
   caption: ""
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
-tags: ["Pallas", "TPU", "Google", "Ironwood", "커널", "커스텀 커널", "Programming Model"]
-categories: ["AI Hardware", "Computer Architecture"]
-series: ["지피지기면 백전불태"]
+tags: ["Pallas", "TPU", "Google", "Ironwood", "커널", "커스텀 커널", "Programming Model", "Computer Architecture"]
+categories: ["Compilers and Kernels"]
+series: ['지피지기면 백전불태']
 series_idx: 2.5
 summary: "TPU에서 커스텀 커널을 작성할 수 있게 해주는 Pallas 프로그래밍 모델에 대해 알아봅니다."
 comments: true
@@ -22,8 +21,6 @@ keywords: [
   "AI Hardware", "Programming Model", "TPU 최적화"
 ]
 ---
-
-# 지피지기면 백전불태 번외편: Pallas Programming Model
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  
 > 상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다는 뜻입니다.  

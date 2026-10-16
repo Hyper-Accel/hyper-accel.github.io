@@ -1,7 +1,6 @@
 ---
 date: '2026-08-04T18:00:00+09:00'
-draft: false
-title: 'Anatomy of torch.compile, Part 1: TorchDynamo, AOTAutograd, TorchInductor'
+title: '[Anatomy of torch.compile - Part 01] TorchDynamo, AOTAutograd, TorchInductor'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch logo"
@@ -9,9 +8,9 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
-series: ["Anatomy of torch.compile"]
+series: ['Anatomy of torch.compile']
 series_idx: 1
-categories: ["AI", "Compiler"]
+categories: ["Compilers and Kernels"]
 summary: 'We take torch.compile apart into its three components — TorchDynamo, AOTAutograd, and TorchInductor — and walk through what each one takes in, what it hands back, and how it actually works.'
 description: 'A walkthrough of the three components behind torch.compile: TorchDynamo, AOTAutograd, and TorchInductor. Covers what a graph is, bytecode interception and guards, graph breaks, operator normalization below the dispatcher, and per-element IR with code generation.'
 comments: true

@@ -1,7 +1,6 @@
 ---
 date: '2026-02-25T14:50:09+09:00'
-draft: false
-title: 'Know Your Enemy, Know Yourself, Supplement: Pallas Programming Model'
+title: '[Know Your Enemy - Extra] Pallas Programming Model'
 cover:
   image: "images/00-main-image.png"
   # can also paste direct link from external site
@@ -10,9 +9,9 @@ cover:
   caption: ""
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Donghyeon Choi"] # must match with content/authors
-tags: ["Pallas", "TPU", "Google", "Ironwood", "Kernel", "Custom Kernel", "Programming Model"]
-categories: ["AI Hardware", "Computer Architecture"]
-series: ["Know Your Enemy, Know Yourself"]
+tags: ["Pallas", "TPU", "Google", "Ironwood", "Kernel", "Custom Kernel", "Programming Model", "Computer Architecture"]
+categories: ["Compilers and Kernels"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 2.5
 summary: "Learn about Pallas programming model that enables writing custom kernels on TPU."
 comments: true
@@ -22,8 +21,6 @@ keywords: [
   "AI Hardware", "Programming Model", "TPU Optimization"
 ]
 ---
-
-# Know Your Enemy, Know Yourself, Supplement: Pallas Programming Model
 
 > **Know Your Enemy, Know Yourself (知彼知己 百戰不殆)**  
 > If you know your enemy and know yourself, you need not fear the result of a hundred battles.  

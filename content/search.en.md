@@ -1,8 +1,7 @@
 ---
-title: "Search" # in any language you want
-layout: "search" # necessary for search
-# url: "/archive"
-# description: "Description for Search"
-summary: "search"
-placeholder: "placeholder text in search input box"
+title: "Search"
+layout: "search"
+description: "Search titles and content from HyperAccel Engineering."
+summary: "Search the tech blog"
+placeholder: "Search topics, series, and authors"
 ---

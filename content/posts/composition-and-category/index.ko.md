@@ -1,7 +1,6 @@
 ---
 date: '2026-09-25T09:00:00+09:00'
-draft: false
-title: '모나드와 범주론 ① 함수가 이어지지 않을 때'
+title: '[모나드와 범주론 - Part 01] 함수가 이어지지 않을 때'
 cover:
   image: "composition-cover.ko.png"
   alt: "함수가 이어지지 않을 때: 함수 f와 g 사이에 연결 규칙을 놓아 계산을 잇는 모습"
@@ -11,7 +10,7 @@ authors: [Jaeho Choi]
 tags: ["category theory", "functional programming", "Lean4", "monad", "composition", "flatMap", "Option"]
 series: ["코드에서 시작하는 모나드와 범주론"]
 series_idx: 1
-categories: ["Programming Language"]
+categories: ["Compilers and Kernels"]
 summary: "Option을 반환하는 함수들의 타입이 맞지 않아 합성이 끊기는 장면에서 출발해, 조건 분기·map·join·bind가 같은 계산을 만드는 과정을 살펴봅니다."
 description: "값이 없을 수 있는 계산을 연결하며, 모나드로 이어지는 첫 번째 합성 규칙을 만들어 봅니다."
 comments: true

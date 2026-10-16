@@ -1,17 +1,16 @@
 ---
 date: '2026-05-28T13:42:34+09:00'
-draft: false
-title: 'Memory in the AI Era, Part 3: The Remaining Challenges of HBF'
+title: '[Memory in the AI Era - Part 03] The Remaining Challenges of HBF'
 cover:
   image: "images/cover.png"
   alt: "HBF commercialization challenges cover image"
   caption: "HBF commercialization challenges"
   relative: true
 authors: [Jaewon Lim]
-tags: ["HBF", "High Bandwidth Flash", "NAND Flash", "memory", "LLM", "Inference", "Sparse Attention", "SanDisk", "SK Hynix"]
-series: ["Memory in the AI Era"]
+tags: ["HBF", "High Bandwidth Flash", "NAND Flash", "memory", "LLM", "Inference", "Sparse Attention", "SanDisk", "SK Hynix", "Semiconductor"]
+series: ['Memory in the AI Era']
 series_idx: 3
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "HBF clearly has its place, but it still has gaps to fill before it can claim a spot in the memory hierarchy pyramid. We walk through the latest LLM model and inference workload trends, how Flash memory is actually used in LLM serving today, and the remaining challenges HBF has to solve."
 description: "HBF clearly has its place, but it still has gaps to fill before it can claim a spot in the memory hierarchy pyramid. We walk through the latest LLM model and inference workload trends, how Flash memory is actually used in LLM serving today, and the remaining challenges HBF has to solve."
 comments: true

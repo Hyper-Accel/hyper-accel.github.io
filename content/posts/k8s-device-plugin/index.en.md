@@ -1,7 +1,6 @@
 ---
 date: '2026-03-27T10:38:13+09:00'
-draft: false
-title: 'Building an In-House Dev Environment on Kubernetes Part 3: Kubernetes Device Plugin for LPU'
+title: '[K8s Dev Environment - Part 03] Kubernetes Device Plugin for LPU'
 cover:
   image: "images/kubernetes_with_devices.png"
   # can also paste direct link from external site
@@ -10,9 +9,10 @@ cover:
   caption: "Kubernetes and Device Plugins"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Younghoon Jun"] # must match with content/authors
-tags: [kubernetes, device-plugin, LPU, GPU, FPGA, DRA]
-categories: [kubernetes]
-series: ["Building an In-House Dev Environment on Kubernetes"]
+tags: ["kubernetes", "device-plugin", "LPU", "GPU", "FPGA", "DRA"]
+categories: ["Infra and DevOps"]
+series: ['Building an In-House Dev Environment on Kubernetes']
+series_idx: 3
 summary: ['We share our journey of building a Kubernetes-based development environment at HyperAccel.']
 comments: true
 description: ""
@@ -21,8 +21,6 @@ keywords: [
   "LPU", "FPGA", "GPU", "gRPC"
 ]
 ---
-
-# Building an In-House Dev Environment on Kubernetes Part 3: Kubernetes Device Plugin for LPU
 
 Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.
 

@@ -1,17 +1,16 @@
 ---
 date: '2026-09-08T09:42:25+09:00'
-draft: false
-title: "Know Your Enemy, Know Yourself, Part 7: A Model Trained on GPUs Builds a Better Chip Than GPUs"
+title: '[Know Your Enemy - Part 07] A Model Trained on GPUs Builds a Better Chip Than GPUs'
 cover:
   image: "images/cover.webp"
   alt: "A flaming jalapeño character standing on NVIDIA and AMD GPUs"
   caption: "Jalapeño, OpenAI's LLM inference accelerator"
   relative: true
 authors: [Jaewon Lim]
-tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS"]
-series: ["Know Your Enemy, Know Yourself"]
+tags: ["OpenAI", "Jalapeño", "LLM Inference", "AI Accelerator", "NVIDIA", "Broadcom", "HLS", "XLS", "Accelerator", "Computer Architecture", "Semiconductor"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 7
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 summary: "The era of using AI to build chips that run AI has arrived. Drawing on publicly released information about Jalapeño, OpenAI's custom chip, this article explores what that means."
 comments: true
 ---

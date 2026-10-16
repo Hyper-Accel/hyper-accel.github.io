@@ -1,6 +1,5 @@
 ---
 date: '2026-03-17T10:00:00+09:00'
-draft: false
 title: 'AITER Analysis: How AMD Doubled ROCm Inference Performance'
 cover:
   image: "images/mi300x-launch.jpg"
@@ -8,8 +7,8 @@ cover:
   caption: "AMD Instinct MI300X Launch Event"
   relative: true
 authors: [Minho Park]
-tags: [AMD, ROCm, AITER, inference, kernel, MI300X, GPU]
-categories: [report]
+tags: ["AMD", "ROCm", "AITER", "inference", "kernel", "MI300X", "GPU"]
+categories: ["Compilers and Kernels"]
 summary: "An analysis of AITER (AI Tensor Engine for ROCm), which boosts inference performance on AMD GPUs."
 description: "An analysis of AMD's AITER kernel library that doubled ROCm inference performance. We examine its four kernel backend strategies (Triton, CK, HIP, ASM), JIT compile pipeline, and the architecture that achieved ~2× throughput improvement on DeepSeek R1."
 comments: true

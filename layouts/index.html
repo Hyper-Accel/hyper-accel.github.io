@@ -1,0 +1,213 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- $cats := (site.GetPage "/categories").Pages }}
+{{- $stack := slice "llm-and-models" "infra-and-devops" "compilers-and-kernels" "memory-and-storage" "ai-hardware" }}
+{{- $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+<div class="tr">
+  <section class="tr-hero">
+    <div class="tr-hero-copy">
+      <p class="tr-eyebrow">HYPERACCEL TECH BLOG</p>
+      <h1 class="tr-headline">{{ cond $ko "트랜지스터부터 LLM Inference까지,<br>Full-Stack AI 기술을 이야기합니다." "From transistors to LLM inference,<br>we write about full-stack AI." | safeHTML }}</h1>
+      <p class="tr-sub">{{ cond $ko "칩 설계, 메모리, 컴파일러, 인프라, 모델까지. HyperAccel 엔지니어들이 AI 스택 전 층위에서 배운 것을 기록합니다." "Chip design, memory, compilers, infrastructure, and models. HyperAccel engineers write down what they learn across every layer of the AI stack." }}</p>
+      <form class="tr-search" action="{{ "search/" | relLangURL }}" method="get" role="search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <input type="search" name="q" maxlength="64" autocomplete="off" aria-label="{{ cond $ko "기술 블로그 검색" "Search the tech blog" }}" placeholder="{{ cond $ko "제목과 본문에서 검색" "Search titles and content" }}">
+        <button type="submit">{{ cond $ko "검색" "Search" }}</button>
+      </form>
+    </div>
+
+    {{- $levels := dict "ai-hardware" "L1 · Hardware" "memory-and-storage" "L2 · Memory" "compilers-and-kernels" "L3 · Compiler" "infra-and-devops" "L4 · Infra" "llm-and-models" "L5 · Model" }}
+    {{- $logo := "/images/logo-transparent.png" | relURL }}
+    <div class="tr-stack-area">
+      <nav class="tr-stack" aria-label="{{ cond $ko "기술 스택별 카테고리" "Categories by stack layer" }}" style="--n:{{ len $stack }}">
+        {{- range $i, $slug := $stack }}
+        {{- with site.GetPage (printf "/categories/%s" $slug) }}
+        <a class="tr-layer" href="{{ .RelPermalink }}" data-layer="{{ $slug }}" aria-controls="tr-drawer" aria-expanded="false" style="--i:{{ sub (len $stack) (add $i 1) }};{{ partial "d/catvars.html" $slug }}">
+          <span class="tr-hit" aria-hidden="true"></span>
+          <svg viewBox="0 0 240 92" aria-hidden="true">
+            <polygon class="f-l" points="0,40 120,80 120,92 0,52"/>
+            <polygon class="f-r" points="120,80 240,40 240,52 120,92"/>
+            <polygon class="f-t" points="120,0 240,40 120,80 0,40"/>
+            <g transform="matrix(120 40 -120 40 120 0)">
+              <image class="f-logo" href="{{ $logo }}" x=".2" y=".2" width=".6" height=".6" preserveAspectRatio="xMidYMid meet"/>
+            </g>
+          </svg>
+          <span class="tr-layer-label"><em>{{ index $levels $slug }}</em><b>{{ .Title }} <small>{{ len .Pages }}{{ cond $ko "편" "" }}</small></b></span>
+        </a>
+        {{- end }}
+        {{- end }}
+      </nav>
+
+      <p class="tr-stack-hint">{{ cond $ko "레이어를 누르면 분야별 글이 아래로 펼쳐집니다" "Click a layer to unfold its posts below" }}</p>
+    </div>
+  </section>
+
+  <section class="tr-drawer" id="tr-drawer" aria-label="{{ cond $ko "선택한 분야의 글" "Posts in the selected layer" }}">
+    <div class="tr-drawer-in">
+      {{- range $stack }}
+      {{- with site.GetPage (printf "/categories/%s" .) }}
+      {{- $slug := path.Base .RelPermalink }}
+      <div class="tr-drawer-panel" data-drawer="{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}" hidden>
+        <header class="tr-drawer-head">
+          <div>
+            <p class="tr-drawer-kicker"><i class="tr-dot"></i>{{ index $levels $slug }}</p>
+            <h2 class="tr-h">{{ .Title }}</h2>
+            <p class="tr-drawer-desc">{{ .Description }}</p>
+          </div>
+          <div class="tr-drawer-actions">
+            <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
+            <button class="tr-drawer-close" type="button" aria-label="{{ cond $ko "접기" "Collapse" }}">×</button>
+          </div>
+        </header>
+        <div class="tr-drawer-row">
+          {{- range .Pages.ByDate.Reverse }}{{ partial "d/card.html" (dict "page" . "summary" true) }}{{ end }}
+        </div>
+      </div>
+      {{- end }}
+      {{- end }}
+    </div>
+  </section>
+
+  <section class="tr-latest">
+    <header class="tr-section-head">
+      <h2 class="tr-h">{{ cond $ko "최신 글" "Latest" }}</h2>
+      <a class="tr-more" href="{{ "posts/" | relLangURL }}">{{ cond $ko (printf "전체 %d편" (len $posts)) (printf "All %d posts" (len $posts)) }} →</a>
+    </header>
+    <div class="tr-latest-grid">
+      {{- range first 3 $posts }}{{ partial "d/card.html" (dict "page" . "summary" true) }}{{ end }}
+    </div>
+  </section>
+
+  <section class="tr-featured">
+    <h2 class="tr-h">{{ cond $ko "연재 시리즈" "Series" }}</h2>
+    {{- /* Every series, most recently updated first. */}}
+    {{- $series := slice }}
+    {{- range site.Taxonomies.series }}{{ $series = $series | append (dict "term" .Page "count" .Count "updated" (index .Pages.ByDate.Reverse 0).Date) }}{{ end }}
+    <div class="tr-featured-grid">
+      {{- range sort $series "updated" "desc" }}
+      {{- $term := .term }}{{ $eps := sort $term.Pages "Params.series_idx" }}
+      {{- $first := index $eps 0 }}{{ $latest := index $term.Pages.ByDate.Reverse 0 }}
+      <article class="tr-feat" style="{{ partial "d/catvars.html" $first }}">
+        <div class="tr-feat-main">
+          <span class="tr-feat-count">{{ .count }}{{ cond $ko "편 연재" " parts" }}</span>
+          <h3><a href="{{ $term.RelPermalink }}">{{ $term.Title }}</a></h3>
+          <p>{{ $first.Summary | plainify | htmlUnescape | truncate 100 }}</p>
+          <ol class="tr-dots">{{ range $eps }}<li><a href="{{ .RelPermalink }}" title="{{ .Title }}"></a></li>{{ end }}</ol>
+        </div>
+        <div class="tr-feat-links">
+          <a href="{{ $first.RelPermalink }}">{{ cond $ko "1편부터 읽기" "Start from part 1" }} →</a>
+          <a href="{{ $latest.RelPermalink }}">{{ cond $ko "최신 편" "Latest" }} →</a>
+        </div>
+      </article>
+      {{- end }}
+    </div>
+  </section>
+
+  {{- range $cats }}{{ $slug := path.Base .RelPermalink }}
+  <section class="tr-shelf" id="track-{{ $slug }}" style="{{ partial "d/catvars.html" $slug }}">
+    <header class="tr-shelf-head">
+      <div>
+        <h2 class="tr-h"><i class="tr-dot"></i>{{ .Title }}</h2>
+        <p class="tr-shelf-desc">{{ .Description }}</p>
+      </div>
+      <a class="tr-more" href="{{ .RelPermalink }}">{{ cond $ko (printf "전체 %d편" (len .Pages)) (printf "All %d posts" (len .Pages)) }} →</a>
+    </header>
+    <div class="tr-scroller">
+      {{- range .Pages.ByDate.Reverse }}{{ partial "d/card.html" (dict "page" .) }}{{ end }}
+    </div>
+  </section>
+  {{- end }}
+</div>
+<script>
+(() => {
+  const area = document.querySelector('.tr-stack-area');
+  const drawer = document.querySelector('.tr-drawer');
+  if (!area || !drawer) return;
+  const layers = [...area.querySelectorAll('.tr-layer')];
+  const panels = [...drawer.querySelectorAll('[data-drawer]')];
+  const touch = matchMedia('(hover: none)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  // Short grace so a cursor that slips off the edge for a moment does not collapse the stack.
+  const CLOSE_MS = 250;
+  let closeTimer, hovered = '', selected = '';
+
+  const paint = () => {
+    const slug = hovered || selected;
+    layers.forEach((l) => l.classList.toggle('on', l.dataset.layer === slug));
+    area.classList.toggle('has-active', !!slug);
+  };
+  const open = () => { clearTimeout(closeTimer); area.classList.add('open'); };
+  const closeSoon = () => {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      area.classList.remove('open');
+      hovered = '';
+      paint();
+    }, CLOSE_MS);
+  };
+
+  // Each new pick folds the open box first and then unfolds it again, so every click reads as a fresh open.
+  const SWITCH_FALLBACK_MS = 500;
+  let switchToken = 0;
+  const reveal = (slug) => {
+    panels.forEach((p) => { p.hidden = p.dataset.drawer !== slug; });
+    const row = drawer.querySelector(`[data-drawer="${slug}"] .tr-drawer-row`);
+    if (row) row.scrollLeft = 0;
+    drawer.classList.add('is-open');
+    const top = drawer.getBoundingClientRect().top;
+    if (top > innerHeight * 0.75) {
+      scrollBy({ top: top - 140, behavior: calm.matches ? 'auto' : 'smooth' });
+    }
+  };
+  const expand = (slug) => {
+    const token = ++switchToken;
+    const wasOpen = drawer.classList.contains('is-open');
+    selected = slug;
+    layers.forEach((l) => l.setAttribute('aria-expanded', String(l.dataset.layer === slug)));
+    paint();
+    if (!wasOpen || calm.matches) { reveal(slug); return; }
+    drawer.classList.remove('is-open');
+    let done = false;
+    const go = () => {
+      if (done || token !== switchToken) return;
+      done = true;
+      drawer.removeEventListener('transitionend', onEnd);
+      reveal(slug);
+    };
+    const onEnd = (e) => { if (e.target === drawer) go(); };
+    drawer.addEventListener('transitionend', onEnd);
+    setTimeout(go, SWITCH_FALLBACK_MS);
+  };
+  const collapse = () => {
+    switchToken++;
+    selected = '';
+    layers.forEach((l) => l.setAttribute('aria-expanded', 'false'));
+    drawer.classList.remove('is-open');
+    paint();
+  };
+  const toggle = (slug) => (selected === slug ? collapse() : expand(slug));
+
+  area.addEventListener('mouseenter', open);
+  area.addEventListener('mouseleave', closeSoon);
+  area.addEventListener('focusout', (e) => { if (!area.contains(e.relatedTarget)) closeSoon(); });
+
+  layers.forEach((l) => {
+    const slug = l.dataset.layer;
+    l.setAttribute('role', 'button');
+    l.addEventListener('mouseenter', () => { if (!touch.matches) { open(); hovered = slug; paint(); } });
+    l.addEventListener('focus', () => { open(); hovered = slug; paint(); });
+    l.addEventListener('click', (e) => { e.preventDefault(); toggle(slug); });
+    l.addEventListener('keydown', (e) => { if (e.key === ' ') { e.preventDefault(); toggle(slug); } });
+  });
+
+  drawer.querySelectorAll('.tr-drawer-close').forEach((b) => b.addEventListener('click', () => {
+    const owner = layers.find((l) => l.dataset.layer === selected);
+    collapse();
+    owner?.focus({ preventScroll: true });
+  }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && selected && (drawer.contains(document.activeElement) || area.contains(document.activeElement))) collapse();
+  });
+})();
+</script>
+{{- end }}

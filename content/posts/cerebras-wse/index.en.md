@@ -1,16 +1,15 @@
 ---
 date: '2026-04-27T10:00:00+09:00'
-draft: false
-title: 'Know Your Enemy, Know Yourself Part 5: Cerebras and the Wafer-Scale Engine'
+title: '[Know Your Enemy - Part 05] Cerebras and the Wafer-Scale Engine'
 cover:
   image: "images/00-cover-cerebras-wse.png"
   alt: "Cerebras WSE-3 or CS-3 system"
   caption: "Cerebras Wafer-Scale Engine"
   relative: true
 authors: ["Donghyeon Choi"]
-tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI"]
-categories: ["AI Hardware", "Architecture", "Accelerator"]
-series: ["Know Your Enemy, Know Yourself"]
+tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI", "Accelerator"]
+categories: ["AI Hardware"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 5
 summary: "This post explains Cerebras's recent momentum, WSE-3 architecture, and the trade-offs of wafer-scale chips in a beginner-friendly way, following reports of a large OpenAI deal."
 description: "This post explains Cerebras's recent momentum, WSE-3 architecture, and the trade-offs of wafer-scale chips in a beginner-friendly way, following reports of a large OpenAI deal."
@@ -20,8 +19,6 @@ keywords: [
   "AI Inference", "CS-3", "AI Hardware", "wafer scale"
 ]
 ---
-
-# Know Your Enemy, Know Yourself Part 5: Cerebras and the Wafer-Scale Engine
 
 > **Know Your Enemy, Know Yourself** comes from the idea that if you understand both the opponent and yourself, you will not be imperiled in a hundred battles.  
 > This series studies competing AI accelerator architectures so that we can reason about our own designs more clearly.  
