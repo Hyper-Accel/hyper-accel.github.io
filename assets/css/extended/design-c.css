@@ -66,7 +66,6 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-layer .f-t { fill: var(--c); fill-opacity: .66; stroke: #9ee8ff; stroke-opacity: .55; stroke-width: 1; transition: fill-opacity .3s, stroke-opacity .3s; }
 .tr-layer .f-l { fill: color-mix(in oklab, var(--c) 60%, #000); }
 .tr-layer .f-r { fill: color-mix(in oklab, var(--c) 40%, #000); }
-.tr-layer .f-grid { fill: none; stroke: #e6fbff; stroke-opacity: .2; stroke-width: 1; }
 .tr-layer .f-logo { opacity: .18; transition: opacity .35s; }
 .tr-layer-label { position: absolute; left: calc(var(--lw) + 22px); top: calc(var(--cy) - 18px); display: flex; flex-direction: column; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity .3s, transform .3s; pointer-events: none; }
 .tr-layer-label::before { content: ""; position: absolute; left: -22px; top: 18px; width: 16px; height: 1px; background: var(--c-ink); opacity: .7; }
