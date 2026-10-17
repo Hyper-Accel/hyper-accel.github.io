@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+<title id="title">자기 자신으로 돌아오는 항등 화살표와 양쪽 항등법칙</title>
+<desc id="desc">A에서 B로 가는 f가 있습니다. A의 둥근 화살표 pureOption_A를 먼저 지나 f로 가는 합성은 f와 같고, f를 지난 뒤 B의 둥근 화살표 pureOption_B를 지나는 합성도 f와 같습니다. 둥근 화살표는 빈 경로의 역할을 맡는 항등 화살표 후보입니다.</desc>
+<defs>
+  <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102634"/><stop offset="1" stop-color="#213f50"/></linearGradient>
+  <linearGradient id="face" x2="1" y2="1"><stop stop-color="#426d80"/><stop offset="1" stop-color="#224858"/></linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#b7d9e4" stroke-opacity=".055"/></pattern>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#061823" flood-opacity=".55"/></filter>
+  <marker id="blue-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#9cd2dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="gold-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#e6c286" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1200" height="560" fill="url(#bg)"/><rect width="1200" height="560" fill="url(#grid)"/>
+<g fill="none" stroke-width="7" stroke-linecap="round">
+  <path d="M300 275 C380 68 125 68 220 275" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M985 275 C1065 68 810 68 905 275" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M355 348H845" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
+</g>
+<g filter="url(#shadow)">
+  <path d="M185 290 215 270H360L330 290Z M870 290 900 270H1045L1015 290Z" fill="#527f91"/>
+  <path d="M330 290 360 270V385L330 405Z M1015 290 1045 270V385L1015 405Z" fill="#193b4c"/>
+  <g fill="url(#face)" stroke="#82afbf" stroke-width="2"><rect x="185" y="290" width="145" height="115" rx="6"/><rect x="870" y="290" width="145" height="115" rx="6"/></g>
+</g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="55" fill="#eff7fa"><text x="257" y="367">A</text><text x="942" y="367">B</text></g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="29" fill="#c2e8ee"><text x="255" y="85">pureOption_A</text><text x="940" y="85">pureOption_B</text></g>
+<text x="600" y="318" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="34" fill="#fff0c5">f</text>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="27" fill="#d3e5eb"><text x="315" y="492">f ⋆ pureOption_A = f</text><text x="885" y="492">pureOption_B ⋆ f = f</text></g>
+</svg>
