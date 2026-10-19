@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">The commutative diagram for associativity</title>
+<desc id="desc">Arrows f, g, and h connect A to B, B to C, and C to D. The upper route first composes g with h; the lower route first composes f with g. Associativity says the resulting arrows from A to D agree.</desc>
+<defs>
+  <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102634"/><stop offset="1" stop-color="#213f50"/></linearGradient>
+  <linearGradient id="face" x2="1" y2="1"><stop stop-color="#426d80"/><stop offset="1" stop-color="#224858"/></linearGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#b7d9e4" stroke-opacity=".055"/></pattern>
+  <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#061823" flood-opacity=".55"/></filter>
+  <marker id="blue-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#9cd2dc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="gold-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#e6c286" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="mid-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#b9cdd4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1200" height="720" fill="url(#bg)"/><rect width="1200" height="720" fill="url(#grid)"/>
+<g fill="none" stroke-width="7" stroke-linecap="round">
+  <path d="M210 318 435 195" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M630 200 954 318" stroke="#9cd2dc" marker-end="url(#blue-arrow)"/>
+  <path d="M210 402 435 525" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
+  <path d="M630 520 954 402" stroke="#e6c286" marker-end="url(#gold-arrow)"/>
+  <path d="M520 222V480" stroke="#b9cdd4" marker-end="url(#mid-arrow)"/>
+</g>
+<g filter="url(#shadow)">
+  <path d="M90 310 120 290H250L220 310Z M450 100 480 80H610L580 100Z M450 520 480 500H610L580 520Z M970 310 1000 290H1130L1100 310Z" fill="#527f91"/>
+  <path d="M220 310 250 290V390L220 410Z M580 100 610 80V180L580 200Z M580 520 610 500V600L580 620Z M1100 310 1130 290V390L1100 410Z" fill="#193b4c"/>
+  <g fill="url(#face)" stroke="#82afbf" stroke-width="2"><rect x="90" y="310" width="130" height="100" rx="6"/><rect x="450" y="100" width="130" height="100" rx="6"/><rect x="450" y="520" width="130" height="100" rx="6"/><rect x="970" y="310" width="130" height="100" rx="6"/></g>
+</g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="51" fill="#eff7fa"><text x="155" y="380">A</text><text x="515" y="170">B</text><text x="515" y="590">C</text><text x="1035" y="380">D</text></g>
+<g font-family="system-ui,-apple-system,sans-serif" text-anchor="middle" font-size="31">
+  <text x="320" y="218" fill="#c2e8ee">f</text><text x="784" y="218" fill="#c2e8ee">h ⋆ g</text>
+  <text x="320" y="515" fill="#fff0c5">g ⋆ f</text><text x="786" y="515" fill="#fff0c5">h</text>
+  <text x="558" y="373" fill="#d3e5eb">g</text>
+</g>
+</svg>
