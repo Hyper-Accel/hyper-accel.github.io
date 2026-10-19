@@ -1,5 +1,5 @@
 ---
-date: '2026-09-28T04:00:00+09:00'
+date: '2026-10-19T12:51:34+09:00'
 draft: false
 title: 'Monads and Category Theory ② Different Computations, the Same Composition'
 cover:
@@ -129,7 +129,7 @@ In our example, `splitWords : String → List String` returns a list whose eleme
 
 The diagram shows the same relationship for either choice of $M$.
 
-![With M fixed to Option or List, f has type A → M B, g has type B → M C, and their composite g ⋆ f has type A → M C.](kleisli-triangle.en.svg)
+![With M fixed to Option or List, f has type A → M B, g has type B → M C, and their composite g ⋆ f has type A → M C.](kleisli-triangle.svg)
 
 Call a sequence of composable arrows a **path**. Its length is the number of arrows it contains, so a single arrow is a path of length one. In the diagram, $f$ followed by $g$ is a path of length two; the lower arrow $g \star f$ is its composite. Because this composite has type `A → M C`, we can append $h : C \to M\\,D$ and apply the same operation again.
 
@@ -149,7 +149,7 @@ h : C → M D
 
 Joining $f$ and $g$ first gives $g \star f : A \to M\\,C$; joining $g$ and $h$ first gives $h \star g : B \to M\\,D$. The diagram includes both choices.
 
-![With M fixed to Option or List, the upper path composes f with h ⋆ g; the lower path composes g ⋆ f with h.](associativity-diamond.en.svg)
+![With M fixed to Option or List, the upper path composes f with h ⋆ g; the lower path composes g ⋆ f with h.](associativity-diamond.svg)
 
 The upper path $A \to B \to D$ groups $g$ and $h$ first, producing $(h \star g) \star f$. The lower path $A \to C \to D$ groups $f$ and $g$ first, producing $h \star (g \star f)$. Both perform $f$, $g$, and $h$ in the same order; they differ only in which portion is composed first.
 
@@ -207,7 +207,7 @@ pureOption_B ⋆ f = f    -- run f, then wrap its result
 
 In our arrow notation, they look like this:
 
-![The arrows pureOption_A and pureOption_B loop from A to A and B to B. Composing either loop with f : A → B leaves f unchanged.](identity-laws.en.svg)
+![The arrows pureOption_A and pureOption_B loop from A to A and B to B. Composing either loop with f : A → B leaves f unchanged.](identity-laws.svg)
 
 The loops `pureOption_A` and `pureOption_B` each start and end at the same object. Traversing the loop at $A$ before $f$, or the loop at $B$ after $f$, must yield the same composite as $f$ itself. These are the two **identity laws**. When they hold, the loops can serve as the composites of the empty paths at $A$ and $B$.
 
@@ -350,7 +350,7 @@ Now keep the same types as objects but use the `Option` arrows and composition w
 
 Calling `f : A → Option B` a morphism from $A$ to $B$ in this category does not mean changing its return type. `f` still returns `Option B`. The diagram shows the difference: the very same function `f : A → Option B` is a morphism from $A$ to `Option B` in $\mathbf{Type}$, but a morphism from $A$ to $B$ in the new category.
 
-![In Type, f : A → Option B goes from A to Option B. In the Option Kleisli category, the same function is a morphism from A to B.](kleisli-arrows.en.svg)
+![In Type, f : A → Option B goes from A to Option B. In the Option Kleisli category, the same function is a morphism from A to B.](kleisli-arrows.svg)
 
 The theorems `composeOption_assoc`, `composeOption_left_id`, and `composeOption_right_id` in section 5 prove the associativity and both identity laws for arbitrary types and functions. Therefore, these data form a category. We call `composeOption` **Kleisli composition** and the resulting category the **Kleisli category** of `Option`.
 

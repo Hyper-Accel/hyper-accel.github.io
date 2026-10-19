@@ -1,5 +1,5 @@
 ---
-date: '2026-09-28T04:00:00+09:00'
+date: '2026-10-19T12:51:34+09:00'
 draft: false
 title: '모나드와 범주론 ② 다른 계산, 같은 합성'
 cover:
@@ -129,7 +129,7 @@ def composeList {A B C : Type}
 
 이 관계를 `Option`과 `List`에 공통인 그림으로 나타내면 다음과 같습니다.
 
-![M을 Option 또는 List로 고정하면 f는 A에서 M B, g는 B에서 M C로 가는 함수입니다. 두 함수를 이은 g ⋆ f는 A에서 M C로 가는 함수이며, 새 화살표 관점에서는 A에서 C로 가는 밑변입니다.](kleisli-triangle.ko.svg)
+![M을 Option 또는 List로 고정하면 f는 A에서 M B, g는 B에서 M C로 가는 함수입니다. 두 함수를 이은 g ⋆ f는 A에서 M C로 가는 함수이며, 새 화살표 관점에서는 A에서 C로 가는 밑변입니다.](kleisli-triangle.svg)
 
 서로 이어지는 화살표를 차례로 놓은 것을 **경로**(path)라고 부르겠습니다. 화살표의 개수를 경로의 길이라고 하면, 화살표 하나도 길이 1인 경로입니다. 위 그림에서 $f$ 다음 $g$는 길이 2인 경로이고, 밑변 $g \star f$는 이 경로를 합성해 얻은 하나의 화살표입니다. 합성 결과도 `A → M C` 형태이므로, $h : C \to M\\,D$를 붙여 같은 연산을 다시 적용할 수 있습니다.
 
@@ -149,7 +149,7 @@ h : C → M D
 
 먼저 $f$와 $g$를 이으면 $g \star f : A \to M\\,C$이고, $g$와 $h$를 이으면 $h \star g : B \to M\\,D$입니다. 두 경우를 함께 그리면 다음과 같습니다.
 
-![M을 Option 또는 List 중 하나로 고정합니다. f는 A에서 B로, g는 B에서 C로, h는 C에서 D로 가는 화살표입니다. 위 경로는 f 다음 h ⋆ g, 아래 경로는 g ⋆ f 다음 h를 합성합니다.](associativity-diamond.ko.svg)
+![M을 Option 또는 List 중 하나로 고정합니다. f는 A에서 B로, g는 B에서 C로, h는 C에서 D로 가는 화살표입니다. 위 경로는 f 다음 h ⋆ g, 아래 경로는 g ⋆ f 다음 h를 합성합니다.](associativity-diamond.svg)
 
 위쪽 경로 $A \to B \to D$는 $g$와 $h$를 먼저 묶어 $(h \star g) \star f$를 만듭니다. 아래쪽 경로 $A \to C \to D$는 $f$와 $g$를 먼저 묶어 $h \star (g \star f)$를 만듭니다. 두 경로는 $f$, $g$, $h$를 같은 순서로 이으면서 먼저 합성하는 구간만 달리한 것입니다.
 
@@ -209,7 +209,7 @@ pureOption_B ⋆ f = f    -- f 실행 뒤 결과를 다시 감쌈
 
 앞 절에서 정한 화살표 표기로 두 식을 그리면 다음과 같습니다.
 
-![A와 B가 있고 f는 A에서 B로 갑니다. A와 B에는 각각 자기 자신으로 돌아오는 pureOption_A와 pureOption_B가 있습니다. A의 둥근 화살표 다음 f를 합성하거나, f 다음 B의 둥근 화살표를 합성해도 결과는 f와 같아야 합니다.](identity-laws.ko.svg)
+![A와 B가 있고 f는 A에서 B로 갑니다. A와 B에는 각각 자기 자신으로 돌아오는 pureOption_A와 pureOption_B가 있습니다. A의 둥근 화살표 다음 f를 합성하거나, f 다음 B의 둥근 화살표를 합성해도 결과는 f와 같아야 합니다.](identity-laws.svg)
 
 그림에서 `pureOption_A`와 `pureOption_B`는 각각 $A$와 $B$에서 출발해 같은 곳으로 돌아오는 화살표입니다. $A$의 둥근 화살표를 먼저 지나 $f$로 가거나, $f$를 지난 뒤 $B$의 둥근 화살표를 돌아도 합성 결과가 $f$와 같아야 합니다. 이 두 조건을 **항등법칙**(identity laws)이라고 합니다. 두 조건이 성립하면 두 둥근 화살표를 각각 $A$와 $B$의 빈 경로에 대응시킬 수 있습니다.
 
@@ -352,7 +352,7 @@ id_B ∘ f = f                  -- 좌측 항등법칙
 
 이 범주에서 `f : A → Option B`를 $A$에서 $B$로 가는 사상으로 부르는 것은, 함수의 반환 타입을 바꾼다는 뜻이 아닙니다. `f`는 여전히 `Option B`를 반환합니다. 아래 그림은 같은 함수 `f : A → Option B`를 $\mathbf{Type}$에서는 $A$에서 `Option B`로 가는 사상으로, 지금 만든 범주에서는 $A$에서 $B$로 가는 사상으로 읽는 차이를 보여 줍니다.
 
-![Type에서는 A에서 Option B로 가는 함수 f를, Option의 Kleisli 범주에서는 A에서 B로 가는 사상으로 삼습니다.](kleisli-arrows.ko.svg)
+![Type에서는 A에서 Option B로 가는 함수 f를, Option의 Kleisli 범주에서는 A에서 B로 가는 사상으로 삼습니다.](kleisli-arrows.svg)
 
 5절의 `composeOption_assoc`, `composeOption_left_id`, `composeOption_right_id`는 이 합성이 결합법칙과 양쪽 항등법칙을 만족함을 임의의 타입과 함수에 대해 증명했습니다. 따라서 위 데이터는 범주를 이루며, `composeOption`으로 정의한 합성을 **Kleisli 합성**(Kleisli composition), 이 범주를 `Option`의 **Kleisli 범주**(Kleisli category)라고 부릅니다.
 
