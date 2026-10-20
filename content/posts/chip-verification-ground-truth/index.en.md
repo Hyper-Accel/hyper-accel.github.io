@@ -224,25 +224,22 @@ This division of roles is similar to CPU verification.
 In general, CPU verifiers check that each instruction behaves according to the spec, while the results of programs built from those instructions are the responsibility of the compiler and software.
 Chip verification works the same way: whether the chip behaves according to the spec is the job of the bit-exact comparisons between the RTL and fsim, and whether the model runs correctly is the job of the comparisons against the golden, through the compiler.
 
-## Tolerance Hides Small Bugs
+## Tolerance Only Where It's Needed
 
 Looking at the criterion column in the comparison table again, every comparison that directly involves the RTL is bit-exact.
 The only places that tolerate error are the two comparisons between fsim and the golden (③, ④), because fsim and the golden can both be correct and still differ in the last bits.
 As we saw in the glossary, even PyTorch gives slightly different results on a CPU and a GPU.
 
 Tolerating error makes the comparison possible, but it comes at a cost.
-**Tolerance hides small bugs.**
+Tolerance can hide small bugs.
 
 As a hypothetical example, suppose the compiler picks the wrong rounding mode for one particular operation.
-This error changes only the last few bits of the result, so if the difference is about the size of a CPU-versus-GPU difference, it falls within the tolerance and passes ③ and ④.
-⑤ is bit-exact, but it doesn't catch this error either, because both sides run the same compiler output.
+This error changes only the last few bits of the result, so if the difference is about the size of a CPU-versus-GPU difference, it can fall within the tolerance and pass ③ and ④.
 
-That is why tolerance is allowed only in comparisons against the golden, and every comparison involving the RTL is bit-exact.
+That is why tolerance is kept only where it is truly needed, and each comparison's criterion is set to match its role.
+Comparisons against the golden check results against a ground truth that never went through the spec, so they catch errors in the spec itself, and they can do this job even while allowing the small errors that come from differences in how the computation is done.
+The comparisons involving the RTL, on the other hand, are there to catch differences between two implementations given the same input, so they are all bit-exact.
 Where there is no tolerance, even a single-bit difference has nowhere to hide.
-
-The two kinds of comparisons cover each other's blind spots.
-A bit-exact comparison doesn't miss even a small difference between two implementations, but it can't catch errors that both sides share, such as errors that come from the same spec or that are baked into the same compiler output.
-Comparisons against the golden catch spec errors, but they can miss small errors that fall within the tolerance.
 
 ## Conclusion: When Results Diverge, What Do You Suspect?
 
