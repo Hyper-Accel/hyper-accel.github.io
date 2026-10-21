@@ -20,6 +20,7 @@ keywords: [
   "AI 메모리", "반도체", "SanDisk", "SK하이닉스",
   "AI hardware", "AI 가속기", "메모리 벽"
 ]
+publication_id: 'what-is-hbf'
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 1편입니다.

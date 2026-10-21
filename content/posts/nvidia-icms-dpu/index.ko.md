@@ -16,6 +16,7 @@ categories: ["Memory and Storage"]
 summary: "LLM의 새로운 병목인 KV 캐시 용량 문제를 해결하기 위해 NVIDIA가 제시한 새로운 계층의 스토리지인 ICMS와 이를 관리하는 Bluefield-4 DPU의 기술적 원리를 살펴봅니다." 
 comments: true
 description: "LLM의 새로운 병목인 KV 캐시 용량 문제를 해결하기 위해 NVIDIA가 제시한 새로운 계층의 스토리지인 ICMS와 이를 관리하는 Bluefield-4 DPU의 기술적 원리를 살펴봅니다." 
+publication_id: 'nvidia-icms-dpu'
 ---
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  

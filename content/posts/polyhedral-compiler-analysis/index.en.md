@@ -19,6 +19,7 @@ keywords: [
   "Polyhedron", "Farkas Lemma", "Schedule Vector",
   "Parallelism", "ILP"
 ]
+publication_id: 'polyhedral-compiler-analysis'
 ---
 
 Today I brought a somewhat different topic. Have you ever thought it would be great if a compiler could automatically transform loops for optimization or parallelization while using it? Compiler engineers have had the same concerns. One approach that emerged is the **polyhedral compiler**, which is used by **LLVM's Polly** project and **MLIR's affine dialect**. Today I'll introduce this approach.

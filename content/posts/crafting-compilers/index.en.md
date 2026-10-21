@@ -15,6 +15,7 @@ series: ['Crafting Compilers']
 series_idx: 1
 summary: [Introduction to series of posts that would guide people to journey learning about how compiler works, and how they can build their own.]
 comments: true
+publication_id: 'crafting-compilers'
 ---
 
 ## Compilers

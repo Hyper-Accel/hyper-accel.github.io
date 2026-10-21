@@ -22,6 +22,7 @@ keywords: [
   "Warp", "SM", "H100", "GPU Architecture",
   "메모리 레이턴시", "CUDA 프로그래밍", "AI 가속기"
 ]
+publication_id: 'how-GPU-works'
 ---
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  

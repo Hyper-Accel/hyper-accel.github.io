@@ -20,6 +20,7 @@ keywords: [
   "Pallas", "TPU", "Google", "Ironwood", "커스텀 커널", "커널 프로그래밍",
   "AI Hardware", "Programming Model", "TPU 최적화"
 ]
+publication_id: 'pallas-programming-model'
 ---
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  

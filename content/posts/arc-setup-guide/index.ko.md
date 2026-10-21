@@ -14,6 +14,7 @@ cover:
   caption: "ARC와 CI/CD 인프라 고도화"
   relative: true
 comments: true
+publication_id: 'arc-setup-guide'
 ---
 
 안녕하세요. HyperAccel ML팀에서 재직중인 김남윤입니다.

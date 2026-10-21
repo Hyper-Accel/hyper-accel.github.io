@@ -12,6 +12,7 @@ categories: ["LLM and Models"]
 summary: "Centered on Anthropic's Project Glasswing and Claude Mythos Preview, this post explains why cybersecurity capability has jumped, how benchmark design is shifting, what real defensive findings looked like, and how developers should evolve their workflow with agents."
 description: 'What Glasswing and Mythos Preview signal, quantitative gaps vs. Opus 4.6, benchmark generation shift, OpenBSD/FFmpeg/FreeBSD cases, and takeaways for defenders and developers.'
 comments: true
+publication_id: 'project-glasswing-mythos-preview'
 ---
 
 # Project Glasswing: Claude Mythos Preview

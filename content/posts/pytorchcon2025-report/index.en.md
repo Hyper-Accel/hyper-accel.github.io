@@ -13,6 +13,7 @@ tags: ["conference", "pytorch", "report"]
 categories: ["Conference Reports"]
 summary: ['A comprehensive report from HyperAccel ML Team on PyTorch Conference 2025. Covers the latest PyTorch technologies including Monarch, TorchComms, PrivateUse1, and torch.accelerator for distributed training and hardware backends, as well as LLM inference engine trends like vLLM and SGLang, sharing technical insights for AI chip development.']
 comments: true
+publication_id: 'pytorchcon2025-report'
 ---
 
 # PyTorch Conference 2025 Report

@@ -22,6 +22,7 @@ keywords: [
   "Warp", "SM", "H100", "GPU architecture",
   "memory latency", "CUDA programming", "AI accelerator"
 ]
+publication_id: 'how-GPU-works'
 ---
 
 > **Know Your Enemy, Know Yourself**  

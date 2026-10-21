@@ -16,6 +16,7 @@ summary: "Option과 List의 합성에서 공통된 형태를 발견하고, 합�
 description: "계산들을 자유롭게 묶고 다시 조립하려면 어떤 법칙이 필요할까요? 직접 만든 합성을 범주라는 수학적 구조로 읽어 봅니다."
 comments: true
 keywords: ["category theory", "범주론", "결합법칙", "associativity", "항등원", "identity", "List", "Option", "Lean 4", "모나드"]
+publication_id: 'kleisli-category'
 ---
 
 안녕하세요, HyperAccel Compiler팀 최재호입니다.

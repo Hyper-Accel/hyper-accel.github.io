@@ -19,6 +19,7 @@ keywords: [
   "Intel Xeon", "Diamond Rapids", "AMD EPYC", "Venice Dense",
   "NVIDIA Vera", "Vera Rubin", "AMX", "LLM 추론 병목"
 ]
+publication_id: 'cpu-revival'
 ---
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  

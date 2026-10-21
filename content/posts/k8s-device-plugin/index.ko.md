@@ -20,6 +20,7 @@ keywords: [
   "Kubernetes", "Device Plugin", "DRA", "Dynamic Resource Allocation",
   "LPU", "FPGA", "GPU", "gRPC"
 ]
+publication_id: 'k8s-device-plugin'
 ---
 
 안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.

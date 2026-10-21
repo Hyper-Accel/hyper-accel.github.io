@@ -11,6 +11,7 @@ tags: ["Spec-Driven Development", "SDD", "AI Engineering", "LLM", "Prompt Engine
 categories: ["Engineering Culture"]
 summary: Spec-Driven Development (SDD) is a new development methodology for the AI era, moving beyond prompt engineering to spec engineering.
 comments: true
+publication_id: 'what-is-sdd'
 ---
 
 # SDD: Adapting to the Changing Meaning of Work

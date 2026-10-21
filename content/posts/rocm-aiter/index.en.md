@@ -12,6 +12,7 @@ categories: ["Compilers and Kernels"]
 summary: "An analysis of AITER (AI Tensor Engine for ROCm), which boosts inference performance on AMD GPUs."
 description: "An analysis of AMD's AITER kernel library that doubled ROCm inference performance. We examine its four kernel backend strategies (Triton, CK, HIP, ASM), JIT compile pipeline, and the architecture that achieved ~2× throughput improvement on DeepSeek R1."
 comments: true
+publication_id: 'rocm-aiter'
 ---
 
 # AITER Analysis: How AMD Doubled ROCm Inference Performance

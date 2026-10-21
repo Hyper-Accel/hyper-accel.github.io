@@ -13,6 +13,7 @@ series: ['Legato']
 series_idx: 1
 summary: "An introduction to Legato — HyperAccel's programming model and compiler stack for the LPU — covering what it is, why it exists, and how it is designed."
 comments: true
+publication_id: 'what-is-legato'
 ---
 
 # Legato: A Programming Model for the LPU

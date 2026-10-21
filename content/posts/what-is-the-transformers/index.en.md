@@ -12,6 +12,7 @@ categories: ["LLM and Models"]
 summary: "A hands-on walkthrough of Transformer-based LLM internals — from each module's role to key optimization techniques."
 description: 'A step-by-step walkthrough of Transformer-based LLM internals: the role of Token Embedding, Attention, LM Head, and optimization techniques such as KV Cache, MHA, and GQA.'
 comments: true
+publication_id: 'what-is-the-transformers'
 ---
 
 Hi, I'm Hyunjun Park from the HyperAccel ML Team. Since ChatGPT launched in November 2022, AI technology has been advancing at an exponential pace, with new AI tools emerging almost every day.

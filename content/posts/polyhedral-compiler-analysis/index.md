@@ -19,6 +19,7 @@ keywords: [
   "Polyhedron", "Farkas Lemma", "Schedule Vector",
   "Parallelism", "ILP"
 ]
+publication_id: 'polyhedral-compiler-analysis'
 ---
 
 오늘은 조금은 색다른 주제를 가지고 왔습니다. 컴파일러를 사용하다가, 자동으로 컴파일러가 loop을 변형하여 최적화해주거나, 병렬화를 해 주면 좋겠다고 생각한 적이 있지 않은가요? 컴파일러 엔지니어들도 이러한 고민들을 해왔습니다. 그 중 하나의 방법으로 등장한 것이 **polyhedral compiler** 인데요, **LLVM Polly** 프로젝트, **MLIR affine dialect**가 사용하는 방법이기도 합니다. 오늘은 이 방법에 대해 소개해 보겠습니다. 

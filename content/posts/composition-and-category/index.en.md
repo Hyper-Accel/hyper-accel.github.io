@@ -15,6 +15,7 @@ summary: "Starting with a type mismatch between functions that return Option, we
 description: "Connect computations that may produce no value and build a first composition rule on the way to understanding monads."
 comments: true
 keywords: ["category theory", "function composition", "composition", "Option", "absence of a value", "flatMap", "bind", "Lean 4", "monad"]
+publication_id: 'composition-and-category'
 ---
 
 Hello, I am Jaeho Choi from the Compiler team at HyperAccel.

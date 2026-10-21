@@ -16,6 +16,7 @@ categories: ["AI Hardware"]
 summary:  그록과 LPU의 탄생 배경과 그들의 하드웨어 / 소프트웨어 설계 철학에 대해 알아보고 엔비디아가 그록을 인수한 의도에 대해 분석해봅니다.
 comments: true
 description: 그록과 LPU의 탄생 배경과 그들의 하드웨어 / 소프트웨어 설계 철학에 대해 알아보고 엔비디아가 그록을 인수한 의도에 대해 분석해봅니다.
+publication_id: 'lpu-deep-dive'
 ---
 
 > **"상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다."**  

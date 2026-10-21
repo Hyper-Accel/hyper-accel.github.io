@@ -19,6 +19,7 @@ keywords: [
   "coherency", "Type 3 device", "memory expander",
   "CMM", "Samsung", "SK hynix", "Micron", "PCIe", "AI memory"
 ]
+publication_id: 'what-is-cxl'
 ---
 
 > This is Part 4 of the **Memory in the AI Era** series.

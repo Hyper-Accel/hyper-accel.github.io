@@ -2,3 +2,5 @@
 .DS_Store
 /resources/_gen
 /docs/superpowers/
+/scripts/__pycache__/
+/tests/__pycache__/

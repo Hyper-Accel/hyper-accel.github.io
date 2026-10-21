@@ -13,6 +13,7 @@ tags: ["SGLang", "LLM serving"]
 categories: ["LLM and Models"]
 summary: [고성능 LLM 서빙 프레임워크인 SGLang에 대한 논문 리뷰]
 comments: true
+publication_id: 'sglang-review'
 ---
 
 ### SGLang의 철학

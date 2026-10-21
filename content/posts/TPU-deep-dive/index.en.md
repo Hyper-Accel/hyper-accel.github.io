@@ -19,6 +19,7 @@ description: "We explore the background of Google's AI chip TPU, born in 2016, a
 keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI Accelerator", "TensorFlow", "JAX"
 ]
+publication_id: 'TPU-deep-dive'
 ---
 [Know Your Enemy, Know Yourself, Part 1: GPU History and Fundamentals](https://hyper-accel.github.io/en/posts/how-gpu-works/)
 

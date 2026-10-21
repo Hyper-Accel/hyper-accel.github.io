@@ -13,6 +13,7 @@ tags: ["SGLang", "LLM serving"]
 categories: ["LLM and Models"]
 summary: [Paper review of SGLang, the high-performance LLM serving framework]
 comments: true
+publication_id: 'sglang-review'
 ---
 
 ### Philosophy of SGLang

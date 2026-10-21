@@ -20,6 +20,7 @@ keywords: [
   "Kubernetes", "Device Plugin", "DRA", "Dynamic Resource Allocation",
   "LPU", "FPGA", "GPU", "gRPC"
 ]
+publication_id: 'k8s-device-plugin'
 ---
 
 Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.

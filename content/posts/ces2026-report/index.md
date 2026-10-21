@@ -11,6 +11,7 @@ tags: ["conference", "CES", "report", "SAMSUNG", "SK", "LG"]
 categories: ["Conference Reports"]
 summary: ['2025년 CES 참가 경험을 바탕으로 CES 2026을 리뷰합니다. CES 통계 및 직관 후기, K-STARTUP 통합관 부스 운영 후기, 그리고 한국 대기업(LG, SAMSUNG, SK)의 부스 관람 후기를 통해 CES의 규모와 기술 동향을 살펴봅니다.']
 comments: true
+publication_id: 'ces2026-report'
 ---
 
 # 2025년에 바라보는 CES 2026 핵심 정리 (feat. SAMSUNG, SK, LG)

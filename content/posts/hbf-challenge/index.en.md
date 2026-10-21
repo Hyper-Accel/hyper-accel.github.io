@@ -17,6 +17,7 @@ comments: true
 keywords: [
   "HBF", "High Bandwidth Flash", "AI memory"
 ]
+publication_id: 'hbf-challenge'
 ---
 
 > This post is Part 3 of the **Memory in the AI Era** series.

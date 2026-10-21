@@ -17,6 +17,7 @@ comments: true
 keywords: [
   "HBF", "High Bandwidth Flash", "AI 메모리"
 ]
+publication_id: 'hbf-challenge'
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 3편입니다.  

@@ -15,6 +15,7 @@ series: ['Crafting Compilers']
 series_idx: 1
 summary: [컴파일러의 작동 방식과, 컴파일러를 제작하는 전반적인 과정에 관한 포스팅 시리즈를 시작하기 위한 소개 글입니다]
 comments: true
+publication_id: 'crafting-compilers'
 ---
 
 ## Compilers
