@@ -1,3 +1,5 @@
+import { createPostMarkup } from "./create-post"
+
 function iconButton(command: string, icon: string, label: string): string {
   return `<button class="tool-button" type="button" data-command="${command}" aria-label="${label}" title="${label}" aria-pressed="false"><i class="ph ph-${icon}" aria-hidden="true"></i></button>`
 }
@@ -18,6 +20,7 @@ export function applicationMarkup(): string {
           <button class="rail-tab" id="agent-tab" type="button" role="tab" aria-selected="false" aria-controls="agent-panel"><i class="ph ph-sparkle"></i><span>AI</span></button>
         </div>
         <section id="posts-panel" role="tabpanel" aria-labelledby="posts-tab">
+          <button class="secondary-button new-post-button" id="new-post-button" type="button"><i class="ph ph-plus" aria-hidden="true"></i><span>새 글 만들기</span></button>
           <label class="search-field">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
             <span class="sr-only">글 검색</span>
@@ -133,6 +136,7 @@ export function applicationMarkup(): string {
         </section>
       </main>
     </div>
+    ${createPostMarkup()}
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   `
 }

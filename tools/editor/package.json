@@ -7,7 +7,8 @@
     "build": "vite build && bun build src/server/index.ts --target bun --outdir dist-server",
     "start": "bun run dist-server/index.js",
     "test": "bun test",
-    "e2e": "bun run src/e2e/editor.e2e.ts && bun run src/e2e/agent-ui.e2e.ts && bun run src/e2e/session-restart.e2e.ts",
+    "e2e": "bun run src/e2e/editor.e2e.ts && bun run src/e2e/agent-ui.e2e.ts && bun run src/e2e/session-restart.e2e.ts && bun run e2e:create-post",
+    "e2e:create-post": "bun run build && bun run src/e2e/create-post.e2e.ts",
     "e2e:agents": "bun run src/e2e/agent-live.e2e.ts",
     "typecheck": "tsc --noEmit",
     "check": "biome check . && bun run typecheck && bun test"

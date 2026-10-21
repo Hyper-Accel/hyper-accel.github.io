@@ -5,6 +5,7 @@ import { setupAgentController } from "./agent-controller"
 import { fetchPost, fetchPosts, persistPost, uploadImage } from "./api"
 import { applyMergedContent } from "./apply-merge"
 import { type EditorCommand, runEditorCommand, syncToolbarState } from "./commands"
+import { setupCreatePost } from "./create-post"
 import { errorMessage, renderPostRows, requiredElement, resizeTextarea } from "./dom"
 import { createBlogEditor, insertImage } from "./editor"
 import { mediaPreviewUrl, prepareMarkdown, restoreMarkdown } from "./markdown"
@@ -155,6 +156,29 @@ export function mountApplication(root: HTMLElement): void {
       updateSaveState()
     }
   }
+
+  setupCreatePost({
+    beforeOpen: async () => {
+      if (!dirty) return true
+      if (!window.confirm("새 글을 만들기 전에 현재 글의 변경을 저장할까요?")) return false
+      return save()
+    },
+    onCreated: async (path) => {
+      try {
+        posts = await fetchPosts()
+        search.value = ""
+        renderPostList()
+        await openPost(path)
+        railController.close()
+        showToast("한국어·영어 글 파일을 만들었습니다. 내용을 작성해 주세요.", "success")
+      } catch (error: unknown) {
+        showToast(
+          `글은 생성됐지만 목록을 갱신하지 못했습니다. 새로고침해 주세요. ${errorMessage(error)}`,
+          "error",
+        )
+      }
+    },
+  })
 
   agentController = setupAgentController({
     getDocument: () => current,

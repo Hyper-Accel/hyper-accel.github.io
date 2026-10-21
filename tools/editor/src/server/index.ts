@@ -1,11 +1,18 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { serveStatic } from "hono/bun"
+import { HTTPException } from "hono/http-exception"
 import { z } from "zod"
-import { postPathSchema, savePostRequestSchema } from "../shared/contracts"
+import {
+  createPostRequestSchema,
+  postPathSchema,
+  registerAuthorRequestSchema,
+  savePostRequestSchema,
+} from "../shared/contracts"
 import { createAgentRoutes } from "./agent/routes"
 import { AgentSessionManager } from "./agent/session"
 import { listPosts, readPost, resolveMediaPath, saveImage, savePost } from "./content"
+import { createPost, listAuthors, registerAuthor } from "./create-post"
 import { ContentError } from "./errors"
 
 const app = new Hono()
@@ -20,6 +27,34 @@ const mediaQuerySchema = z.object({
 app.get("/api/posts", async (context) => {
   return context.json({ posts: await listPosts() })
 })
+
+app.get("/api/authors", async (context) => {
+  return context.json({ authors: await listAuthors() })
+})
+
+app.post(
+  "/api/authors",
+  zValidator("json", registerAuthorRequestSchema, (result, context) => {
+    if (!result.success) {
+      return context.json({ error: "작성자 이름 및 프로필 입력을 확인해 주세요." }, 400)
+    }
+  }),
+  async (context) => {
+    return context.json(await registerAuthor(context.req.valid("json")), 201)
+  },
+)
+
+app.post(
+  "/api/posts",
+  zValidator("json", createPostRequestSchema, (result, context) => {
+    if (!result.success) {
+      return context.json({ error: "디렉터리, 제목, 작성자 및 프로필 입력을 확인해 주세요." }, 400)
+    }
+  }),
+  async (context) => {
+    return context.json(await createPost(context.req.valid("json")), 201)
+  },
+)
 
 app.route("/api/agent", createAgentRoutes(agentSessions))
 
@@ -63,7 +98,7 @@ app.onError((error, context) => {
   if (error instanceof ContentError) {
     return context.json({ error: error.message }, error.status as 400)
   }
-  if (error instanceof z.ZodError) {
+  if (error instanceof z.ZodError || (error instanceof HTTPException && error.status === 400)) {
     return context.json({ error: "요청 형식이 올바르지 않습니다." }, 400)
   }
   console.error(error)
