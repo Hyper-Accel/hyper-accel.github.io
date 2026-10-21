@@ -1,5 +1,5 @@
 ---
-date: '2026-10-14T10:35:01+09:00'
+date: '2026-10-21T10:35:01+09:00'
 draft: false
 title: 'Verifying an LLM Inference Chip, Part 1: Where Does the Ground Truth Come From?'
 cover:
