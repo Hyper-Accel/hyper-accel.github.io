@@ -18,7 +18,6 @@ keywords: [
   "Cerebras", "WSE", "Wafer Scale Engine", "OpenAI",
   "AI Inference", "CS-3", "AI Hardware", "웨이퍼 스케일"
 ]
-publication_id: 'cerebras-wse'
 ---
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  

@@ -12,6 +12,7 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
+  deployments: read
   pages: write
   id-token: write
 
@@ -29,6 +30,7 @@ defaults:
 jobs:
   # Build job
   build:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -43,24 +45,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          persist-credentials: false
           submodules: recursive
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+      - name: Install publication build dependency
+        run: bun install --cwd scripts --frozen-lockfile --ignore-scripts
+      - name: Test read-only publication build
+        run: bun test ./scripts/build-publication.test.mjs
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Install Node.js dependencies
         run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
-      - name: Build with Hugo
+      - name: Build with deployment-only publication dates
         env:
-          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
-          HUGO_ENVIRONMENT: production
+          GH_TOKEN: ${{ github.token }}
+          PUBLICATION_REPOSITORY: ${{ github.repository }}
+          PUBLICATION_SITE: ${{ steps.pages.outputs.base_url }}
         run: |
-          hugo \
-            --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+          bun scripts/build-publication.mjs build \
+            --work-dir "${{ runner.temp }}/publication-build" \
+            --repository "$PUBLICATION_REPOSITORY" \
+            --site-url "$PUBLICATION_SITE" \
+            --base-url "$PUBLICATION_SITE"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ${{ runner.temp }}/publication-build/public
 
   # Deployment job
   deploy:
@@ -74,3 +89,21 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Checkout deployed source for read-back verification
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+      - name: Install publication build dependency
+        run: bun install --cwd scripts --frozen-lockfile --ignore-scripts
+      - name: Verify published state matches this deployment
+        env:
+          PUBLICATION_SITE: ${{ steps.deployment.outputs.page_url }}
+          PUBLICATION_COMMIT: ${{ github.sha }}
+        run: |
+          bun scripts/build-publication.mjs verify \
+            --site-url "$PUBLICATION_SITE" \
+            --expected-commit "$PUBLICATION_COMMIT"

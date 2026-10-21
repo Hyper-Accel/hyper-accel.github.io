@@ -12,7 +12,6 @@ categories: ["LLM and Models"]
 summary: 'Transformer 기반 LLM의 내부 구조를 하나하나 뜯어보며, 각 모듈이 갖는 의미와 최적화 기법까지 정리합니다.'
 description: 'Transformer 기반 LLM의 내부 구조를 단계별로 살펴보고, Token Embedding·Attention·LM Head 등 각 모듈의 의미와 KV Cache·MHA·GQA 등 최적화 기법을 정리합니다.'
 comments: true
-publication_id: 'what-is-the-transformers'
 ---
 
 안녕하세요? HyperAccel ML팀 소속 박현준입니다. 2022년 11월 ChatGPT가 출시된 이래 AI 기술들이 기하급수적으로 빠르게 발전하며 하루가 멀다하고 새로운 AI tools가 출시되고 있습니다.

@@ -20,7 +20,6 @@ keywords: [
   "Pallas", "TPU", "Google", "Ironwood", "Custom Kernel", "Kernel Programming",
   "AI Hardware", "Programming Model", "TPU Optimization"
 ]
-publication_id: 'pallas-programming-model'
 ---
 
 > **Know Your Enemy, Know Yourself (知彼知己 百戰不殆)**  

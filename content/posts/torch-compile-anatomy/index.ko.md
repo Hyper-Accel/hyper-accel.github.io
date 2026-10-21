@@ -21,7 +21,6 @@ keywords: [
   "functionalization", "core ATen IR", "Inductor IR",
   "loop-level IR", "OpOverrides"
 ]
-publication_id: 'torch-compile-anatomy'
 ---
 
 ### 개요

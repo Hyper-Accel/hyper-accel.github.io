@@ -20,7 +20,6 @@ keywords: [
   "Development Environment", "Container", "Kubernetes",
   "Server", "FPGA", "GPU"
 ]
-publication_id: 'development-environment-with-k8s-ch1'
 ---
 
 Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.

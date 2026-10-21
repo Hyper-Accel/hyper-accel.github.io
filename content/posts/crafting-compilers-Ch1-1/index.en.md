@@ -15,7 +15,6 @@ series: ['Crafting Compilers']
 series_idx: 2
 summary: [First article about building a programming language]
 comments: true
-publication_id: 'crafting-compilers-Ch1-1'
 ---
 
 Before building a compiler, we need to define the language it will compile. A programming language isn’t just syntax and semantics—it’s the user interface between humans and computers.

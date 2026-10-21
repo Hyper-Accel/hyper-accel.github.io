@@ -15,7 +15,6 @@ series: ['Crafting Compilers']
 series_idx: 2
 summary: [프로그래밍 언어를 만드는 방법에 대한 첫 번째 글]
 comments: true
-publication_id: 'crafting-compilers-Ch1-1'
 ---
 
 컴파일러를 만들기 전에, 우리는 먼저 언어를 정의해야 합니다. 프로그래밍 언어는 단순히 구문으로 정의되는 것이 아닙니다. 사실 프로그래밍 언어는 인간과 컴퓨터 사이의 사용자 인터페이스입니다.

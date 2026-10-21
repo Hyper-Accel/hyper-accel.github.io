@@ -16,7 +16,6 @@ categories: ["AI Hardware"]
 summary: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
 comments: true
 description: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
-publication_id: 'lpu-deep-dive'
 ---
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**  

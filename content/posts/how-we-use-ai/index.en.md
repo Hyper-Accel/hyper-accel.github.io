@@ -15,7 +15,6 @@ series: ['AI Agent Series']
 series_idx: 1
 summary: ["How the ML team at HyperAccel started implemented AI into our development workflow."]
 comments: true
-publication_id: 'how-we-use-ai'
 ---
 
 Hello, my name is Taeseo Um, currently on the ML team at HyperAccel.

@@ -11,7 +11,6 @@ tags: ["conference", "CES", "report", "SAMSUNG", "SK", "LG"]
 categories: ["Conference Reports"]
 summary: ['A review of CES 2026 based on CES 2025 participation experience. Exploring the scale and technology trends of CES through statistics, first-hand impressions, K-STARTUP integrated pavilion booth operation experience, and Korean conglomerate (LG, SAMSUNG, SK) booth reviews.']
 comments: true
-publication_id: 'ces2026-report'
 ---
 
 # CES 2026 Key Highlights from a 2025 Participant (feat. SAMSUNG, SK, LG)

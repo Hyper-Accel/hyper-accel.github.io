@@ -13,7 +13,6 @@ series: ['Legato']
 series_idx: 1
 summary: "LPU를 위한 HyperAccel의 프로그래밍 모델이자 컴파일러 스택인 Legato를 소개하며, 이것이 무엇이고 왜 존재하며 어떻게 설계되었는지 다룹니다."
 comments: true
-publication_id: 'what-is-legato'
 ---
 
 

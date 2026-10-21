@@ -3,4 +3,5 @@
 /resources/_gen
 /docs/superpowers/
 /scripts/__pycache__/
+/scripts/node_modules/
 /tests/__pycache__/

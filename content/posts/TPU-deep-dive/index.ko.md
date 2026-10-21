@@ -19,7 +19,6 @@ description: "2016년 탄생한 구글의 AI 칩 TPU의 등장 배경에 대해 
 keywords: [
   "TPU", "Google", "Systolic Array", "TensorCore", "Machine Learning", "AI 가속기", "TensorFlow", "JAX"
 ]
-publication_id: 'TPU-deep-dive'
 ---
 [지피지기면 백전불태 1편: GPU의 역사와 기초](https://hyper-accel.github.io/posts/how-gpu-works/)
 

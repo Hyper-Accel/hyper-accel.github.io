@@ -15,7 +15,6 @@ summary: "Option을 반환하는 함수들의 타입이 맞지 않아 합성이 
 description: "값이 없을 수 있는 계산을 연결하며, 모나드로 이어지는 첫 번째 합성 규칙을 만들어 봅니다."
 comments: true
 keywords: ["category theory", "범주론", "함수 합성", "composition", "Option", "값의 부재", "flatMap", "bind", "Lean 4", "모나드"]
-publication_id: 'composition-and-category'
 ---
 
 안녕하세요, HyperAccel Compiler팀 최재호입니다.

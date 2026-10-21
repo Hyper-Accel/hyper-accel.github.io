@@ -15,7 +15,6 @@ summary: [“HyperAccel의 ML 팀이 어떻게 개발 워크플로우에 AI를 �
 series: ['AI Agent Series']
 series_idx: 1
 comments: true
-publication_id: 'how-we-use-ai'
 ---
 
 안녕하세요, 하이퍼엑셀 ML 팀 엔지니어 엄태서입니다.

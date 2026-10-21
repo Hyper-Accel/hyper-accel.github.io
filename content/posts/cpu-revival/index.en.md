@@ -19,7 +19,6 @@ keywords: [
   "Intel Xeon", "Diamond Rapids", "AMD EPYC", "Venice Dense",
   "NVIDIA Vera", "Vera Rubin", "AMX", "LLM inference bottleneck"
 ]
-publication_id: 'cpu-revival'
 ---
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**

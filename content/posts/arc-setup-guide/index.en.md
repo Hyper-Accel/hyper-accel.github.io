@@ -14,7 +14,6 @@ cover:
   caption: "CI/CD Infrastructure Modernization with ARC"
   relative: true
 comments: true
-publication_id: 'arc-setup-guide'
 ---
 
 Hello. I'm Namyoon Kim, working on the ML team at HyperAccel.

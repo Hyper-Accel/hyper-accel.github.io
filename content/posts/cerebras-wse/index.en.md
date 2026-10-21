@@ -18,7 +18,6 @@ keywords: [
   "Cerebras", "WSE", "Wafer Scale Engine", "OpenAI",
   "AI Inference", "CS-3", "AI Hardware", "wafer scale"
 ]
-publication_id: 'cerebras-wse'
 ---
 
 > **Know Your Enemy, Know Yourself** comes from the idea that if you understand both the opponent and yourself, you will not be imperiled in a hundred battles.  

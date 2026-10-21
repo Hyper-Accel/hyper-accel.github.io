@@ -18,7 +18,6 @@ keywords: [
   "CXL", "Compute Express Link", "KV cache offload", "메모리 pooling",
   "VM consolidation", "메모리 tiering", "CMM", "LLM 추론"
 ]
-publication_id: 'cxl-workload'
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 5편입니다.

@@ -13,7 +13,6 @@ series_idx: 7
 categories: ["AI Hardware"]
 summary: "AI로 AI를 돌리는 칩을 만드는 시대가 도래했습니다. AI 회사인 OpenAI의 자체칩 할라피뇨의 공개된 정보들을 바탕으로 이를 알아봅니다."
 comments: true
-publication_id: 'jalapeno-shock'
 ---
 
 > LLM을 처음 시장에 선보였던 OpenAI가 이제는 그 LLM으로 칩을 만들어냈습니다.

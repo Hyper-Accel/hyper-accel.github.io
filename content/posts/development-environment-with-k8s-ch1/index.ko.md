@@ -20,7 +20,6 @@ keywords: [
   "Development Environment", "Container", "Kubernetes",
   "Server", "FPGA", "GPU"
 ]
-publication_id: 'development-environment-with-k8s-ch1'
 ---
 
 안녕하세요! 저는 HyperAccel ML팀에서 DevOps Engineer로 근무하고 있는 전영훈입니다.

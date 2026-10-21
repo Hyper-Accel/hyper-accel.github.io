@@ -13,7 +13,6 @@ series_idx: 7
 categories: ["AI Hardware"]
 summary: "The era of using AI to build chips that run AI has arrived. Drawing on publicly released information about Jalapeño, OpenAI's custom chip, this article explores what that means."
 comments: true
-publication_id: 'jalapeno-shock'
 ---
 
 > OpenAI, the company that first brought LLMs to market, has now used an LLM to build a chip.

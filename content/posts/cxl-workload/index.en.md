@@ -18,7 +18,6 @@ keywords: [
   "CXL", "Compute Express Link", "KV cache offload", "memory pooling",
   "VM consolidation", "memory tiering", "CMM", "LLM inference"
 ]
-publication_id: 'cxl-workload'
 ---
 
 > This is Part 5 of the **Memory in the AI Era** series.

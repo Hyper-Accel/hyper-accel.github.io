@@ -15,7 +15,6 @@ series: ['AI Agent Series']
 series_idx: 2
 summary: 'AI coding agents did not just change how we write code. They changed where work can happen: over SSH, inside Termux, in Kubernetes pods, and from remote machines that no longer need a full local editor setup.'
 comments: true
-publication_id: 'moving-back-to-terminals'
 ---
 
 ![A terminal that travels between laptop, phone, and server](./images/terminal-travels.png)

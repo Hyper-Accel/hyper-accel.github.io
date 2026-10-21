@@ -15,7 +15,6 @@ summary: "SK하이닉스의 H³ 아키텍처를 중심으로, HBF의 약점을 �
 description: "SK하이닉스의 H³ 아키텍처를 중심으로, HBF의 약점을 극복할 수 있는 워크로드를 탐색합니다."
 comments: true
 keywords: ["HBF", "High Bandwidth Flash", "Cache-Augmented Generation", "LLM Inference", "SK Hynix"]
-publication_id: 'hbf-workload'
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 2편입니다.  

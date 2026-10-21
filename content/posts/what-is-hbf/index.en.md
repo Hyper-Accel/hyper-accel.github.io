@@ -20,7 +20,6 @@ keywords: [
   "AI memory", "Semiconductor", "SanDisk", "SK hynix",
   "AI hardware", "AI accelerator", "memory wall"
 ]
-publication_id: 'what-is-hbf'
 ---
 
 > This is Part 1 of the **Memory in the AI Era** series.

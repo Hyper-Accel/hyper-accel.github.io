@@ -16,7 +16,6 @@ summary: "Compare composition for Option and List, prove its laws, and recognize
 description: "What laws let us group and recombine computations? We examine the composition we built as a mathematical category."
 comments: true
 keywords: ["category theory", "Kleisli category", "associativity", "identity", "List", "Option", "Lean 4", "monad"]
-publication_id: 'kleisli-category'
 ---
 
 Hello, I am Jaeho Choi from the Compiler team at HyperAccel.

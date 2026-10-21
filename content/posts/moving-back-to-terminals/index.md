@@ -15,7 +15,6 @@ series: ['AI Agent Series']
 series_idx: 2
 summary: 'AI 코딩 에이전트는 코드를 쓰는 방식만 바꾸지 않았습니다. SSH, Termux, Kubernetes pod, 원격 머신 위에서 일이 시작되는 방식까지 바꾸고 있습니다.'
 comments: true
-publication_id: 'moving-back-to-terminals'
 ---
 
 ![노트북과 휴대폰, 서버 사이를 함께 옮겨 다니는 터미널](./images/terminal-travels.png)

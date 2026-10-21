@@ -19,7 +19,6 @@ keywords: [
   "코히런시", "coherency", "Type 3 device", "memory expander",
   "CMM", "삼성", "SK하이닉스", "마이크론", "PCIe", "AI 메모리"
 ]
-publication_id: 'what-is-cxl'
 ---
 
 > 이 글은 **AI 시대의 필수 소비재, 메모리 이해하기** 시리즈의 4편입니다.

@@ -13,7 +13,6 @@ tags: ["tech-blog", "hugo", "engineering-culture"]
 categories: ["Engineering Culture"]
 summary: ["This post shares the journey of starting HyperAccel's tech blog, from the initial motivation to building it with Hugo, operating through an Editor Group, and implementing a Bus Factor-aware operation strategy."]
 comments: true
-publication_id: 'tech-blog-operation'
 ---
 
 ## The Motivation Behind Starting Our Tech Blog

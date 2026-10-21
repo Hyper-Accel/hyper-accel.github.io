@@ -13,7 +13,6 @@ tags: ["tech-blog", "hugo", "engineering-culture"]
 categories: ["Engineering Culture"]
 summary: ['HyperAccel 기술 블로그를 시작하게 된 계기부터 Hugo를 이용한 구축 과정, Editor Group 운영 방식, Bus Factor를 고려한 운영 전략까지 기술 블로그 운영의 전체 여정을 공유합니다.']
 comments: true
-publication_id: 'tech-blog-operation'
 ---
 
 ## Tech Blog를 시작하게 된 계기

@@ -15,7 +15,6 @@ summary: "Centered on SK hynix's H³ architecture, we explore workloads that can
 description: "Centered on SK hynix's H³ architecture, we explore workloads that can overcome HBF's weaknesses."
 comments: true
 keywords: ["HBF", "High Bandwidth Flash", "Cache-Augmented Generation", "LLM Inference", "SK Hynix"]
-publication_id: 'hbf-workload'
 ---
 
 > This post is Part 2 of the **Memory in the AI Era** series.  

@@ -11,7 +11,6 @@ tags: ["Spec-Driven Development", "SDD", "AI Engineering", "LLM", "Prompt Engine
 categories: ["Engineering Culture"]
 summary: AI 시대의 새로운 개발 방법론, Spec-Driven Development에 대해 알아보고, 프롬프트 엔지니어링을 넘어 스펙(Spec) 엔지니어링으로 나아가는 방향을 제시합니다.
 comments: true
-publication_id: 'what-is-sdd'
 ---
 
 # SDD, 일의 의미가 변하는 시대에 적응하기 위하여
