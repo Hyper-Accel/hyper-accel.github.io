@@ -11,7 +11,6 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  actions: read
   contents: read
   pages: write
   id-token: write
@@ -44,36 +43,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Queued runs must include date records written by the preceding run.
-          ref: main
           submodules: recursive
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install publication-date dependencies
-        run: python -m pip install -r scripts/requirements-publication.txt
-      - name: Test publication-date automation
-        run: python -m unittest discover -s tests -p 'test_publication_dates.py' -v
-      - name: Require previous successful deployments to have recorded dates
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python scripts/check_publication_recovery.py
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Install Node.js dependencies
         run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
-      - name: Set first-publication dates
-        run: python scripts/publication_dates.py prepare --plan "${{ runner.temp }}/publication-plan.json"
-      - name: Save publication plan for successful deployment and retries
-        uses: actions/upload-artifact@v4
-        with:
-          name: publication-plan
-          path: ${{ runner.temp }}/publication-plan.json
-          if-no-files-found: error
-          overwrite: true
-          retention-days: 90
       - name: Build with Hugo
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
@@ -99,32 +74,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  # Failed builds/deployments never change source dates. Workflow-level
-  # concurrency also covers this job, so the next build sees its date records.
-  record-publication:
-    name: Record successful publication dates
-    needs: deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout latest main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install publication-date dependencies
-        run: python -m pip install -r scripts/requirements-publication.txt
-      - name: Download publication plan
-        uses: actions/download-artifact@v4
-        with:
-          name: publication-plan
-          path: ${{ runner.temp }}/publication-plan
-      - name: Persist dates without overwriting concurrent changes
-        run: bash scripts/record_publication_dates.sh "${{ runner.temp }}/publication-plan/publication-plan.json"

@@ -3,11 +3,9 @@ import importlib.util
 import json
 import os
 import shutil
-import subprocess
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/publication_dates.py"
 
@@ -201,83 +199,22 @@ class PublicationDatesTest(unittest.TestCase):
         self.assertTrue(text.endswith(b"---\r\n\r\n## Body\r\n"))
         self.assertNotIn(b"\n", text.replace(b"\r\n", b""))
 
-    def test_record_script_pushes_dates_and_preserves_advanced_main(self):
-        ko, plan = self.deployment_plan()
-        plan_file = self.root / "publication-plan.json"
-        plan_file.write_text(json.dumps(plan))
-        source = self.root / "source"
-        source.mkdir()
-        shutil.copytree(self.root / "content", source / "content")
-        shutil.copytree(self.root / "data", source / "data")
-        env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1",
-                   GIT_AUTHOR_NAME="Test", GIT_AUTHOR_EMAIL="test@example.invalid",
-                   GIT_COMMITTER_NAME="Test", GIT_COMMITTER_EMAIL="test@example.invalid")
-
-        def git(cwd, *args):
-            return subprocess.check_output(["git", *args], cwd=cwd, env=env, stderr=subprocess.STDOUT)
-
-        remote = self.root / "remote.git"
-        git(self.root, "init", "--bare", "--initial-branch=main", str(remote))
-        git(source, "init", "--initial-branch=main")
-        git(source, "add", ".")
-        git(source, "commit", "-m", "New post before deployment")
-        git(source, "remote", "add", "origin", str(remote))
-        git(source, "push", "-u", "origin", "main")
-        checkout = self.root / "record-checkout"
-        git(self.root, "clone", str(remote), str(checkout))
-        source_ko = source / ko.relative_to(self.root)
-        source_ko.write_text(source_ko.read_text() + "Hotfix landed while deploying\n")
-        git(source, "add", ".")
-        git(source, "commit", "-m", "Concurrent hotfix")
-        git(source, "push")
-        script = SCRIPT.with_name("record_publication_dates.sh")
-        result = subprocess.run(["bash", str(script), str(plan_file)], cwd=checkout,
-                                env=env, capture_output=True, text=True)
-        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        published = git(source, "--git-dir", str(remote), "show", "main:content/posts/new-post/index.md").decode()
-        self.assertIn("date: '2026-10-21T09:00:00+09:00'", published)
-        self.assertIn("Hotfix landed while deploying", published)
-        head = git(checkout, "rev-parse", "HEAD")
-        result = subprocess.run(["bash", str(script), str(plan_file)], cwd=checkout,
-                                env=env, capture_output=True, text=True)
-        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertEqual(head, git(checkout, "rev-parse", "HEAD"))
-
-    def test_recovery_gate_blocks_deployed_but_unrecorded_dates(self):
-        script = SCRIPT.with_name("check_publication_recovery.py")
-        self.assertTrue(script.exists(), "Missing recovery gate")
-        spec = importlib.util.spec_from_file_location("publication_recovery", script)
-        assert spec is not None and spec.loader is not None
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        jobs = [{"name": "deploy", "conclusion": "success"},
-                {"name": "Record successful publication dates", "conclusion": "failure"}]
-        with self.assertRaisesRegex(ValueError, "Re-run failed jobs"):
-            module.check_jobs(jobs)
-        module.check_jobs([{"name": "deploy", "conclusion": "skipped"}])
-        module.check_jobs([{"name": "deploy", "conclusion": "success"},
-                           {"name": "Record successful publication dates", "conclusion": "success"}])
-        # An attempt-2 gate failure must not hide attempt 1 from attempt 3.
-        history = jobs + [{"name": "deploy", "conclusion": "skipped"}]
-        env = {"GITHUB_REPOSITORY": "example/blog", "GITHUB_RUN_ID": "42",
-               "GITHUB_RUN_ATTEMPT": "3", "GITHUB_RUN_NUMBER": "10"}
-        with patch.dict(os.environ, env), patch.object(module, "api", return_value={
-                "total_count": len(history), "jobs": history}) as request:
-            with self.assertRaisesRegex(ValueError, "Re-run failed jobs"):
-                module.main()
-            self.assertIn("filter=all", request.call_args.args[0])
-
-    def test_workflow_keeps_reruns_serialized_and_publication_plan_replaceable(self):
+    def test_deployment_does_not_commit_or_mutate_publication_source(self):
         yaml = self.module.yaml
-        workflow = yaml.safe_load((SCRIPT.parents[1] / ".github/workflows/hugo.yml").read_text())
+        source = (SCRIPT.parents[1] / ".github/workflows/hugo.yml").read_text()
+        workflow = yaml.safe_load(source)
         self.assertIs(False, workflow["concurrency"]["cancel-in-progress"])
-        jobs = workflow["jobs"]
-        self.assertEqual("deploy", jobs["record-publication"]["needs"])
-        self.assertEqual("write", jobs["record-publication"]["permissions"]["contents"])
-        upload = next(step for step in jobs["build"]["steps"]
-                      if step.get("uses") == "actions/upload-artifact@v4")
-        self.assertIs(True, upload["with"].get("overwrite"),
-                      "A full rerun after failed deployment must replace its old plan artifact")
+        self.assertEqual("read", workflow["permissions"]["contents"])
+        self.assertEqual({"build", "deploy"}, set(workflow["jobs"]))
+        for job in workflow["jobs"].values():
+            self.assertNotIn(job.get("permissions"), ("write-all",))
+            if isinstance(job.get("permissions"), dict):
+                self.assertNotEqual("write", job["permissions"].get("contents"))
+        for forbidden in ("git commit", "git push", "publication_dates.py", "publication-plan",
+                          "record_publication_dates", "check_publication_recovery"):
+            self.assertNotIn(forbidden, source)
+        self.assertFalse(SCRIPT.with_name("record_publication_dates.sh").exists())
+        self.assertFalse(SCRIPT.with_name("check_publication_recovery.py").exists())
 
 
 if __name__ == "__main__":
