@@ -1,6 +1,6 @@
 ---
 date: '2026-08-04T18:00:00+09:00'
-title: '[torch.compile 해부 - Part 01] TorchDynamo, AOTAutograd, TorchInductor'
+title: '[torch.compile() 알아보기 - Part 01] 세 가지 구성 요소'
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch 로고"
@@ -8,7 +8,7 @@ cover:
   relative: true
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
-series: ['torch.compile 해부']
+series: ['torch.compile() 알아보기']
 series_idx: 1
 categories: ["Compilers and Kernels"]
 summary: 'torch.compile을 TorchDynamo, AOTAutograd, TorchInductor 세 요소로 분해해, 각각이 무엇을 입력받아 무엇을 내놓고 어떤 원리로 동작하는지 정리합니다.'
@@ -33,7 +33,7 @@ keywords: [
 
 그래서 PyTorch는 예전부터 파이썬의 정체성을 유지하면서도 성능을 높일 수 있는 시도를 해왔고, `TorchScript`, `torch.jit.trace`, `torch.fx` 등의 시도가 있었습니다. 그리고 꾸준한 시도 끝에 결국 `torch.compile()` 이 탄생하게 됩니다.
 
-이번 글에서는 다루고 싶은 내용이 많기에 2부작으로 구성하고자 하는데요, 이번 편에서는 `torch.compile()` 의 구성 요소를 낱낱이 분해해서 살펴보고, 다음 편에서는 저희를 포함한 다양한 NPU 회사들이 어떤 식으로 `torch.compile()` 의 생태계에 탑승하고 있는지 정리해보고자 합니다.
+이번 글에서는 다루고 싶은 내용이 많기에 3부작으로 구성하고자 하는데요, 이번 편에서는 `torch.compile()` 의 구성 요소를 낱낱이 분해해서 살펴보고, 2편에서는 `torch.compile()` 이 왜 이렇게 세 단계로 나뉘어 있는지, 그리고 그 덕분에 누가 어떤 이득을 얻는지 정리해보고자 합니다. 그리고 3편에서는 PyTorch Conference 2026을 다녀와서 느낀 점을 정리해 보겠습니다.
 
 ---
 
@@ -86,7 +86,7 @@ AOTAutograd는 FX 그래프를 다듬어 아래쪽 Backend로 넘깁니다. **�
 | **AOTAutograd**   | FX 그래프        | 정규화된 ATen 그래프                  |
 | **TorchInductor** | ATen 그래프      | Triton(GPU) 또는 C++(CPU) 커널 소스 |
 
-그리고 이 세 요소는 **독립적으로 교체할 수 있습니다.** `torch.compile(backend=...)` 으로 Inductor 대신 다른 컴파일러를 꽂을 수 있고, 실제로 저희도 Legato Backend를 붙여서 사용하고 있는데, 이 부분은 다음 편에서 자세히 다루겠습니다.
+그리고 이 세 요소는 **독립적으로 교체할 수 있습니다.** `torch.compile(backend=...)` 으로 Inductor 대신 다른 컴파일러를 꽂을 수 있고, 실제로 저희도 Legato Backend를 붙여서 사용하고 있습니다. 이렇게 교체할 수 있다는 점이 왜 중요한지는 다음 편에서 자세히 다루겠습니다.
 
 ---
 
@@ -171,9 +171,7 @@ IR을 이렇게 표현하면 융합을 간단하게 처리할 수 있습니다. 
 
 하지만 저는 `torch.compile()` 의 진짜 면모는 확장성을 고려한 **구조** 라고 생각합니다. Part 4에서 보셨듯이, Inductor는 교체 규칙 하나만 바꿔서 Triton과 C++을 모두 만들어 냈습니다. 그렇다면 **저 자리에 완전히 다른 하드웨어를 위한 코드 생성기를 꽂으면 어떻게 될까요?** Part 3에서 본 decomposition이 구현해야 할 연산 수를 크게 줄여 준다는 사실은 새 하드웨어를 붙이려는 입장에서 어떤 의미일까요?
 
-저는 PyTorch가 이 확장성을 의도적으로 설계하고 있다고 생각합니다. CUDA가 아닌 가속기, NPU들이 PyTorch 생태계 안으로 들어올 수 있는 문을 열어 두고, 그럼으로써 AI 하드웨어 시장 전체의 표준 프레임워크 자리를 지키려는 것이라고 생각합니다. 다음 편에서는 그 문이 구체적으로 어떻게 생겼는지 살펴보겠습니다. PyTorch가 서드파티 가속기를 위해 열어 둔 확장점들, 그리고 같은 문제 앞에서 여러 NPU 회사들이 어떻게 **서로 다른 답** 을 골랐는지 비교해 보려고 합니다.
-
-그리고 마지막으로, 저희 HyperAccel의 [Legato]({{< ref "/posts/what-is-legato" >}})가 이 생태계의 어느 자리에 꽂히려 하는지, 그리고 왜 그 자리인지를 이야기하겠습니다.
+저는 PyTorch가 이 확장성을 의도적으로 설계했다고 생각합니다. 다음 편에서는 질문을 하나 더 거슬러 올라가 보겠습니다. `torch.compile()` 은 애초에 왜 세 단계로 나뉘어 있을까요? 그리고 각 단계를 바꿔 끼울 수 있다면, 누가 무엇을 바꾸고 어떤 이득을 얻을까요? PyTorch가 생태계를 넓혀 온 흐름에서 출발해, 각 단계의 경계를 활용하는 컴파일러와 하드웨어, 그리고 GPU가 아닌 칩을 만드는 회사들의 사례까지 살펴보겠습니다.
 
 ## Reference
 
