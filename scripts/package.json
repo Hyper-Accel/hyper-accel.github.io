@@ -1,0 +1,13 @@
+{
+  "name": "@hyperaccel/blog-build",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test ./build-publication.test.mjs",
+    "build": "bun build-publication.mjs build",
+    "verify": "bun build-publication.mjs verify"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  }
+}
