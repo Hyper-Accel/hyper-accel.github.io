@@ -24,13 +24,13 @@ keywords: [
 
 ### 개요
 
-안녕하세요? HyperAccel CL(Compute Library)팀 박현준입니다. [1편]({{< ref "/posts/torch-compile-anatomy" >}})에서는 `torch.compile()` 을 TorchDynamo, AOTAutograd, TorchInductor(이하 Dynamo, Inductor) 세 요소로 나누어 살펴봤습니다. Dynamo는 파이썬 코드에서 그래프를 꺼내고, AOTAutograd는 그 그래프를 정리하고, Inductor는 정리된 그래프로 커널을 만듭니다. (그래프는 1편에서 다뤘으니 참고 부탁드립니다.)
+안녕하세요? HyperAccel CL(Compute Library)팀 박현준입니다. [1편]({{< ref "/posts/torch-compile-anatomy" >}})에서는 `torch.compile()` 을 TorchDynamo, AOTAutograd, TorchInductor(이하 Dynamo, Inductor) 세 요소로 나누어 살펴봤습니다. Dynamo는 파이썬 코드에서 그래프를 꺼내고, AOTAutograd는 그 그래프를 정리하고, Inductor는 정리된 그래프로 커널을 만듭니다. (그래프라는 개념에 대해서는 1편에서 다뤘으니 참고 부탁드립니다.)
 
-1편에서는 `torch.compile()` 을 구성하는 3가지 요소를 하나씩 설명했습니다. 이번 편에서는 왜 PyTorch는 이를 굳이 세 단계로 나누었을지에 대한 의문에서 시작합니다. 세 단계로 나누었을 때 얻을 수 있는 이득은 무엇이고 누구를 위한 것인지를 이야기해보고자 합니다.
+이번 편에서는 왜 PyTorch는 이를 굳이 세 단계로 나누었을지에 대한 의문에서 시작합니다. 세 단계로 나누었을 때 얻을 수 있는 이득은 무엇이고 누구를 위한 것인지를 이야기해보고자 합니다.
 
-저는 이 질문의 답이 기술보다 생태계에 있다고 생각합니다. 그래서 먼저 PyTorch가 어떻게 사람을 모아 생태계를 만들었는지, 그리고 2.0 이후 그 생태계를 어느 방향으로 넓히고 있는지 살펴봅니다. 이어서 세 단계가 각각 무엇을 내놓고 그 결과물을 누가 어떻게 쓰는지 정리한 뒤, 이 구조를 가장 많이 쓰는 회사들의 사례로 마무리하겠습니다.
+저는 이 질문에 대해 기술적으로 모듈화하기 위함이라는 측면도 있지만, 생태계 확장성 측면으로도 정답이 있다고 생각합니다. 그래서 먼저 PyTorch가 어떻게 사람을 모아 생태계를 만들었는지, 그리고 2.0 이후 그 생태계를 어느 방향으로 넓히고 있는지 살펴봅니다. 그 이후 세 단계가 각각 어떤 결과물을 내놓고 그 결과물을 누가 어떻게 쓰는지 정리한 뒤, 이 구조를 가장 많이 쓰는 회사들의 사례로 마무리하겠습니다.
 
-이 시리즈는 3편까지 이어집니다. 제가 26년 10월에 열리는 PyTorch Conference 2026에 참여할 예정인데, 다녀와서 알게 된 최신 동향 및 느낀 점을 정리해 보겠습니다.
+이 시리즈는 3편까지 이어집니다. 참고로 제가 다음 주에 PyTorch Conference 2026에 참관할 예정인데, 다녀와서 알게 된 최신 동향 및 느낀 점은 다음 편에서 정리해 보겠습니다.
 
 ---
 
@@ -63,11 +63,11 @@ PyTorch는 그냥 파이썬처럼 쓸 수 있었습니다. 한 줄씩 실행되�
 
 ### torch.compile이 지켜야 했던 것
 
-2023년 3월, PyTorch 2.0과 함께 `torch.compile()` 이 나왔습니다. 이는 파이썬처럼 쓰는 편함은 그대로 두면서 성능을 끌어올리는 기능입니다.
+2023년 3월, PyTorch 2.0과 함께 `torch.compile()` 이 나왔습니다. 이는 파이썬처럼 쓰는 편함은 그대로 두면서 성능을 끌어올려는 시도였습니다.
 
-그런데 이 시점의 PyTorch는 이미 거대한 생태계였습니다. 사용자 코드만 많은 게 아니라, PyTorch 모델을 받아 자기 방식으로 최적화하는 도구들도 자리 잡고 있었습니다. NVIDIA의 TensorRT는 PyTorch 모델을 추론 엔진으로 바꿔 빠르게 돌렸고, Google의 PyTorch/XLA는 PyTorch 코드를 TPU에서 돌리는 통로였습니다.
+이 시점의 PyTorch는 이미 거대한 생태계였습니다. 사용자 코드만 많은 게 아니라, PyTorch 모델을 받아 자기 방식으로 최적화하는 도구들도 자리 잡고 있었습니다. NVIDIA의 TensorRT는 PyTorch 모델을 추론 엔진으로 바꿔 빠르게 돌렸고, Google의 PyTorch/XLA는 PyTorch 코드를 TPU에서 돌리는 통로였습니다.
 
-저는 새 컴파일러가 이 생태계를 깨지 않으려면 두 가지를 지켜야 했다고 생각합니다. 첫째, 사용자는 코드를 거의 고치지 않아야 합니다. 둘째, 이런 도구들이 `torch.compile()` 안으로 들어올 수 있어야 합니다. `torch.compile()` 이 PyTorch의 컴파일러와 Triton만 쓰는 닫힌 구조였다면, 사용자는 `torch.compile()` 과 기존 도구 중 하나를 골라야 했을 것이고 생태계는 갈라졌을 겁니다.
+저는 새 컴파일러가 이 생태계를 깨지 않으려면 두 가지를 지켜야 한다고 생각합니다. 첫째, 사용자는 코드를 거의 고치지 않아야 합니다. 둘째, 이런 도구들이 `torch.compile()` 과 함꼐 사용할 수 있어야 합니다. 만약 `torch.compile()` 이 PyTorch의 컴파일러와 Triton에만 쓰이는 쓰는 닫힌 구조였다면, 사용자는 `torch.compile()` 과 기존에 사용하던 도구 중 하나를 골라야 했을 것이고 생태계는 갈라졌을 겁니다.
 
 ![PyTorch 2.0부터 2.13까지 바깥 하드웨어와 컴파일러를 위한 확장 기능이 추가된 연표. 2.0의 torch.compile 출시와 rename_privateuse1_backend, 2.1의 자동 dynamic shape와 Inductor 디바이스 등록 API, 2.4의 custom_op, 2.5의 디바이스 확장 자동 로드와 Intel GPU 지원, 2.6의 torch.accelerator, 2.9의 OpenReg 재작성과 Accelerator Integration 문서와 Stable ABI, 2.10의 통합 문서 확장, 2.13의 set_default_backend가 표시되어 있다](images/01-release-timeline.png)
 
@@ -89,12 +89,17 @@ PyTorch는 모든 것을 직접 만드는 대신 **외부 컴파일러와 하드
 
 ![torch.compile의 세 단계와 각 단계의 출력을 활용하는 쪽. 파이썬 코드가 TorchDynamo, AOTAutograd, TorchInductor를 거쳐 커널 코드가 된다. Dynamo의 출력인 FX 그래프와 guard는 TensorRT, OpenVINO, XLA 같은 다른 컴파일러 백엔드와 torch.export가 받아 쓴다. AOTAutograd의 출력인 core ATen 그래프는 자체 그래프 컴파일러를 가진 백엔드가 받아 쓴다. Inductor의 출력인 커널 코드는 Triton 백엔드를 통해 NVIDIA, AMD, Intel GPU로 가거나, 코드 생성기를 교체해 새로운 칩으로 간다. 그 아래에는 컴파일되지 않는 연산(폴백)을 바로 실행하는 디스패처와 PrivateUse1이 있다](images/02-three-stages.png)
 
+이 글에서는 세 단계를 각자 하는 일의 이름으로 부르겠습니다. 순서는 1편에서 본 세 요소와 같습니다.
 
-### 1단계 Dynamo의 출력: 그래프가 필요한 쪽에게
+- **1단계 그래프 캡처(Graph Capture)**: Dynamo가 파이썬 코드에서 그래프를 뽑아냅니다.
+- **2단계 그래프 정규화(Graph Normalization)**: AOTAutograd가 그 그래프를 core ATen 연산으로 다듬습니다.
+- **3단계 코드 생성(Code Generation)**: Inductor가 연산을 묶은 뒤 커널 코드를 적습니다.
+
+### 1단계 그래프 캡처: 그래프가 필요한 쪽에게
 
 Dynamo가 내놓는 것은 FX 그래프와 guard입니다. 파이썬 코드에서 그래프를 뽑아내는 일은 까다롭지만, Dynamo가 이 일을 대신 해 주기 때문에 다른 도구는 그 결과만 받아 쓰면 됩니다.
 
-Dynamo의 출력을 가장 많이 받아 쓰는 쪽은 **다른 컴파일러** 입니다. NVIDIA의 TensorRT(`backend="torch_tensorrt"`), Intel의 OpenVINO(`backend="openvino"`), Google의 XLA(`backend="openxla"`)처럼, 그래프를 받아 최적화부터 커널 생성까지 통째로 해내는 별도의 컴파일러입니다. `backend` 자리에 이름만 넘기면 AOTAutograd와 Inductor가 하던 일을 이 컴파일러가 자기 방식으로 대신합니다. 연산을 어떻게 묶을지부터 스스로 정한다는 점에서, 코드를 적는 부분만 바꾸는 3단계와 다릅니다.
+Dynamo의 출력을 가장 많이 받아 쓰는 쪽은 **다른 컴파일러** 입니다. NVIDIA의 TensorRT(`backend="torch_tensorrt"`), Intel의 OpenVINO(`backend="openvino"`), Google의 XLA(`backend="openxla"`)처럼, 그래프를 받아 최적화부터 커널 생성까지 통째로 해내는 별도의 컴파일러입니다. `backend` 자리에 이름만 넘기면 AOTAutograd와 Inductor가 하던 일을 이 컴파일러가 자기 방식으로 대신합니다. 연산을 어떻게 묶을지부터 스스로 정한다는 점에서, 코드를 적는 부분만 바꾸는 코드 생성 단계와 다릅니다.
 
 이들이 Inductor 대신 쓰이는 이유는 `torch.compile()` 보다 먼저 있었고, 각자 하드웨어에 맞춰 오래 다듬어진 독립 도구이기 때문입니다. TensorRT는 NVIDIA GPU 추론, OpenVINO는 Intel CPU와 GPU, XLA는 Triton이 돌지 않는 TPU에 맞춰져 있습니다. 이미 잘 만든 컴파일러를 다시 만들기보다 그래프만 넘겨받아 쓰는 편이 자연스럽고, 사용자는 문자열 하나만 바꾸면 됩니다.
 
@@ -127,7 +132,7 @@ relu = torch.nn.functional.relu(linear)
 
 사용자가 쓴 `F.linear` 와 `F.relu` 가 그대로 그래프가 되어 넘어왔습니다. 받는 쪽은 파이썬을 해석할 필요 없이 이 연산들만 처리하면 됩니다.
 
-### 2단계 AOTAutograd의 출력: 줄어든 연산
+### 2단계 그래프 정규화: 줄어든 연산
 
 같은 함수를 이번에는 AOTAutograd를 거친 뒤에 받아 보겠습니다. 앞의 `show_graph` 를 `aot_autograd` 로 한 번 감싸기만 하면 됩니다.
 
@@ -149,9 +154,9 @@ relu = torch.ops.aten.relu.default(addmm)
 
 이 단계를 거친 그래프의 가치는 숫자로 보면 분명합니다. PyTorch에는 연산이 오버로드까지 2,500개가 넘게 있지만(2.14 기준), core ATen은 약 190개입니다. 이 그래프를 받으면 2,500여 개가 아니라 **약 190개 연산만 처리하면 됩니다.** 그래서 자체 그래프 컴파일러를 가진 쪽은 보통 여기서 그래프를 받습니다.
 
-### 3단계 Inductor의 출력: 코드 생성기만 바꾸기
+### 3단계 코드 생성: 코드를 적는 부분만 바꾸기
 
-마지막은 Inductor 안쪽입니다. 예를 들어 `y = x * 2 + 1` 을 컴파일한다고 해 보겠습니다. Inductor는 먼저 이 계산을 원소 하나 기준의 식 `y[i] = x[i] * 2 + 1` 로 바꿉니다. 곱셈과 덧셈을 커널 하나로 묶는 것, 즉 융합도 이 단계에서 끝납니다. 이 식을 **어떤 언어로 적을지** 는 맨 마지막에 정합니다.
+마지막은 Inductor가 맡는 코드 생성 단계입니다. 이름은 코드 생성이지만, Inductor는 코드를 적기 전에 연산을 어떻게 묶을지부터 정합니다. 예를 들어 `y = x * 2 + 1` 을 컴파일한다고 해 보겠습니다. Inductor는 먼저 이 계산을 원소 하나 기준의 식 `y[i] = x[i] * 2 + 1` 로 바꿉니다. 곱셈과 덧셈을 커널 하나로 묶는 것, 즉 융합도 이 단계에서 끝납니다. 이 식을 **어떤 언어로 적을지** 는 맨 마지막에 정합니다.
 
 GPU용으로 적으면 Triton 코드가 됩니다(핵심 줄만 옮겼습니다).
 
@@ -173,7 +178,7 @@ tmp6.store(out_ptr0 + x0);                           // y[i] 쓰기
 
 두 코드는 같은 계산을 다른 언어로 적었을 뿐입니다. 읽고, 곱하고, 더하고, 쓰는 순서는 Inductor가 이미 정해 두었습니다. 이 단계를 활용하는 쪽은 바로 이 **"적는 부분"** 만 자기 것으로 바꿉니다. 
 
-다만 Inductor가 정하는 묶는 방식은 GPU와 CPU를 기준으로 만들어졌고, 이 등록 API도 아직 private입니다. 연산을 묶는 방식부터 칩에 맞게 정해야 한다면 2단계의 출력을 받아 직접 컴파일하는 편이 낫습니다.
+다만 Inductor가 정하는 묶는 방식은 GPU와 CPU를 기준으로 만들어졌고, 이 등록 API도 아직 private입니다. 연산을 묶는 방식부터 칩에 맞게 정해야 한다면 정규화된 그래프를 받아 직접 컴파일하는 편이 낫습니다.
 
 ### 컴파일되지 않는 부분: 폴백과 PrivateUse1
 
@@ -187,9 +192,9 @@ ATen에 없는 연산은 `torch.library.custom_op` 으로 정의합니다. 출�
 
 | 단계 | 넘겨주는 것 | 받아 쓰는 쪽 | 얻는 것 |
 | --- | --- | --- | --- |
-| **1단계 Dynamo의 출력** | 사용자가 쓴 연산 그대로의 그래프 | TensorRT, OpenVINO, XLA 같은 컴파일러 백엔드, `torch.export` | 파이썬 코드를 해석하는 일을 하지 않아도 됨 |
-| **2단계 AOTAutograd의 출력** | core ATen 연산만 남은 그래프 | 자체 그래프 컴파일러를 가진 백엔드 | 처리할 연산이 2,500여 개에서 약 190개로 줄어듦 |
-| **3단계 Inductor의 출력** | 연산 묶기가 끝난 원소 단위 식 | Triton을 지원하는 GPU, 코드 생성기를 바꾸는 새 칩 | 코드를 "적는 부분" 만 만들면 됨 |
+| **1단계 그래프 캡처** (Dynamo) | 사용자가 쓴 연산 그대로의 그래프 | TensorRT, OpenVINO, XLA 같은 컴파일러 백엔드, `torch.export` | 파이썬 코드를 해석하는 일을 하지 않아도 됨 |
+| **2단계 그래프 정규화** (AOTAutograd) | core ATen 연산만 남은 그래프 | 자체 그래프 컴파일러를 가진 백엔드 | 처리할 연산이 2,500여 개에서 약 190개로 줄어듦 |
+| **3단계 코드 생성** (Inductor) | 연산 묶기가 끝난 원소 단위 식 | Triton을 지원하는 GPU, 코드 생성기를 바꾸는 새 칩 | 코드를 "적는 부분" 만 만들면 됨 |
 | **폴백: 디스패처** | 컴파일되지 않은 연산 하나(바로 실행) | 모든 디바이스 | 컴파일되지 않는 부분도 그 디바이스에서 실행 |
 
 
@@ -197,31 +202,31 @@ ATen에 없는 연산은 `torch.library.custom_op` 으로 정의합니다. 출�
 
 ## Part 3. GPU가 아닌 칩은 이 구조를 어떻게 쓰는가 {#part3}
 
-이 구조를 가장 넓게 쓰는 쪽은 GPU가 아닌 AI 칩, 흔히 **Neural Processing Unit(NPU)** 이라고 부르는 칩을 만드는 회사들입니다. Triton이 그대로 맞지 않는 경우가 많아 2단계나 3단계에서 직접 들어와야 하고, 폴백도 스스로 처리해야 하기 때문입니다. Part 3에서는 torch.compile()을 적극적으로 사용하는 세 회사를 간단히 살펴보겠습니다.
+이 구조를 가장 넓게 쓰는 쪽은 GPU가 아닌 AI 칩, 흔히 **Neural Processing Unit(NPU)** 이라고 부르는 칩을 만드는 회사들입니다. Triton이 그대로 맞지 않는 경우가 많아 그래프 정규화나 코드 생성 단계로 직접 들어와야 하고, 폴백도 스스로 처리해야 하기 때문입니다. Part 3에서는 torch.compile()을 적극적으로 사용하는 세 회사를 간단히 살펴보겠습니다.
 
-### Huawei Ascend: 2단계와 3단계 모두
+### Huawei Ascend: 정규화된 그래프와 코드 생성 모두
 
-Huawei의 Ascend는 **2단계와 3단계를 모두** 활용합니다. 2단계에서는 TorchAir라는 백엔드가 정리된 그래프를 받아 Ascend의 자체 그래프 엔진에 넘깁니다. 3단계에서는 Inductor에 Ascend용 코드 생성기를 등록합니다. 디바이스는 PrivateUse1에 `npu` 라는 이름을 붙여 연결했습니다.
+Huawei의 Ascend는 **그래프 정규화와 코드 생성 단계를 모두** 활용합니다. 먼저 TorchAir라는 백엔드가 정규화된 그래프를 받아 Ascend의 자체 그래프 엔진에 넘깁니다. 그리고 코드 생성 단계에서는 Inductor에 Ascend용 코드 생성기를 등록합니다. 디바이스는 PrivateUse1에 `npu` 라는 이름을 붙여 연결했습니다. 정리하면 TorchAir 경로는 Dynamo와 AOTAutograd까지 재사용하고 Inductor를 자체 그래프 엔진으로 대체했습니다. Inductor 경로는 Inductor의 연산 묶기까지 재사용하고 코드를 적는 부분만 Ascend용으로 대체했습니다.
 
-### Intel Gaudi: 2단계
+### Intel Gaudi: 정규화된 그래프를 받아 자체 컴파일러로
 
-Intel Gaudi는 **2단계** 의 출력을 받아 씁니다. `hpu_backend` 라는 백엔드가 정리된 그래프를 받아 Gaudi의 자체 그래프 컴파일러에 넘기고, Inductor는 거치지 않습니다. 디바이스 `hpu` 는 PrivateUse1이 아니라 PyTorch 본체에 들어 있는 디바이스 타입입니다.
+Intel Gaudi는 **정규화된 그래프** 를 받아 씁니다. `hpu_backend` 라는 백엔드가 이 그래프를 받아 Gaudi의 자체 그래프 컴파일러에 넘기고, Inductor는 거치지 않습니다. 디바이스 `hpu` 는 PrivateUse1이 아니라 PyTorch 본체에 들어 있는 디바이스 타입입니다. 정리하면 Dynamo와 AOTAutograd까지 재사용하고, Inductor 전체를 자체 그래프 컴파일러로 대체했습니다.
 
-### IBM Spyre: 3단계
+### IBM Spyre: 코드 생성기만 바꾸기
 
-IBM의 Spyre는 **3단계** 를 활용합니다. Inductor에 Spyre용 코드 생성기를 등록해, Inductor가 묶어 준 계산을 Spyre용 코드로 적고 마지막 변환은 자체 컴파일러가 맡습니다. 디바이스는 PrivateUse1에 `spyre` 라는 이름을 붙였습니다. 예전에는 Inductor를 거치지 않는 방식을 썼는데, [발표 소개](https://pytorchconferenceeu2026.sched.com/event/2Hiqa)에 따르면 3단계를 활용하는 방식으로 옮기며 자체 컴파일러 코드를 상당 부분 줄일 수 있었다고 합니다.
+IBM의 Spyre는 **코드 생성 단계** 를 활용합니다. Inductor에 Spyre용 코드 생성기를 등록해, Inductor가 묶어 준 계산을 Spyre용 코드로 적고 마지막 변환은 자체 컴파일러가 맡습니다. 디바이스는 PrivateUse1에 `spyre` 라는 이름을 붙였습니다. 예전에는 Inductor를 거치지 않는 방식을 썼는데, [발표 소개](https://pytorchconferenceeu2026.sched.com/event/2Hiqa)에 따르면 코드 생성 단계를 활용하는 방식으로 옮기며 자체 컴파일러 코드를 상당 부분 줄일 수 있었다고 합니다. 정리하면 Dynamo, AOTAutograd, Inductor의 연산 묶기까지 재사용하고, 코드를 적는 부분과 그 뒤의 최종 변환만 자체 모듈로 대체했습니다.
 
 ### 한눈에 비교하기
 
 | | 활용한 단계 | 연결 방식 | 디바이스 |
 | --- | --- | --- | --- |
-| **Huawei Ascend** | ② + ③ | ②: TorchAir → 자체 그래프 엔진 / ③: Inductor에 코드 생성기 등록 | PrivateUse1 `npu` |
-| **Intel Gaudi** | ② | `hpu_backend` → 자체 그래프 컴파일러 | 본체 내장 `hpu` |
-| **IBM Spyre** | ③ | Inductor에 코드 생성기 등록 → 자체 컴파일러 | PrivateUse1 `spyre` |
+| **Huawei Ascend** | 그래프 정규화 + 코드 생성 | 정규화: TorchAir → 자체 그래프 엔진 / 코드 생성: Inductor에 코드 생성기 등록 | PrivateUse1 `npu` |
+| **Intel Gaudi** | 그래프 정규화 | `hpu_backend` → 자체 그래프 컴파일러 | 본체 내장 `hpu` |
+| **IBM Spyre** | 코드 생성 | Inductor에 코드 생성기 등록 → 자체 컴파일러 | PrivateUse1 `spyre` |
 
-세 회사 모두 1단계 Dynamo의 그래프 캡처는 그대로 쓰고, 폴백도 자기 디바이스에서 처리하도록 갖췄습니다. 갈린 곳은 2단계와 3단계 중 어디서 받느냐, 즉 **"하드웨어에 맞는 결정을 어디까지 Inductor에 맡길 것인가"** 입니다. 많이 맡길수록 만들 것이 줄고, 적게 맡길수록 하드웨어에 맞는 결정을 직접 내릴 수 있습니다.
+세 회사 모두 Dynamo의 그래프 캡처는 그대로 쓰고, 폴백도 자기 디바이스에서 처리하도록 갖췄습니다. 갈린 곳은 그래프 정규화와 코드 생성 중 어느 단계에서 들어오느냐, 즉 **"하드웨어에 맞는 결정을 어디까지 Inductor에 맡길 것인가"** 입니다. 많이 맡길수록 만들 것이 줄고, 적게 맡길수록 하드웨어에 맞는 결정을 직접 내릴 수 있습니다.
 
-참고로 저희 HyperAccel의 LPU는 Gaudi처럼 2단계의 출력을 받아, 자체 언어인 [Legato]({{< ref "/posts/what-is-legato" >}})로 커널을 만듭니다. 자세한 내용은 [Legato 문서](https://legato-docs.hyperaccel.net/latest/)에서 확인하실 수 있습니다.
+참고로 저희 HyperAccel의 LPU는 Gaudi처럼 정규화된 그래프를 받아, 자체 언어인 [Legato]({{< ref "/posts/what-is-legato" >}})로 커널을 만듭니다. 자세한 내용은 [Legato 문서](https://legato-docs.hyperaccel.net/latest/)에서 확인하실 수 있습니다.
 
 ---
 
@@ -231,11 +236,11 @@ IBM의 Spyre는 **3단계** 를 활용합니다. Inductor에 Spyre용 코드 생
 
 첫째는 기술적인 이유입니다. 파이썬 코드에서 그래프를 꺼내는 일(Dynamo), 그래프를 표준 연산으로 정리하는 일(AOTAutograd), 하드웨어용 코드를 만드는 일(Inductor)은 성격이 전혀 다른 일입니다. 이 일들을 나눠 두면 각각을 따로 발전시키기 쉽고, 다른 도구가 중간 결과를 가져다 쓰기도 편합니다.
 
-둘째는 생태계를 위한 이유입니다. PyTorch는 파이썬처럼 쉽게 쓸 수 있는 방식으로 연구자와 개발자를 모았고, 그 위에 모델과 도구가 쌓이며 사실상의 표준이 되었습니다. 다음 과제였던 속도를 위해 `torch.compile()` 을 만들면서, PyTorch는 각 단계의 출력을 외부 컴파일러와 하드웨어가 받아 쓸 수 있도록 설계했습니다. PyTorch 2.0 공식 소개에도 백엔드(컴파일러)를 붙이는 경험을 단순하게 만들겠다는 목표와, 연산 수를 줄여 벤더가 통합을 쉽게 하도록 돕겠다는 설명이 나옵니다. 1단계의 출력은 TensorRT 같은 다른 컴파일러가, 2단계의 출력은 자체 그래프 컴파일러를 가진 쪽이 받아 씁니다. 3단계에는 새로운 하드웨어가 들어오고, 컴파일되지 않는 부분은 PrivateUse1이 받아 줍니다.
+둘째는 생태계를 위한 이유입니다. PyTorch는 파이썬처럼 쉽게 쓸 수 있는 방식으로 연구자와 개발자를 모았고, 그 위에 모델과 도구가 쌓이며 사실상의 표준이 되었습니다. 다음 과제였던 속도를 위해 `torch.compile()` 을 만들면서, PyTorch는 각 단계의 출력을 외부 컴파일러와 하드웨어가 받아 쓸 수 있도록 설계했습니다. PyTorch 2.0 공식 소개에도 백엔드(컴파일러)를 붙이는 경험을 단순하게 만들겠다는 목표와, 연산 수를 줄여 벤더가 통합을 쉽게 하도록 돕겠다는 설명이 나옵니다. 그래프 캡처의 출력은 TensorRT 같은 다른 컴파일러가, 그래프 정규화의 출력은 자체 그래프 컴파일러를 가진 쪽이 받아 씁니다. 코드 생성 단계에는 새로운 하드웨어가 들어오고, 컴파일되지 않는 부분은 PrivateUse1이 받아 줍니다.
 
 실제로 이 길로 벤더들이 몰려들고 있습니다. Part 3에서 본 것처럼 GPU가 아닌 가속기, 특히 NPU를 만드는 회사들이 각자 필요한 단계로 들어오고 있고, PyTorch도 버전마다 그 길을 공식 API와 문서로 다져 가고 있습니다. 이것을 PyTorch가 처음부터 짜 둔 전략이라고 단정할 수는 없습니다. 다만 메신저로 치면 사람이 충분히 모인 플랫폼이 바깥에 길을 열어 두었고, 그 길로 새로운 참여자가 몰려오며 생태계가 GPU 너머로 넓어지고 있다고 저는 생각합니다.
 
-다음 편에서는 시야를 조금 넓혀, 10월 20~21일 미국 새너제이에서 열리는 PyTorch Conference 2026을 다녀와서 느낀 점을 정리해보고자 합니다. 긴 글 읽어주셔서 감사합니다.
+다음 편에서는 시야를 조금 넓혀, 10월 20~21일 미국 산호세에서 열리는 PyTorch Conference 2026을 다녀와서 느낀 점을 정리해보고자 합니다. 긴 글 읽어주셔서 감사합니다.
 
 ## Reference
 
@@ -243,7 +248,7 @@ IBM의 Spyre는 **3단계** 를 활용합니다. Inductor에 Spyre용 코드 생
 
 - [PyTorch 2.0 release blog](https://pytorch.org/blog/pytorch-2.0-release/) — `torch.compile()` 출시
 - [PyTorch 2.0 소개](https://docs.pytorch.org/get-started/pytorch-2.0/) — 백엔드 통합을 단순하게 만들겠다는 설계 의도
-- [Custom Backends](https://docs.pytorch.org/docs/main/user_guide/torch_compiler/torch.compiler_custom_backends.html) — 1·2단계의 출력에 백엔드를 붙이는 방법
+- [Custom Backends](https://docs.pytorch.org/docs/main/user_guide/torch_compiler/torch.compiler_custom_backends.html) — 그래프 캡처·정규화 단계의 출력에 백엔드를 붙이는 방법
 - [Accelerator Integration](https://docs.pytorch.org/docs/2.9/accelerator/index.html) — PrivateUse1 기반 가속기 통합 가이드
 - [Intel GPU Support Now Available in PyTorch 2.5](https://pytorch.org/blog/intel-gpu-support-pytorch-2-5/)
 - [PyTorch 2.9 Release Blog](https://pytorch.org/blog/pytorch-2-9/) — LibTorch Stable ABI
