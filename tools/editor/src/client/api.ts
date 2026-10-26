@@ -80,6 +80,18 @@ export async function persistPost(
   }
 }
 
+export async function uploadCoverImage(path: string, image: File): Promise<ImageUploadResponse> {
+  const body = new FormData()
+  body.set("path", path)
+  body.set("image", image)
+  try {
+    const payload: unknown = await client.post("api/cover-image", { body }).json()
+    return imageUploadResponseSchema.parse(payload)
+  } catch (error: unknown) {
+    throw new Error(await messageFrom(error), { cause: error })
+  }
+}
+
 export async function uploadImage(path: string, image: File): Promise<ImageUploadResponse> {
   const body = new FormData()
   body.set("path", path)

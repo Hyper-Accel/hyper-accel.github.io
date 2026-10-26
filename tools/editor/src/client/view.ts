@@ -1,3 +1,4 @@
+import { coverEditorMarkup } from "./cover-editor"
 import { createPostMarkup } from "./create-post"
 
 function iconButton(command: string, icon: string, label: string): string {
@@ -88,13 +89,14 @@ export function applicationMarkup(): string {
               ${iconButton("bulletList", "list-bullets", "글머리 목록")}
               ${iconButton("orderedList", "list-numbers", "번호 목록")}
               <button class="tool-button" id="link-button" type="button" aria-label="링크 추가" title="링크 추가"><i class="ph ph-link"></i></button>
-              <button class="tool-button" id="image-button" type="button" aria-label="이미지 추가" title="이미지 추가"><i class="ph ph-image"></i></button>
+              <button class="tool-button" id="image-button" type="button" aria-label="본문 이미지 추가" title="본문 이미지 추가"><i class="ph ph-image"></i></button>
               <button class="tool-button" id="alt-button" type="button" aria-label="이미지 대체 텍스트 편집" title="이미지 대체 텍스트 편집"><i class="ph ph-text-aa"></i></button>
               <input id="image-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden />
             </div>
           </div>
           <div class="document-actions">
             <span class="save-state" id="save-state" role="status">글을 선택하세요</span>
+
             <button class="secondary-button" id="preview-button" type="button" disabled><i class="ph ph-arrow-square-out"></i><span>실제 화면</span></button>
             <button class="save-button" id="save-button" type="button" disabled><i class="ph ph-floppy-disk"></i><span>저장</span></button>
           </div>
@@ -112,6 +114,7 @@ export function applicationMarkup(): string {
               <textarea class="post-title-input" id="post-title" rows="1" aria-label="글 제목"></textarea>
               <div class="post-meta editor-meta" id="post-meta"></div>
             </header>
+            ${coverEditorMarkup()}
             <div id="editor"></div>
           </article>
           <section class="merge-workspace" id="merge-workspace" hidden aria-label="AI 수정 검토">

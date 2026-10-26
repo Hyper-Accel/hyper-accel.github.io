@@ -158,3 +158,29 @@ merge grid or change the document's vertical scroll position.
   Labels are at least 14px with Korean word wrapping. No decorative motion or new dependencies.
 - Author lookup happens when the dialog opens (suggestions) and when **저자명 확인** is clicked.
   Submitting the post never initiates author lookup or author registration.
+
+## 10. Representative Image
+
+- Keep the new-post form's three base inputs unchanged. The article canvas gains a compact
+  **대표 이미지** section between its title/meta and body, usable for existing and new posts.
+- Keep representative-image controls in the article section only; do not add a command-bar
+  shortcut or tab. Leave the section visible even without a cover.
+- Reuse the existing palette, system/CJK font stack, 4px spacing scale, and secondary buttons.
+  The empty state has a short hint and **대표 이미지 추가**; the populated state shows a
+  bounded, uncropped preview with **이미지 교체**, **대표 이미지 제거**, and a labelled alt input.
+- Upload PNG/JPEG/GIF/WebP files of at most 1MiB. Reject unsupported or oversized files on both
+  client and server, and do not add image-processing dependencies. Show the limit before upload.
+- Upload writes a uniquely named bundle asset; cover metadata changes remain unsaved until the
+  normal **저장** action. Removing a cover clears its reference, never deletes shared assets.
+  Tell the user that the selected language's cover alone changes; translations are not overwritten.
+- Preserve unrelated cover fields (caption, hidden flags), other front matter, comments, and body.
+  Omitted cover data in older API requests must preserve the existing cover. Use normal revision
+  conflicts and Hugo validation/rollback for cover saves.
+- Display existing bundle, static, or HTTP(S) covers without changing their metadata. Resolve
+  local previews inside allowed real paths; never server-fetch remote URLs or follow escaping links.
+- Cover controls cover empty, ready, uploading, invalid file, failed upload, and failed image load
+  states. A failed replacement leaves the prior cover intact. Announce status/errors; prevent
+  saves during upload and ignore responses belonging to a previously opened document.
+- At 1440/768/375px, stack controls when needed, keep the preview inside the article width, and
+  use labels of at least 14px with Korean wrapping. Preserve visible focus rings and keyboard
+  access. No animation, no extra page-load requests beyond a populated cover's preview.

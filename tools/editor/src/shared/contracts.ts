@@ -70,6 +70,13 @@ export const postListSchema = z.object({
   posts: z.array(postSummarySchema),
 })
 
+export const postCoverSchema = z.object({
+  image: z.string().max(2048),
+  alt: z.string().max(1000),
+  relative: z.boolean(),
+})
+export type PostCover = z.infer<typeof postCoverSchema>
+
 export const postDocumentSchema = z.object({
   path: postPathSchema,
   slug: z.string().min(1),
@@ -78,6 +85,7 @@ export const postDocumentSchema = z.object({
   draft: z.boolean(),
   body: z.string(),
   revision: z.string().min(1),
+  cover: postCoverSchema.nullable().optional(),
 })
 
 export const savePostRequestSchema = z.object({
@@ -85,6 +93,7 @@ export const savePostRequestSchema = z.object({
   title: z.string().trim().min(1).max(240),
   body: z.string(),
   revision: z.string().min(1),
+  cover: postCoverSchema.nullable().optional(),
 })
 
 export const savePostResponseSchema = z.object({

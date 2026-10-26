@@ -1,0 +1,114 @@
+.cover-editor {
+  width: min(100%, var(--main-width));
+  margin: 0 auto 32px;
+  padding: var(--space-4);
+  border: 1px solid var(--editor-border);
+  border-radius: var(--radius-control);
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.cover-heading-row,
+.cover-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cover-heading-row {
+  justify-content: space-between;
+}
+
+.cover-editor h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cover-empty p,
+.cover-status,
+.cover-alt-field p {
+  margin: var(--space-2) 0 0;
+  color: var(--editor-secondary);
+}
+
+.cover-preview {
+  display: grid;
+  place-items: center;
+  margin-top: var(--space-4);
+  min-height: 100px;
+  background: var(--editor-soft);
+  border-radius: var(--radius-control);
+}
+
+.cover-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-control);
+}
+
+.cover-alt-field {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.cover-alt-field label {
+  font-weight: 600;
+}
+
+.cover-alt-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--editor-border);
+  border-radius: var(--radius-control);
+  background: var(--editor-paper);
+  color: var(--editor-text);
+  resize: vertical;
+}
+
+.cover-alt-field textarea:focus-visible {
+  outline: 2px solid var(--editor-accent);
+  outline-offset: 2px;
+}
+
+.cover-alt-field p {
+  margin: 0;
+}
+
+.cover-error {
+  margin: var(--space-2) 0 0;
+  color: var(--editor-danger);
+}
+
+@media (max-width: 980px) {
+  .cover-actions .secondary-button .cover-button-label {
+    display: inline;
+  }
+}
+
+@media (max-width: 480px) {
+  .cover-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cover-actions {
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .cover-actions button {
+    white-space: normal;
+    min-height: 40px;
+    padding-block: var(--space-2);
+  }
+}

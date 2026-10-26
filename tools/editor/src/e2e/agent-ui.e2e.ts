@@ -148,7 +148,10 @@ async function run(): Promise<void> {
     await page.locator("#save-button").click()
     await page.waitForFunction(() => {
       const button = document.querySelector<HTMLButtonElement>("#save-button")
-      return button?.disabled === true
+      return (
+        button?.disabled === true &&
+        document.querySelector("#save-state")?.textContent === "모든 변경 저장됨"
+      )
     })
 
     const saved = await Bun.file(fixturePath).text()
@@ -163,6 +166,7 @@ async function run(): Promise<void> {
         sessionHistoryRestored: true,
         resumedTurns: state.requests.length,
         mergeCloseRestoresEditor: true,
+
         mergeScrollPreserved: true,
         responsiveWidths: [1280, 768, 375],
         perHunkApply: true,

@@ -12,6 +12,7 @@ import {
 import { createAgentRoutes } from "./agent/routes"
 import { AgentSessionManager } from "./agent/session"
 import { listPosts, readPost, resolveMediaPath, saveImage, savePost } from "./content"
+import { resolveCoverMediaPath, saveCoverImage } from "./cover"
 import { createPost, listAuthors, registerAuthor } from "./create-post"
 import { ContentError } from "./errors"
 
@@ -65,12 +66,36 @@ app.get("/api/post", zValidator("query", postQuerySchema), async (context) => {
 
 app.put("/api/post", zValidator("json", savePostRequestSchema), async (context) => {
   const request = context.req.valid("json")
-  const revision = await savePost(request.path, request.title, request.body, request.revision)
+  const revision = await savePost(
+    request.path,
+    request.title,
+    request.body,
+    request.revision,
+    request.cover,
+  )
   return context.json({
     revision,
     renderedUrl: `http://127.0.0.1:1413/posts/${request.path.split("/")[2] ?? ""}/`,
   })
 })
+
+app.post("/api/cover-image", async (context) => {
+  const form = await context.req.formData()
+  const path = postPathSchema.parse(form.get("path"))
+  const image = form.get("image")
+  if (!(image instanceof File)) throw new ContentError("업로드할 이미지가 없습니다.")
+  return context.json(await saveCoverImage(path, image))
+})
+
+app.get(
+  "/api/cover-media",
+  zValidator("query", mediaQuerySchema.extend({ src: z.string().min(1).max(2048) })),
+  async (context) => {
+    const query = context.req.valid("query")
+    const absolute = resolveCoverMediaPath(query.path, query.src)
+    return new Response(Bun.file(absolute), { headers: { "X-Content-Type-Options": "nosniff" } })
+  },
+)
 
 app.post("/api/image", async (context) => {
   const form = await context.req.formData()
