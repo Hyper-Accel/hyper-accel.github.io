@@ -1,5 +1,5 @@
 ---
-date: '2026-10-12T18:00:00+09:00'
+date: '2026-10-16T18:00:00+09:00'
 title: '[torch.compile() 알아보기 - Part 02] 왜 세 단계로 나눠 설계했을까'
 cover:
   image: "images/pytorch.jpg"
@@ -63,11 +63,11 @@ PyTorch는 그냥 파이썬처럼 쓸 수 있었습니다. 한 줄씩 실행되�
 
 ### torch.compile이 지켜야 했던 것
 
-2023년 3월, PyTorch 2.0과 함께 `torch.compile()` 이 나왔습니다. 이는 파이썬처럼 쓰는 편함은 그대로 두면서 성능을 끌어올려는 시도였습니다.
+2023년 3월, PyTorch 2.0과 함께 `torch.compile()` 이 나왔습니다. 이는 파이썬처럼 쓰는 편함은 그대로 두면서 성능을 끌어올리려는 시도였습니다.
 
 이 시점의 PyTorch는 이미 거대한 생태계였습니다. 사용자 코드만 많은 게 아니라, PyTorch 모델을 받아 자기 방식으로 최적화하는 도구들도 자리 잡고 있었습니다. NVIDIA의 TensorRT는 PyTorch 모델을 추론 엔진으로 바꿔 빠르게 돌렸고, Google의 PyTorch/XLA는 PyTorch 코드를 TPU에서 돌리는 통로였습니다.
 
-저는 새 컴파일러가 이 생태계를 깨지 않으려면 두 가지를 지켜야 한다고 생각합니다. 첫째, 사용자는 코드를 거의 고치지 않아야 합니다. 둘째, 이런 도구들이 `torch.compile()` 과 함꼐 사용할 수 있어야 합니다. 만약 `torch.compile()` 이 PyTorch의 컴파일러와 Triton에만 쓰이는 쓰는 닫힌 구조였다면, 사용자는 `torch.compile()` 과 기존에 사용하던 도구 중 하나를 골라야 했을 것이고 생태계는 갈라졌을 겁니다.
+저는 새 컴파일러가 이 생태계를 깨지 않으려면 두 가지를 지켜야 한다고 생각합니다. 첫째, 사용자는 코드를 거의 고치지 않아야 합니다. 둘째, 이런 도구들이 `torch.compile()` 과 함께 사용할 수 있어야 합니다. 만약 `torch.compile()` 이 PyTorch의 컴파일러와 Triton에만 쓰이는 닫힌 구조였다면, 사용자는 `torch.compile()` 과 기존에 사용하던 도구 중 하나를 골라야 했을 것이고 생태계는 갈라졌을 겁니다.
 
 ![PyTorch 2.0부터 2.13까지 바깥 하드웨어와 컴파일러를 위한 확장 기능이 추가된 연표. 2.0의 torch.compile 출시와 rename_privateuse1_backend, 2.1의 자동 dynamic shape와 Inductor 디바이스 등록 API, 2.4의 custom_op, 2.5의 디바이스 확장 자동 로드와 Intel GPU 지원, 2.6의 torch.accelerator, 2.9의 OpenReg 재작성과 Accelerator Integration 문서와 Stable ABI, 2.10의 통합 문서 확장, 2.13의 set_default_backend가 표시되어 있다](images/01-release-timeline.png)
 

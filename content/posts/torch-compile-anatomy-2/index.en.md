@@ -1,5 +1,5 @@
 ---
-date: '2026-10-12T18:00:00+09:00'
+date: '2026-10-16T18:00:00+09:00'
 title: '[Exploring torch.compile() - Part 02] Why Split It into Three Stages?'
 cover:
   image: "images/pytorch.jpg"
