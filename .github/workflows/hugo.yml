@@ -55,7 +55,7 @@ jobs:
       - name: Install publication build dependency
         run: bun install --cwd scripts --frozen-lockfile --ignore-scripts
       - name: Test read-only publication build
-        run: bun test ./scripts/build-publication.test.mjs
+        run: bun run --cwd scripts test
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

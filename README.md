@@ -451,10 +451,34 @@ techblog-editor
 hugo server -D
 ```
 
-### 프로덕션 모드
+### 일반 미리보기 (발행일 보정 없음)
 
 ```bash
 hugo server
+```
+
+### 배포 동작 미리보기 (최초 발행일 자동 적용)
+
+Hugo extended와 Bun을 설치한 뒤 저장소 루트에서 실행합니다.
+
+```bash
+bun install --cwd scripts --frozen-lockfile --ignore-scripts
+bun run --cwd scripts preview
+```
+
+`http://127.0.0.1:1313/`에서 실제 배포 빌더로 만든 페이지를 확인합니다. 파일을 저장하면 다시 빌드하고 브라우저를 자동 새로고침합니다. 초안·예약 글의 공개 조건도 실제 배포와 같습니다.
+
+- 최초 실행은 현재 성공한 Pages 배포의 발행 기록을 가져옵니다. `gh` 인증과 해당 배포 commit의 로컬 Git 이력이 필요합니다(`git fetch origin`). 조회 실패 시 임의로 날짜를 초기화하지 않습니다.
+- 신규 글은 첫 로컬 빌드 시각(KST)을 사용하고, 이후 수정·재시작에도 같은 날짜를 유지합니다.
+- 로컬 기록과 빌드 복사본은 `~/.cache/hyperaccel-blog-preview/` 아래에 보관합니다. 원본 Markdown·실제 배포 기록은 변경하지 않습니다. 로컬 미리보기 날짜가 실제 배포로 전송되지는 않습니다.
+- `Ctrl+C`로 종료하면 서버와 임시 빌드는 정리하고 로컬 발행 기록은 보존합니다.
+
+```bash
+# 포트 변경
+bun run --cwd scripts preview --port 8080
+
+# 네트워크 없이 명시한 기존 배포 commit의 날짜로 초기화 (별도 로컬 기록)
+bun run --cwd scripts preview --bootstrap-ref <deployed-commit> --work-dir <저장소-밖-새-디렉터리>
 ```
 
 ### 특정 포트로 실행
