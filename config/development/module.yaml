@@ -1,0 +1,14 @@
+# Native server only: original post bundles become adapter inputs, never duplicate pages.
+mounts:
+  - source: content
+    target: content
+    excludeFiles: ['posts/**']
+  - source: content/posts
+    target: content/posts
+    includeFiles: ['_index.md', '_index.ko.md', '_index.en.md']
+  - source: native-preview
+    target: content/posts
+  - source: assets
+    target: assets
+  - source: content/posts
+    target: assets/__preview_posts

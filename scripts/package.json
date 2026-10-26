@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "test": "bun test ./*.test.mjs",
-    "preview": "bun preview-publication.mjs",
     "build": "bun build-publication.mjs build",
     "verify": "bun build-publication.mjs verify"
   },
