@@ -1,0 +1,76 @@
+{{/* Development mounts only. No authoring files or deployment ledger are written. */}}
+{{ .EnableAllLanguages }}
+{{ $ctx := . }}
+{{ $lang := .Site.Language.Lang }}
+{{ $origin := strings.TrimSuffix "/" (or .Site.Params.previewPublicationURL "https://hyper-accel.github.io") }}
+{{ $state := dict }}
+{{ with try (resources.GetRemote (printf "%s/publication-state.json" $origin)) }}
+  {{ with .Err }}{{ errorf "Preview cannot read deployed publication state: %s" . }}
+  {{ else with .Value }}
+    {{ $state = .Content | transform.Unmarshal }}
+    {{ if or (ne (int $state.version) 1) (not (isset $state "posts")) (not (findRE `^[0-9a-f]{40}$` (string $state.source_commit))) }}{{ errorf "Invalid deployed publication state" }}{{ end }}
+    {{ range $slug, $entry := $state.posts }}
+      {{ if or (not $entry.date) (not (isset $entry "dates")) }}{{ errorf "Invalid deployed publication entry: %s" $slug }}{{ end }}
+      {{ range $stamp := merge $entry.dates (dict "bundle" $entry.date) }}
+        {{ if not (findRE `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$` (string $stamp)) }}{{ errorf "Invalid deployed publication timestamp: %s" $slug }}{{ else }}{{ $validated := time.AsTime $stamp }}{{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ $localName := printf "__hugo_preview_dates_%s.json" $lang }}
+{{ $local := dict }}
+{{ $localPath := path.Join "public" $localName }}
+{{ if os.FileExists $localPath }}{{ $local = os.ReadFile $localPath | transform.Unmarshal }}{{ end }}
+{{ range resources.Match "__preview_posts/**" }}
+  {{ $source := strings.TrimPrefix "__preview_posts/" (strings.TrimPrefix "/" .Name) }}
+  {{ if findRE `^[^/]+/index(?:\.(?:ko|en))?\.md$` $source }}
+    {{ $sourceLang := "ko" }}{{ if strings.HasSuffix $source ".en.md" }}{{ $sourceLang = "en" }}{{ end }}
+    {{ if eq $lang $sourceLang }}
+      {{ $slug := path.Dir $source }}
+      {{ $frontRE := `(?s)^---\r?\n(.*?)\r?\n---(?:\r?\n|$)` }}
+      {{ if not (findRE $frontRE .Content) }}{{ errorf "Expected YAML front matter in posts/%s" $source }}{{ end }}
+      {{ $front := replaceRE $frontRE "$1" (index (findRE $frontRE .Content 1) 0) | transform.Unmarshal }}
+      {{ $body := replaceRE $frontRE "" .Content 1 }}
+      {{ $date := "" }}
+      {{ with index $state.posts $slug }}{{ $date = or (index .dates $lang) .date }}{{ end }}
+      {{ if not $date }}
+        {{ $prefix := "" }}{{ if eq $lang "en" }}{{ $prefix = "en/" }}{{ end }}
+        {{ $url := printf "/%sposts/%s/" $prefix (lower (or $front.slug $slug)) }}
+        {{ with $front.url }}{{ $url = . }}{{ end }}
+        {{ with try (resources.GetRemote (printf "%s/%s" $origin (strings.TrimPrefix "/" $url))) }}
+          {{ with .Err }}{{ errorf "Preview cannot check published article %s: %s" $source . }}
+          {{ else with .Value }}
+            {{ $meta := findRE `<meta\s+[^>]*property=["']article:published_time["'][^>]*>` .Content 1 }}
+            {{ if not $meta }}{{ errorf "Published article has no publication date: %s" $source }}
+            {{ else }}{{ $date = replaceRE `.*content=["']([^"']+)["'].*` "$1" (index $meta 0) }}{{ end }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ if not $date }}
+        {{ $date = or (index $local $source) ($ctx.Store.Get $source) (now.Format "2006-01-02T15:04:05Z07:00") }}
+        {{ $ctx.Store.Set $source $date }}
+        {{ $local = merge $local (dict $source $date) }}
+      {{ end }}
+      {{ $date = time.AsTime $date }}
+      {{ $dates := dict "date" $date }}
+      {{ range $key := slice "publishDate" "expiryDate" "lastmod" }}{{ with index $front $key }}{{ $dates = merge $dates (dict $key .) }}{{ end }}{{ end }}
+      {{ $page := dict "path" $slug "translationKey" $slug "dates" $dates "content" (dict "mediaType" "text/markdown" "value" $body) }}
+      {{ range $key := slice "title" "linkTitle" "summary" "description" "slug" "url" "type" "layout" "weight" "draft" "aliases" "outputs" "keywords" "markup" "build" "cascade" "resources" "sitemap" "translationKey" }}
+        {{ if isset $front $key }}{{ $value := index $front $key }}{{ if and (eq $key "summary") (reflect.IsSlice $value) }}{{ $value = delimit $value "\n" }}{{ end }}{{ $page = merge $page (dict $key $value) }}{{ end }}
+      {{ end }}
+      {{ $params := dict }}
+      {{ range $key, $value := $front }}{{ if ne $key "params" }}{{ $params = merge $params (dict $key $value) }}{{ end }}{{ end }}
+      {{ $params = merge $params (or $front.params dict) (dict "previewSourcePath" (printf "posts/%s" $source)) }}
+      {{ $page = merge $page (dict "params" $params) }}
+      {{ $ctx.AddPage $page }}
+      {{ range resources.Match (printf "__preview_posts/%s/**" $slug) }}
+        {{ if and (ne (path.Base .Name) "AGENTS.md") (not (findRE `^index(?:\.(?:ko|en))?\.md$` (path.Base .Name))) }}
+          {{ $relative := strings.TrimPrefix (printf "__preview_posts/%s/" $slug) (strings.TrimPrefix "/" .Name) }}
+          {{ $resource := resources.Copy (printf "%sposts/%s/%s" (cond (eq $lang "en") "en/" "") (lower $slug) $relative) . }}
+          {{ $ctx.AddResource (dict "path" (printf "%s/%s" $slug $relative) "name" $relative "content" (dict "mediaType" .MediaType.Type "value" $resource)) }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ $output := resources.FromString $localName ($local | jsonify) }}{{ $output.Publish }}
