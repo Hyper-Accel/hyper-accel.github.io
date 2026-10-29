@@ -30,15 +30,15 @@ AI 모델이 고도화되고 적용 범위가 넓어질수록, 이를 실제로 
 
 ![AI_Infra_Summit_blog.jpg](images/pasted-20261028-041537-ed2862.jpg)
 
-### \[ AI INFRA SUMMIT 2026 개요 \]
+### \[AI INFRA SUMMIT 2026 개요\]
 
 **AI Infra Summit 2026** 은 9월 15일부터 17일까지 미국 캘리포니아주 산타클라라 컨벤션센터에서 개최된 글로벌 AI 인프라 전문 컨퍼런스입니다.
 
-올해로 9회째를 맞이한 이번 행사에는 **약 8,000명의 글로벌 참관객**, **400여 명의 전문 연사**, 그리고 **250여 개 파트너사** 가 한자리에 모였습니다. AI Data Center부터 Compute, Data Movement, Data & Models, Physical AI에 이르기까지 AI 인프라 생태계 전반을 아우르는 최신 기술 트렌드와 전략이 다양하게 논의되었습니다.
+올해로 9회째를 맞이한 이번 행사에는 **약 8,000명의 글로벌 참관객**, **400여 명의 전문 연사**, 그리고 **250여 개 파트너사** 가 한자리에 모였습니다. AI Data Center부터 Compute, Data Movement, Data &amp; Models, Physical AI에 이르기까지 AI 인프라 생태계 전반을 아우르는 최신 기술 트렌드와 전략이 다양하게 논의되었습니다.
 
 메인 스테이지 키노트에는 **NVIDIA, AMD, AWS, Meta, Google, Intel** 등 글로벌 빅테크 기업의 리더들이 연사로 나섰으며, 국내에서는 **HyperAccel** 을 포함해 SK하이닉스, 삼성전자, 리벨리온, 퓨리오사AI, 망고부스트, 모레 등이 스폰서로 참여했습니다.
 
-### \[ HyperAccel's Presence \] 골드 스폰서 참여 및 첫 단독 부스 운영
+### \[HyperAccel's Presence\] 골드 스폰서 참여 및 첫 단독 부스 운영
 
 HyperAccel은 이번 행사에 골드 스폰서(Gold Sponsor)로 참여해 글로벌 무대에서 처음으로 자체 단독 부스를 운영했습니다.
 
@@ -63,8 +63,8 @@ HyperAccel은 이번 행사에 골드 스폰서(Gold Sponsor)로 참여해 글�
 결국 단순히 토큰당 단가를 낮추는 단편적인 접근을 넘어, **전체 추론 과정에서 토큰을 얼마나 효율적으로 처리할 수 있는 인프라를 구축하느냐** 가 핵심 과제입니다. 하이퍼엑셀은 이를 위한 3가지 핵심 접근 방식을 제시했습니다.
 
 - **Token Efficiency (토큰 효율성):** LLM 추론에 최적화된 LPU 아키텍처를 소개했습니다. Big Core 연산 엔진과 메모리·연산 공동 설계(Co-design) 기반의 Streamlined Dataflow를 통해 메모리 대역폭 활용률을 극대화했습니다. 그 결과, LLM 추론 시 **평균 83%, 최대 90% 이상** 의 높은 대역폭 활용률을 달성했습니다.
-- **Enterprise Performance & Cost (성능 및 비용):** 엔터프라이즈 AI 인프라의 핵심 지표인 처리량(TPS), 전력 효율, TCO(총소유비용) 관점에서 Bertha의 성능을 공유했습니다. 워크로드와 비교 대상에 따라 **와트·달러당 최대 3\~5배 수준의 효율 개선** 이 가능함을 입증했습니다.
-- **Disaggregation & Edge (아키텍처 및 에지 확장성):** Prefill과 Decode 단계를 분리하여 추론 성능과 효율을 극대화하는 아키텍처 구성과 더불어, 데이터센터용 'Bertha'부터 온디바이스 AI용 'Bertha-Edge'까지 이어지는 폭넓은 제품 로드맵을 선보였습니다.
+- **Enterprise Performance &amp; Cost (성능 및 비용):** 엔터프라이즈 AI 인프라의 핵심 지표인 처리량(TPS), 전력 효율, TCO(총소유비용) 관점에서 Bertha의 성능을 공유했습니다. 워크로드와 비교 대상에 따라 **와트·달러당 최대 3\~5배 수준의 효율 개선** 이 가능함을 입증했습니다.
+- **Disaggregation &amp; Edge (아키텍처 및 에지 확장성):** Prefill과 Decode 단계를 분리하여 추론 성능과 효율을 극대화하는 아키텍처 구성과 더불어, 데이터센터용 'Bertha'부터 온디바이스 AI용 'Bertha-Edge'까지 이어지는 폭넓은 제품 로드맵을 선보였습니다.
 
 발표 직후 많은 참석자들이 하이퍼엑셀 부스를 방문해 Bertha의 실시간 추론 시연을 참관하고 자사 인프라 적용 가능성을 논의했습니다. 발표에서 전달한 기술적 비전이 실제 제품 체험과 현장 논의로 자연스럽게 이어진 순간이었습니다.
 
@@ -87,7 +87,7 @@ HyperAccel 부스는 전시장 안쪽에 위치했음에도 불구하고, 실제
 전시 공간의 규모나 위치보다 훨씬 중요한 것은 **‘제품의 가치를 얼마나 직관적으로 경험하게 만드느냐’**, 그리고 그 경험을 ‘실질적인 협력 기회로 이어가느냐’라는 점을 다시 한번 확인한 계기였습니다.
 
 🔗 생생한 현장 스케치는 **\[[*Day 1 현장 기록*](https://www.linkedin.com/feed/update/urn:li:activity:7506005768014561280)\]** 과 **\[[*Day 2 라이브 데모 현장*](https://www.linkedin.com/feed/update/urn:li:activity:7506382400264929280)\]** 에서 확인하실 수 있습니다.  
-🎬 현장 취재 영상: [***TechTechPotato HyperAccel BERTHA 라이브 데모 시연 & 현장 취재***](https://www.linkedin.com/feed/update/urn:li:activity:7507628607909830656)
+🎬 현장 취재 영상: [***TechTechPotato HyperAccel BERTHA 라이브 데모 시연 &amp; 현장 취재***](https://www.linkedin.com/feed/update/urn:li:activity:7507628607909830656)
 
 ### 3. 글로벌 AI 인프라 시장을 관통하는 4가지 트렌드
 
@@ -108,17 +108,31 @@ HyperAccel 부스는 전시장 안쪽에 위치했음에도 불구하고, 실제
 
 ![Rebellions_trend2_pair.jpg](images/pasted-20261028-050718-a83d78.jpg)
 
-- **Rebellions** 발표(*Marshall Choy, CBO*)에서는 국가 및 기업별 데이터 주권을 보장하는 'Sovereign AI' 인프라 구축과 실제 상용화/양산(Commercialized/Deployed) 단계 진입이 핵심 화두로 제시되었습니다.
-- 특히 단품 칩(Chip)을 넘어 서버(RebelServer), 랙(RebelRack), 데이터센터 POD(RebelPOD) 단위의 통합 AI 인프라 플랫폼을 완성해 데이터센터 ROI와 즉시 배포 가능성(Zero Friction)을 입증하는 것이 시장 진입의 결정적 기준이 되고 있음을 보여주었습니다.
+*▲ Rebellions 발표 세션: Sovereign AI 및 랙 스케일(RebelRack/RebelPOD) 통합 플랫폼 로드맵*
 
-### ③ 전력 효율 최적화(Power Optimization)와 Extreme Co-design
+![c_rack_en.jpg](images/pasted-20261029-011146-e2576e.jpg)
+
+![c_chips (1).jpg](images/pasted-20261029-013543-6b5e0d.jpg)
+
+*▲ \[AI Infra Summit 2026\] 주요 AI 반도체 및 인프라 기업들의 랙 스케일(Rack-Scale) 시스템 현장 스케치*
+
+- 국가 및 기업별 데이터 주권을 보장하는 'Sovereign AI' 인프라 구축과 실제 상용화/양산(Commercialized/Deployed) 단계 진입이 핵심 화두로 제시되었습니다. 단품 칩(Chip)을 넘어 서버(RebelServer), 랙(RebelRack), 데이터센터 POD(RebelPOD) 단위의 통합 AI 인프라 플랫폼을 완성해 데이터센터 ROI와 즉시 배포 가능성(Zero Friction)을 입증하는 것이 시장 진입의 결정적 기준임을 강조했습니다.
+- **글로벌 칩 기업들의 다양한 추론 전략:** **AMD**(Helios 랙 스케일 플랫폼)와 **Qualcomm**(Dragonfly 라인업)은 랙 단위 시스템 최적화를 전면에 내세웠습니다. 한편 **Tenstorrent**(Galaxy Blackhole 시스템 실물 시연), **SambaNova**, **Cerebras** 등 도전자 기업들도 각자의 독자적인 아키텍처와 시연을 기반으로 상담 중심 부스를 운영하며 시장에서의 존재감을 피력했습니다.
+
+### ③ 전력 효율 최적화(Power Optimization)와 Extreme Co-design 및 인프라 생태
 
 ![NVIDIA_trend3_pair.jpg](images/pasted-20261028-050741-cfd097.jpg)
 
-*▲ NVIDIA 키노트 세션: DSX MaxLPS 기반 데이터센터 전력 최적화 및 Extreme Co-design*
+*▲ NVIDIA Ian Buck 키노트 세션: DSX MaxLPS 기반 데이터센터 전력 최적화 및 Extreme Co-design*
 
-- **NVIDIA** 는 키노트를 통해 DSX AI Factory Platform과 DSX MaxLPS 기술을 공개하며 데이터센터의 버려지는 유휴 전력을 회수해 최대 40% 더 높은 컴퓨트 성능과 처리량(Throughput)을 얻는 기술을 제시했습니다.
+- **NVIDIA** Ian Buck 은 키노트를 통해 DSX AI Factory Platform과 DSX MaxLPS 기술을 공개하며 데이터센터의 버려지는 유휴 전력을 회수해 최대 40% 더 높은 컴퓨트 성능과 처리량(Throughput)을 얻는 기술을 제시했습니다.
 - 또한 Vera Rubin / Groq 3 LPX / d-Matrix 등과의 연동 사례에서 보듯, 이제 개별 칩 성능을 넘어 전력 관리, 인터커넥트, 스토리지까지 랙 전체를 하나의 통합 시스템으로 설계(Extreme Co-design)하는 방향으로 진화하고 있습니다.
+
+![c_cloud (2).jpg](images/pasted-20261029-013621-e4176e.jpg)
+
+*▲ \[AI Infra Summit 2026\] AI 클라우드, 에이전트 운영 및 인프라 조달 생태계 부스 현장 스케치 (좌측 상단부터 시계방향: AWS, Red Hat, HCLTech, Lambda, Server Monkey, RackN, Rafay, Crusoe)*
+
+- **AI 클라우드 및 인프라 운영 생태계:** AWS, Lambda, Crusoe 등 AI 클라우드 기업들은 단순 성능 경쟁을 넘어 **보안 인증(SOC 2, ISO 27001), ROI, 비용 통제** 등 기업 고객의 실질적 도입 요건을 앞세웠습니다. 또한 Rafay, Server Monkey, RackN 등 운영·조달 파트너사들도 **'Token Factory'** 및 'GPU 서버 빠른 조달'을 주요 메시지로 내걸며, 토큰 처리 효율과 조달 속도가 인프라 경쟁력의 핵심 축이 되었음을 보여주었습니다.
 
 ### ④ Prefill / Decode 분리(Disaggregation)와 저지연(Low Latency)의 표준화
 
@@ -126,8 +140,15 @@ HyperAccel 부스는 전시장 안쪽에 위치했음에도 불구하고, 실제
 
 *▲ d-Matrix 세션: Disaggregated Inference 기반 Ultra Low Latency 아키텍처*
 
-- **d-Matrix** 등의 세션에서 공통적으로 다뤄진 화두는 Disaggregated Inference이었습니다.
-- 에이전틱(Agentic) 워크로드와 Long-Context 처리가 늘어남에 따라, Prefill 단계를 연산 특화 영역에 배치하고 Decode 단계를 메모리 대역폭 특화 영역에 분리하여 Ultra Low Latency와 높은 TPS를 동시에 달성하는 아키텍처가 AI 데이터센터 구축의 필수 표준으로 자리 잡았습니다.
+![c_interconnect_booth2.jpg](images/pasted-20261029-014521-5776df.jpg)
+
+*▲* 인터커넥트(Interconnect) 주요 기업 부스 현장 스케치 (좌측 상단부터 시계방향: Broadcom, Lightmatter, ZeroFlap, Samtec)
+
+- **d-Matrix 세션:** 에이전틱(Agentic) 워크로드와 Long-Context 처리가 늘어남에 따라, Prefill 단계를 연산 특화 영역에 배치하고 Decode 단계를 메모리 대역폭 특화 영역에 분리하여 **Ultra Low Latency와 높은 TPS를 동시에 달성하는 아키텍처**가 AI 데이터센터 구축의 필수 표준으로 자리 잡았음을 다루었습니다.
+- Data Movement &amp; Interconnect)
+  - **Broadcom:** 스케일업/스케일아웃을 위한 통합 패브릭 솔루션 제시
+  - **Lightmatter:** 'Passage + Guide' 프라이빗 미팅룸 중심의 B2B 파트너십 전개
+  - **ZeroFlap &amp; Samtec:** PCIe Gen6 기반 저전력 연결 및 차세대 구리/광 패브릭 시연
 
 **\[ Outro: AI Infra Summit 2026을 마치며 \]**
 
@@ -140,10 +161,10 @@ HyperAccel 부스는 전시장 안쪽에 위치했음에도 불구하고, 실제
 
   B2B AI 인프라 시장에서는 더 이상 이론적 Peak FLOPS나 수식 위주의 스펙 시트가 통하지 않습니다. 실제 LLM 워크로드 기반의 **실시간 추론 서버 구동 데모, Streamlined Dataflow 메모리 설계, 그리고 Prefill/Decode 분리 아키텍처** 만이 글로벌 고객의 도입 불확실성을 깨는 유일한 기준입니다.
 
-HyperAccel은 앞으로도 독보적인 LPU 기술력을 바탕으로, 글로벌 AI 인프라 시장에서 가장 토큰 효율적이고 전력 친화적인 AI 추론 솔루션을 제시해 나갈 것입니다.
+HyperAccel은 앞으로도 독보적인 LPU 기술력을 바탕으로, 글로벌 AI 인프라 시장에서 가장 효율적인 AI 추론 솔루션을 제시해 나가겠습니다.
 
 *BERTHA의 기술 사양이나 LPU 기반 추론 인프라 구축에 관해 궁금한 점은 언제든 [HyperAccel 공식 채널](https://hyperaccel.ai/contact/)로 문의해 주시기 바랍니다.*  
-  
+
 ✉️ **Contact:** [contact@hyperaccel.ai](mailto:contact@hyperaccel.ai)  
 🔗 **LinkedIn:** [HyperAccel Official LinkedIn](https://www.linkedin.com/company/hyperaccel)  
 🌐 **Website:** [www.hyperaccel.ai](http://www.hyperaccel.ai)
