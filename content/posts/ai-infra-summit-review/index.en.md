@@ -108,17 +108,31 @@ The experience confirmed once more that what matters far more than booth size or
 
 ![Rebellions' session slide on Sovereign AI and rack-scale platforms](images/pasted-20261028-050718-a83d78.jpg)
 
-- In **Rebellions**' talk(*Marshall Choy, CBO*), the main topics were building 'Sovereign AI' infrastructure that guarantees data sovereignty for countries and companies, and moving into commercialized, deployed products.
-- The talk showed that it is no longer enough to sell a chip. To enter the market, a vendor needs an integrated AI infrastructure platform, from servers(RebelServer) and racks(RebelRack) to data center PODs(RebelPOD). It must prove data center ROI and zero-friction deployment.
+*▲ Rebellions session: Sovereign AI and the rack-scale(RebelRack/RebelPOD) integrated platform roadmap*
 
-#### ③ Power optimization and Extreme Co-design
+![Rack-scale systems from major AI chip and infrastructure companies](images/pasted-20261029-011146-e2576e.jpg)
+
+![Chips and systems from major AI chip companies on the exhibition floor](images/pasted-20261029-013543-6b5e0d.jpg)
+
+*▲ [AI Infra Summit 2026] Rack-scale systems from major AI chip and infrastructure companies, as seen on the floor*
+
+- Building 'Sovereign AI' infrastructure that guarantees data sovereignty for countries and companies was a key topic, as was moving into commercialized, deployed products. Rebellions stressed that it is no longer enough to sell a chip. To enter the market, a vendor needs an integrated AI infrastructure platform, from servers(RebelServer) and racks(RebelRack) to data center PODs(RebelPOD). It must prove data center ROI and zero-friction deployment.
+- **Varied inference strategies from global chip companies:** **AMD**(Helios rack-scale platform) and **Qualcomm**(Dragonfly lineup) put rack-level system optimization front and center. Challengers such as **Tenstorrent**(a live Galaxy Blackhole system), **SambaNova**, and **Cerebras** also made their presence felt. Each ran a consultation-focused booth built on its own architecture and demos.
+
+#### ③ Power optimization, Extreme Co-design, and the infrastructure ecosystem
 
 ![NVIDIA's keynote slide on DSX MaxLPS power optimization and Extreme Co-design](images/pasted-20261028-050741-cfd097.jpg)
 
-*▲ NVIDIA keynote: data center power optimization with DSX MaxLPS, and Extreme Co-design*
+*▲ NVIDIA keynote by Ian Buck: data center power optimization with DSX MaxLPS, and Extreme Co-design*
 
-- In its keynote, **NVIDIA** unveiled the DSX AI Factory Platform and DSX MaxLPS. The technology recovers idle power that data centers would otherwise waste, and it can deliver up to 40% higher compute performance and throughput.
+- In his keynote, **NVIDIA**'s Ian Buck unveiled the DSX AI Factory Platform and DSX MaxLPS. The technology recovers idle power that data centers would otherwise waste, and it can deliver up to 40% higher compute performance and throughput.
 - Integrations with Vera Rubin, Groq 3 LPX, and d-Matrix point the same way. The focus is moving beyond single-chip performance to designing the whole rack as one integrated system, including power management, interconnect, and storage (Extreme Co-design).
+
+![Booths of AI cloud, agent operations, and infrastructure procurement companies](images/pasted-20261029-013621-e4176e.jpg)
+
+*▲ [AI Infra Summit 2026] Booths in the AI cloud, agent operations, and infrastructure procurement ecosystem (clockwise from top left: AWS, Red Hat, HCLTech, Lambda, Server Monkey, RackN, Rafay, Crusoe)*
+
+- **The AI cloud and infrastructure operations ecosystem:** AI cloud companies such as AWS, Lambda, and Crusoe went beyond performance claims. They led with what enterprise customers actually need to adopt: **security certifications(SOC 2, ISO 27001), ROI, and cost control**. Operations and procurement partners such as Rafay, Server Monkey, and RackN built their messages around a **'Token Factory'** and fast GPU server procurement. Together they showed that token processing efficiency and procurement speed have become core axes of infrastructure competitiveness.
 
 #### ④ Prefill/Decode disaggregation and low latency become standard
 
@@ -126,8 +140,15 @@ The experience confirmed once more that what matters far more than booth size or
 
 *▲ d-Matrix session: an ultra low latency architecture based on Disaggregated Inference*
 
-- Disaggregated Inference was a common topic in sessions such as **d-Matrix**'s.
-- Agentic workloads and long-context processing keep growing. In response, one architecture has become a standard requirement for AI data centers. It places the Prefill stage on compute-specialized hardware and the Decode stage on memory-bandwidth-specialized hardware. This delivers ultra low latency and high TPS at the same time.
+![Booths of leading interconnect companies](images/pasted-20261029-014521-5776df.jpg)
+
+*▲ Booths of leading interconnect companies (clockwise from top left: Broadcom, Lightmatter, ZeroFlap, Samtec)*
+
+- **d-Matrix session:** Agentic workloads and long-context processing keep growing. In response, an architecture that places the Prefill stage on compute-specialized hardware and the Decode stage on memory-bandwidth-specialized hardware has become a standard requirement for AI data centers. It achieves **ultra low latency and high TPS at the same time**.
+- Data Movement & Interconnect
+  - **Broadcom:** presented an integrated fabric solution for scale-up and scale-out
+  - **Lightmatter:** pursued B2B partnerships centered on private meeting rooms, with its 'Passage + Guide' products
+  - **ZeroFlap & Samtec:** demonstrated low-power PCIe Gen6 connectivity and next-generation copper and optical fabrics
 
 ### Outro: Closing AI Infra Summit 2026
 
@@ -140,7 +161,7 @@ The structural shifts and implications we saw in the global AI infrastructure ma
 
   In the B2B AI infrastructure market, theoretical peak FLOPS and formula-heavy spec sheets no longer work. What breaks a global customer's doubts about adoption is a **live inference server demo on real LLM workloads, a Streamlined Dataflow memory design, and a Prefill/Decode disaggregated architecture**.
 
-HyperAccel will keep building on its LPU technology. Our goal is to offer the most token-efficient and power-friendly AI inference solution in the global AI infrastructure market.
+HyperAccel will keep building on its LPU technology. Our goal is to offer the most efficient AI inference solution in the global AI infrastructure market.
 
 *For questions about BERTHA's technical specifications or building LPU-based inference infrastructure, please contact us through the [HyperAccel official channel](https://hyperaccel.ai/contact/).*  
   
