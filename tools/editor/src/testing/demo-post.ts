@@ -1,10 +1,12 @@
 import type { startFakeGitHub } from "./fake-github"
 
 /**
- * A finished demo post for the local site (dev-site.ts only, not the test harness): every block
- * and inline tool of the editor, written in both Korean and English so it can go straight to review.
+ * Finished demo posts for the local site (dev-site.ts only, not the test harness), written in both
+ * Korean and English so they can go straight to review:
+ * - onsite-editor-tour: every block and inline tool of the editor, by the demo user;
+ * - hbm4-review-demo: someone else's post already waiting for review, so the demo user reviews it
+ *   (read-only editor, comments, 승인).
  */
-const SLUG = "onsite-editor-tour"
 
 const IMAGES: Record<string, string> = {
   "cover.svg":
@@ -167,50 +169,134 @@ const BLOCKS: readonly (readonly [string, Text])[] = [
   ],
 ]
 
-function markdown(language: "ko" | "en"): string {
-  const title = language === "ko" ? "온사이트 에디터 기능 둘러보기" : "A tour of the on-site editor"
-  const description =
-    language === "ko"
-      ? "에디터의 모든 블록과 서식을 한 번씩 써 본 데모 글"
-      : "A demo post using every block and format of the editor once"
+const REVIEW_BLOCKS: readonly (readonly [string, Text])[] = [
+  ["why-heading", { ko: "## 왜 HBM4인가", en: "## Why HBM4" }],
+  [
+    "why",
+    {
+      ko: "LLM 추론은 연산보다 **메모리 대역폭**에 묶이는 경우가 많습니다. HBM4는 인터페이스 폭을 2048비트로 넓혀 같은 클록에서 대역폭을 크게 늘립니다.",
+      en: "LLM inference is often bound by **memory bandwidth** rather than compute. HBM4 widens the interface to 2048 bits, raising bandwidth a lot at the same clock.",
+    },
+  ],
+  [
+    "compare-table",
+    {
+      ko: "| 세대 | 인터페이스 폭 | 스택당 대역폭 |\n| --- | --- | --- |\n| HBM3E | 1024비트 | 약 1.2 TB/s |\n| HBM4 | 2048비트 | 약 2 TB/s |",
+      en: "| Generation | Interface width | Bandwidth per stack |\n| --- | --- | --- |\n| HBM3E | 1024-bit | about 1.2 TB/s |\n| HBM4 | 2048-bit | about 2 TB/s |",
+    },
+  ],
+  [
+    "picture",
+    {
+      ko: '![메모리 스택 개념도](images/cover.svg "메모리 스택 개념도")',
+      en: '![Memory stack concept](images/cover.svg "Memory stack concept")',
+    },
+  ],
+  [
+    "caveat",
+    {
+      ko: "> [!NOTE] 리뷰 포인트\n> 수치는 공개 자료 기준의 대략값입니다. 출처 표기가 충분한지 봐 주세요.",
+      en: "> [!NOTE] Review point\n> The figures are rough values from public sources. Please check that the sources are cited enough.",
+    },
+  ],
+  ["wrap-heading", { ko: "## 정리", en: "## Wrap-up" }],
+  [
+    "wrap",
+    {
+      ko: "대역폭이 늘면 같은 칩에서도 더 큰 배치를 감당할 수 있습니다. 다음 글에서는 실제 처리량 변화를 측정해 봅니다.",
+      en: "More bandwidth lets the same chip handle larger batches. The next post measures the actual change in throughput.",
+    },
+  ],
+]
+
+interface DemoPost {
+  readonly slug: string
+  readonly title: Text
+  readonly description: Text
+  readonly authors: readonly string[]
+  readonly editors: readonly string[]
+  readonly tags: readonly string[]
+  readonly blocks: readonly (readonly [string, Text])[]
+  /** Open its pull request already ready for review (not a draft). */
+  readonly inReview: boolean
+}
+
+const POSTS: readonly DemoPost[] = [
+  {
+    slug: "onsite-editor-tour",
+    title: { ko: "온사이트 에디터 기능 둘러보기", en: "A tour of the on-site editor" },
+    description: {
+      ko: "에디터의 모든 블록과 서식을 한 번씩 써 본 데모 글",
+      en: "A demo post using every block and format of the editor once",
+    },
+    authors: ["Donghyeon Choi"],
+    editors: ["author"],
+    tags: ["editor", "demo"],
+    blocks: BLOCKS,
+    inReview: false,
+  },
+  {
+    slug: "hbm4-review-demo",
+    title: { ko: "HBM4가 바꾸는 메모리 계층", en: "How HBM4 changes the memory hierarchy" },
+    description: {
+      ko: "리뷰어 입장에서 보는 데모 글(리뷰 요청됨)",
+      en: "A demo post to see as a reviewer (review requested)",
+    },
+    authors: ["Hyunjun Park"],
+    editors: [],
+    tags: ["memory", "demo"],
+    blocks: REVIEW_BLOCKS,
+    inReview: true,
+  },
+]
+
+function markdown(post: DemoPost, language: "ko" | "en"): string {
   const alt = language === "ko" ? "HyperAccel 커버" : "HyperAccel cover"
+  const list = (values: readonly string[]): string =>
+    `[${values.map((value) => `"${value}"`).join(", ")}]`
   const front = [
     "---",
-    `title: "${title}"`,
-    `description: "${description}"`,
+    `title: "${post.title[language]}"`,
+    `description: "${post.description[language]}"`,
     'date: "2026-10-30"',
-    'authors: ["Donghyeon Choi"]',
-    'editors: ["author"]',
+    `authors: ${list(post.authors)}`,
+    `editors: ${list(post.editors)}`,
     'categories: ["AI Hardware"]',
-    'tags: ["editor", "demo"]',
+    `tags: ${list(post.tags)}`,
     "cover:",
     '  image: "images/cover.svg"',
     `  alt: "${alt}"`,
     "draft: false",
     "---",
   ].join("\n")
-  const body = BLOCKS.map(([id, text]) => `<!-- b:${id} -->\n${text[language]}`).join("\n\n")
+  const body = post.blocks.map(([id, text]) => `<!-- b:${id} -->\n${text[language]}`).join("\n\n")
   return `${front}\n${body}\n`
 }
 
-/** Seeds the demo post's branch and opens its draft pull request on the fake GitHub. */
+/** Seeds the demo posts' branches and opens their pull requests on the fake GitHub. */
 export async function seedDemoPost(github: ReturnType<typeof startFakeGitHub>): Promise<void> {
-  const files: Record<string, string> = {
-    [`content/posts/${SLUG}/index.md`]: markdown("ko"),
-    [`content/posts/${SLUG}/index.en.md`]: markdown("en"),
+  for (const post of POSTS) {
+    const files: Record<string, string> = {
+      [`content/posts/${post.slug}/index.md`]: markdown(post, "ko"),
+      [`content/posts/${post.slug}/index.en.md`]: markdown(post, "en"),
+    }
+    for (const [name, source] of Object.entries(IMAGES))
+      files[`content/posts/${post.slug}/images/${name}`] = source
+    github.seed(`post/${post.slug}`, files)
+    const response = await fetch(`${github.url}/repos/Hyper-Accel/hyper-accel.github.io/pulls`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${github.defaultToken}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        title: post.title.ko,
+        head: `post/${post.slug}`,
+        base: "main",
+        draft: !post.inReview,
+      }),
+    })
+    if (!response.ok)
+      throw new Error(`Failed to seed the demo post ${post.slug} (${response.status})`)
   }
-  for (const [name, source] of Object.entries(IMAGES))
-    files[`content/posts/${SLUG}/images/${name}`] = source
-  github.seed(`post/${SLUG}`, files)
-  const response = await fetch(`${github.url}/repos/Hyper-Accel/hyper-accel.github.io/pulls`, {
-    method: "POST",
-    headers: { authorization: `Bearer ${github.defaultToken}`, "content-type": "application/json" },
-    body: JSON.stringify({
-      title: "온사이트 에디터 기능 둘러보기",
-      head: `post/${SLUG}`,
-      base: "main",
-      draft: true,
-    }),
-  })
-  if (!response.ok) throw new Error(`Failed to seed the demo post (${response.status})`)
 }
