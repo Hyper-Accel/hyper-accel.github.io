@@ -1,0 +1,2 @@
+{{- $entry := resources.Get "js/editor-entry.js" | minify | fingerprint }}
+<script defer src="{{ $entry.RelPermalink }}" integrity="{{ $entry.Data.Integrity }}"></script>

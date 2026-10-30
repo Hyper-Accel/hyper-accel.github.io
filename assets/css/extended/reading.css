@@ -5,6 +5,13 @@ body.reading-page {
   --reading-rail-width: 240px;
   --reading-gap: 48px;
   --reading-offset: 132px;
+  --reading-edge: var(--gap);
+  --reading-viewport: 100vw;
+  --reading-wide-max: 180px;
+  --reading-drawer-width: min(320px, calc(100vw - 64px));
+  --reading-column: min(var(--reading-width), calc(var(--reading-viewport) - 2 * var(--reading-edge)));
+  /* Wide figures grow the same amount on both sides of the article; 0 once the column already fills the viewport. */
+  --reading-figure-expand: clamp(0px, calc((var(--reading-viewport) - var(--reading-column)) / 2 - var(--reading-edge)), var(--reading-wide-max));
 }
 .post-reading-layout {
   max-width: var(--reading-width);
@@ -15,7 +22,8 @@ body.reading-page {
 .reading-page .post-title, .reading-page .post-content h1 { font-size: 36px; }
 .reading-page .post-content h2 { font-size: 28px; }
 .reading-page .post-content h3 { font-size: 22px; }
-.reading-page .post-content :is(h1, h2, h3, h4, h5, h6)[id] {
+.reading-page .post-content :is(h1, h2, h3, h4, h5, h6)[id],
+.reading-page #reading-title {
   scroll-margin-top: var(--reading-offset);
 }
 .reading-toc {
@@ -35,6 +43,11 @@ body.reading-page {
 .reading-toc-links { overflow-y: auto; overscroll-behavior: contain; }
 .reading-toc ul { list-style: none; padding: 0; margin: 0; }
 .reading-toc ul ul { padding-left: 14px; }
+/* The post title heads the list; chapters (# / ## / ###) nest under it. A skipped level
+   (e.g. ## without #) leaves an empty wrapper item, which adds no indent. */
+.reading-toc nav > ul { padding-left: 14px; }
+.reading-toc li:not(:has(> a)) > ul { padding-left: 0; }
+.reading-toc a.reading-toc-post { color: var(--primary); font-weight: 700; }
 .reading-toc li { margin: 0; }
 .reading-toc a {
   display: block;
@@ -50,73 +63,96 @@ body.reading-page {
   font-weight: 650;
 }
 .reading-toc a:focus-visible,
-.reading-toc-toggle:focus-visible,
+.reading-toc-handle:focus-visible,
 .reading-toc-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
-.reading-toc-toggle, .reading-toc-close { display: none; }
+/* The header's legacy TOC button is superseded by the handle rendered next to the TOC. */
+.reading-toc-toggle, .reading-toc-close, .reading-toc-handle, .reading-toc-scrim { display: none; }
 
 @media (min-width: 1100px) {
+  /* TOC is pinned to the site's left edge; the article stays centered and only shifts right when the viewport is too narrow to clear the TOC. */
+  .reading-page .main { max-width: none; }
   .post-reading-layout.has-toc {
-    display: grid;
-    grid-template-columns: var(--reading-rail-width) minmax(0, var(--reading-width));
-    gap: var(--reading-gap);
-    max-width: none;
+    --reading-toc-edge: calc(var(--gap) + var(--reading-rail-width));
+    --reading-article-left: max(calc(var(--reading-toc-edge) + var(--reading-gap)), calc((var(--reading-viewport) - var(--reading-width)) / 2));
+    /* Symmetric growth bounded by the TOC on the left and the viewport padding on the right. */
+    --reading-figure-expand: clamp(0px, min(calc(var(--reading-article-left) - var(--reading-toc-edge) - var(--gap)), calc(var(--reading-viewport) - var(--reading-edge) - var(--reading-article-left) - var(--reading-width))), var(--reading-wide-max));
+    max-width: var(--reading-width);
+    margin-inline-end: auto;
+    margin-inline-start: max(calc(var(--reading-rail-width) + var(--reading-gap)), calc((100% - var(--reading-width)) / 2));
   }
   .reading-toc {
-    grid-column: 1;
-    grid-row: 1;
-    position: sticky;
+    position: fixed;
+    left: var(--gap, 24px);
     top: var(--reading-offset);
-    align-self: start;
+    width: var(--reading-rail-width);
+    margin-top: 0;
     border-left: 1px solid var(--border);
     padding-left: 20px;
     max-height: calc(100dvh - var(--reading-offset) - 24px);
     display: flex;
     flex-direction: column;
   }
-  .post-reading-layout.has-toc .post-single { grid-column: 2; grid-row: 1; }
   .reading-toc-links { min-height: 0; }
 }
 
 @media (max-width: 1099px) {
-  /* Without JS, a useful plain TOC remains after the article, never before it. */
-  .reading-toc-ready .reading-toc { display: none; }
-  .reading-toc-ready .reading-toc.is-open {
+  /* Without JS, a useful plain TOC remains after the article, never before it. With JS it becomes a left drawer. */
+  .reading-toc-ready .reading-toc {
     display: flex;
     flex-direction: column;
     position: fixed;
-    z-index: 30;
-    right: 16px;
-    top: var(--reading-offset);
-    margin-top: 0;
-    width: min(340px, calc(100vw - 32px));
-    max-height: min(60dvh, calc(100dvh - var(--reading-offset) - 16px));
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    z-index: 40;
+    inset: 0 auto 0 0;
+    width: var(--reading-drawer-width);
+    margin: 0;
+    padding: 20px 20px 24px;
+    border-right: 1px solid var(--border);
     background: var(--theme);
+    box-shadow: 24px 0 48px var(--shadow-color);
+    translate: -100% 0;
+    visibility: hidden;
+    transition: translate .22s cubic-bezier(.33, 0, .15, 1), visibility .22s;
   }
-  .reading-toc-ready .reading-toc-toggle {
-    position: absolute;
-    right: 8px;
-    bottom: 0;
-    width: 96px;
+  .reading-toc-ready .reading-toc.is-open { translate: 0 0; visibility: visible; }
+  .reading-toc-ready .reading-toc a { padding-block: 11px; }
+  .reading-toc-ready .reading-toc-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: color-mix(in srgb, var(--tr-bg) 55%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s;
+  }
+  .reading-toc-ready .reading-toc.is-open + .reading-toc-scrim { opacity: 1; pointer-events: auto; }
+  /* Slim handle at the viewport's left-center: only a triangle, 44px hit area via ::after, attaches to the drawer edge when open.
+     16px wide so it never covers the article column, whose left edge is at least 16px at every width. */
+  .reading-toc-ready .reading-toc-handle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-height: 44px;
     justify-content: center;
-    padding: 8px;
-    border-left: 1px solid var(--tr-line);
-    background: transparent;
-    color: var(--primary);
-    font-size: 14px;
-    font-weight: 650;
+    position: fixed;
+    z-index: 41;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    width: 16px;
+    height: 96px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-left: 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--entry);
+    color: var(--tr-cyan-soft);
+    cursor: pointer;
+    transition: left .22s cubic-bezier(.33, 0, .15, 1), border-color .18s ease;
   }
-  .reading-toc-toggle:hover, .reading-toc-toggle[aria-expanded="true"] { border-color: var(--tr-cyan-soft); }
-  /* The TOC toggle sits at the bottom-right of the header, so categories move to their own row beside it. */
-  .reading-toc-ready .tr-header-in { flex-wrap: wrap; row-gap: 0; }
-  .reading-toc-ready .tr-nav { order: 3; flex-basis: 100%; max-width: calc(100% - 104px); min-height: 44px; border-top: 1px solid var(--tr-line); }
-  .reading-toc-close {
+  .reading-toc-ready .reading-toc-handle::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 44px; }
+  .reading-toc-ready .reading-toc-handle:hover { border-color: var(--tr-cyan-soft); }
+  .reading-toc-ready .reading-toc-handle[aria-expanded="true"] { left: var(--reading-drawer-width); }
+  .reading-toc-ready .reading-toc-handle[aria-expanded="true"] svg { transform: scaleX(-1); }
+  .reading-toc-ready .reading-toc-close {
     display: block;
     flex: 0 0 44px;
     height: 44px;
@@ -127,17 +163,20 @@ body.reading-page {
   .reading-toc-header { flex: 0 0 auto; }
   .reading-toc-links { min-height: 0; }
 }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  body.reading-page { --reading-edge: 16px; }
   .reading-page .main { padding-inline: 16px; }
+}
+@media (max-width: 640px) {
   .reading-page .post-title, .reading-page .post-content h1 { font-size: 28px; }
   .reading-page .post-content h2 { font-size: 24px; }
   .reading-page .post-content h3 { font-size: 20px; }
 }
-@media (min-width: 641px) {
-  /* Preserve #side figures, but do not let them spill into the TOC rail. */
-  .reading-page .post-content .side-figure { width: 36%; margin: 4px 0 16px 28px; }
+@media (prefers-reduced-motion: reduce) {
+  .reading-toc-ready .reading-toc, .reading-toc-ready .reading-toc-scrim, .reading-toc-ready .reading-toc-handle { transition: none; }
 }
 @media print {
-  .post-reading-layout.has-toc { display: block; max-width: var(--reading-width); }
-  .reading-toc, .reading-toc-ready .reading-toc.is-open, .reading-toc-ready .reading-toc-toggle { display: none; }
+  body.reading-page, .post-reading-layout.has-toc { --reading-figure-expand: 0px; }
+  .post-reading-layout.has-toc { display: block; max-width: var(--reading-width); margin-inline: auto; }
+  .reading-toc, .reading-toc-ready .reading-toc, .reading-toc-ready .reading-toc.is-open, .reading-toc-handle, .reading-toc-ready .reading-toc-handle, .reading-toc-scrim, .reading-toc-ready .reading-toc-scrim, .reading-toc-toggle { display: none; }
 }

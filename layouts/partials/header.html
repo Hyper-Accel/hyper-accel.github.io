@@ -8,26 +8,40 @@
       <a class="tr-brand-logo" href="https://hyperaccel.ai/" aria-label="{{ cond $ko "HyperAccel 홈페이지" "HyperAccel website" }}" title="{{ cond $ko "HyperAccel 홈페이지" "HyperAccel website" }}"><img src="{{ "/images/logo-transparent.png" | relURL }}" alt="" width="28" height="28"></a>
       <a class="tr-brand-name" href="{{ "" | relLangURL }}"><span class="tr-brand-co">HyperAccel</span><b>Tech Blog</b></a>
     </div>
+    {{- /* Wide screens fold the categories into their colour dots; hover or focus drops the
+         dots down into the full list. Narrow screens keep the scrolling row of links. */}}
     <nav class="tr-nav" aria-label="{{ cond $ko "카테고리" "Categories" }}">
-      {{- range (site.GetPage "/categories").Pages }}
-      <a href="{{ .RelPermalink }}" style="{{ partial "d/catvars.html" (path.Base .RelPermalink) }}"{{ if eq .RelPermalink $cat }} aria-current="page"{{ end }}><i class="tr-dot"></i>{{ .Title }}</a>
-      {{- end }}
+      <button class="tr-nav-dots" type="button" aria-label="{{ cond $ko "카테고리 보기" "Show categories" }}">
+        {{- range $i, $c := (site.GetPage "/categories").Pages }}<i class="tr-dot" style="{{ partial "d/catvars.html" (path.Base $c.RelPermalink) }};--i:{{ $i }}"></i>{{ end -}}
+      </button>
+      <div class="tr-nav-menu">
+        {{- range $i, $c := (site.GetPage "/categories").Pages }}
+        <a href="{{ $c.RelPermalink }}" style="{{ partial "d/catvars.html" (path.Base $c.RelPermalink) }};--i:{{ $i }}"{{ if eq $c.RelPermalink $cat }} aria-current="page"{{ end }}><i class="tr-dot"></i>{{ $c.Title }}</a>
+        {{- end }}
+      </div>
     </nav>
     <div class="tr-tools">
       <a class="tr-pill tr-search-link" href="{{ "search/" | relLangURL }}" aria-label="{{ cond $ko "검색" "Search" }}" title="{{ cond $ko "검색" "Search" }}">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
       </a>
-      <a class="tr-pill tr-pill-careers" href="https://hyperaccel.career.greetinghr.com/{{ cond $ko "ko" "en" }}/guide" target="_blank" rel="noopener">{{ cond $ko "채용" "Careers" }} ↗</a>
+      {{- /* Language switch: a round button between search and careers, "En" toward English, "한" toward Korean. */}}
       {{- with .Translations }}
-        {{- range . }}<a class="tr-pill" href="{{ .Permalink }}">{{ .Language.LanguageName }}</a>{{ end }}
+        {{- range . }}<a class="tr-pill tr-lang-switch" data-lang-switch="{{ .Lang }}" href="{{ .Permalink }}" hreflang="{{ .Lang }}" lang="{{ .Lang }}" aria-label="{{ .Language.LanguageName }}" title="{{ .Language.LanguageName }}">{{ cond (eq .Lang "en") "En" "한" }}</a>{{ end }}
       {{- else }}
-        {{- with site.Home.Translations }}{{ range . }}{{ if ne .Lang site.Language.Lang }}<a class="tr-pill" href="{{ .Permalink }}">{{ .Language.LanguageName }}</a>{{ end }}{{ end }}{{ end }}
+        {{- with site.Home.Translations }}{{ range . }}{{ if ne .Lang site.Language.Lang }}<a class="tr-pill tr-lang-switch" data-lang-switch="{{ .Lang }}" href="{{ .Permalink }}" hreflang="{{ .Lang }}" lang="{{ .Lang }}" aria-label="{{ .Language.LanguageName }}" title="{{ .Language.LanguageName }}">{{ cond (eq .Lang "en") "En" "한" }}</a>{{ end }}{{ end }}{{ end }}
       {{- end }}
+      {{- /* Editor entry: the round pencil opens the editor; hovering or focusing it shows a small hint
+           underneath. On a post, returning editors (js/editor-entry.js) go straight to editing it. */}}
+      <span class="tr-editor-menu">
+        <a class="tr-pill tr-editor-link" href="/editor-login/" aria-labelledby="tr-editor-tip"
+          {{- if and .IsPage (eq .Section "posts") }} data-editor-entry="{{ .RelPermalink }}?edit"{{ end }}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m16 3 5 5L8 21H3v-5L16 3Z"></path><path d="m14 5 5 5"></path></svg>
+        </a>
+        <span class="tr-editor-tip" id="tr-editor-tip" role="tooltip">{{ cond $ko "에디터 로그인" "Editor login" }}</span>
+      </span>
+      <a class="tr-pill tr-pill-careers" href="https://hyperaccel.career.greetinghr.com/{{ cond $ko "ko" "en" }}/guide" target="_blank" rel="noopener">{{ cond $ko "채용" "Careers" }} ↗</a>
     </div>
   </div>
-  {{- if partialCached "d/has_reading_toc.html" . .Page }}
-    {{- partial "reading_toc_toggle.html" . }}
-  {{- end }}
 </header>
 <script>
 (() => {

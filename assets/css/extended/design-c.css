@@ -42,6 +42,12 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--tr-line); font-size: 0.82rem; font-weight: 600; color: var(--tr-muted); }
 .tr-pill:hover { border-color: var(--tr-cyan); color: var(--tr-cyan-soft); }
 .tr-search-link { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; }
+.tr-lang-switch { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0; }
+.tr-editor-menu { position: relative; display: inline-flex; }
+.tr-editor-link { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; }
+.tr-editor-tip { position: absolute; top: calc(100% + 8px); left: 50%; z-index: 30; padding: 6px 10px; border: 1px solid var(--tr-line); border-radius: 8px; background: color-mix(in srgb, var(--tr-bg) 96%, transparent); box-shadow: 0 10px 26px rgb(0 0 0 / 40%); color: var(--tr-fg); font-size: 0.78rem; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; visibility: hidden; translate: -50% -4px; transition: opacity .16s, translate .16s, visibility 0s .16s; }
+.tr-editor-link:hover + .tr-editor-tip, .tr-editor-link:focus-visible + .tr-editor-tip { opacity: 1; visibility: visible; translate: -50% 0; transition-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { .tr-editor-tip { transition: none; } }
 .tr-pill-careers { background: var(--tr-cyan); color: #031117; border-color: var(--tr-cyan); }
 .tr-pill-careers:hover { background: var(--tr-cyan-soft); color: #031117; border-color: var(--tr-cyan-soft); }
 
@@ -265,16 +271,35 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-search-page #searchResults .entry-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; color: var(--tr-muted); font-size: 0.76rem; }
 .tr-search-page #searchResults mark { padding: 0 2px; border-radius: 3px; background: rgb(0 158 226 / 28%); color: var(--tr-fg); }
 
-/* opt-in side figures: ![alt](img.png#side "caption") */
-.post-content .side-figure { float: right; clear: right; display: block; width: 36%; max-width: 360px; margin: 4px 0 16px 28px; }
-.post-content .side-figure img { width: 100%; margin: 0; border-radius: 10px; }
-.post-content .side-caption { display: block; margin-top: 8px; color: var(--secondary); font-size: 0.8rem; line-height: 1.5; word-break: keep-all; }
-.post-content h2, .post-content h3, .post-content pre, .post-content table, .post-content .highlight { clear: both; }
-@media (min-width: 1720px) {
-  .post-content .side-figure { width: 280px; margin: 4px -316px 16px 0; }
-  .post-content h2, .post-content h3, .post-content pre, .post-content table, .post-content .highlight { clear: none; }
+/* Side figures (#side-right / #side-left) and the other article blocks live in figures.css. */
+
+
+/* Folding category nav (wide screens): only the colour dots show; hovering or focusing them
+   lets the dots drop away while the full list slides down from where they were. */
+.tr-nav-dots { display: none; }
+@media (min-width: 901px) {
+  .tr-nav { position: relative; flex: 0 0 auto; overflow: visible; align-items: center; }
+  .tr-nav-dots { display: inline-flex; align-items: center; gap: 7px; padding: 10px 12px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; }
+  .tr-nav-dots:hover, .tr-nav-dots:focus-visible { background: color-mix(in srgb, var(--tr-fg) 8%, transparent); }
+  /* Opening, each folded dot travels from the row to its own category; closing, it travels back.
+     Offsets follow the fixed geometry: row dots 10px + 7px gap after 12px padding; menu rows 36px + 2px gap
+     inside 1px border + 8px padding, dot after 12px padding, menu 8px below the 30px row. */
+  .tr-nav-dots .tr-dot { width: 10px; height: 10px; margin: 0; border-radius: 50%; transition: opacity 0s .66s; }
+  .tr-nav-menu { position: absolute; top: calc(100% + 8px); left: 0; z-index: 20; display: grid; gap: 2px; min-width: 248px; padding: 8px; border: 1px solid var(--tr-line); border-radius: 14px; background: color-mix(in srgb, var(--tr-bg) 96%, transparent); backdrop-filter: blur(14px); box-shadow: 0 18px 40px rgb(0 0 0 / 45%); transition: visibility 0s, border-color .25s .15s, background-color .25s .15s, box-shadow .25s .15s; }
+  .tr-nav-menu::before { content: ""; position: absolute; inset: -10px 0 auto; height: 10px; }
+  .tr-nav-menu a { height: 36px; padding: 0 12px; border-radius: 10px; transition: color .25s calc(.3s + var(--i) * 25ms), background-color .15s; }
+  .tr-nav-menu .tr-dot { width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; transition: translate .45s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 25ms); }
+  .tr-nav:not(:hover, :focus-within) .tr-nav-menu { visibility: hidden; border-color: transparent; background-color: transparent; box-shadow: none; backdrop-filter: none; transition: visibility 0s .66s, border-color .15s, background-color .15s, box-shadow .15s; }
+  .tr-nav:not(:hover, :focus-within) .tr-nav-menu a { color: transparent; background-color: transparent; transition: color .12s, background-color .12s; }
+  .tr-nav:not(:hover, :focus-within) .tr-nav-menu .tr-dot { translate: calc(17px * var(--i) - 9px) calc(-50px - 38px * var(--i)); }
+  .tr-nav:is(:hover, :focus-within) .tr-nav-dots .tr-dot { opacity: 0; transition: none; }
 }
-@media (max-width: 640px) {
-  .post-content .side-figure { float: none; width: 100%; margin: 16px 0; }
+@media (max-width: 900px) {
+  .tr-nav-menu { display: contents; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tr-nav-dots .tr-dot, .tr-nav-menu, .tr-nav-menu a, .tr-nav-menu .tr-dot { transition: none; }
 }
 
+/* The editors' drafts shelf on the home page stays out of readers' view until the editor module fills it. */
+.tr-drafts[hidden] { display: none; }

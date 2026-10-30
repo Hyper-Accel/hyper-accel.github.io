@@ -1,0 +1,31 @@
+{{- define "main" }}
+{{- /* The editor no longer has an address of its own: posts are edited on their own page (?edit),
+     new posts and drafts on /editor-new/, login on /editor-login/. Old /editor/#/... links land
+     on the matching new address. */}}
+{{- $published := slice }}
+{{- range where site.RegularPages "Section" "posts" }}{{ with .File }}{{ $published = $published | append (path.Base (strings.TrimSuffix "/" .Dir)) }}{{ end }}{{ end }}
+<p data-editor-moved>편집기 주소가 바뀌었습니다. 이동하는 중입니다… <a href="/">홈으로</a></p>
+<script>
+(() => {
+  const published = new Set({{ $published | uniq | jsonify | safeJS }})
+  const hash = location.hash.replace(/^#/, "")
+  const path = hash.split("?")[0]
+  const slug = "[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*"
+  let target = "/"
+  const edit = new RegExp(`^/edit/(${slug})$`).exec(path)
+  const review = /^\/review\/([1-9]\d*)$/.exec(path)
+  if (location.search.includes("code=") || location.search.includes("error=")) {
+    target = `/editor-login/${location.search}`
+  } else if (edit) {
+    target = published.has(edit[1]) ? `/posts/${edit[1]}/?edit` : `/editor-new/?draft=${edit[1]}`
+  } else if (review) {
+    target = `/editor-new/?review=${review[1]}`
+  } else if (path === "/new") {
+    target = "/editor-new/"
+  } else if (path === "/login" || path.startsWith("/callback")) {
+    target = "/editor-login/"
+  }
+  location.replace(target)
+})()
+</script>
+{{- end }}

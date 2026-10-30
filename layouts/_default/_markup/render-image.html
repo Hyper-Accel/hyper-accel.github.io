@@ -1,28 +1,30 @@
-{{- /* PaperMod hook + opt-in side figures: ![alt](img.png#side "caption") floats beside the following paragraph. */ -}}
+{{- /* Image presets via URL fragment: none = body width, #wide, #side-right (#side is an alias), #side-left.
+     A standalone image renders as <figure> with a visible caption from the title; an inline image stays <img>.
+     The fragment is always stripped from src. Bundle images get width/height. */ -}}
 {{- $u := urls.Parse .Destination -}}
-{{- $side := eq $u.Fragment "side" -}}
-{{- $src := $u.String -}}
-{{- if $side }}{{ $src = strings.TrimSuffix "#side" $src }}{{ end -}}
+{{- $preset := "body" -}}
+{{- if eq $u.Fragment "wide" }}{{ $preset = "wide" }}
+{{- else if or (eq $u.Fragment "side") (eq $u.Fragment "side-right") }}{{ $preset = "side-right" }}
+{{- else if eq $u.Fragment "side-left" }}{{ $preset = "side-left" }}{{ end -}}
+{{- $src := index (split .Destination "#") 0 -}}
+{{- $width := 0 }}{{ $height := 0 -}}
 {{- if not $u.IsAbs -}}
   {{- $path := strings.TrimPrefix "./" $u.Path }}
   {{- with or (.PageInner.Resources.Get $path) (resources.Get $path) -}}
     {{- $src = .RelPermalink -}}
-    {{- with $u.RawQuery -}}
-      {{- $src = printf "%s?%s" $src . -}}
-    {{- end -}}
-    {{- with and (not $side) $u.Fragment -}}
-      {{- $src = printf "%s#%s" $src . -}}
+    {{- with $u.RawQuery }}{{ $src = printf "%s?%s" $src . }}{{ end -}}
+    {{- if and (eq .ResourceType "image") (not (strings.HasPrefix .MediaType.Type "image/svg")) -}}
+      {{- $width = .Width }}{{ $height = .Height -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- $title := cond $side "" .Title -}}
-{{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" ($title | transform.HTMLEscape) "loading" "lazy") -}}
-{{- if $side }}<span class="side-figure">{{ end -}}
-<img
-  {{- range $k, $v := $attributes -}}
-    {{- if $v -}}
-      {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
-    {{- end -}}
-  {{- end -}}>
-{{- if $side }}{{ with .Title }}<span class="side-caption">{{ . }}</span>{{ end }}</span>{{ end -}}
-{{- /**/ -}}
+{{- $extra := "" -}}
+{{- range $k, $v := .Attributes }}{{ $extra = printf "%s %s=%q" $extra $k (print $v) }}{{ end -}}
+{{- if .IsBlock -}}
+<figure class="figure figure-{{ $preset }}">
+<img src="{{ $src }}" alt="{{ .PlainText }}" loading="lazy"{{ if $width }} width="{{ $width }}" height="{{ $height }}"{{ end }}{{ $extra | safeHTMLAttr }}>
+{{- with .Title }}<figcaption>{{ . }}</figcaption>{{ end }}
+</figure>
+{{- else -}}
+<img src="{{ $src }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy"{{ if $width }} width="{{ $width }}" height="{{ $height }}"{{ end }}{{ $extra | safeHTMLAttr }}>
+{{- end -}}

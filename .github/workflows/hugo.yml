@@ -48,6 +48,16 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Install Node.js dependencies
         run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Build hosted editor
+        working-directory: tools/editor
+        env:
+          VITE_EDITOR_GITHUB_CLIENT_ID: ${{ vars.VITE_EDITOR_GITHUB_CLIENT_ID }}
+          VITE_EDITOR_TOKEN_EXCHANGE_URL: ${{ vars.VITE_EDITOR_TOKEN_EXCHANGE_URL }}
+        run: bun install --frozen-lockfile && bun run build:site
       - name: Build with Hugo
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
@@ -56,6 +66,12 @@ jobs:
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
+      - name: Include hosted editor
+        run: |
+          test -s tools/editor/dist-site/editor/manifest.json
+          mkdir -p public/editor
+          cp -R tools/editor/dist-site/editor/. public/editor/
+          git rev-parse HEAD > public/editor/build-commit.txt
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

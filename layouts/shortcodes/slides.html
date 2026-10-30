@@ -1,0 +1,25 @@
+{{- /* {{< slides >}} two to ten Markdown images {{< /slides >}} (Naver's "슬라이드"): one picture at a
+     time, swiped or stepped with the arrows; the counter shows where the reader is. Without JS the row
+     still scrolls sideways and snaps to each picture; feature-blocks.js adds the arrows and counter. */ -}}
+{{- $images := findRE `!\[[^\]]*\]\([^)]*\)` .Inner -}}
+{{- $count := len $images -}}
+{{- if or (lt $count 2) (gt $count 10) }}{{ errorf "The %q shortcode needs two to ten images, got %d. See %s" .Name $count .Position }}{{ end -}}
+<figure class="figure figure-slides" role="group" aria-roledescription="carousel" aria-label="{{ i18n "slides_label" }}">
+<div class="slides-stage">
+<div class="slides" tabindex="0">
+{{- range $i, $image := $images }}
+<div class="slide" role="group" aria-roledescription="slide" aria-label="{{ add $i 1 }} / {{ $count }}">
+{{ $.Page.RenderString (dict "display" "block") $image }}
+</div>
+{{- end }}
+</div>
+<button class="slides-prev" type="button" aria-label="{{ i18n "slides_prev" }}" hidden>‹</button>
+<button class="slides-next" type="button" aria-label="{{ i18n "slides_next" }}" hidden>›</button>
+<span class="slides-count" aria-hidden="true" hidden>1 / {{ $count }}</span>
+</div>
+</figure>
+{{- if not (.Page.Store.Get "feature-blocks-included") }}
+{{- .Page.Store.Set "feature-blocks-included" true }}
+{{- $blocks := resources.Get "js/feature-blocks.js" | minify | fingerprint }}
+<script defer src="{{ $blocks.RelPermalink }}" integrity="{{ $blocks.Data.Integrity }}"></script>
+{{- end }}

@@ -1,0 +1,105 @@
+name: Editor checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ko-en:
+    name: editor/ko-en
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install editor dependencies
+        working-directory: tools/editor
+        run: bun install --frozen-lockfile
+      - name: Test post validators
+        run: bun test tools/editor/ci
+      - name: Check translations, blocks, drafts, and images
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || format('origin/{0}', github.event.repository.default_branch) }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bun tools/editor/ci/validate-posts.ts --all --check ko-en
+
+  authors:
+    name: editor/authors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install editor dependencies
+        working-directory: tools/editor
+        run: bun install --frozen-lockfile
+      - name: Check author directories
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || format('origin/{0}', github.event.repository.default_branch) }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bun tools/editor/ci/validate-posts.ts --all --check authors
+
+  category:
+    name: editor/category
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install editor dependencies
+        working-directory: tools/editor
+        run: bun install --frozen-lockfile
+      - name: Check canonical category arrays
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || format('origin/{0}', github.event.repository.default_branch) }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bun tools/editor/ci/validate-posts.ts --all --check category
+
+  hugo:
+    name: editor/hugo
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.152.2
+    steps:
+      - name: Install Hugo CLI
+        run: |
+          wget -O "${{ runner.temp }}/hugo.deb" "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "${{ runner.temp }}/hugo.deb"
+      - name: Install Dart Sass
+        run: sudo snap install dart-sass
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Build hosted editor
+        working-directory: tools/editor
+        run: bun install --frozen-lockfile && bun run build:site
+      - name: Build with Hugo
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          HUGO_ENVIRONMENT: production
+        run: hugo --minify
+      - name: Include hosted editor
+        run: |
+          test -s tools/editor/dist-site/editor/index.html
+          mkdir -p public/editor
+          cp -R tools/editor/dist-site/editor/. public/editor/

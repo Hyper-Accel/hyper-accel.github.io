@@ -1,0 +1,18 @@
+{{- /* GitHub-style alerts: > [!NOTE|TIP|IMPORTANT|WARNING|CAUTION] optional title. Plain blockquotes render unchanged. */ -}}
+{{- if eq .Type "alert" -}}
+{{- $icons := dict
+  "note" `<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>`
+  "tip" `<path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 3.6 10.8c-.6.5-.6 1.2-.6 2.2h-6c0-1 0-1.7-.6-2.2A6 6 0 0 1 12 3z"/>`
+  "important" `<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8v4M12 14h.01"/>`
+  "warning" `<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17h.01"/>`
+  "caution" `<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v4M12 15h.01"/>`
+-}}
+<blockquote class="alert alert-{{ .AlertType }}" role="note">
+<p class="alert-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{{ index $icons .AlertType | safeHTML }}</svg><span class="alert-type">{{ i18n (printf "alert_%s" .AlertType) | default (title .AlertType) }}</span>{{ with .AlertTitle }}<span class="alert-heading">{{ . }}</span>{{ end }}</p>
+{{ .Text }}
+</blockquote>
+{{- else -}}
+<blockquote>
+{{ .Text }}
+</blockquote>
+{{- end -}}
