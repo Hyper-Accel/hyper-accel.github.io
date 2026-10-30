@@ -1,0 +1,103 @@
+/* Callout edited in place: the published title line stays as is; only hints appear. */
+.ProseMirror .onsite-alert .alert-heading:empty {
+  display: none;
+}
+
+/* While the caret is in the callout, an empty title shows a faint placeholder to click into. */
+.ProseMirror .onsite-alert.is-editing .alert-heading:empty {
+  display: inline;
+  /* The hint must not grow the title line: an untitled published callout's line is 18px. */
+  line-height: 1;
+}
+
+.ProseMirror .onsite-alert.is-editing .alert-heading:empty::before {
+  content: attr(data-placeholder);
+  color: var(--secondary);
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.ProseMirror .onsite-alert .onsite-alert__type,
+.ProseMirror .onsite-alert .onsite-alert__heading {
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+}
+
+.ProseMirror .onsite-alert .onsite-alert__type {
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-alert.is-editing .onsite-alert__type:hover,
+.ProseMirror .onsite-alert .onsite-alert__type[aria-expanded="true"] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ProseMirror .onsite-alert .onsite-alert__type:focus-visible,
+.ProseMirror .onsite-alert .onsite-alert__heading:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* The type list floats under the label, outside the article flow. */
+.onsite-tools.onsite-alert-types {
+  position: fixed;
+  z-index: 75;
+  display: grid;
+  gap: 2px;
+  min-width: 132px;
+  margin: 0;
+  padding: 6px;
+  font:
+    13px / 1.4 system-ui,
+    sans-serif;
+}
+
+.onsite-tools.onsite-alert-types[hidden] {
+  display: none;
+}
+
+.onsite-alert-types__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--alert-color, var(--primary));
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+}
+
+.onsite-alert-types__option svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.onsite-alert-types__option:is(:hover, :focus-visible),
+.onsite-alert-types__option[aria-selected="true"] {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  outline: none;
+}
+
+.onsite-alert-types__option.alert-note {
+  --alert-color: var(--alert-note);
+}
+.onsite-alert-types__option.alert-tip {
+  --alert-color: var(--alert-tip);
+}
+.onsite-alert-types__option.alert-important {
+  --alert-color: var(--alert-important);
+}
+.onsite-alert-types__option.alert-warning {
+  --alert-color: var(--alert-warning);
+}
+.onsite-alert-types__option.alert-caution {
+  --alert-color: var(--alert-caution);
+}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Composer harness</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--theme);
+        color: var(--primary);
+        font: 18px / 1.6 system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+      }
+      .harness { width: min(100% - 2 * var(--gap), var(--main-width)); margin-inline: auto; padding-block: var(--gap); }
+      .harness h1 { margin: 0 0 var(--gap); font-size: 32px; line-height: 1.25; }
+    </style>
+  </head>
+  <body>
+    <main class="harness">
+      <h1 id="harness-title">새 글</h1>
+      <div id="app"></div>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

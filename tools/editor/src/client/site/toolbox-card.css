@@ -1,0 +1,205 @@
+/* 도구상자, card layout: one thin sticky row (history · text formats · ＋ 넣기) leaves the article its
+   height; the insert tools sit in a card at the top right — beside the article on wide screens, a
+   popup under ＋ 넣기 on narrow ones. */
+.site-editor .composer-toolbox[data-layout="card"] {
+  margin-bottom: 8px;
+}
+
+.composer-toolbox__bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px 12px;
+}
+
+.site-editor .composer-toolbox[data-layout="card"] .composer-toolbox__bar > .composer-props {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  padding: 0 4px;
+  border-top: 0;
+}
+
+/* 실행 취소 · 다시 실행: icons in the thin row; their names stay for screen readers and tooltips. */
+.site-editor
+  .composer-toolbox[data-layout="card"]
+  .composer-toolbox__bar
+  > button.composer-toolbox__button {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+}
+
+.site-editor .composer-toolbox[data-layout="card"] .composer-toolbox__bar .composer-toolbox__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.site-editor .composer-toolbox[data-layout="card"] button.composer-toolbox__insert {
+  position: static;
+  flex: none;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0 0 0 4px;
+  padding: 0 12px;
+  translate: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--entry);
+  color: var(--primary);
+  font:
+    600 13px / 1 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+  white-space: nowrap;
+}
+
+.site-editor
+  .composer-toolbox[data-layout="card"]
+  button.composer-toolbox__insert[aria-expanded="true"] {
+  border-color: var(--editor-accent, var(--tr-cyan, var(--primary)));
+  background: color-mix(in srgb, var(--editor-accent, var(--tr-cyan, #4dabf7)) 16%, var(--entry));
+}
+
+/* The card. */
+.site-editor .composer-toolbox[data-mode][data-layout="card"] .composer-toolbox__row {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 16px;
+  z-index: 20;
+  display: block;
+  width: 264px;
+  max-height: calc(100dvh - var(--composer-sticky-top, 0px) - 160px);
+  margin: 0;
+  padding: 6px 8px 8px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--entry);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+}
+
+.site-editor .composer-toolbox[data-mode][data-layout="card"].is-collapsed .composer-toolbox__row {
+  display: none;
+}
+
+.composer-toolbox__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 6px;
+}
+
+.composer-toolbox__card-title {
+  color: var(--secondary);
+  font:
+    600 12px / 1 system-ui,
+    sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__card-close {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  min-width: 0;
+  height: 26px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__card-close:is(:hover, :focus-visible) {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.site-editor .composer-toolbox[data-mode][data-layout="card"] .composer-toolbox__tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+  overflow: visible;
+}
+
+.site-editor
+  .composer-toolbox[data-layout="card"]
+  .composer-toolbox__tools
+  .composer-toolbox__group {
+  display: contents;
+}
+
+.site-editor .composer-toolbox[data-layout="card"] .composer-toolbox__tools .composer-toolbox__sep {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 1px;
+  margin: 4px 0;
+}
+
+.site-editor
+  .composer-toolbox[data-mode][data-layout="card"]
+  .composer-toolbox__tools
+  button.composer-toolbox__button {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 6px 2px 4px;
+  font-size: 11px;
+}
+
+@media (max-width: 699px) {
+  .composer-toolbox__bar {
+    padding-inline: 8px;
+  }
+
+  .site-editor .composer-toolbox[data-mode][data-layout="card"] .composer-toolbox__row {
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
+
+  .site-editor .composer-toolbox[data-mode][data-layout="card"] .composer-toolbox__tools {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* No group breaks inside the card (they leave holes in the grid); only the panels sit apart. */
+.site-editor
+  .composer-toolbox[data-layout="card"]
+  .composer-toolbox__tools
+  .composer-toolbox__separator {
+  display: none;
+}
+
+/* While editing, the toolbox hangs right under the site header (no strip of page padding above). */
+.main:has(.composer[data-mode="edit"]) {
+  padding-top: 0;
+}
+
+/* On a phone the text formats run past the edge: the row fades there to say it scrolls sideways. */
+@media (max-width: 699px) {
+  .site-editor .composer-toolbox[data-layout="card"] .composer-toolbox__bar > .composer-props {
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+}
+
+/* A side panel (라이브러리 · 모바일) takes the right side: the 넣기 card steps back meanwhile. */
+body:has(.composer-panel:not([hidden]))
+  .site-editor
+  .composer-toolbox[data-layout="card"]
+  .composer-toolbox__row {
+  display: none;
+}

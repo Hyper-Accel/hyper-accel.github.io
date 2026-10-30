@@ -1,0 +1,197 @@
+/* The shell lives inside the Hugo page (layouts/_default/editor.html); the post itself is styled by the site. */
+.site-editor {
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.site-editor *,
+.site-editor *::before,
+.site-editor *::after {
+  box-sizing: border-box;
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: var(--radius);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)):hover,
+.site-editor a[aria-current="page"]:where(:not(.post-single a)) {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)):active {
+  background: var(--tertiary);
+}
+
+.site-editor :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+#site-content {
+  padding-block: calc(2 * var(--gap));
+  outline: none;
+}
+
+#site-content[data-route="compose"] {
+  padding-block: 0;
+}
+
+#site-content > h1 {
+  margin: 0 0 var(--gap);
+  font-size: 32px;
+  line-height: 1.25;
+}
+
+#site-content[data-route="compose"] > h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.site-editor p:where(:not(.post-single p)) {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--secondary);
+}
+
+.site-editor [hidden] {
+  display: none;
+}
+
+.site-editor #site-session {
+  padding-block: 8px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.site-editor [data-site-controls]:has([data-site-save][hidden]):has([data-site-save-status]:empty) {
+  display: none;
+}
+
+.site-editor [data-site-controls] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.site-editor [data-site-save] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--theme);
+  font-weight: 600;
+}
+
+.site-editor [data-site-save]:hover:not(:disabled) {
+  background: var(--content);
+  color: var(--theme);
+}
+
+.site-editor [data-site-save-status] {
+  flex-basis: 100%;
+  font-size: 14px;
+}
+
+@media (max-width: 699px) {
+  .site-editor #site-session,
+  .site-editor [data-site-save-status] {
+    font-size: 15px;
+  }
+}
+
+.site-editor #site-conflict {
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.site-editor button,
+.site-editor input,
+.site-editor select,
+.site-editor textarea {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+  padding: 8px 16px;
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.site-editor button {
+  cursor: pointer;
+}
+
+.site-editor button:hover:not(:disabled) {
+  background: var(--code-bg);
+}
+
+.site-editor button:active:not(:disabled) {
+  background: var(--tertiary);
+}
+
+.site-editor button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.site-editor [data-site-save]:disabled {
+  opacity: 0.75;
+}
+
+.site-editor label {
+  display: grid;
+  gap: 8px;
+  margin-block: 24px;
+}
+
+.site-editor textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.site-editor dialog {
+  width: min(560px, calc(100% - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  color: var(--primary);
+}
+
+.site-editor dialog::backdrop {
+  background: var(--content);
+  opacity: 0.6;
+}
+
+.site-editor dialog button {
+  margin-top: 16px;
+}
+
+.site-editor dialog h2 {
+  margin-top: 0;
+}
+
+.site-editor [data-recovery] > p {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+/* No menu bar of its own: the session line shows only when the login has expired. */
+.reading-page .site-editor #site-session {
+  max-width: var(--reading-width);
+  margin-inline: auto;
+}

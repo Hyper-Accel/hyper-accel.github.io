@@ -1,0 +1,46 @@
+/* Syntax colours in the editor, the same as the published post's Chroma theme
+   (themes/PaperMod/assets/css/includes/chroma-styles.css). */
+.ProseMirror pre code .hljs-keyword {
+  color: #c6a0f6;
+}
+.ProseMirror pre code :is(.hljs-type, .hljs-selector-tag) {
+  color: #ed8796;
+}
+.ProseMirror pre code .hljs-literal {
+  color: #f5a97f;
+}
+.ProseMirror pre code .hljs-built_in {
+  color: #91d7e3;
+}
+.ProseMirror pre code :is(.hljs-title, .hljs-title.function_) {
+  color: #8aadf4;
+}
+.ProseMirror pre code :is(.hljs-string, .hljs-char) {
+  color: #a6da95;
+}
+.ProseMirror pre code .hljs-number {
+  color: #f5a97f;
+}
+.ProseMirror pre code .hljs-operator {
+  color: #91d7e3;
+  font-weight: bold;
+}
+.ProseMirror pre code :is(.hljs-comment, .hljs-meta, .hljs-meta .hljs-string) {
+  color: #6e738d;
+  font-style: italic;
+}
+
+/* Coloured runs stay inline, and the block takes the published Chroma background. */
+.ProseMirror pre code span {
+  display: inline;
+}
+
+.ProseMirror pre:has(> code) {
+  background-color: #24273a;
+  color: #cad3f5;
+}
+
+/* The code element is a plain block (not a flex/grid box) so its coloured runs flow as text. */
+.ProseMirror pre > code {
+  display: block;
+}

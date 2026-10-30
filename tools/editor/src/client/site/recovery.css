@@ -1,0 +1,37 @@
+[data-recovery-conflict] {
+  min-width: 0;
+}
+
+.site-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 16px;
+}
+
+.site-recovery-actions button {
+  min-height: 44px;
+  white-space: normal;
+}
+
+.site-recovery-versions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.site-recovery-versions section {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.site-recovery-versions pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .site-recovery-versions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

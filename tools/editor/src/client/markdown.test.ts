@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test"
-import { originalMediaSource, prepareMarkdown, restoreMarkdown } from "./markdown"
+import {
+  createMarkdownTransport,
+  mediaPreviewUrl,
+  originalMediaSource,
+  prepareMarkdown,
+  restoreMarkdown,
+} from "./markdown"
 
 describe("editor markdown transport", () => {
   const path = "content/posts/example/index.ko.md"
@@ -31,5 +37,36 @@ describe("editor markdown transport", () => {
     const preview = "/api/media?path=content%2Fposts%2Fexample%2Findex.md&src=images%2Fplot.png"
 
     expect(originalMediaSource(preview)).toBe("images/plot.png")
+  })
+
+  test("keeps image preset fragments out of the media src and restores them", () => {
+    const preview = mediaPreviewUrl(path, "images/a.png#side")
+
+    expect(preview).toBe(
+      "/api/media?path=content%2Fposts%2Fexample%2Findex.ko.md&src=images%2Fa.png#side",
+    )
+    expect(new URL(preview, "http://editor.local").searchParams.get("src")).toBe("images/a.png")
+    expect(originalMediaSource(preview)).toBe("images/a.png#side")
+
+    const source = '![넓게](images/a.png#wide "캡션")\n'
+    const prepared = prepareMarkdown(source, path)
+    expect(prepared.markdown).not.toContain("src=images%2Fa.png%23wide")
+    expect(restoreMarkdown(prepared.markdown, prepared.shortcodes)).toBe(source)
+  })
+
+  test("custom transports map previews back through their own resolver", () => {
+    const previews = new Map([["images/p.webp", "blob:http://editor.local/1"]])
+    const originals = new Map([["blob:http://editor.local/1", "images/p.webp"]])
+    const transport = createMarkdownTransport(
+      (source) => previews.get(source.split("#")[0] ?? "") ?? source,
+      (preview) => originals.get(preview.split("#")[0] ?? "") ?? preview,
+    )
+    const source = "![a](images/p.webp)\n\n![b](https://x.test/b.png)\n"
+    const prepared = transport.prepare(source)
+
+    expect(prepared.markdown).toBe(
+      "![a](blob:http://editor.local/1)\n\n![b](https://x.test/b.png)\n",
+    )
+    expect(transport.restore(prepared.markdown, prepared.shortcodes)).toBe(source)
   })
 })

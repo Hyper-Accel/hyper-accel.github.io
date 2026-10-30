@@ -1,0 +1,144 @@
+[
+  { "name": "missing English", "code": "pair", "file": "index.en.md", "delete": true },
+  { "name": "missing Korean", "code": "pair", "file": "index.md", "delete": true },
+  {
+    "name": "empty title",
+    "code": "title",
+    "file": "index.en.md",
+    "find": "English fixture",
+    "replace": "  "
+  },
+  { "name": "empty body", "code": "body", "file": "index.en.md", "emptyBody": true },
+  {
+    "name": "unknown author",
+    "code": "authors",
+    "file": "index.md",
+    "find": "Fixture Author",
+    "replace": "Unknown Author"
+  },
+  {
+    "name": "author case mismatch",
+    "code": "authors",
+    "file": "index.md",
+    "find": "Fixture Author",
+    "replace": "fixture author"
+  },
+  {
+    "name": "author scalar",
+    "code": "authors",
+    "file": "index.md",
+    "find": "[\"Fixture Author\"]",
+    "replace": "Fixture Author"
+  },
+  {
+    "name": "unknown category",
+    "code": "category",
+    "file": "index.en.md",
+    "find": "AI Hardware",
+    "replace": "Other"
+  },
+  {
+    "name": "multiple categories",
+    "code": "category",
+    "file": "index.md",
+    "find": "[\"AI Hardware\"]",
+    "replace": "[\"AI Hardware\", \"Infra and DevOps\"]"
+  },
+  {
+    "name": "scalar category",
+    "code": "category",
+    "file": "index.md",
+    "find": "[\"AI Hardware\"]",
+    "replace": "AI Hardware"
+  },
+  {
+    "name": "empty categories",
+    "code": "category",
+    "file": "index.md",
+    "find": "[\"AI Hardware\"]",
+    "replace": "[]"
+  },
+  {
+    "name": "draft Korean",
+    "code": "draft",
+    "file": "index.md",
+    "find": "draft: false",
+    "replace": "draft: true"
+  },
+  {
+    "name": "draft English",
+    "code": "draft",
+    "file": "index.en.md",
+    "find": "draft: false",
+    "replace": "draft: true"
+  },
+  {
+    "name": "block sequence",
+    "code": "blocks",
+    "file": "index.en.md",
+    "find": "b:intro",
+    "replace": "b:other"
+  },
+  {
+    "name": "missing block",
+    "code": "blocks",
+    "file": "index.en.md",
+    "find": "<!-- b:details -->",
+    "replace": ""
+  },
+  {
+    "name": "missing inline image",
+    "code": "images",
+    "file": "index.md",
+    "find": "](images/pixel.svg#wide",
+    "replace": "](images/missing.svg#wide"
+  },
+  {
+    "name": "missing reference image",
+    "code": "images",
+    "file": "index.en.md",
+    "find": "[pixel]: images/pixel.svg",
+    "replace": "[pixel]: images/missing.svg"
+  },
+  {
+    "name": "missing cover",
+    "code": "images",
+    "file": "index.md",
+    "find": "image: images/pixel.svg",
+    "replace": "image: images/missing.svg"
+  },
+  {
+    "name": "HTML image",
+    "code": "images",
+    "file": "index.md",
+    "append": "\n<img src='images/missing.svg'>\n"
+  },
+  {
+    "name": "shortcode image",
+    "code": "images",
+    "file": "index.md",
+    "append": "\n{{< figure src=\"images/missing.svg\" >}}\n"
+  },
+  {
+    "name": "escaping image",
+    "code": "images",
+    "file": "index.md",
+    "find": "](images/pixel.svg#wide",
+    "replace": "](../../pixel.svg#wide"
+  },
+  {
+    "name": "hotlinked image",
+    "code": "images",
+    "file": "index.md",
+    "find": "](images/pixel.svg#wide",
+    "replace": "](https://example.com/pixel.svg#wide"
+  },
+  { "name": "oversized image", "code": "images", "file": "images/pixel.svg", "bytes": 1048577 },
+  {
+    "name": "malformed YAML",
+    "code": "frontmatter",
+    "file": "index.md",
+    "find": "authors: [\"Fixture Author\"]",
+    "replace": "authors: ["
+  }
+]

@@ -1,0 +1,1388 @@
+/* Editor chrome for the on-site blocks. The site look itself comes from
+   assets/css/extended/figures.css (lane D), which applies because the editor root
+   carries the `post-content` class. Colors are site tokens (theme-vars.css,
+   design-c.css, figures.css) or editor tokens from shared/onsite/theme.ts. */
+.ProseMirror,
+.onsite-dropzones,
+.onsite-slash {
+  --onsite-accent: var(--editor-accent, var(--tr-cyan, var(--primary)));
+  --onsite-focus: var(--editor-focus, var(--primary));
+  --onsite-danger: var(--editor-danger, var(--alert-caution, var(--primary)));
+  --onsite-selection: var(
+    --editor-selection,
+    color-mix(in srgb, var(--onsite-accent) 14%, transparent)
+  );
+  --onsite-space-1: calc(var(--gap, 24px) / 6);
+  --onsite-space-2: calc(var(--gap, 24px) / 3);
+  --onsite-space-3: calc(var(--gap, 24px) / 2);
+  --onsite-space-4: var(--gap, 24px);
+  --onsite-chrome-size: 0.85rem;
+  --onsite-chrome-size-small: 0.74rem;
+}
+
+.ProseMirror::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* atoms: selection ring */
+.ProseMirror .onsite-image,
+.ProseMirror .onsite-pair,
+.ProseMirror .onsite-compare,
+.ProseMirror .hugo-shortcode {
+  position: relative;
+  border-radius: var(--radius, 8px);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  transition: outline-color 0.12s ease;
+}
+
+.ProseMirror .onsite-image.ProseMirror-selectednode,
+.ProseMirror .onsite-pair.ProseMirror-selectednode,
+.ProseMirror .onsite-compare.ProseMirror-selectednode,
+.ProseMirror .hugo-shortcode.ProseMirror-selectednode {
+  outline-color: var(--onsite-accent);
+}
+
+.ProseMirror .onsite-image > img,
+.ProseMirror .onsite-pair img,
+.ProseMirror .onsite-compare img {
+  cursor: grab;
+}
+
+.ProseMirror .onsite-image[hidden],
+.ProseMirror .onsite-image > [hidden],
+.ProseMirror .onsite-pair [hidden],
+.ProseMirror .onsite-compare [hidden],
+.ProseMirror .onsite-tabs [hidden],
+.ProseMirror .onsite-alert [hidden],
+.ProseMirror .onsite-math [hidden],
+.ProseMirror .onsite-math-inline [hidden] {
+  display: none;
+}
+
+.ProseMirror .onsite-image.is-selected,
+.ProseMirror .onsite-pair.is-selected,
+.ProseMirror .onsite-compare.is-selected {
+  z-index: 1;
+}
+
+.onsite-placeholder {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  padding: var(--onsite-space-4);
+  color: var(--secondary);
+  background: var(--code-bg);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius, 8px);
+  font-size: var(--onsite-chrome-size);
+  text-align: center;
+}
+
+/* tools panel shown while a block is selected or focused */
+.onsite-tools {
+  display: grid;
+  gap: var(--onsite-space-3);
+  margin-top: var(--onsite-space-3);
+  padding: var(--onsite-space-3);
+  color: var(--primary);
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  box-shadow: 0 8px 24px var(--shadow-color, transparent);
+  font-size: var(--onsite-chrome-size);
+  line-height: 1.4;
+  text-align: start;
+  cursor: default;
+  user-select: none;
+}
+
+.ProseMirror :is(.figure-side-right, .figure-side-left) > .onsite-tools {
+  font-size: var(--onsite-chrome-size-small);
+}
+
+.onsite-fieldset {
+  display: grid;
+  gap: var(--onsite-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: var(--onsite-space-2) var(--onsite-space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+}
+
+.onsite-fieldset > legend {
+  padding: 0 var(--onsite-space-1);
+  color: var(--secondary);
+  font-size: var(--onsite-chrome-size-small);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.onsite-field {
+  display: grid;
+  flex: 1 1 160px;
+  gap: var(--onsite-space-1);
+  min-width: 0;
+}
+
+.onsite-field__label {
+  color: var(--secondary);
+  font-size: var(--onsite-chrome-size-small);
+  font-weight: 600;
+}
+
+.onsite-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--onsite-space-2);
+  align-items: end;
+}
+
+.onsite-tools input[type="text"],
+.onsite-tools input[type="number"],
+.onsite-tools input:not([type]) {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 var(--onsite-space-2);
+  color: var(--primary);
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius, 8px) * 0.75);
+  font: inherit;
+  font-size: var(--onsite-chrome-size);
+}
+
+.onsite-tools input:focus-visible,
+.onsite-button:focus-visible,
+.onsite-segmented > button:focus-visible,
+.onsite-alert__type:focus-visible,
+.onsite-alert__heading:focus-visible,
+.ProseMirror .onsite-tabs .tabs-tab:focus-visible,
+.onsite-slash__item:focus-visible {
+  outline: 2px solid var(--onsite-focus);
+  outline-offset: 2px;
+}
+
+.onsite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 var(--onsite-space-3);
+  color: var(--primary);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius, 8px) * 0.75);
+  font: inherit;
+  font-size: var(--onsite-chrome-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.onsite-button:hover {
+  border-color: var(--onsite-accent);
+}
+
+.onsite-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* image preset segmented control (keyboard: Alt+Arrow) */
+.onsite-segmented {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.onsite-segmented > button {
+  min-height: 32px;
+  padding: 0 var(--onsite-space-3);
+  color: var(--secondary);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--onsite-chrome-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.onsite-segmented > button:hover {
+  color: var(--primary);
+}
+
+.onsite-segmented > button[aria-checked="true"] {
+  color: var(--primary);
+  background: var(--entry);
+  box-shadow: inset 0 0 0 1px var(--onsite-accent);
+}
+
+/* pair / compare node views */
+.ProseMirror .onsite-pair > .onsite-tools,
+.ProseMirror .onsite-compare > .onsite-tools {
+  grid-column: 1 / -1;
+}
+
+.ProseMirror .onsite-compare .compare-range {
+  cursor: ew-resize;
+}
+
+/* Callout content uses the published title and body styles without inline controls. */
+.ProseMirror .onsite-alert {
+  outline: none;
+}
+.ProseMirror .onsite-alert .alert-body {
+  display: contents;
+}
+.ProseMirror .onsite-alert .alert-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Tab controls occupy the published tab button, never a second tools row. */
+.ProseMirror .onsite-tabs .tabs-tab {
+  max-width: none;
+  border-radius: 0;
+}
+.ProseMirror .onsite-tabs .tabs-tab:is(:hover, :active) {
+  background: transparent;
+}
+
+.ProseMirror .onsite-tabs .onsite-tabs__add {
+  color: var(--onsite-accent);
+}
+
+.ProseMirror .onsite-tab-slot {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  color: var(--primary);
+}
+
+.ProseMirror .onsite-tab-label {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: bottom;
+  outline: none;
+  white-space: pre;
+  cursor: text;
+}
+
+.ProseMirror .onsite-tab-remove {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font:
+    14px / 1 system-ui,
+    sans-serif;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-tab-slot:is(:hover, :focus-within) .onsite-tab-remove {
+  opacity: 1;
+}
+
+.composer .ProseMirror .onsite-tab-remove:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  outline: none;
+}
+.ProseMirror .onsite-tab-remove:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.ProseMirror .onsite-tabs [data-tab-index] {
+  touch-action: pan-y;
+}
+.ProseMirror .onsite-tabs [data-dragging] {
+  opacity: 0.55;
+  cursor: grabbing;
+}
+@media (pointer: coarse) {
+  .ProseMirror .onsite-tab-remove:not(:disabled) {
+    opacity: 1;
+  }
+}
+
+.ProseMirror .onsite-tabs .tabs-panel[hidden] {
+  display: none;
+}
+
+.ProseMirror .onsite-tabs .tabs-panel:focus-visible {
+  outline: none;
+}
+
+/* math: KaTeX preview, LaTeX source while selected */
+.ProseMirror .onsite-math {
+  margin: var(--onsite-space-4) 0;
+  padding: var(--onsite-space-2);
+  border-radius: var(--radius, 8px);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  text-align: center;
+}
+
+.ProseMirror .onsite-math.ProseMirror-selectednode,
+.ProseMirror .onsite-math-inline.ProseMirror-selectednode {
+  outline-color: var(--onsite-accent);
+}
+
+.ProseMirror .onsite-math > .onsite-tools {
+  text-align: start;
+}
+
+.ProseMirror .onsite-math__preview.is-empty {
+  color: var(--secondary);
+  font-size: var(--onsite-chrome-size);
+}
+
+.onsite-math__source {
+  width: 100%;
+  min-height: 36px;
+  padding: var(--onsite-space-2);
+  color: var(--primary);
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius, 8px) * 0.75);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--onsite-chrome-size);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* In-place formula editing (math-input.ts): the formula is edited still rendered; the bar with the
+   LaTeX switch and errors floats under it so opening the editor never moves the text around it. */
+.ProseMirror .onsite-math,
+.ProseMirror .onsite-math-inline {
+  position: relative;
+}
+
+.ProseMirror .onsite-math__input {
+  display: block;
+}
+
+.ProseMirror .onsite-math-inline .onsite-math__input {
+  display: inline-block;
+}
+
+.ProseMirror .onsite-math__field math-field {
+  display: block;
+  width: 100%;
+  min-height: 1.6em;
+  padding: 0;
+  border: 0;
+  outline: none;
+  color: inherit;
+  background: transparent;
+  font-size: 1.21em;
+  text-align: center;
+  --caret-color: var(--onsite-accent);
+  --selection-background-color: color-mix(in srgb, var(--onsite-accent) 28%, transparent);
+  --contains-highlight-background-color: color-mix(in srgb, var(--onsite-accent) 10%, transparent);
+  --smart-fence-color: var(--secondary);
+}
+
+/* Centred like the rendered display formula; the left padding balances the keyboard button. */
+.ProseMirror .onsite-math > .onsite-math__input .onsite-math__field math-field {
+  padding-inline-start: 34px;
+}
+
+.ProseMirror .onsite-math > .onsite-math__input .onsite-math__field math-field::part(content) {
+  justify-content: center;
+}
+
+/* Inline, only the keyboard button sits beside the formula: the line stays as short as possible. */
+.ProseMirror .onsite-math-inline .onsite-math__field math-field::part(menu-toggle) {
+  display: none;
+}
+
+.ProseMirror .onsite-math-inline .onsite-math__field math-field {
+  display: inline-block;
+  width: auto;
+  min-width: 2ch;
+  min-height: 0;
+  vertical-align: middle;
+}
+
+/* LaTeX source in place of the formula: no box of its own inside the selected block. */
+.ProseMirror .onsite-math > .onsite-math__input > .onsite-math__source {
+  display: block;
+  min-height: 0;
+  padding: 4px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  resize: none;
+  field-sizing: content;
+}
+
+.ProseMirror .onsite-math__bar {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: var(--onsite-space-2);
+  max-width: min(92vw, 560px);
+  padding: 4px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius, 8px) * 0.75);
+  background: var(--entry);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.28);
+  font:
+    500 var(--onsite-chrome-size) / 1.4 system-ui,
+    sans-serif;
+  text-align: start;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ProseMirror .onsite-math-inline .onsite-math__bar {
+  left: 0;
+  transform: none;
+}
+
+.ProseMirror .onsite-math__bar .onsite-math__toggle {
+  flex: 0 0 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: calc(var(--radius, 8px) * 0.5);
+  color: var(--primary);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-math__bar .onsite-math__toggle:is(:hover, :focus-visible) {
+  outline: none;
+  background: color-mix(in srgb, var(--onsite-accent) 14%, transparent);
+}
+
+.ProseMirror .onsite-math__error {
+  color: var(--alert-caution, #f47067);
+  white-space: normal;
+}
+
+.ProseMirror .onsite-math__error:empty {
+  display: none;
+}
+
+.ProseMirror .onsite-math__input.has-error math-field {
+  --caret-color: var(--alert-caution, #f47067);
+}
+
+.ProseMirror .onsite-math-inline {
+  display: inline-block;
+  border-radius: calc(var(--radius, 8px) * 0.5);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.ProseMirror .onsite-math-inline > .onsite-math__preview.is-empty {
+  color: var(--secondary);
+}
+
+.ProseMirror .onsite-math__source--inline {
+  display: inline-block;
+  width: auto;
+  min-height: 28px;
+  margin-inline-start: var(--onsite-space-1);
+  padding: 0 var(--onsite-space-2);
+  vertical-align: middle;
+}
+
+.ProseMirror .onsite-math__source--inline[hidden] {
+  display: none;
+}
+
+/* drop zones while an image is dragged */
+.onsite-dropzones {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.onsite-dropzones[hidden] {
+  display: none;
+}
+
+/* Magnet drop mark (DropZoneController): one line where the picture lands — in the gap between
+   blocks (as long as the layout it takes) or at a picture's edge — and its name. It glides from
+   gap to gap instead of flashing a field of zones. */
+.onsite-dropzone {
+  position: fixed;
+  border-radius: 2px;
+  background: var(--onsite-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--onsite-accent) 22%, transparent);
+  transition:
+    left 0.08s ease-out,
+    top 0.08s ease-out,
+    width 0.08s ease-out,
+    height 0.08s ease-out;
+}
+
+/* The name sits in the margin beside the line, clear of the text it lands between. */
+.onsite-dropzone__label {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
+  translate: 0 -50%;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--onsite-accent);
+  color: var(--entry);
+  font:
+    600 12px / 1.4 system-ui,
+    sans-serif;
+  white-space: nowrap;
+}
+
+.onsite-dropzone[data-zone="side-right"] > .onsite-dropzone__label,
+.onsite-dropzone[data-zone="wide-right"] > .onsite-dropzone__label {
+  right: auto;
+  left: calc(100% + 10px);
+}
+
+.onsite-dropzone[data-zone="pair"] > .onsite-dropzone__label {
+  top: auto;
+  right: auto;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+}
+
+/* Without side margins (phones) the name goes just above the line's start. */
+@media (max-width: 699px) {
+  .onsite-dropzone:not([data-zone="pair"]) > .onsite-dropzone__label {
+    top: auto;
+    right: auto;
+    bottom: calc(100% + 6px);
+    left: 0;
+    translate: none;
+  }
+}
+
+/* Our mark replaces ProseMirror's own drop line while a picture is dragged. */
+body:has(.onsite-dropzones:not([hidden]))
+:is(.prosemirror-dropcursor-block, .prosemirror-dropcursor-inline) {
+  display: none;
+}
+
+/* slash menu */
+.onsite-slash {
+  position: fixed;
+  z-index: 60;
+  max-height: min(60vh, 360px);
+  overflow-y: auto;
+  padding: var(--onsite-space-1);
+  color: var(--primary);
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  box-shadow: 0 12px 32px var(--shadow-color, transparent);
+  font-size: var(--onsite-chrome-size);
+}
+
+.onsite-slash[hidden] {
+  display: none;
+}
+
+.onsite-slash__item {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--onsite-space-3);
+  padding: 0 var(--onsite-space-3);
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius, 8px) * 0.75);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.onsite-slash__item:hover,
+.onsite-slash__item[aria-selected="true"] {
+  background: var(--onsite-selection);
+}
+
+.onsite-slash__icon {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font:
+    600 13px / 1 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.onsite-slash__text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-width: 0;
+  padding-block: 6px;
+}
+
+.onsite-slash__label {
+  font-weight: 600;
+}
+
+.onsite-slash__description {
+  overflow: hidden;
+  color: var(--secondary);
+  font-size: var(--onsite-chrome-size-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onsite-slash__hint {
+  color: var(--secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--onsite-chrome-size-small);
+  white-space: nowrap;
+}
+
+.onsite-slash__grid {
+  display: grid;
+  grid-template-columns: repeat(10, 20px);
+  gap: 3px;
+  padding: var(--onsite-space-2);
+}
+
+.onsite-slash__cell {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--theme);
+  cursor: pointer;
+}
+
+.onsite-slash__cell[data-active="true"] {
+  border-color: var(--onsite-accent);
+  background: var(--onsite-selection);
+}
+
+.onsite-slash__size {
+  margin: 0;
+  padding: 0 var(--onsite-space-2) var(--onsite-space-2);
+  color: var(--primary);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onsite-dropzone,
+  .ProseMirror .onsite-image,
+  .ProseMirror .onsite-pair,
+  .ProseMirror .onsite-compare,
+  .ProseMirror .hugo-shortcode {
+    transition: none;
+  }
+}
+
+/* Scrolled into view (placePopover) clear of the sticky toolbars and the bottom save bar. */
+.ProseMirror .onsite-bar {
+  scroll-margin: calc(var(--composer-sticky-top, 0px) + 56px) 0 96px;
+}
+
+/* While a picture is dragged the drop zones underneath must stay reachable. */
+body:has(.onsite-dropzones:not([hidden])) .onsite-bar {
+  display: none;
+}
+
+/* Picture toolbar (Confluence media controls): one compact row under the selected picture. */
+.ProseMirror :is(.onsite-image, .onsite-group) > .onsite-bar {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  margin: 0;
+  padding: 4px;
+  translate: -50% 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.ProseMirror :is(.onsite-image, .onsite-group) > .onsite-bar[hidden] {
+  display: none;
+}
+
+.ProseMirror :is(.onsite-image, .onsite-group) > .onsite-bar[data-place="above"] {
+  top: auto;
+  bottom: calc(100% + 8px);
+}
+
+.ProseMirror .onsite-bar .onsite-bar__button {
+  min-width: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-bar .onsite-bar__button:hover,
+.ProseMirror .onsite-bar .onsite-bar__button[aria-expanded="true"] {
+  background: var(--code-bg);
+}
+
+.ProseMirror .onsite-bar .onsite-bar__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  gap: 8px;
+  width: min(320px, calc(100vw - 32px));
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  white-space: normal;
+}
+
+.ProseMirror .onsite-bar .onsite-bar__menu[hidden] {
+  display: none;
+}
+
+.ProseMirror .onsite-bar .onsite-segmented {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  background: none;
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button {
+  justify-content: flex-start;
+  min-height: 36px;
+  text-align: start;
+}
+
+.ProseMirror .onsite-bar .onsite-bar__danger {
+  justify-self: start;
+  color: var(--onsite-danger);
+}
+
+/* Caption slot under the selected picture, as in Confluence ("캡션 추가"). */
+.ProseMirror .onsite-image > .onsite-caption-input {
+  display: none;
+  width: 100%;
+  margin-top: 8px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+  font-size: 0.875em;
+  text-align: center;
+}
+
+.ProseMirror .onsite-image.is-selected > .onsite-caption-input {
+  display: block;
+}
+
+.ProseMirror .onsite-image.is-selected > figcaption {
+  display: none;
+}
+
+.ProseMirror .onsite-image > .onsite-caption-input:focus {
+  outline: 1px solid var(--border);
+  color: var(--primary);
+}
+
+/* Side resize handles; dragging snaps to the figure presets. */
+.ProseMirror .onsite-image > .onsite-resize {
+  position: absolute;
+  top: 50%;
+  display: none;
+  width: 6px;
+  height: min(56px, 40%);
+  translate: 0 -50%;
+  border-radius: 3px;
+  background: var(--onsite-accent);
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ProseMirror .onsite-image > .onsite-resize::after {
+  position: absolute;
+  inset: -12px -16px;
+  content: "";
+}
+
+.ProseMirror .onsite-image.is-selected > .onsite-resize {
+  display: block;
+}
+
+.ProseMirror .onsite-image > .onsite-resize--left {
+  left: -14px;
+}
+
+.ProseMirror .onsite-image > .onsite-resize--right {
+  right: -14px;
+}
+
+.ProseMirror .onsite-image[data-resize] > img {
+  outline: 2px dashed var(--onsite-accent);
+  outline-offset: 2px;
+}
+
+/* Renaming a tab looks exactly like the published tab: only the caret shows it is editable. */
+.site-editor .composer .ProseMirror .onsite-tab-label,
+.site-editor .composer .ProseMirror .onsite-tab-label:is(:focus, :focus-visible) {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* The delete mark is a small transparent circle; only hover/focus tints it. */
+.site-editor .composer .ProseMirror button.onsite-tab-remove {
+  width: 18px;
+  min-width: 0;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  line-height: 18px;
+}
+
+.site-editor .composer .ProseMirror button.onsite-tab-remove:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  outline: none;
+}
+
+/* A picture dragged to another picture's edge joins it there (Naver's edge line, 나란히 놓기). */
+.ProseMirror [data-drop-beside] {
+  position: relative;
+}
+
+.ProseMirror [data-drop-beside]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--onsite-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--onsite-accent) 25%, transparent);
+  pointer-events: none;
+}
+
+.ProseMirror [data-drop-beside="left"]::after {
+  left: -6px;
+}
+.ProseMirror [data-drop-beside="right"]::after {
+  right: -6px;
+}
+
+/* Picture bar: placement as four layout icons, then 캡션 · 대체 텍스트 · 교체 · 삭제. */
+.ProseMirror .onsite-bar .onsite-segmented {
+  display: flex;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font:
+    600 12px / 1 system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button::before {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button[data-preset="body"]::before {
+  content: "▭";
+}
+.ProseMirror .onsite-bar .onsite-segmented > button[data-preset="wide"]::before {
+  content: "⬌";
+}
+.ProseMirror .onsite-bar .onsite-segmented > button[data-preset="side-left"]::before {
+  content: "◧";
+}
+.ProseMirror .onsite-bar .onsite-segmented > button[data-preset="side-right"]::before {
+  content: "◨";
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button[aria-checked="true"] {
+  background: color-mix(in srgb, var(--onsite-accent) 22%, transparent);
+  color: var(--primary);
+}
+
+.ProseMirror .onsite-bar .onsite-segmented > button:hover {
+  background: var(--code-bg);
+}
+
+.ProseMirror .onsite-bar .onsite-bar__sep {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+@media (max-width: 599px) {
+  .ProseMirror :is(.onsite-image, .onsite-group) > .onsite-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    white-space: normal;
+  }
+}
+
+/* Picture groups (rows and slides): each picture is picked and edited on its own, in place. */
+.ProseMirror .onsite-slides {
+  position: relative;
+  border-radius: var(--radius, 8px);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+}
+
+.ProseMirror .onsite-slides.ProseMirror-selectednode {
+  outline-color: var(--onsite-accent);
+}
+
+.ProseMirror .onsite-slides [hidden] {
+  display: none;
+}
+
+.ProseMirror .onsite-group__item {
+  position: relative;
+  cursor: grab;
+}
+
+.ProseMirror .onsite-pair.is-selected .onsite-group__item.is-active > img {
+  outline: 3px solid var(--onsite-accent);
+  outline-offset: 2px;
+}
+
+.ProseMirror .onsite-group__item > .onsite-caption-input {
+  display: none;
+  width: 100%;
+  margin-top: 8px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.ProseMirror .onsite-group.is-selected .onsite-group__item > .onsite-caption-input {
+  display: block;
+}
+
+.ProseMirror .onsite-group.is-selected .onsite-group__item > figcaption {
+  display: none;
+}
+
+.ProseMirror .onsite-group__item > .onsite-caption-input:focus {
+  outline: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.ProseMirror .onsite-group-bar :is(.onsite-bar__button):disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* 그룹 편집: thumbnails in order under the slides; drag to reorder, hover for 교체 · 삭제. */
+.ProseMirror .onsite-group-edit {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+}
+
+.ProseMirror .onsite-group-edit[hidden] {
+  display: none;
+}
+
+.ProseMirror .onsite-group-edit__thumb {
+  position: relative;
+  flex: 0 0 96px;
+  height: 72px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: var(--code-bg);
+  cursor: grab;
+}
+
+.ProseMirror .onsite-group-edit__thumb > img {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+.ProseMirror .onsite-group-edit__thumb[data-drop-side="before"] {
+  box-shadow: -4px 0 0 var(--onsite-accent);
+}
+
+.ProseMirror .onsite-group-edit__thumb[data-drop-side="after"] {
+  box-shadow: 4px 0 0 var(--onsite-accent);
+}
+
+.ProseMirror .onsite-group-edit__number {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.ProseMirror .onsite-group-edit__actions {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.ProseMirror .onsite-group-edit__thumb:is(:hover, :focus-within) .onsite-group-edit__actions {
+  opacity: 1;
+}
+
+.ProseMirror .onsite-group-edit__action {
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ProseMirror .onsite-group-edit__action.is-danger {
+  color: #c92a2a;
+}
+
+.ProseMirror .onsite-group-edit__add {
+  flex: 0 0 96px;
+  height: 72px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 사진 첨부 방식 (several pictures at once): 개별 사진 · 나란히 · 슬라이드. */
+.onsite-insert-kind {
+  position: fixed;
+  z-index: 120;
+  display: grid;
+  gap: 10px;
+  width: min(380px, calc(100vw - 16px));
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  color: var(--primary);
+  font:
+    14px / 1.4 system-ui,
+    sans-serif;
+}
+
+.onsite-insert-kind__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.onsite-insert-kind__options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.onsite-insert-kind__option {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.onsite-insert-kind__option:is(:hover, :focus-visible) {
+  border-color: var(--editor-accent, var(--tr-cyan, var(--primary)));
+  background: color-mix(in srgb, var(--editor-accent, var(--tr-cyan, #4dabf7)) 12%, transparent);
+  outline: none;
+}
+
+.onsite-insert-kind__label {
+  font-weight: 600;
+}
+
+.onsite-insert-kind__detail {
+  color: var(--secondary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.onsite-insert-kind__picture {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  width: 64px;
+  height: 40px;
+}
+
+.onsite-insert-kind__picture > span {
+  flex: 1;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.onsite-insert-kind__picture.is-slides > .onsite-insert-kind__arrows {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  color: var(--primary);
+  font-size: 14px;
+  letter-spacing: 18px;
+}
+
+/* Before/after compare, edited in place: the label where it is published (top) and 교체 under it,
+   both over the slider; the caption is typed under it. */
+.ProseMirror .onsite-compare .onsite-compare-side {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: min(40%, 180px);
+  pointer-events: none;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-side.is-before {
+  left: 8px;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-side.is-after {
+  right: 8px;
+  align-items: flex-end;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-side > * {
+  pointer-events: auto;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-label-input {
+  display: none;
+  width: 100%;
+  height: 28px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 13px;
+}
+
+.ProseMirror .onsite-compare .is-after > .onsite-compare-label-input {
+  text-align: end;
+}
+
+.ProseMirror .onsite-compare.is-selected .onsite-compare-label-input {
+  display: block;
+}
+
+.ProseMirror .onsite-compare.is-selected .compare-label {
+  display: none;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-pick {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.ProseMirror .onsite-compare:not(.is-selected) .onsite-compare-pick:not(.is-empty) {
+  pointer-events: none;
+}
+
+.ProseMirror .onsite-compare.is-selected .onsite-compare-pick,
+.ProseMirror .onsite-compare .onsite-compare-pick.is-empty {
+  opacity: 1;
+}
+
+.ProseMirror .onsite-compare .onsite-compare-pick:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--onsite-focus);
+}
+
+.ProseMirror .onsite-compare > .onsite-caption-input {
+  display: none;
+  width: 100%;
+  margin-top: 8px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.ProseMirror .onsite-compare.is-selected > .onsite-caption-input {
+  display: block;
+}
+
+.ProseMirror .onsite-compare.is-selected > figcaption {
+  display: none;
+}
+
+/* An empty side shows where its picture goes. */
+.ProseMirror .onsite-compare .compare-pane:has(img[hidden], img:not([src])) {
+  min-height: 160px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius, 8px);
+}
+
+/* Where a footnote jump lands (number or note) glows for a moment. */
+@keyframes onsite-footnote-target {
+  from {
+    background: color-mix(in srgb, var(--onsite-accent) 45%, transparent);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+.ProseMirror .is-footnote-target {
+  border-radius: 4px;
+  animation: onsite-footnote-target 1.6s ease-out;
+}
+
+/* ↩ under a note: a comfortable target that says where it goes. */
+.ProseMirror .footnote-backref {
+  padding: 0 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ProseMirror .footnote-backref:hover {
+  background: var(--code-bg);
+}
+
+/* The picture being dragged fades in place; a thumbnail follows the pointer (setPictureDragImage). */
+.ProseMirror .is-drag-source {
+  opacity: 0.35;
+  transition: opacity 0.12s ease;
+}
+
+.onsite-drag-thumb {
+  position: fixed;
+  top: -200px;
+  left: -200px;
+  border-radius: 6px;
+}
+
+/* While a picture is dragged only the drop mark shows: the selection toolbar steps aside. */
+body:has(.onsite-dropzones:not([hidden])) .composer-bubble {
+  display: none;
+}

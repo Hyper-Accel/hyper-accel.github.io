@@ -1,0 +1,883 @@
+/*
+ * The editable post reuses the site's reading layout (reading.css, design-c.css, PaperMod
+ * post-single). Rules here only mark editable regions and place the few editor controls.
+ */
+
+.site-editor .composer-post-layout {
+  padding-bottom: calc(var(--editor-bar-height) + 48px);
+  word-break: break-word;
+  overflow-wrap: normal;
+}
+
+.composer-post-layout .post-header {
+  position: relative;
+}
+
+.composer .composer-inline {
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.composer .post-meta .composer-inline {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--tertiary);
+  text-underline-offset: 4px;
+  padding-block: 12px;
+  margin-block: -12px;
+}
+
+.composer .composer-inline:hover,
+.composer .composer-inline:focus-visible {
+  text-decoration-color: currentColor;
+  color: var(--primary);
+}
+
+.composer .composer-inline[data-empty] {
+  color: var(--secondary);
+}
+
+.composer .post-kicker .tr-cat[data-empty] {
+  background: transparent;
+  color: var(--secondary);
+  box-shadow: inset 0 0 0 1px var(--tertiary);
+}
+
+.composer .composer-title {
+  outline: none;
+  cursor: text;
+  border-radius: var(--radius);
+}
+
+.composer .composer-title:focus-visible {
+  outline: 1px dashed var(--tertiary);
+  outline-offset: 6px;
+}
+
+.composer .composer-description {
+  outline: none;
+  cursor: text;
+}
+
+.composer .composer-description:focus-visible {
+  outline: 1px dashed var(--tertiary);
+  outline-offset: 6px;
+}
+
+.composer .composer-description[data-empty]::before,
+.composer .composer-title[data-empty]::before {
+  color: var(--secondary);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+/* "번역: 한국어 English" mirrors the post page's translation list. */
+.composer .post-meta .composer-tabs {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  vertical-align: baseline;
+}
+
+.site-editor .composer .post-meta button.composer-tab {
+  min-height: 0;
+  margin-block: -10px;
+  padding: 10px 6px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--secondary);
+  font: inherit;
+  font-weight: 400;
+}
+
+.site-editor .composer .post-meta button.composer-tab::before {
+  display: none;
+}
+
+.site-editor .composer .post-meta button.composer-tab[aria-selected="true"] {
+  background: none;
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.site-editor .composer .post-meta button.composer-tab:hover:not(:disabled) {
+  background: none;
+  color: var(--primary);
+}
+
+/* Post information opens in place, directly under the meta line it edits. */
+.composer .composer-post .composer-meta {
+  margin-top: 4px;
+  border: 0;
+  background: none;
+}
+
+/* The summary is replaced by the meta line's "글 정보" control. */
+.composer .composer-post .composer-meta > .composer-meta__summary {
+  display: none;
+}
+
+.composer .composer-post .composer-meta[open] .composer-form {
+  margin-top: 8px;
+  padding: var(--editor-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+}
+
+/* An open post's titles are written on the page itself (a new post's are in its settings form). */
+.composer[data-mode="edit"] .composer-meta .metadata-group:first-child {
+  display: none;
+}
+
+.composer[data-mode="edit"] .composer-meta .metadata-group:nth-child(2) {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.composer .composer-post .composer-meta:not([open]) {
+  display: none;
+}
+
+.composer .post-tags .composer-tags-edit .composer-inline {
+  background: none;
+  color: var(--secondary);
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+}
+
+.composer .post-tags li:not(.composer-tags-edit) a {
+  cursor: default;
+}
+
+.composer-post-after {
+  margin-top: 24px;
+}
+
+.composer .composer-article-language {
+  margin-top: 0;
+}
+
+.composer-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  align-items: center;
+  gap: 4px 12px;
+  width: min(var(--reading-width, 760px) + 32px, 100%);
+  margin-inline: auto;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: color-mix(in srgb, var(--entry) 96%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -8px 24px var(--shadow-color, rgba(0, 0, 0, 0.2));
+}
+
+/* Save controls come from the site lane; their items join the dock grid. */
+.site-editor .composer-dock [data-site-controls] {
+  display: contents;
+}
+
+.composer-dock__status,
+.composer-dock [data-recovery],
+.composer-dock [data-site-save-status] {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.composer-dock__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: baseline;
+}
+
+.composer-dock__status:has(.composer-summary[hidden]):has(.composer-save-state:empty) {
+  display: none;
+}
+
+.composer-dock .composer-summary {
+  margin: 0;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.site-editor .composer-dock [data-recovery],
+.site-editor .composer-dock [data-site-save-status],
+.site-editor .composer-dock [data-recovery] > p {
+  max-width: none;
+  margin: 0;
+  font-size: 13px;
+  text-align: start;
+}
+
+.site-editor .composer-dock [data-recovery] button {
+  min-height: 36px;
+  margin-top: 4px;
+  padding-block: 4px;
+}
+
+.composer-dock [data-site-comments],
+.composer-dock [data-site-review],
+.composer-dock [data-site-save],
+.composer-dock > [data-action="request-review"] {
+  grid-row: 1 / span 3;
+  white-space: nowrap;
+}
+
+.composer-dock [data-site-comments] {
+  grid-column: 2;
+}
+
+.composer-dock [data-site-review] {
+  grid-column: 3;
+}
+
+.composer-dock [data-site-save] {
+  grid-column: 4;
+}
+
+.composer-dock > [data-action="request-review"] {
+  grid-column: 5;
+}
+
+/* The site's back-to-top button stays clear of the save bar. */
+body:has(.composer-dock) .top-link {
+  bottom: calc(var(--editor-bar-height, 56px) + 72px);
+}
+
+/* The live table of contents follows the article like the reading page; drawers stay on the site. */
+@media (max-width: 1099px) {
+  .composer-toc {
+    display: none;
+  }
+}
+
+@media (max-width: 699px) {
+  .composer-dock {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .composer-dock__status,
+  .composer-dock [data-recovery],
+  .composer-dock [data-site-save-status] {
+    grid-column: 1 / -1;
+  }
+
+  .composer-dock [data-site-comments],
+  .composer-dock [data-site-review],
+  .composer-dock [data-site-save],
+  .composer-dock > [data-action="request-review"] {
+    grid-row: auto;
+    grid-column: auto;
+  }
+}
+
+/* New post: Naver-style templates, each a card with a small page showing how the post starts. */
+.composer .composer-templates {
+  min-width: 0;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+}
+
+.composer .composer-templates legend {
+  margin-bottom: 10px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.composer .composer-templates__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: 12px;
+}
+
+.composer .composer-template {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.composer .composer-template:hover {
+  border-color: color-mix(in srgb, var(--editor-accent, #009ee2) 55%, var(--border));
+}
+
+.composer .composer-template:has(input:checked) {
+  border-color: var(--editor-accent, #009ee2);
+  box-shadow: inset 0 0 0 1px var(--editor-accent, #009ee2);
+}
+
+.composer .composer-template:has(input:focus-visible) {
+  outline: 2px solid var(--editor-accent, #009ee2);
+  outline-offset: 2px;
+}
+
+/* The radio stays for keyboards and screen readers; the card shows the choice. */
+.composer .composer-template input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer .composer-template:has(input:checked)::after {
+  content: "✓";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--editor-accent, #009ee2);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.composer .composer-template__page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 132px;
+  overflow: hidden;
+  padding: 12px 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--entry);
+}
+
+.composer .composer-template__page::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 28px;
+  background: linear-gradient(transparent, var(--entry));
+}
+
+.composer .composer-template__title {
+  flex: none;
+  width: 72%;
+  height: 8px;
+  margin-bottom: 4px;
+  border-radius: 2px;
+  background: var(--primary);
+  opacity: 0.85;
+}
+
+.composer .composer-template__page b {
+  flex: none;
+  overflow: hidden;
+  color: var(--primary);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.composer .composer-template__lines {
+  display: grid;
+  flex: none;
+  gap: 3px;
+}
+
+.composer .composer-template__lines i {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--secondary);
+  opacity: 0.35;
+}
+
+.composer .composer-template__lines i:last-child {
+  width: 60%;
+}
+
+.composer .composer-template__caret {
+  width: 2px;
+  height: 12px;
+  background: var(--editor-accent, #009ee2);
+}
+
+.composer .composer-template__text {
+  display: grid;
+  gap: 2px;
+}
+
+.composer .composer-template__text strong {
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.composer .composer-template__text span {
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.composer .composer-template__meta {
+  margin-top: auto;
+  color: var(--editor-accent, #009ee2);
+  font-size: 11px;
+}
+
+/* A post the writer may not edit: the notice takes the review button's place. */
+.composer-dock .composer-readonly {
+  grid-column: 1;
+  margin: 0;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.composer[data-readonly] .composer-handles,
+.composer[data-readonly] .composer-tags-edit {
+  display: none;
+}
+
+/* Tags are edited in place under the post, like the published tag list. */
+.composer .composer-tag-panel {
+  margin-top: 12px;
+}
+
+@media (max-width: 699px) {
+  .composer-dock .composer-readonly {
+    grid-column: 1 / -1;
+  }
+}
+
+/* TOC jumps land below the sticky site header and toolbox; the site lane sets the offset. */
+.composer .composer-article-document :is(h1, h2, h3, h4, h5, h6),
+.composer .composer-title {
+  scroll-margin-top: var(--reading-offset, 132px);
+}
+
+/* Save and restore notices sit in the page's bottom-left corner as a small chip; the dock keeps
+   the buttons. The dock drops its blur so these fixed chips are placed against the viewport. */
+.site-editor .composer-dock {
+  background: var(--entry);
+  backdrop-filter: none;
+}
+
+.site-editor .composer-dock :is(.composer-dock__status, [data-recovery], [data-site-save-status]) {
+  position: fixed;
+  /* Out of the dock grid: a placed grid item would be positioned against its grid area. */
+  grid-area: auto;
+  left: 16px;
+  z-index: 51;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 32px));
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+  box-shadow: 0 6px 18px var(--shadow-color, rgba(0, 0, 0, 0.25));
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.site-editor .composer-dock [data-site-save-status] {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.site-editor .composer-dock [data-recovery] {
+  bottom: calc(56px + env(safe-area-inset-bottom));
+}
+
+.site-editor .composer-dock .composer-dock__status {
+  bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+.site-editor .composer-dock [data-site-save-status]:empty,
+.site-editor
+  .composer-dock
+  [data-recovery]:not(:has(> p:not(:empty))):not(:has(> button:not([hidden]))) {
+  display: none;
+}
+
+/* Phones: the dock spans the bottom edge, so the chips sit just above it, at the left. */
+@media (max-width: 699px) {
+  .site-editor
+    .composer-dock
+    :is(.composer-dock__status, [data-recovery], [data-site-save-status]) {
+    position: absolute;
+    left: 16px;
+  }
+
+  .site-editor .composer-dock [data-site-save-status] {
+    bottom: calc(100% + 8px);
+  }
+
+  .site-editor .composer-dock [data-recovery] {
+    bottom: calc(100% + 44px);
+  }
+
+  .site-editor .composer-dock .composer-dock__status {
+    bottom: calc(100% + 80px);
+  }
+}
+
+/* Phones: two cards a row with a shorter page, so the four fit on one screen. */
+@media (max-width: 599px) {
+  .composer .composer-templates__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .composer .composer-template {
+    padding: 8px 8px 10px;
+  }
+
+  .composer .composer-template__page {
+    height: 96px;
+    padding: 9px 9px 0;
+  }
+}
+
+/* The new-post screen is a settings page, not the post: it uses the wider page. */
+.composer[data-mode="form"] .composer-post-layout {
+  max-width: min(1120px, 100%);
+}
+
+/* On the wide page the cards are wider, so their pages are a little taller. */
+@media (min-width: 1024px) {
+  .composer[data-mode="form"] .composer-template__page {
+    height: 156px;
+  }
+}
+
+/* New post on the wide layout (create-layout.ts): templates on top, then details | pinned card. */
+.composer[data-mode="form"] .composer-form--create-layout {
+  gap: 20px;
+}
+
+.composer-create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.composer-create__main,
+.composer-create__side {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.composer-create__side {
+  position: sticky;
+  top: calc(var(--composer-sticky-top, 64px) + 16px);
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+}
+
+.composer-create__section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.composer-create__section h3 {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.composer-create__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.composer-create__main
+  .composer-create__fields
+  > :is(.metadata-field:has([name="titleKo"]), .metadata-choices, .metadata-cover) {
+  grid-column: 1 / -1;
+}
+
+.composer-create__side .composer-create__fields {
+  grid-template-columns: minmax(0, 1fr) 72px;
+}
+
+.composer-create__side
+  .composer-create__fields
+  > :not(:has([name="seriesIndex"])):not(:has([name="seriesQuery"])) {
+  grid-column: 1 / -1;
+}
+
+.composer-create__side .composer-form__actions .composer-button {
+  width: 100%;
+}
+
+/* The home card preview. */
+.composer-card {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+}
+
+.composer-card__cover {
+  aspect-ratio: 16 / 9;
+  background: center / cover no-repeat;
+}
+
+.composer-card__cover.is-empty {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--chip) 45%, transparent),
+    transparent 70%
+  );
+}
+
+.composer-card__body {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+
+.composer-card__category {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--chip) 22%, transparent);
+  color: var(--chip);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.composer-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--primary);
+  font-size: 17px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.composer-card__byline {
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.composer-card :is(.is-empty) {
+  opacity: 0.55;
+}
+
+/* What the card and the form already show is not repeated in the page head. */
+.composer-post[data-mode="create"] :is(.composer-post-meta, .post-tags) {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .composer-create {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .composer-create__side {
+    position: static;
+  }
+
+  .composer-create__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 내 프로필 추가 is a small link under the author picker, not a second button (both forms). */
+.composer-form .metadata-picker__self {
+  justify-self: start;
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--editor-accent, #009ee2);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+/* Phones: the card preview lies flat (small cover beside the text) so it does not fill the screen. */
+@media (max-width: 899px) {
+  .composer-card {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  .composer-card__cover {
+    aspect-ratio: auto;
+    min-height: 100%;
+  }
+}
+
+/* A new post is set up on this page: its head is just "새 글"; the title is the form's first field. */
+.composer-post[data-mode="create"] .post-header > :is(.post-kicker, .composer-title) {
+  display: none;
+}
+
+.composer-create__heading {
+  margin: 4px 0 16px;
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+/* English title and the address side by side; the Korean title leads, larger. */
+.composer-create__main
+  .composer-create__fields
+  > .metadata-field--wide:not(:has([name="titleKo"])) {
+  grid-column: auto;
+}
+
+.composer-create .metadata-field:has([name="titleKo"]) > input {
+  min-height: 52px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.composer-create .metadata-field:has([name="titleEn"]) > input {
+  min-height: var(--editor-touch-target);
+  font-size: 15px;
+}
+
+/* Layout pass on the new-post page. */
+/* Right under the site header: no page gap above the breadcrumb. */
+main.main:has(.composer[data-mode="form"]) {
+  padding-top: 16px;
+}
+
+.composer-post[data-mode="create"] .post-header {
+  margin-top: 0;
+}
+
+/* The page is the canvas: no grey panel around templates and the two columns. */
+.composer[data-mode="form"] .composer-meta .composer-form.composer-form--create-layout {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* One heading style for 템플릿 and every section; sections after the first get a divider. */
+.composer-form--create-layout .composer-templates legend,
+.composer-create__section h3 {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.composer-create__main > .composer-create__section + .composer-create__section {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* English title and the address are the same height on one line. */
+.composer-create .metadata-field:has([name="titleEn"]) > input,
+.composer-create .metadata-slug {
+  height: 44px;
+  min-height: 44px;
+  padding-block: 0;
+}
+
+.composer-create .metadata-slug input {
+  height: 100%;
+}
+
+/* Cover: the section heading names it; the box is a 16:9 frame with a real button. */
+.composer-create .metadata-cover > .composer-field__label,
+.composer-create .metadata-cover:has([name="removeCover"][hidden]) .composer-cover__status {
+  display: none;
+}
+
+.composer-create .metadata-cover__media:has(> .composer-cover__preview[hidden]) {
+  width: min(100%, 288px);
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+}
+
+.composer-create .metadata-cover .composer-button {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--entry);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Every field label sits the same distance above its control, so fields in a row line up. */
+.composer-create .composer-create__fields > .metadata-field {
+  gap: 6px;
+  /* A taller neighbour in the row (the address with its note) must not stretch the label row. */
+  align-content: start;
+}
+
+.composer-create .composer-create__fields > .metadata-field > .composer-field__label {
+  min-height: 0;
+  padding: 0;
+  line-height: 18px;
+}
+
+/* The address note sits at the right of the "슬러그" label line, so the field is as tall as its
+   neighbour (English title). */
+.composer-create .metadata-field:has([name="slug"]) {
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 12px;
+}
+
+.composer-create .metadata-field:has([name="slug"]) > .composer-field__label {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.composer-create .metadata-field:has([name="slug"]) > .composer-field__hint {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  align-self: center;
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 11px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.composer-create .metadata-field:has([name="slug"]) > .metadata-slug {
+  grid-column: 1 / -1;
+}

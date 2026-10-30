@@ -1,0 +1,659 @@
+/* Naver SmartEditor-style 도구상자: insert tools stay visible under the site header. */
+.composer-toolbox {
+  position: sticky;
+  top: var(--composer-sticky-top, 0px);
+  z-index: 9;
+  margin: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--theme) 94%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.site-editor:not(:has(.composer[data-mode="edit"])) .composer-toolbox {
+  display: none;
+}
+
+.composer-toolbox__row {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  /* The bar uses the page's full width (not the article's), so more tools fit before "더보기". */
+  width: 100%;
+  margin-inline: auto;
+  padding: 4px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.composer-toolbox__row::-webkit-scrollbar {
+  display: none;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__button {
+  display: grid;
+  flex: none;
+  justify-items: center;
+  gap: 2px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 6px 6px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--secondary);
+  font:
+    500 12px / 1.2 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+  cursor: pointer;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__button::before {
+  display: none;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__button:hover,
+.site-editor .composer-toolbox button.composer-toolbox__button[aria-expanded="true"],
+.site-editor .composer-toolbox button.composer-toolbox__button[aria-pressed="true"] {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__button:focus-visible {
+  outline: 2px solid var(--editor-focus, var(--primary));
+  outline-offset: -2px;
+}
+.site-editor .composer-toolbox button.composer-toolbox__button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.composer-toolbox__icon {
+  display: grid;
+  min-width: 24px;
+  height: 22px;
+  place-items: center;
+  color: var(--primary);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.composer-toolbox__sep {
+  flex: none;
+  width: 1px;
+  margin: 10px 6px;
+  background: var(--border);
+}
+
+.composer-toolbox__menu {
+  position: fixed;
+  z-index: 70;
+  display: grid;
+  min-width: 140px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  font:
+    14px / 1.4 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+}
+
+.composer-toolbox__menu > button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.composer-toolbox__menu > button:hover,
+.composer-toolbox__menu > button:focus-visible {
+  background: var(--code-bg);
+  outline: none;
+}
+
+.composer-toolbox__menu--grid {
+  gap: 6px;
+  padding: 8px;
+}
+
+.composer-toolbox__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 20px);
+  gap: 3px;
+}
+
+.composer-toolbox__cell {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.composer-toolbox__cell[data-active] {
+  border-color: var(--editor-accent, var(--tr-cyan, #009ee2));
+  background: color-mix(in srgb, var(--editor-accent, var(--tr-cyan, #009ee2)) 30%, transparent);
+}
+
+.composer-toolbox__size {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Side panels opened from the toolbox: 라이브러리 and 모바일 미리보기. */
+.composer-panel {
+  position: fixed;
+  top: calc(var(--composer-sticky-top, 0px) + var(--composer-toolbox-height, 61px) + 12px);
+  right: 12px;
+  bottom: 88px;
+  z-index: 60;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 320px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  color: var(--primary);
+  font:
+    14px / 1.5 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+}
+
+.composer-panel[hidden] {
+  display: none;
+}
+
+.composer-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.composer-panel__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.composer-panel button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.composer-panel button:hover {
+  background: var(--code-bg);
+}
+
+.composer-panel .composer-panel__close {
+  min-width: 36px;
+  padding: 0;
+  border: 0;
+}
+
+.composer-panel__body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.composer-panel__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.composer-panel__empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--secondary);
+}
+
+.composer-library {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 12px 12px;
+  list-style: none;
+}
+
+.composer-library__item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: grab;
+}
+
+.composer-library__item img {
+  width: 72px;
+  height: 54px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  object-fit: cover;
+}
+
+.composer-library__text {
+  display: grid;
+  min-width: 0;
+}
+
+.composer-library__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-library__state {
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.composer-library__item[data-state="unused"] .composer-library__state {
+  color: var(--alert-warning, #d29922);
+}
+
+/* The phone frame shows a 390px-wide page, scaled to fit beside the article. */
+.composer-panel--preview {
+  width: 320px;
+}
+
+.composer-preview {
+  display: grid;
+  justify-items: center;
+  padding: 12px;
+}
+
+.composer-preview__phone {
+  width: 297px;
+  height: calc(100dvh - var(--composer-sticky-top, 0px) - 72px - 88px - 90px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--theme);
+}
+
+.composer-preview__frame {
+  width: 390px;
+  height: calc((100dvh - var(--composer-sticky-top, 0px) - 72px - 88px - 90px) / 0.76);
+  border: 0;
+  transform: scale(0.76);
+  transform-origin: top left;
+}
+
+@media (max-width: 699px) {
+  /* A sheet under the toolbox, so the other panel and the tools stay reachable. */
+  .composer-panel {
+    inset: var(
+        --composer-panel-top,
+        calc(var(--composer-sticky-top, 0px) + var(--composer-toolbox-height, 61px))
+      )
+      0 0;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    z-index: 80;
+  }
+
+  .composer-panel--preview {
+    width: 100%;
+  }
+
+  .composer-preview {
+    padding: 0;
+  }
+
+  .composer-preview__phone {
+    width: 100%;
+    height: calc(
+      100dvh -
+      var(--composer-sticky-top, 0px) -
+      var(--composer-toolbox-height, 61px) -
+      54px
+    );
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-preview__frame {
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
+}
+
+.composer-toolbox[hidden] {
+  display: none;
+}
+
+/* The tools scroll sideways on narrow screens; the fold button stays at the end. */
+.composer-toolbox__row {
+  overflow: visible;
+}
+
+.composer-toolbox__tools {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.composer-toolbox__tools::-webkit-scrollbar {
+  display: none;
+}
+
+.composer-toolbox__tools[hidden] {
+  display: none;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__collapse {
+  flex: none;
+  align-self: center;
+  min-width: 36px;
+  min-height: 36px;
+  margin-left: 4px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--secondary);
+  font:
+    500 13px / 1 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+  cursor: pointer;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__collapse::before {
+  display: none;
+}
+
+.site-editor .composer-toolbox button.composer-toolbox__collapse:hover {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+/* Folded: a thin bar with only the button that unfolds it. */
+.composer-toolbox[data-collapsed] .composer-toolbox__row {
+  padding-block: 2px;
+}
+
+.site-editor .composer-toolbox[data-collapsed] button.composer-toolbox__collapse {
+  margin-left: 0;
+}
+
+/* On wide screens the fold button sits at the bar's right edge, clear of the tools. */
+@media (min-width: 900px) {
+  .composer-toolbox:not([data-collapsed]) .composer-toolbox__collapse {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    translate: 0 -50%;
+  }
+}
+
+.composer-tool-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(560px, calc(100vw - 24px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 20px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+  color: var(--primary);
+  font:
+    15px / 1.5 system-ui,
+    sans-serif;
+}
+.composer-tool-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+.composer-tool-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.composer-tool-dialog h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.composer-tool-dialog form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.composer-tool-dialog input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+}
+.composer-tool-dialog button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--primary);
+  cursor: pointer;
+}
+.composer-tool-dialog :focus-visible {
+  outline: 2px solid var(--editor-focus, var(--primary));
+  outline-offset: 2px;
+}
+.composer-shortcuts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 16px;
+  margin-block: 20px;
+}
+.composer-shortcuts dd {
+  margin: 0;
+}
+.composer-tool-dialog__error {
+  color: var(--editor-danger, #ff8e86);
+}
+
+/* Second row (속성 도구 막대): paragraph type and text formats, one compact scrollable line. */
+.site-editor .composer-toolbox .composer-props {
+  display: flex;
+  align-items: center;
+  justify-content: safe center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 16px;
+  overflow-x: auto;
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  scrollbar-width: none;
+}
+
+.site-editor .composer-toolbox .composer-props::-webkit-scrollbar {
+  display: none;
+}
+
+.composer-props__group {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding-inline: 4px;
+  border-inline-start: 1px solid var(--border);
+}
+
+.site-editor .composer-toolbox .composer-props__type {
+  flex: none;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font:
+    13px / 1 system-ui,
+    sans-serif;
+}
+
+.site-editor .composer-toolbox button.composer-props__button {
+  flex: none;
+  min-width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font:
+    600 13px / 1 system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+
+.site-editor .composer-toolbox button.composer-props__button:hover,
+.site-editor .composer-toolbox button.composer-props__button[aria-pressed="true"],
+.site-editor .composer-toolbox button.composer-props__button[aria-expanded="true"] {
+  background: var(--code-bg);
+}
+
+.site-editor .composer-toolbox button.composer-props__button[aria-pressed="true"] {
+  color: var(--onsite-accent, var(--primary));
+}
+
+.site-editor .composer-toolbox button.composer-props__button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.composer-props__button[data-format="italic"] {
+  font-style: italic;
+}
+.composer-props__button[data-format="strike"] {
+  text-decoration: line-through;
+}
+
+.composer-toolbox__menu.composer-props__symbols {
+  display: grid;
+  grid-template-columns: repeat(10, 34px);
+  gap: 2px;
+  max-height: min(420px, calc(100dvh - 160px));
+  overflow-y: auto;
+}
+
+.composer-props__symbols-caption {
+  grid-column: 1 / -1;
+  padding: 8px 4px 2px;
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.composer-props__symbols-caption:first-child {
+  padding-top: 2px;
+}
+
+.composer-toolbox__menu.composer-props__symbols > button {
+  width: 34px;
+  min-width: 0;
+  height: 34px;
+  padding: 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* 글꼴·크기 selects in the toolbox's second row. */
+.site-editor .composer-toolbox :is(.composer-props__font, .composer-props__size) {
+  flex: none;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font:
+    13px / 1 system-ui,
+    sans-serif;
+}
+
+.site-editor .composer-toolbox .composer-props__font {
+  width: 120px;
+}
+.site-editor .composer-toolbox .composer-props__size {
+  width: 64px;
+}
+
+/* Picking from the 라이브러리 for a picture button: the chosen tiles numbered in order, and
+   "N장 넣기" when several are wanted. */
+.composer-library__actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.composer-library__actions .composer-library__done {
+  flex: 1;
+}
+
+.composer-library__actions .composer-library__done:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.composer-library.is-picking .composer-library__item {
+  cursor: pointer;
+}
+
+.composer-library__item[data-chosen] {
+  outline: 2px solid var(--editor-accent, var(--tr-cyan, #4dabf7));
+  outline-offset: -2px;
+}
+
+.composer-panel button.composer-library__pick[aria-pressed="true"] {
+  min-width: 32px;
+  border-radius: 999px;
+  background: var(--editor-accent, var(--tr-cyan, #4dabf7));
+  color: var(--entry);
+  font-weight: 700;
+}

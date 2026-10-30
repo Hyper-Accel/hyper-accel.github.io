@@ -1,0 +1,555 @@
+.composer .composer-article-editor {
+  min-width: 0;
+}
+
+/* Selection toolbar (Confluence live docs): one row floating over the selected text. */
+.composer-bubble {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  max-width: calc(100vw - 16px);
+  padding: 4px;
+  overflow: visible;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1;
+  scrollbar-width: none;
+}
+
+.composer-bubble[hidden] {
+  display: none;
+}
+
+.composer-bubble__row,
+.composer-bubble__link {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.composer-bubble__row[hidden],
+.composer-bubble__link[hidden] {
+  display: none;
+}
+
+.composer .composer-bubble button,
+.composer .composer-bubble select {
+  min-width: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.composer .composer-bubble button:hover:not(:disabled),
+.composer .composer-bubble select:hover {
+  background: var(--code-bg);
+}
+
+.composer .composer-bubble button[aria-pressed="true"] {
+  background: var(--code-bg);
+  color: var(--editor-accent);
+}
+
+.composer-bubble button[aria-label="기울임"] {
+  font-style: italic;
+}
+
+.composer-bubble button[aria-label="취소선"] {
+  text-decoration: line-through;
+}
+
+.composer-bubble__sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+.composer-bubble__more {
+  position: absolute;
+  right: 0;
+  display: grid;
+  min-width: 192px;
+  max-width: calc(100vw - 16px);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.composer-bubble__more[hidden] {
+  display: none;
+}
+.composer .composer-bubble__more button {
+  text-align: start;
+  min-height: 36px;
+}
+.composer-bubble__caption {
+  padding: 8px;
+  color: var(--secondary);
+  font-size: 12px;
+}
+.composer-link-address {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.composer-bubble__link a {
+  padding: 8px;
+  color: var(--primary);
+}
+.composer .composer-bubble select {
+  width: 92px;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.composer-bubble__link input {
+  width: min(240px, 52vw);
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--editor-control-border, var(--border));
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+}
+
+.composer-bubble :focus-visible {
+  outline: 2px solid var(--editor-focus, #93c5fd);
+  outline-offset: 1px;
+}
+
+@media (pointer: coarse) {
+  .composer .composer-bubble select {
+    width: 82px;
+    min-width: 0;
+  }
+  .composer .composer-bubble button,
+  .composer .composer-bubble select {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+.composer .composer-article-document {
+  /* Same breaking as the published .post-content (PaperMod), not the shell's keep-all. */
+  word-break: break-word;
+  overflow-wrap: normal;
+  font-variant-ligatures: normal;
+  min-height: 24rem;
+  outline: none;
+  caret-color: var(--editor-accent);
+}
+
+/* The caret and the floating format bar mark writing; the page keeps the reading look. */
+.composer .composer-article-document:focus-visible {
+  outline: none;
+}
+
+.composer .composer-article-document::after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+.composer .composer-article-document ::selection {
+  background: var(--editor-selection);
+}
+
+/* Tiptap keeps the header row in tbody; give it the published thead style. */
+.composer .composer-article-document table tbody tr:first-child > th {
+  background-color: var(--code-bg);
+  font-weight: 600;
+}
+
+.composer .composer-article-document :is(th, td) > p {
+  margin: 0;
+}
+
+.composer .composer-article-document img {
+  max-width: 100%;
+  height: auto;
+}
+
+.composer .composer-article-document p.is-editor-empty:first-child::before {
+  float: left;
+  height: 0;
+  color: var(--secondary);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+/* Block handles: "+" inserts through the "/" menu, the grip drags or opens the block menu. */
+.composer-handles {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  gap: 2px;
+}
+
+.composer-handles[hidden] {
+  display: none;
+}
+
+.composer-handle {
+  display: grid;
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--secondary);
+  font:
+    600 16px / 1 system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+
+.composer-handle--grip {
+  font-size: 12px;
+  letter-spacing: -2px;
+  cursor: grab;
+}
+
+.composer-handle:hover,
+.composer-handle[aria-expanded="true"] {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.composer-block-menu {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  display: grid;
+  min-width: 160px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.composer-block-menu[hidden] {
+  display: none;
+}
+
+.composer-handles .composer-block-menu button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font:
+    14px / 1.2 system-ui,
+    sans-serif;
+  text-align: start;
+  cursor: pointer;
+}
+
+.composer-handles .composer-block-menu button:hover:not(:disabled),
+.composer-handles .composer-block-menu button:focus-visible {
+  background: var(--code-bg);
+}
+
+.composer-handles .composer-block-menu button:disabled {
+  color: var(--secondary);
+  cursor: default;
+  opacity: 0.6;
+}
+
+@media (pointer: coarse) {
+  .composer-handle {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* 글꼴·크기·글자색·배경색 in the drag toolbar (style-controls.ts): the row wraps on narrow screens. */
+.composer-bubble__row {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: calc(100vw - 26px);
+}
+
+.composer .composer-bubble :is(.composer-bubble__font, .composer-bubble__size) {
+  height: 32px;
+  padding: 0 4px;
+  font-size: 13px;
+}
+
+.composer .composer-bubble .composer-bubble__font {
+  width: 96px;
+}
+.composer .composer-bubble .composer-bubble__size {
+  width: 56px;
+}
+
+/* A colour button shows the colour it applies under its glyph. */
+:is(.composer-bubble__color, .composer-props__color) {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+:is(.composer-bubble__swatch, .composer-props__swatch) {
+  position: absolute;
+  inset: auto 7px 5px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--swatch, currentColor);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.composer-palette {
+  position: fixed;
+  z-index: 95;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+  font:
+    13px / 1.4 system-ui,
+    sans-serif;
+  color: var(--primary);
+}
+
+.composer-palette__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 26px);
+  gap: 6px;
+}
+
+.composer-palette__swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.composer-palette__swatch:is(:hover, :focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.composer-palette__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.composer-palette__reset {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.composer-palette__custom {
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: none;
+  vertical-align: middle;
+}
+
+/* Toolbar glyphs (icons.ts): H run over with the highlighter (the published mark's colour), U
+   underlined, and line icons for 링크 · 댓글. */
+.composer-glyph-highlight {
+  padding: 0 3px;
+  border-radius: 2px;
+  /* Covers the whole letter, as a highlighted word does in the post. */
+  background: #f0d36a;
+  color: #1b1b1b;
+  font-weight: 700;
+}
+
+.composer-glyph-underline {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.composer-icon {
+  display: block;
+  flex: none;
+}
+
+/* Row and column tools floating above the table that holds the caret (table-toolbar.ts). */
+.composer-table-tools {
+  position: fixed;
+  z-index: 68;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: calc(100vw - 16px);
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.28);
+}
+
+.composer-table-tools[hidden] {
+  display: none;
+}
+
+.composer .composer-table-tools > button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font:
+    600 12px / 1 system-ui,
+    sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.composer .composer-table-tools > button:is(:hover, :focus-visible) {
+  outline: none;
+  background: var(--code-bg);
+}
+
+.composer .composer-table-tools > button.is-danger {
+  color: var(--alert-caution, #f47067);
+}
+
+/* A new, empty table opens with cells wide enough to write in; filled cells size as published. */
+.composer .composer-article-document :is(th, td):has(> p:only-child > br:only-child) {
+  min-width: 9em;
+}
+
+.composer .composer-article-document :is(th, td).selectedCell {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+@media (max-width: 600px) {
+  .composer .composer-table-tools > button {
+    min-height: 28px;
+    padding: 0 7px;
+    font-size: 11px;
+  }
+}
+
+/* The code block's language, picked at its top-right corner (code-language.ts). */
+.composer-code-language {
+  position: fixed;
+  z-index: 66;
+}
+
+.composer-code-language[hidden] {
+  display: none;
+}
+
+.composer .composer-code-language select {
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--entry);
+  color: var(--primary);
+  font:
+    12px / 1 system-ui,
+    sans-serif;
+}
+
+/* "서식 더보기" entries show their effect beside their name (toolbar-formats.ts preview()). */
+.composer-format-preview {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.composer-format-sample {
+  color: var(--secondary);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.composer-format-sample code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.composer-format-sample kbd {
+  padding: 0.05em 0.35em;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  box-shadow: 0 1px 0 var(--border);
+  color: var(--primary);
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.composer-format-sample :is(sup, sub) {
+  font-size: 0.75em;
+}
+
+.composer-format-sample small {
+  font-size: 0.8em;
+}
+
+.composer-format-sample .is-quote {
+  padding-inline-start: 6px;
+  border-inline-start: 3px solid var(--border);
+}
+
+.composer-format-sample .is-callout {
+  padding: 0 6px;
+  border-inline-start: 3px solid var(--alert-note, #4dabf7);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--alert-note, #4dabf7) 12%, transparent);
+  color: var(--alert-note, #4dabf7);
+  font-size: 0.9em;
+}
+
+.composer-format-sample .is-math {
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+
+/* Reviewing a read-only post: the selection toolbar offers only 댓글. */
+.composer-bubble[data-readonly="true"]
+:is(button, select, .composer-bubble__divider):not([aria-label="댓글"]) {
+  display: none;
+}
