@@ -2,10 +2,12 @@ import { type Editor, Extension } from "@tiptap/core"
 import type { Node as PMNode } from "@tiptap/pm/model"
 import { Plugin, PluginKey } from "@tiptap/pm/state"
 import { Decoration, DecorationSet } from "@tiptap/pm/view"
+import katex from "katex"
 import { createRenderer } from "../../render"
 import type { DocumentCodec, Language, PostBundle } from "../../shared/onsite/document"
 import type { GitHubAdapter } from "../../shared/onsite/github"
 import type { ReviewThread } from "../../shared/onsite/review"
+import { attrString } from "../blocks/dom"
 import { articleRanges } from "../composer/article-identity"
 import { h } from "../composer/dom"
 import {
@@ -88,10 +90,24 @@ function blockIndex(doc: PMNode, from: number, to: number): Indexed {
   const positions: number[] = []
   let space = true
   doc.nodesBetween(from, to, (node, position) => {
-    if (node.isText) {
-      const value = node.text ?? ""
+    if (node.isBlock && !space) {
+      text += " "
+      positions.push(position)
+      space = true
+    }
+    const math = node.type.name === "mathInline" || node.type.name === "mathBlock"
+    if (node.isText || math) {
+      const value = node.isText
+        ? (node.text ?? "")
+        : (new DOMParser().parseFromString(
+            katex.renderToString(attrString(node.attrs, "source"), {
+              displayMode: node.type.name === "mathBlock" || node.attrs["display"] === true,
+              throwOnError: false,
+            }),
+            "text/html",
+          ).body.textContent ?? "")
       for (let index = 0; index < value.length; index += 1) {
-        const at = position + index
+        const at = node.isText ? position + index : position
         if (at < from || at >= to) continue
         const char = value[index] ?? ""
         if (/\s/.test(char)) {
@@ -107,11 +123,6 @@ function blockIndex(doc: PMNode, from: number, to: number): Indexed {
         }
       }
       return false
-    }
-    if (node.isBlock && !space) {
-      text += " "
-      positions.push(position)
-      space = true
     }
     return true
   })
@@ -402,13 +413,10 @@ export class SiteComments {
       .filter((range) => range.to > from && range.from < to)
       .map((range) => ({
         id: range.id,
-        text: normalise(
-          editor.state.doc.textBetween(
-            Math.max(from, range.from),
-            Math.min(to, range.to),
-            " ",
-            " ",
-          ),
+        text: blockIndex(
+          editor.state.doc,
+          Math.max(from, range.from),
+          Math.min(to, range.to),
         ).text.trim(),
         start: blockIndex(editor.state.doc, range.from, range.to).positions.findIndex(
           (position) => position >= from,
@@ -417,7 +425,14 @@ export class SiteComments {
       }))
       .filter((portion) => portion.text !== "")
     if (portions.length === 0) return
-    const quoted = portions.map((portion) => portion.text).join(" ")
+    const quoted = editor.state.doc
+      .textBetween(from, to, " ", (node) =>
+        node.type.name === "mathInline" || node.type.name === "mathBlock"
+          ? attrString(node.attrs, "source")
+          : " ",
+      )
+      .replace(/\s+/g, " ")
+      .trim()
     this.anchorRect = () => rectFor(editor, from, to)
     this.pending = { language, from, to }
     const textarea = h("textarea", {
