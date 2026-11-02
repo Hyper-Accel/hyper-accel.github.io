@@ -51,7 +51,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   if (!session) throw new Error("글을 편집할 권한이 없습니다.")
   // Someone without write access reads the same editor, read-only, to comment and approve.
   const reviewerOnly = !session.canWrite
-  root.innerHTML = `<div data-site-controls><div data-recovery></div><p role="status" data-site-save-status></p><button type="button" data-site-save>GitHub에 저장</button></div><div data-composer></div>`
+  root.innerHTML = `<div data-site-controls><div data-recovery></div><p role="status" data-site-save-status></p><button type="button" data-site-save title="리뷰어가 볼 수 있게 GitHub 초안에 올립니다. 공개되지 않습니다.">GitHub에 저장</button></div><div data-composer></div>`
   const host = root.querySelector<HTMLElement>("[data-composer]")
   const status = root.querySelector<HTMLElement>("[data-site-save-status]")
   const recoveryRoot = root.querySelector<HTMLElement>("[data-recovery]")

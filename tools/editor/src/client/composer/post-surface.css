@@ -881,3 +881,146 @@ main.main:has(.composer[data-mode="form"]) {
 .composer-create .metadata-field:has([name="slug"]) > .metadata-slug {
   grid-column: 1 / -1;
 }
+
+/* No save bar: 저장 and 리뷰 요청 float at the bottom right as two buttons. 댓글, the read-only mark
+   and status or error lines join the group only when they have something to show. */
+.site-editor .composer-dock,
+.composer-dock {
+  inset: auto calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: calc(100% - 40px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.composer-dock > *,
+.site-editor .composer-dock [data-site-controls] > * {
+  pointer-events: auto;
+}
+
+/* A status or error line sits above the buttons, right-aligned. */
+.composer-dock__status,
+.site-editor .composer-dock [data-recovery],
+.site-editor .composer-dock [data-site-save-status] {
+  flex-basis: 100%;
+  order: -1;
+  text-align: end;
+}
+
+.site-editor .composer-dock [data-recovery]:not(:empty),
+.site-editor .composer-dock [data-site-save-status]:not(:empty) {
+  justify-self: end;
+  margin-left: auto;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+/* The review controls (review-flow.ts) join the floating group as their own buttons. */
+.composer-dock .review-flow {
+  display: contents;
+}
+
+.site-editor
+  .composer-dock
+  :is(
+    [data-site-comments],
+    [data-site-save],
+    [data-action="request-review"],
+    [data-action="approve"],
+    [data-action="back-to-draft"]
+  ) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--entry);
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+}
+
+.site-editor
+  .composer-dock
+  :is([data-site-comments], [data-site-save], [data-action="back-to-draft"]):hover {
+  background: color-mix(in srgb, var(--entry) 85%, #fff);
+}
+
+.site-editor .composer-dock [data-site-save]::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  mask:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M8%200C3.58%200%200%203.58%200%208c0%203.54%202.29%206.53%205.47%207.59.4.07.55-.17.55-.38%200-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01%201.08.58%201.23.82.72%201.21%201.87.87%202.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95%200-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12%200%200%20.67-.21%202.2.82.64-.18%201.32-.27%202-.27.68%200%201.36.09%202%20.27%201.53-1.04%202.2-.82%202.2-.82.44%201.1.16%201.92.08%202.12.51.56.82%201.27.82%202.15%200%203.07-1.87%203.75-3.65%203.95.29.25.54.73.54%201.48%200%201.07-.01%201.93-.01%202.2%200%20.21.15.46.55.38A8.013%208.013%200%200016%208c0-4.42-3.58-8-8-8z%22%2F%3E%3C%2Fsvg%3E")
+    center / contain no-repeat;
+}
+
+.site-editor .composer-dock :is([data-action="request-review"], [data-action="approve"]) {
+  border-color: transparent;
+  background: var(--editor-accent, #4dabf7);
+  color: #0d1117;
+}
+
+.site-editor .composer-dock :is([data-action="request-review"], [data-action="approve"]):disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.composer-dock .composer-readonly {
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--entry);
+  color: var(--secondary);
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+/* The site's back-to-top button stays above the floating buttons. */
+body:has(.composer-dock) .top-link {
+  bottom: calc(20px + 44px + 16px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 699px) {
+  .composer-dock {
+    inset: auto calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))
+      auto;
+    max-width: calc(100% - 24px);
+  }
+}
+
+/* A dock button the flow hides (no pull request yet, not in review) stays hidden. */
+.site-editor .composer-dock button[hidden] {
+  display: none;
+}
+
+/* Phones: 저장 shrinks to its GitHub mark so the review buttons stay on one row (its name stays). */
+@media (max-width: 699px) {
+  .site-editor .composer-dock [data-site-save] {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+}
