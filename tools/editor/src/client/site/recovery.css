@@ -1,37 +1,165 @@
+/* This device's draft vs the post on GitHub: only what differs, GitHub-diff style. */
 [data-recovery-conflict] {
   min-width: 0;
+  max-width: 880px;
 }
 
-.site-recovery-actions {
+[data-recovery-conflict] h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.recovery-summary {
+  margin: 0 0 14px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.recovery-legend {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-block: 16px;
+  gap: 14px;
+  margin: 0 0 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
 }
 
-.site-recovery-actions button {
-  min-height: 44px;
-  white-space: normal;
+.recovery-legend .is-del {
+  color: #ff8182;
 }
 
-.site-recovery-versions {
+.recovery-legend .is-add {
+  color: #56d364;
+}
+
+.recovery-changes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+  gap: 12px;
 }
 
-.site-recovery-versions section {
-  min-width: 0;
-  overflow-wrap: anywhere;
+.recovery-change {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
-.site-recovery-versions pre {
+.recovery-change header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--entry);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.recovery-change__kind {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.recovery-change__kind.is-changed {
+  background: rgb(210 153 34 / 0.2);
+  color: #e3b341;
+}
+
+.recovery-change__kind.is-local-only {
+  background: rgb(46 160 67 / 0.2);
+  color: #56d364;
+}
+
+.recovery-change__kind.is-remote-only {
+  background: rgb(248 81 73 / 0.2);
+  color: #ff8182;
+}
+
+.recovery-diff {
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.recovery-diff__line {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+
+.recovery-diff__sign {
+  color: var(--secondary);
+  text-align: center;
+  user-select: none;
+}
+
+.recovery-diff__text {
+  padding-right: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+.recovery-diff__line.is-del {
+  background: rgb(248 81 73 / 0.12);
+}
+
+.recovery-diff__line.is-add {
+  background: rgb(46 160 67 / 0.12);
+}
+
+.recovery-diff__line.is-del .recovery-diff__sign {
+  color: #ff8182;
+}
+
+.recovery-diff__line.is-add .recovery-diff__sign {
+  color: #56d364;
+}
+
+.recovery-diff__line mark {
+  border-radius: 3px;
+  color: inherit;
+}
+
+.recovery-diff__line.is-del mark {
+  background: rgb(248 81 73 / 0.4);
+}
+
+.recovery-diff__line.is-add mark {
+  background: rgb(46 160 67 / 0.4);
+}
+
+/* The choice stays in reach under a long list of changes. */
+.site-recovery-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-block: 12px;
+  background: var(--theme);
+}
+
+.site-recovery-actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  color: var(--primary);
+  font-weight: 700;
+  white-space: normal;
+}
+
+.site-recovery-actions button.is-primary {
+  border-color: transparent;
+  background: var(--editor-accent, #4dabf7);
+  color: #0d1117;
+}
+
 @media (max-width: 700px) {
-  .site-recovery-versions {
-    grid-template-columns: minmax(0, 1fr);
+  .site-recovery-actions button {
+    flex: 1 1 100%;
   }
 }
