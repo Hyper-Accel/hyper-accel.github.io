@@ -440,7 +440,13 @@ export const mountComposer: SiteMount = async (root, deps) => {
     else host.querySelector(".composer-readonly")?.after(flow.element)
     void flow.refresh()
   }
-  host.querySelector(".composer-dock")?.prepend(mountHelp(readOnly ? "reviewer" : "author", root))
+  let help: HTMLButtonElement | undefined
+  const syncHelp = (): void => {
+    const dock = host.querySelector(".composer-dock")
+    if (!dock) return
+    help ??= mountHelp(readOnly ? "reviewer" : "author", root)
+    if (help.parentElement !== dock) dock.prepend(help)
+  }
   // The site header's language pill switches the editing language, like reading /en/.
   const wrapper = host.querySelector<HTMLElement>(".composer")
   const languageSwitch = document.querySelector<HTMLAnchorElement>(".tr-header [data-lang-switch]")
@@ -464,15 +470,20 @@ export const mountComposer: SiteMount = async (root, deps) => {
     const next = wrapper.dataset["lang"] === "en" ? "ko" : "en"
     host.querySelector<HTMLButtonElement>(`.composer-tab[data-lang="${next}"]`)?.click()
   }
-  const languageObserver = new MutationObserver(syncLanguageSwitch)
+  const composerObserver = new MutationObserver(() => {
+    syncLanguageSwitch()
+    syncHelp()
+  })
   if (wrapper) {
-    languageObserver.observe(wrapper, {
+    composerObserver.observe(wrapper, {
       attributes: true,
       attributeFilter: ["data-lang", "data-mode"],
+      childList: true,
     })
   }
   languageSwitch?.addEventListener("click", onLanguageSwitch)
   syncLanguageSwitch()
+  syncHelp()
   const headerObserver = observeEditorOcclusion(toolbox.element)
   if (deps.unpaired) {
     const tab = host.querySelector<HTMLButtonElement>(
@@ -522,7 +533,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     root.removeEventListener("mouseup", selection)
     root.removeEventListener("click", onLanguage)
     saveButton.removeEventListener("click", onSave)
-    languageObserver.disconnect()
+    composerObserver.disconnect()
     languageSwitch?.removeEventListener("click", onLanguageSwitch)
     if (languageSwitch) {
       languageSwitch.textContent = switchLabel

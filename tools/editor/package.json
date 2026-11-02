@@ -8,7 +8,7 @@
     "build:site": "vite build --mode site",
     "build:shell": "cd ../.. && hugo --quiet --destination tools/editor/dist-site --baseURL http://127.0.0.1:4175/",
     "dev:site": "bun run build:site && bun run build:shell && bun run src/testing/dev-site.ts",
-    "e2e:site": "bun run build:site && bun run build:shell && bun run src/e2e/site-flow.e2e.ts && bun run src/e2e/site-recovery.e2e.ts",
+    "e2e:site": "bun run build:site && bun run build:shell && bun run src/e2e/site-flow.e2e.ts && bun run src/e2e/site-recovery.e2e.ts && bun run src/e2e/site-help.e2e.ts",
     "ci:dry-run": "bun run check && bun run build:site && bun test ci && bun ci/validate-posts.ts --root ../.. --all",
     "start": "bun run dist-server/index.js",
     "test": "bun test",
