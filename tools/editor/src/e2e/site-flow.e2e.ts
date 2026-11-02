@@ -8,7 +8,7 @@ import { startSiteHarness } from "../testing/site-harness"
 async function login(page: Page): Promise<void> {
   const modal = page
     .locator("dialog[open]")
-    .getByRole("button", { name: "GitHub 로그인", exact: true })
+    .getByRole("button", { name: "로그인하고 편집 계속하기", exact: true })
   const button = (await modal.isVisible())
     ? modal
     : page.getByRole("button", { name: "GitHub 로그인", exact: true })

@@ -177,12 +177,70 @@
   opacity: 0.6;
 }
 
-.site-editor dialog button {
-  margin-top: 16px;
+/* Session expired: the title, then a white GitHub button and a dark "홈으로 돌아가기". */
+.site-editor dialog {
+  width: min(420px, calc(100% - 48px));
 }
 
 .site-editor dialog h2 {
-  margin-top: 0;
+  margin: 0 0 20px;
+  font-size: 20px;
+}
+
+.site-editor dialog #site-login {
+  display: grid;
+  gap: 8px;
+}
+
+.site-editor dialog #site-login [role="status"]:empty,
+.site-editor dialog #site-login button[hidden] {
+  display: none;
+}
+
+.site-editor dialog #site-login [role="status"] {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.site-editor dialog :is(.auth-github, .site-login-home) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.site-editor dialog .auth-github {
+  border: 0;
+  background: #fff;
+  color: #1b1f23;
+}
+
+.site-editor dialog .auth-github:hover {
+  background: #f0f0f0;
+}
+
+.site-editor dialog .auth-github:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.site-editor dialog .site-login-home {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  background: #0d0f12;
+  color: var(--primary);
+}
+
+.site-editor dialog .site-login-home:hover {
+  background: #16191e;
 }
 
 .site-editor [data-recovery] > p {

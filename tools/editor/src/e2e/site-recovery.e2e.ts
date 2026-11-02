@@ -6,8 +6,15 @@ import { chromium, type Page } from "playwright"
 import { startSiteHarness } from "../testing/site-harness"
 
 async function login(page: Page): Promise<void> {
+  // The session-expired popup has its own button; the login page has "GitHub 로그인".
+  const modal = page
+    .locator("dialog[open]")
+    .getByRole("button", { name: "로그인하고 편집 계속하기", exact: true })
+  const button = (await modal.isVisible())
+    ? modal
+    : page.getByRole("button", { name: "GitHub 로그인", exact: true })
   const popup = page.waitForEvent("popup")
-  await page.getByRole("button", { name: "GitHub 로그인", exact: true }).click()
+  await button.click()
   await popup
   // A fresh login lands on the blog home (drafts shelf); a re-login stays in the editor.
   await page

@@ -8,6 +8,7 @@ export async function loadSiteMount(
     return (root, deps) => {
       const mount = mountAuth(root, {
         auth: deps.auth,
+        variant: root.dataset["variant"] === "relogin" ? "relogin" : "page",
         onSession: (session) => {
           if (session) deps.onAuthenticated()
         },

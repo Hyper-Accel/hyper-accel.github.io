@@ -17,10 +17,9 @@ export function mountSiteShell(
       <aside id="site-conflict" role="alert" hidden></aside>
       <div id="site-content" tabindex="-1"><h1></h1><div id="site-screen"></div></div>
       <dialog aria-labelledby="site-login-title">
-        <h2 id="site-login-title">다시 로그인해 주세요</h2>
-        <p>작성중인 내용은 이 기기에 보관됩니다. 로그인 후 계속 편집할 수 있습니다.</p>
-        <div id="site-login"></div>
-        <button type="button" id="site-login-close">편집 계속하기</button>
+        <h2 id="site-login-title">세션이 만료되었습니다</h2>
+        <div id="site-login" data-variant="relogin"></div>
+        <button type="button" id="site-login-close" class="site-login-home">홈으로 돌아가기</button>
       </dialog>
     </div>`
   const main = root.querySelector<HTMLElement>("#site-content")
@@ -137,7 +136,21 @@ export function mountSiteShell(
       })
       session.append(" ", retry)
       session.hidden = false
-      if (!disposed) dialog.showModal()
+      if (!disposed) {
+        dialog.showModal()
+        // Enter logs in again (not 홈으로 돌아가기, which would leave the editor). The button may
+        // still be disabled for a moment while the expiry settles: focus it once it is enabled.
+        const github = loginRoot.querySelector<HTMLButtonElement>(".auth-github")
+        if (github && !github.disabled) github.focus()
+        else if (github) {
+          const enabled = new MutationObserver(() => {
+            if (github.disabled) return
+            enabled.disconnect()
+            if (dialog.open) github.focus()
+          })
+          enabled.observe(github, { attributes: true, attributeFilter: ["disabled"] })
+        }
+      }
     } catch (error: unknown) {
       reportError(error)
     } finally {
@@ -434,7 +447,8 @@ export function mountSiteShell(
   const onRelogin = (): void => {
     void showRelogin()
   }
-  const onClose = (): void => dialog.close()
+  // 홈으로 돌아가기: unsaved writing stays on this device (autosave) for the next visit.
+  const onClose = (): void => window.location.assign("/")
   close.addEventListener("click", onClose)
   const onDialogClose = (): void => restoreFocus?.()
   dialog.addEventListener("close", onDialogClose)
