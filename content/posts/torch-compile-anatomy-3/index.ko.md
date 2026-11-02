@@ -89,7 +89,7 @@ graph break 쪽도 움직이고 있습니다. 1편에서 graph break가 나면 �
 
 ### 동적 shape: guard를 없애야 하는 곳
 
-이어지는 두 세션은 제가 듣지 못해 소개를 기준으로 정리했습니다. 1편에서 Dynamo는 가정이 깨졌는지를 guard로 검사하고, 깨지면 재컴파일한다고 설명했습니다. 그런데 서빙 환경에서는 입력 길이가 매번 바뀌고, 그때마다 재컴파일할 수는 없습니다.
+이어지는 두 세션은 제가 듣지 못해 소개를 기준으로 정리했습니다. 1편에서 Dynamo의 출력에 guard가 포함된다고 소개했습니다. guard는 캡처할 때의 shape 같은 가정이 여전히 맞는지 검사하는 장치이고, 가정이 깨지면 다시 컴파일이 일어납니다. 그런데 서빙 환경에서는 입력 길이가 매번 바뀌고, 그때마다 재컴파일할 수는 없습니다.
 
 [From Backed to Unbacked](https://pytorch.org/blog/core-pytorch-sessions-at-pytorch-conference-north-america-2026/) 세션은 이런 환경을 위한 **unbacked shape** 을 다룹니다. 기존 backed shape은 예시 입력의 값을 힌트로 삼기 때문에 암묵적인 guard와 재컴파일이 생길 수 있습니다. unbacked shape은 동적 shape에 대한 암묵적 guard를 허용하지 않습니다. 대신 기존 방식과의 성능 격차를 줄이는 것이 과제입니다. [Parametrized Dynamic Shape CUDA Graphs](https://pytorch.org/blog/core-pytorch-sessions-at-pytorch-conference-north-america-2026/)는 torch.compile의 심볼릭 추적과 guard를 활용해 CUDA Graph 하나를 여러 shape에 재사용합니다. 서빙의 콜드 스타트를 줄이는 효과도 보고되었습니다. 두 작업 모두 그래프 위의 정보를 런타임까지 끌고 내려간다는 점에서 1편의 구조가 확장된 모습입니다.
 
