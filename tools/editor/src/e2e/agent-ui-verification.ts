@@ -53,12 +53,29 @@ export async function verifyAgentPanel(page: Page): Promise<void> {
     throw new Error("대화 기록의 접근성 이름이 화면 레이블과 일치하지 않습니다.")
   }
   const contextRemove = page.locator("#agent-context-remove")
-  await contextRemove.focus()
-  const [contextOpacity, focusOutline] = await Promise.all([
+  // Anchor the tab order, then use real keyboard input to activate :focus-visible.
+  await page.locator("#agent-prompt").focus()
+  await page.keyboard.press("Shift+Tab")
+  const [contextMessages, focus] = await Promise.all([
     page.locator(".agent-message-context").count(),
-    contextRemove.evaluate((button) => getComputedStyle(button).outlineStyle),
+    contextRemove.evaluate((button) => {
+      const style = getComputedStyle(button)
+      return {
+        active: document.activeElement === button,
+        visible: button.matches(":focus-visible"),
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+      }
+    }),
   ])
-  if (contextOpacity !== 0 || focusOutline === "none") {
+  if (
+    contextMessages !== 0 ||
+    !focus.active ||
+    !focus.visible ||
+    focus.outlineStyle === "none" ||
+    focus.outlineStyle === "hidden" ||
+    !(focus.outlineWidth > 0)
+  ) {
     throw new Error("첨부 문맥 제거 버튼의 키보드 포커스가 보이지 않습니다.")
   }
 }

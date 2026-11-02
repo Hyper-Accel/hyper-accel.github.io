@@ -81,6 +81,7 @@ export async function verifySessionHistory(
     }
     await page.locator("#merge-close").click()
     await page.locator("#agent-new-session").click()
+    await page.locator("#agent-empty").waitFor()
     await page.locator("#agent-session").selectOption(sessionId)
     await page.locator(".agent-message--user").nth(1).waitFor()
     const restoredRoles = await page
@@ -119,6 +120,7 @@ export async function verifySessionHistory(
       ],
     }
     await page.locator("#agent-new-session").click()
+    await page.locator("#agent-empty").waitFor()
     await page.locator("#agent-session").selectOption(sessionId)
     await page.locator(".agent-message--user").nth(1).waitFor()
     const boundaryText = await page
