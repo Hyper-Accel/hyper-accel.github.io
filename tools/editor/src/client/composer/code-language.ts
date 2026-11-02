@@ -42,6 +42,13 @@ export function createCodeLanguagePicker(current: () => Editor | undefined): Cod
       return
     }
     const language: unknown = editor.getAttributes("codeBlock")["language"]
+    if (
+      typeof language === "string" &&
+      language &&
+      ![...select.options].some((option) => option.value === language)
+    ) {
+      select.add(new Option(language, language))
+    }
     select.value = typeof language === "string" ? language : ""
     element.hidden = false
     const rect = dom.getBoundingClientRect()

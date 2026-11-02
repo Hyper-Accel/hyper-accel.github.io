@@ -218,7 +218,8 @@ class CompareView implements NodeView {
 
   private commit(patch: Record<string, unknown>): void {
     const pos = this.getPos()
-    if (pos === undefined) {
+    // A read-only post (someone reviewing it) slides like the published one: the post stays as it is.
+    if (pos === undefined || !this.editor.isEditable) {
       return
     }
     const tr = this.editor.state.tr.setNodeMarkup(pos, undefined, { ...this.node.attrs, ...patch })

@@ -3,6 +3,12 @@
  * post-single). Rules here only mark editable regions and place the few editor controls.
  */
 
+.composer .composer-article-document {
+  font-variant-ligatures: normal;
+  font-feature-settings: normal;
+  white-space: pre-wrap;
+}
+
 .site-editor .composer-post-layout {
   padding-bottom: calc(var(--editor-bar-height) + 48px);
   word-break: break-word;
@@ -1023,4 +1029,29 @@ body:has(.composer-dock) .top-link {
     justify-content: center;
     font-size: 0;
   }
+}
+
+/* ⓘ opens the guide (intro.ts); it leads the floating group. */
+.site-editor .composer-dock [data-site-help] {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--entry);
+  color: var(--secondary);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+}
+
+.site-editor .composer-dock [data-site-help]:hover {
+  color: var(--primary);
+}
+
+.site-editor .composer-dock [data-site-help].is-pointed {
+  color: var(--primary);
+  outline: 2px solid var(--editor-accent, #4dabf7);
+  outline-offset: 3px;
 }

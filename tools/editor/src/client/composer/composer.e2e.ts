@@ -4,6 +4,7 @@ import { tmpdir } from "node:os"
 import { join, resolve, sep } from "node:path"
 import { chromium } from "playwright"
 import { build } from "vite"
+import { checkCodeRendering } from "./code-scenario.e2e"
 import { createArticle } from "./form-scenario.e2e"
 import { checkArticleMedia } from "./media-scenario.e2e"
 import { checkArticleMetadata } from "./metadata-scenario.e2e"
@@ -95,6 +96,7 @@ async function run(viewport: Viewport): Promise<void> {
     await checkArticleMetadata(page, shot)
 
     await checkEditorUpgrades(page, shot)
+    await checkCodeRendering(page, shot)
     await runRepair(page, mobile, shot)
 
     assert.deepEqual(errors, [])

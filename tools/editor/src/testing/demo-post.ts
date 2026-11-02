@@ -298,5 +298,11 @@ export async function seedDemoPost(github: ReturnType<typeof startFakeGitHub>): 
     })
     if (!response.ok)
       throw new Error(`Failed to seed the demo post ${post.slug} (${response.status})`)
+    // A post waiting for review belongs to someone else, so the demo user can approve it.
+    if (post.inReview) {
+      const { number } = (await response.json()) as { number: number }
+      const pull = github.state.pulls.get(number)
+      if (pull) github.state.pulls.set(number, { ...pull, author: "hyunjun" })
+    }
   }
 }

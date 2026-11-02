@@ -469,6 +469,7 @@
 .composer-code-language {
   position: fixed;
   z-index: 66;
+  line-height: 1;
 }
 
 .composer-code-language[hidden] {
@@ -476,6 +477,7 @@
 }
 
 .composer .composer-code-language select {
+  min-height: 0;
   height: 26px;
   padding: 0 6px;
   border: 1px solid var(--border);

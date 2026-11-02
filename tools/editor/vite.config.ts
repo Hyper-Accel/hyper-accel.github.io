@@ -1,14 +1,16 @@
 import { readdir, readFile } from "node:fs/promises"
 import { resolve } from "node:path"
-import { defineConfig } from "vite"
+import { defineConfig, type Plugin } from "vite"
 import { parse as parseYaml } from "yaml"
+import { chromaAssets } from "./chroma/build"
 
 const apiPort = process.env["TECHBLOG_EDITOR_API_PORT"] ?? "4174"
 const webPort = Number(process.env["TECHBLOG_EDITOR_WEB_PORT"] ?? "4173")
 
 export default defineConfig(({ mode }) => ({
-  plugins:
-    mode === "site"
+  plugins: [
+    chromaAssets(),
+    ...(mode === "site"
       ? [
           {
             name: "onsite-author-directory",
@@ -83,9 +85,10 @@ export default defineConfig(({ mode }) => ({
                 }),
               })
             },
-          },
+          } satisfies Plugin,
         ]
-      : [],
+      : []),
+  ],
   root: mode === "site" ? "site" : ".",
   base: mode === "site" ? "/editor/" : "/",
   build: {

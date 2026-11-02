@@ -240,7 +240,7 @@
 .ProseMirror .onsite-alert .alert-body {
   display: contents;
 }
-.ProseMirror .onsite-alert .alert-body > :last-child {
+.ProseMirror .onsite-alert .alert-body > :last-child:not(p) {
   margin-bottom: 0;
 }
 
@@ -328,8 +328,8 @@
 
 /* math: KaTeX preview, LaTeX source while selected */
 .ProseMirror .onsite-math {
-  margin: var(--onsite-space-4) 0;
-  padding: var(--onsite-space-2);
+  margin: 0 0 var(--content-gap, 20px);
+  padding: 0;
   border-radius: var(--radius, 8px);
   outline: 2px solid transparent;
   outline-offset: 4px;
@@ -1385,4 +1385,41 @@ body:has(.onsite-dropzones:not([hidden])) .onsite-bar {
 /* While a picture is dragged only the drop mark shows: the selection toolbar steps aside. */
 body:has(.onsite-dropzones:not([hidden])) .composer-bubble {
   display: none;
+}
+
+/* A read-only post (someone reviewing it) shows its blocks as published: the editing tools go
+   (picture bar, caption fields, resize grips, group and pick buttons, add-tab, type picker), and what a
+   reader uses stays, as on the blog: the callout mark and title, tabs, slide arrows, the compare handle. */
+.composer[data-readonly="true"]
+  .ProseMirror
+  [data-onsite-ui]:not(
+    .alert-type,
+    .alert-heading,
+    .tabs-list,
+    .tabs-tab[role="tab"],
+    .slides-prev,
+    .slides-next,
+    .compare-range
+  ) {
+  display: none;
+}
+
+.composer[data-readonly="true"] .ProseMirror .alert-type {
+  pointer-events: none;
+  cursor: default;
+}
+
+.composer[data-readonly="true"] .ProseMirror .alert-heading:empty {
+  display: none;
+}
+
+.composer[data-readonly="true"] .ProseMirror [draggable="true"] {
+  -webkit-user-drag: none;
+  user-select: text;
+}
+
+.composer[data-readonly="true"] .ProseMirror :is(.ProseMirror-selectednode, .is-selected),
+.composer[data-readonly="true"] .ProseMirror :is(.ProseMirror-selectednode, .is-selected) * {
+  outline: none;
+  box-shadow: none;
 }

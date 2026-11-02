@@ -52,6 +52,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.2"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/editor/chroma/go.mod
+          cache-dependency-path: tools/editor/chroma/go.sum
       - name: Build hosted editor
         working-directory: tools/editor
         env:

@@ -1,4 +1,3 @@
-import "../../../../assets/css/core/theme-vars.css"
 import "./site.css"
 import { relayPopupCallback } from "./site/auth"
 import { createSiteServices } from "./site/services"

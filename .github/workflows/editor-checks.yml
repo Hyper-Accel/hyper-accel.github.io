@@ -90,6 +90,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.2"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/editor/chroma/go.mod
+          cache-dependency-path: tools/editor/chroma/go.sum
       - name: Build hosted editor
         working-directory: tools/editor
         run: bun install --frozen-lockfile && bun run build:site
@@ -100,6 +104,6 @@ jobs:
         run: hugo --minify
       - name: Include hosted editor
         run: |
-          test -s tools/editor/dist-site/editor/index.html
+          test -s tools/editor/dist-site/editor/manifest.json
           mkdir -p public/editor
           cp -R tools/editor/dist-site/editor/. public/editor/

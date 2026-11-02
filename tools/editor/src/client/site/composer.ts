@@ -12,6 +12,7 @@ import { editAccess } from "./access"
 import { SiteComments } from "./comments"
 import type { SiteMount } from "./contracts"
 import { observeEditorOcclusion } from "./editor-occlusion"
+import { mountHelp } from "./intro"
 import type { Person } from "./mentions"
 import { NewAuthors } from "./new-authors"
 import { ImageLibrary, MobilePreview, type SidePanel } from "./panels"
@@ -439,6 +440,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     else host.querySelector(".composer-readonly")?.after(flow.element)
     void flow.refresh()
   }
+  host.querySelector(".composer-dock")?.prepend(mountHelp(readOnly ? "reviewer" : "author", root))
   // The site header's language pill switches the editing language, like reading /en/.
   const wrapper = host.querySelector<HTMLElement>(".composer")
   const languageSwitch = document.querySelector<HTMLAnchorElement>(".tr-header [data-lang-switch]")

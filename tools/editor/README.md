@@ -26,6 +26,10 @@ hugo new content/posts/<글-slug>/index.en.md
 
 ## 최초 설치
 
+개발 빌드에는 Go 1.24 이상이 필요합니다. 코드 강조기는 Hugo 0.152.2와 같은 Chroma
+2.20.0을 WebAssembly로 빌드합니다. `.chroma/`의 생성 파일은 커밋하지 않으며,
+배포된 편집기를 사용하는 사람은 Go를 설치할 필요가 없습니다.
+
 macOS/Linux에서는 저장소 루트에서:
 
 ```bash
