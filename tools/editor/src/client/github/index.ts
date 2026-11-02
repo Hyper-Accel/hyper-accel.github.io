@@ -417,6 +417,31 @@ export class FetchGitHubAdapter implements GitHubAdapter {
     })
   }
 
+  markDraft(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<DraftPullRequest>> {
+    return result(async () => {
+      const pr = await this.checkedPull(pullNumber, expectedHeadSha)
+      if (pr.draft) return draft(pr)
+      await this.http.reconcile(
+        `draft:${pr.node_id}`,
+        async () => {
+          await this.http.graph(
+            "mutation($input: ConvertPullRequestToDraftInput!) { convertPullRequestToDraft(input: $input) { pullRequest { id isDraft } } }",
+            { input: { pullRequestId: pr.node_id } },
+            z.object({
+              convertPullRequestToDraft: z.object({
+                pullRequest: z.object({ id: z.string(), isDraft: z.literal(true) }),
+              }),
+            }),
+            true,
+          )
+          return true
+        },
+        async () => ((await this.pull(pullNumber)).draft ? true : undefined),
+      )
+      return draft(await this.checkedPull(pullNumber, expectedHeadSha))
+    })
+  }
+
   squashMerge(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<CommitReceipt>> {
     return result(async () => {
       const pr = await this.checkedPull(pullNumber, expectedHeadSha, true)

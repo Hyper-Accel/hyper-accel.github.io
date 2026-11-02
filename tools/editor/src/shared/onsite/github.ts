@@ -78,5 +78,7 @@ export interface GitHubAdapter {
   resolveThread(thread: ReviewThread, resolved: boolean): Promise<GitHubResult<ReviewThread>>
   approve(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<void>>
   markReady(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<DraftPullRequest>>
+  /** Takes a pull request back from review to draft (the author wants to keep writing). */
+  markDraft(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<DraftPullRequest>>
   squashMerge(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<CommitReceipt>>
 }

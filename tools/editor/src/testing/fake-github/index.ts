@@ -226,6 +226,16 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
           data: { markPullRequestReadyForReview: { pullRequest: { id, isDraft: false } } },
         })
       }
+      if (input.query.includes("convertPullRequestToDraft")) {
+        if (!canWrite) throw new HttpFailure(403, "Write access required")
+        const id = z.string().parse(graphInput["pullRequestId"])
+        const pr = [...state.pulls.values()].find((value) => value.node_id === id)
+        if (pr?.state !== "open") throw new HttpFailure(422, "Open pull required")
+        pr.draft = true
+        return json({
+          data: { convertPullRequestToDraft: { pullRequest: { id, isDraft: true } } },
+        })
+      }
       if (input.query.includes("reviewThreads")) {
         const number = z
           .number()

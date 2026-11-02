@@ -592,6 +592,13 @@ describe("approval and publication", () => {
     expect(fake.state.pulls.get(pr.number)?.merged).toBe(false)
   })
 
+  test("takes a pull request in review back to draft", async () => {
+    const pr = await setup()
+    expect(value(await adapter().markReady(pr.number, pr.headSha)).draft).toBe(false)
+    expect(value(await adapter().markDraft(pr.number, pr.headSha)).draft).toBe(true)
+    expect(fake.state.pulls.get(pr.number)?.draft).toBe(true)
+  })
+
   test("rejects self-approval and requires a current-head review before squash merge", async () => {
     const pr = await setup()
     const author = adapter()

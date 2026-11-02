@@ -30,7 +30,10 @@ const POLL_LIMIT = 60
  * and, once approved, publish; anyone else reads the same editor read-only, comments and approves.
  */
 export class ReviewFlow {
-  readonly element: HTMLButtonElement
+  /** The dock's review controls: the main button and, while in review, 초안으로 되돌리기. */
+  readonly element: HTMLElement
+  private readonly button: HTMLButtonElement
+  private readonly revert: HTMLButtonElement
   private pr: DraftPullRequest | null = null
   private approvedSha: string | null = null
   private busy = false
@@ -38,7 +41,7 @@ export class ReviewFlow {
   private disposed = false
 
   constructor(private readonly options: ReviewFlowOptions) {
-    this.element = h(
+    this.button = h(
       "button",
       {
         type: "button",
@@ -47,7 +50,20 @@ export class ReviewFlow {
       },
       "",
     )
-    this.element.addEventListener("click", () => void this.act())
+    this.revert = h(
+      "button",
+      {
+        type: "button",
+        class: "composer-button",
+        "data-action": "back-to-draft",
+        title: "리뷰 요청을 거두고 초안으로 되돌립니다.",
+        hidden: true,
+      },
+      "초안으로 되돌리기",
+    )
+    this.element = h("div", { class: "review-flow" }, this.revert, this.button)
+    this.button.addEventListener("click", () => void this.act())
+    this.revert.addEventListener("click", () => void this.backToDraft())
     // A reviewer may approve while the author has the editor open: look again on return.
     window.addEventListener("focus", this.onFocus)
     this.render()
@@ -95,22 +111,38 @@ export class ReviewFlow {
   private render(): void {
     const { pr, approvedSha } = this
     const set = (label: string, enabled: boolean, title = ""): void => {
-      this.element.textContent = label
-      this.element.disabled = !enabled || this.busy
-      this.element.title = title
+      this.button.textContent = label
+      this.button.disabled = !enabled || this.busy
+      this.button.title = title
     }
+    // A pull request in review (or approved, not yet published) can go back to draft.
+    this.revert.hidden =
+      this.options.role !== "author" ||
+      this.stage !== "idle" ||
+      !pr ||
+      pr.draft ||
+      pr.state !== "open"
+    this.revert.disabled = this.busy
     if (this.options.role === "reviewer") {
-      this.element.hidden = pr === null
-      if (!pr) return
+      this.button.hidden = pr === null
+      if (!pr) {
+        this.button.disabled = true
+        return
+      }
       const gate = approveGate(pr, approvedSha)
-      set(approvedSha === pr.headSha ? "승인됨" : "승인", gate.allowed, gate.reasons.join(" "))
+      set(
+        approvedSha === pr.headSha ? "승인됨" : "승인",
+        gate.allowed,
+        gate.allowed ? "이 버전을 게시해도 된다고 승인합니다." : gate.reasons.join(" "),
+      )
       return
     }
     if (this.stage === "deploying") set("배포 중…", false)
     else if (this.stage === "published") set("게시됨", false)
-    else if (pr && !pr.draft && approvedSha === pr.headSha) set("게시", true)
+    else if (pr && !pr.draft && approvedSha === pr.headSha)
+      set("게시", true, "main에 반영해 블로그에 공개합니다.")
     else if (pr && !pr.draft) set("리뷰 중", false, "승인되면 게시할 수 있습니다.")
-    else set("리뷰 요청", true)
+    else set("리뷰 요청", true, "저장하고 리뷰를 요청합니다.")
   }
 
   private async act(): Promise<void> {
@@ -124,6 +156,26 @@ export class ReviewFlow {
       else await this.requestReview()
     } catch (error: unknown) {
       this.options.status(error instanceof Error ? error.message : String(error))
+    } finally {
+      this.busy = false
+      this.render()
+    }
+  }
+
+  /** Takes the pull request back from review to draft; 리뷰 요청 asks again later. */
+  private async backToDraft(): Promise<void> {
+    const pr = this.pr
+    if (this.busy || !pr || pr.draft) return
+    this.busy = true
+    this.render()
+    try {
+      const result = await this.options.github.markDraft(pr.number, pr.headSha)
+      if (!result.ok) {
+        this.options.status(describeGitHubError(result.error))
+        return
+      }
+      this.pr = result.value
+      this.options.status("초안으로 되돌렸습니다. 다시 리뷰를 요청할 수 있습니다.")
     } finally {
       this.busy = false
       this.render()
