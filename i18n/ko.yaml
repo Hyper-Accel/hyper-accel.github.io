@@ -52,3 +52,33 @@
 
 - id: reaction_summary_aria
   translation: "반응 {total}개. 글 하단에서 반응 남기기"
+
+- id: alert_note
+  translation: "참고"
+
+- id: alert_tip
+  translation: "팁"
+
+- id: alert_important
+  translation: "중요"
+
+- id: alert_warning
+  translation: "주의"
+
+- id: alert_caution
+  translation: "경고"
+
+- id: compare_slider
+  translation: "비교 위치"
+
+- id: slides_label
+  translation: "사진 슬라이드"
+
+- id: slides_prev
+  translation: "이전 사진"
+
+- id: slides_next
+  translation: "다음 사진"
+
+- id: tabs
+  translation: "탭"

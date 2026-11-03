@@ -1,0 +1,43 @@
+.onsite-video-tools {
+  position: absolute;
+  inset: 8px 8px auto;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  color: var(--primary);
+  font:
+    14px / 1.4 system-ui,
+    sans-serif;
+}
+.onsite-video-tools[hidden] {
+  display: none;
+}
+.onsite-video-tools input {
+  flex: 1;
+  min-width: 0;
+  width: 160px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  background: var(--theme);
+  color: var(--primary);
+}
+.onsite-video-tools button {
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--primary);
+  cursor: pointer;
+}
+.onsite-video-tools [role="alert"] {
+  flex-basis: 100%;
+}
+.onsite-video-tools [role="alert"]:empty {
+  display: none;
+}

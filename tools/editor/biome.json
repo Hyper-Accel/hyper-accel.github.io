@@ -43,6 +43,14 @@
     }
   },
   "files": {
-    "includes": ["**", "!node_modules", "!dist", "!dist-server", "!coverage"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!dist",
+      "!dist-server",
+      "!dist-site",
+      "!.chroma",
+      "!coverage"
+    ]
   }
 }

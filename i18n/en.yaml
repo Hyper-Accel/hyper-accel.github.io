@@ -52,3 +52,33 @@
 
 - id: reaction_summary_aria
   translation: "{total} reactions. React at the end of this article"
+
+- id: alert_note
+  translation: "Note"
+
+- id: alert_tip
+  translation: "Tip"
+
+- id: alert_important
+  translation: "Important"
+
+- id: alert_warning
+  translation: "Warning"
+
+- id: alert_caution
+  translation: "Caution"
+
+- id: compare_slider
+  translation: "Comparison position"
+
+- id: slides_label
+  translation: "Photo slides"
+
+- id: slides_prev
+  translation: "Previous photo"
+
+- id: slides_next
+  translation: "Next photo"
+
+- id: tabs
+  translation: "Tabs"

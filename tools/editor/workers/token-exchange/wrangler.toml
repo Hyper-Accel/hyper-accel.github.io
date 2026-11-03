@@ -1,0 +1,10 @@
+name = "hyperaccel-editor-token-exchange"
+main = "index.ts"
+compatibility_date = "2026-10-27"
+
+[vars]
+GITHUB_CLIENT_ID = ""
+
+# Set GITHUB_CLIENT_SECRET with `wrangler secret put GITHUB_CLIENT_SECRET`.
+# Register https://hyper-accel.github.io/editor-login/ as the GitHub App callback URL.
+# Local development requires its exact http://localhost:<port>/editor-login/ callback.

@@ -1,0 +1,23 @@
+/* Same resource order as PaperMod head.html; local assets override theme files. */
+@import "../../../themes/PaperMod/assets/css/core/license.css";
+@import "../../../assets/css/core/theme-vars.css";
+@import "../../../themes/PaperMod/assets/css/core/reset.css";
+@import "../../../themes/PaperMod/assets/css/common/404.css";
+@import "../../../themes/PaperMod/assets/css/common/archive.css";
+@import "../../../themes/PaperMod/assets/css/common/footer.css";
+@import "../../../themes/PaperMod/assets/css/common/header.css";
+@import "../../../themes/PaperMod/assets/css/common/main.css";
+@import "../../../themes/PaperMod/assets/css/common/post-entry.css";
+@import "../../../themes/PaperMod/assets/css/common/post-single.css";
+@import "../../../themes/PaperMod/assets/css/common/profile-mode.css";
+@import "../../../themes/PaperMod/assets/css/common/search.css";
+@import "../../../themes/PaperMod/assets/css/common/terms.css";
+@import "../../../themes/PaperMod/assets/css/includes/chroma-styles.css";
+@import "../../../themes/PaperMod/assets/css/includes/chroma-mod.css";
+@import "../../../themes/PaperMod/assets/css/includes/scroll-bar.css";
+@import "../../../themes/PaperMod/assets/css/core/zmedia.css";
+@import "../../../assets/css/extended/custom.css";
+@import "../../../assets/css/extended/design-c.css";
+@import "../../../assets/css/extended/figures.css";
+@import "../../../assets/css/extended/reading.css";
+@import "katex/dist/katex.min.css";

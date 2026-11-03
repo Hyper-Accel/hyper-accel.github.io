@@ -27,6 +27,7 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 - Secondary text: `#6b6b6b`
 - Subtle text: `#9a9a97`
 - Border: `#e7e7e4`
+- Hosted control edge: `#888888` (separate from decorative separators).
 - Soft surface: `#f1f1ef`
 - Accent: `#2563eb`
 - Accent hover: `#1d4ed8`
@@ -73,12 +74,71 @@ Design dials: variance 4, motion 2, density 4. The product is editorial and trus
 
 ## 4. Article Surface
 
+### Hosted Wave 0 shell
+
+Layout: hosted shell - route navigation above one content region -> content-limiter
+(existing site layout); scroll owner: document; avoid nested scroll regions and fixed
+widths that overflow at 390px.
+
+The hosted entry uses the site's existing theme tokens and defaults to dark, matching
+the published site. Its primary action is internal route navigation. Information
+priority is editor identity, active route, then the explicit Wave 0 placeholder state.
+Required content: drafts/new-post navigation, route heading, readiness notice,
+and noindex metadata. No login or editing controls pretend to work before their lanes
+land. No AI or external preview links are included.
+
+Navigation links use 44px minimum targets, visible focus, current-page state, and the
+existing 8px radius. Body uses 18px/1.6; route titles use 32px/1.25; spacing uses the
+24px site gap. Width is constrained by `--main-width`, with wrapping navigation.
+
 - The title is editable in place and visually matches `.post-title`.
 - The body is TipTap but carries PaperMod `.post-content` rules.
 - Selected images show one blue outline. Shortcodes render as protected, non-editable blocks.
 - The canvas remains white; editor-only controls live outside article typography.
 
 ## 5. Primitives and States
+
+### Hosted continuous authoring (2026-10-28)
+
+This section governs the on-site editor, not the older local editor and agent rail.
+The article is the editing surface: one continuous rendered document per language,
+with native paragraph creation, selection across paragraphs, deletion, and undo.
+Internal bilingual IDs never become numbered boxes or assembly controls.
+
+Layout: hosted article - readable continuous writing within the existing blog shell ->
+content-limiter (skipped: upstream returned no readable content);
+scroll owner: document; anti-patterns: nested article scrollers, boxed paragraph editors,
+parallel columns that squeeze prose, metadata walls above the writing surface.
+
+- Primary action: save the current draft to GitHub, with its actual save state.
+- Information priorities: article title and rendered prose; language and formatting;
+  secondary metadata and review readiness.
+- Left out on purpose: visible block IDs, numbering, translation chips per paragraph,
+  add/move/delete block buttons, debug save sequence counters, AI controls.
+- Required metadata: Korean and English titles, immutable existing slug/editable new slug,
+  date, authors, category, tags, series and order, cover and alternative text, Hugo draft.
+  Do not invent a description field that the current metadata contract does not have.
+- New-post form: titles and required classification first, optional publishing details
+  grouped below. Editing: metadata is available through a clearly labelled disclosure.
+- Language controls remain available at every width. Exactly one rendered article is
+  visible at a time; translation mapping remains an internal persistence concern.
+- Formatting is a compact labelled toolbar with native keyboard equivalents, not
+  paragraph assembly. Controls preserve the text selection on pointer interaction.
+- The title leads the article. Hosted save controls sit beside language selection;
+  review follows the writing surface. Secondary list/link formats expand inline
+  under "기타 서식", and undo/redo remain together.
+- Keyboard focus has an explicit article outline. Language and formatting selection
+  use a visible check shape as well as a surface wash.
+- Local persistence and remote GitHub saving/saved/error states are distinct.
+- The hosted page retains the repository's dark-only default; light-mode captures
+  test token robustness, not a newly introduced system-theme preference.
+- Baseline cases: article, open metadata, new-post form at 390/1440/1920, light/dark.
+  Capture before and after under identical seed and theme conditions.
+- Both themes reuse the hosted site variables. Interactive targets are at least 44px;
+  article typography follows PaperMod, with no per-paragraph borders or backgrounds.
+  At 699px and below, UI labels and secondary text are at least 15px; prose stays 18px.
+- Metadata's bounded `.metadata-choices__list--authors` scrolls only the searchable author
+  choices; it is a deliberate nested selection list, not a second article scroller.
 
 - Icon button: rest, hover, active-format, focus-visible, disabled.
 - Save button: clean, dirty, saving, saved, error.

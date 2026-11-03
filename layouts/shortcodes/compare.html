@@ -1,0 +1,28 @@
+{{- /* {{< compare caption="…" start="50" >}} before-image after-image {{< /compare >}}
+     Without JS both panes sit side by side with their labels (title, else alt); feature-blocks.js turns it into a slider. */ -}}
+{{- $images := findRE `!\[[^\]]*\]\([^)]*\)` .Inner -}}
+{{- if ne (len $images) 2 }}{{ errorf "The %q shortcode needs exactly two images, got %d. See %s" .Name (len $images) .Position }}{{ end -}}
+{{- $start := int (.Get "start" | default 50) -}}
+{{- if lt $start 0 }}{{ $start = 0 }}{{ else if gt $start 100 }}{{ $start = 100 }}{{ end -}}
+<figure class="figure figure-compare" data-start="{{ $start }}">
+<div class="compare" style="--compare-pos:{{ $start }}%">
+{{- range $i, $image := $images }}
+{{- $alt := "" }}{{ with findRESubmatch `^!\[([^\]]*)\]` $image }}{{ $alt = index (index . 0) 1 }}{{ end }}
+{{- $title := "" }}{{ with findRESubmatch `"([^"]*)"\s*\)$` $image }}{{ $title = index (index . 0) 1 }}{{ end }}
+<div class="compare-pane compare-{{ cond (eq $i 0) "before" "after" }}">
+{{ $.Page.RenderString (dict "display" "block") $image }}
+<span class="compare-label">{{ $title | default $alt }}</span>
+</div>
+{{- end }}
+<div class="compare-divider" aria-hidden="true"></div>
+<input class="compare-range" type="range" min="0" max="100" step="1" value="{{ $start }}" aria-label="{{ i18n "compare_slider" }}" hidden>
+</div>
+{{- with .Get "caption" }}
+<figcaption>{{ . }}</figcaption>
+{{- end }}
+</figure>
+{{- if not (.Page.Store.Get "feature-blocks-included") }}
+{{- .Page.Store.Set "feature-blocks-included" true }}
+{{- $blocks := resources.Get "js/feature-blocks.js" | minify | fingerprint }}
+<script defer src="{{ $blocks.RelPermalink }}" integrity="{{ $blocks.Data.Integrity }}"></script>
+{{- end }}

@@ -68,6 +68,25 @@
     </div>
   </section>
 
+  {{- /* "작성 중인 글" for signed-in editors. The section ships empty and hidden; js/editor-entry.js
+       loads the editor's home module only for returning editors, which fills and reveals it. */}}
+  {{- $manifest := "tools/editor/dist-site/editor/manifest.json" }}
+  {{- if fileExists $manifest }}{{ with index (os.ReadFile $manifest | transform.Unmarshal) "../src/client/home-drafts.ts" }}
+  {{- $looks := dict }}
+  {{- /* Published posts are edited on their own page (?edit); other drafts on /editor-new/. */}}
+  {{- $published := slice }}
+  {{- range where site.RegularPages "Section" "posts" }}{{ with .File }}{{ $published = $published | append (path.Base (strings.TrimSuffix "/" .Dir)) }}{{ end }}{{ end }}
+  {{- range $cats }}{{ $look := dict "title" .Title "style" (partial "d/catvars.html" (path.Base .RelPermalink)) }}
+  {{- $looks = merge $looks (dict (path.Base .RelPermalink) $look (lower .Title) $look (lower (.Data.Term | default .Title)) $look) }}
+  {{- end }}
+  <section class="tr-shelf tr-drafts" data-editor-drafts hidden aria-label="작성 중인 글" data-module="{{ printf "editor/%s" .file | relURL }}" data-styles="{{ range .css }}{{ printf "editor/%s" . | relURL }} {{ end }}" data-categories="{{ $looks | jsonify }}" data-published="{{ $published | uniq | jsonify }}">
+    <header class="tr-shelf-head">
+      <h2 class="tr-h">작성 중인 글</h2>
+    </header>
+    <div class="tr-scroller" data-drafts-grid></div>
+  </section>
+  {{- end }}{{ end }}
+
   <section class="tr-latest">
     <header class="tr-section-head">
       <h2 class="tr-h">{{ cond $ko "최신 글" "Latest" }}</h2>

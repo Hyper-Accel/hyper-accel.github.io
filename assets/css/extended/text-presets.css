@@ -1,0 +1,41 @@
+/* Semantic text presets shared by Hugo, the editor and review. */
+.post-content p.lead {
+  font-size: 1.2em;
+  line-height: 1.65;
+}
+
+.post-content mark {
+  padding: 0.05em 0.15em;
+  border-radius: 2px;
+  background: #f0d36a;
+  color: #1d1e20;
+}
+
+.post-content :is(sup, sub) {
+  position: relative;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+.post-content sup { top: -0.5em; }
+.post-content sub { bottom: -0.25em; }
+
+.post-content kbd {
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  box-shadow: 0 1px 0 var(--border);
+  color: var(--primary);
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.post-content small { font-size: 0.85em; }
+.post-content .footnotes { clear: both; }
+
+/* Paragraph alignment set in the editor ({.text-center} etc. after the paragraph). */
+.post-content .text-center { text-align: center; }
+.post-content .text-right { text-align: right; }
+.post-content .text-justify { text-align: justify; }

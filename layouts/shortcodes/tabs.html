@@ -1,0 +1,18 @@
+{{- /* {{< tabs >}}{{< tab name="…" >}}…{{< /tab >}}{{< /tabs >}}: child tabs register themselves in .Store before this renders.
+     Without JS every panel shows under its own h4; feature-blocks.js enables the WAI-ARIA tablist. */ -}}
+{{- $inner := .Inner -}}
+{{- $tabs := .Store.Get "tabs" | default slice -}}
+{{- if not $tabs }}{{ errorf "The %q shortcode needs at least one {{< tab >}}. See %s" .Name .Position }}{{ end -}}
+<div class="tabs">
+<div class="tabs-list" role="tablist" aria-label="{{ i18n "tabs" }}">
+{{- range $i, $tab := $tabs }}
+<button class="tabs-tab" type="button" role="tab" id="{{ $tab.id }}-tab" aria-controls="{{ $tab.id }}" aria-selected="{{ cond (eq $i 0) "true" "false" }}" tabindex="{{ cond (eq $i 0) "0" "-1" }}">{{ $tab.name }}</button>
+{{- end }}
+</div>
+{{ $inner }}
+</div>
+{{- if not (.Page.Store.Get "feature-blocks-included") }}
+{{- .Page.Store.Set "feature-blocks-included" true }}
+{{- $blocks := resources.Get "js/feature-blocks.js" | minify | fingerprint }}
+<script defer src="{{ $blocks.RelPermalink }}" integrity="{{ $blocks.Data.Integrity }}"></script>
+{{- end }}

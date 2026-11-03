@@ -1,0 +1,30 @@
+{{- /* {{< pair >}} two or three Markdown images {{< /pair >}} (Naver's "나란히 놓기"): one row, the
+     pictures at the same height, each as wide as its aspect ratio (--pair-ratio) allows. Each image
+     renders through render-image as its own figure, caption included. Bundle images get their ratio
+     here; feature-blocks.js measures the rest (SVG, remote) once they load. */ -}}
+{{- $images := findRE `!\[[^\]]*\]\([^)]*\)` .Inner -}}
+{{- $count := len $images -}}
+{{- if or (lt $count 2) (gt $count 3) }}{{ errorf "The %q shortcode needs two or three images, got %d. See %s" .Name $count .Position }}{{ end -}}
+<div class="figure-pair" data-count="{{ $count }}">
+{{- range $images }}
+{{- $ratio := "" -}}
+{{- with findRESubmatch `\]\(\s*([^\s)#?]+)` . 1 -}}
+  {{- $path := strings.TrimPrefix "./" (index (index . 0) 1) -}}
+  {{- if not (strings.Contains $path "://") -}}
+    {{- with or ($.Page.Resources.Get $path) (resources.Get $path) -}}
+      {{- if and (eq .ResourceType "image") (not (strings.HasPrefix .MediaType.Type "image/svg")) -}}
+        {{- $ratio = printf "%.4f" (div (float .Width) .Height) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end }}
+{{- $html := string ($.Page.RenderString (dict "display" "block") .) -}}
+{{- with $ratio }}{{ $html = replaceRE `<figure ` (printf `<figure style="--pair-ratio:%s" ` .) $html 1 }}{{ end }}
+{{ $html | safeHTML }}
+{{- end }}
+</div>
+{{- if not (.Page.Store.Get "feature-blocks-included") }}
+{{- .Page.Store.Set "feature-blocks-included" true }}
+{{- $blocks := resources.Get "js/feature-blocks.js" | minify | fingerprint }}
+<script defer src="{{ $blocks.RelPermalink }}" integrity="{{ $blocks.Data.Integrity }}"></script>
+{{- end }}

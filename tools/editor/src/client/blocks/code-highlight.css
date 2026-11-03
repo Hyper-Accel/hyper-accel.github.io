@@ -1,0 +1,21 @@
+@import "../../../../../themes/PaperMod/assets/css/includes/chroma-styles.css";
+
+/* The post's existing .chroma rules colour tokens; only its wrapper differs in the editor. */
+.ProseMirror pre.chroma {
+  margin: 10px auto;
+  background-color: var(--code-block-bg);
+  border-radius: var(--radius);
+}
+
+.ProseMirror pre > code {
+  display: block;
+  white-space: pre;
+}
+
+.ProseMirror pre.chroma > code {
+  padding-block: 8px;
+}
+
+.ProseMirror pre code span {
+  display: inline;
+}

@@ -30,7 +30,8 @@ Series titles: `[<short series name> - Part 0N] <title>` (side story: `번외편
 - **Capitalization**: pick once, keep consistent. Acronyms uppercase (GPU, HBM, XLA); common nouns lowercase (loop, thread, warp); brands official (NVIDIA, TensorFlow, PyTorch).
 - **Headings**: body starts at H2 (`##`); never skip levels (H2→H3→H4); H1 reserved for the title.
 - **Code blocks**: always tag language (```python, ```bash, ```cuda...); explain code before/after; mark pseudocode as such.
-- **Images**: descriptive alt text (not "image"); place image BEFORE the paragraph explaining it; meaningful kebab-case filenames. Append `#side` to the path (`![alt](images/x.png#side "caption")`) to float a narrow image beside the next paragraph; wide diagrams stay full width.
+- **Images**: descriptive alt text (not "image"); place image BEFORE the paragraph explaining it; meaningful kebab-case filenames. A standalone image renders as a figure; its title becomes a visible caption. Layout presets via the path fragment: none = body width, `#wide` = wider than the text column (adapts to viewport, never overlaps the TOC), `#side-right` (alias `#side`) / `#side-left` = narrow image floated beside the next paragraph (`![alt](images/x.png#side "caption")`).
+- **Blocks**: `{{< pair >}}` + two or three images = one row at the same height (each as wide as its aspect ratio); `{{< slides >}}` + two to ten images = slides shown one at a time; `{{< steps >}}` + numbered list = step-by-step; `{{< compare caption="…" start="50" >}}` + exactly two images = before/after slider; `{{< tabs >}}{{< tab name="…" >}}…{{< /tab >}}{{< /tabs >}}` (no h2/h3 inside tabs); callouts use GitHub alerts `> [!NOTE|TIP|IMPORTANT|WARNING|CAUTION] title`.
 - **Readability**: short sentences (~50 chars), 5-7 sentences per paragraph, one idea each; define technical terms on first appearance.
 - **New posts must ship both ko + en versions** (README mandate); same slug so Hugo links translations.
 

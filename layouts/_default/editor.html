@@ -1,0 +1,16 @@
+{{- define "main" }}
+{{- /* The hosted editor runs inside the real site chrome so authors write on the reading surface. */}}
+<div id="app" class="onsite-app"></div>
+{{- $manifest := "tools/editor/dist-site/editor/manifest.json" }}
+{{- if fileExists $manifest }}
+{{- $entries := os.ReadFile $manifest | transform.Unmarshal }}
+{{- with index $entries "../src/client/site.ts" }}
+{{- range .css }}
+<link rel="stylesheet" href="{{ printf "editor/%s" . | relURL }}">
+{{- end }}
+<script type="module" src="{{ printf "editor/%s" .file | relURL }}"></script>
+{{- end }}
+{{- else }}
+<p>편집기 빌드가 없습니다. <code>tools/editor</code>에서 <code>bun run build:site</code>를 먼저 실행하세요.</p>
+{{- end }}
+{{- end }}

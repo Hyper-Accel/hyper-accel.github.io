@@ -1,0 +1,69 @@
+/* Home "작성 중인 글" shelf: published-post cards plus a state tag on the thumbnail. */
+.tr-draft-state {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #f5b740;
+  color: #1c1300;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+}
+
+.tr-draft-state[data-status="review"] {
+  background: var(--tr-cyan);
+  color: #031117;
+}
+
+.tr-draft-state[data-status="approved"] {
+  background: #7ee2a0;
+  color: #06210f;
+}
+
+.tr-draft-state[data-status="local"] {
+  background: #c9d3da;
+  color: #0b1419;
+}
+
+.tr-draft-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  aspect-ratio: 8 / 5;
+  border: 1.5px dashed var(--tr-line);
+  border-radius: 14px;
+  color: var(--tr-muted);
+  font-weight: 700;
+}
+
+.tr-draft-new:hover,
+.tr-draft-new:focus-visible {
+  border-color: var(--tr-cyan);
+  color: var(--tr-cyan-soft);
+}
+
+.tr-draft-new-plus {
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.tr-draft-review {
+  color: var(--tr-cyan-soft);
+  font-weight: 700;
+}
+
+.tr-drafts-error {
+  color: #ff7b72;
+}
+
+/* Category shelves hide the category pill; drafts mix categories, so they show it. */
+.tr-drafts .tr-cat {
+  display: block;
+}
