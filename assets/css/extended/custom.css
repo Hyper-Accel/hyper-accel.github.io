@@ -366,12 +366,6 @@
     }
 }
 
-/* figure shortcode class="full-width": stretch the image to the post body width */
-.post-content figure.full-width img {
-    width: 100%;
-    height: auto;
-}
-
 /* fulltable shortcode: opt-in table that fills the post width, scrolls when wider */
 .post-content .table-wrapper {
     overflow-x: auto;

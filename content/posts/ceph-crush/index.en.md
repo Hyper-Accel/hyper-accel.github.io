@@ -49,7 +49,7 @@ bucket
   - Large reads and writes are served by many storage devices in parallel.
   - Replicas and erasure coding shards are spread out to survive failures.
 
-{{< figure src="images/en/object-storage-overview.svg" alt="File storage managed through directories and inodes versus object storage accessed directly by key, and large data split into four objects stored on four OSDs" align="center" class="full-width" >}}
+![File storage managed through directories and inodes versus object storage accessed directly by key, and large data split into four objects stored on four OSDs](images/en/object-storage-overview.svg)
 
 > The core problem of object storage is **which device should store each of a huge number of objects?**
 
@@ -72,7 +72,7 @@ object-C → osd.3
 
 - Storing the mapping for every object to every disk creates a metadata load that hurts scalability and availability.
 
-{{< figure src="images/en/metadata-table-vs-crush.svg" alt="Every client asking a metadata server for locations versus each client computing locations directly with CRUSH" align="center" class="full-width" >}}
+![Every client asking a metadata server for locations versus each client computing locations directly with CRUSH](images/en/metadata-table-vs-crush.svg)
 
 - On the left, every request goes through the metadata server, which becomes both a bottleneck and a single point of failure (SPOF).
 - On the right is the CRUSH approach covered in this post. Each client computes the location itself, so no central lookup is needed.
@@ -85,7 +85,7 @@ This leads to the first question CRUSH has to answer.
 
 Spreading data across devices does not by itself make it safe.
 
-{{< figure src="images/en/failure-domain-racks.svg" alt="Impact of a rack-1 power failure when all three replicas sit in one rack versus one replica per rack" align="center" class="full-width" >}}
+![Impact of a rack-1 power failure when all three replicas sit in one rack versus one replica per rack](images/en/failure-domain-racks.svg)
 
 - As on the left, if **all replicas land in the same rack domain**, a power failure makes the data unreachable.
 - As on the right, with one replica per rack, the remaining replicas keep the data reachable even if one rack goes down.
@@ -112,7 +112,7 @@ hash(x) % 10 -> hash(x) % 11 ...?
 
 The example below shows how the locations of 12 objects change when the cluster grows from 4 devices to 5.
 
-{{< figure src="images/en/hash-mod-remapping.svg" alt="Switching from hash % 4 to hash % 5 moves 9 of 12 objects to a different device" align="center" class="full-width" >}}
+![Switching from hash % 4 to hash % 5 moves 9 of 12 objects to a different device](images/en/hash-mod-remapping.svg)
 
 - **When the number of devices changes**, most existing object mappings change. The result is **massive relocation**.
 
@@ -165,7 +165,7 @@ root
 - Tree nodes organize devices into a hierarchy and are called `buckets`.
   - The paper's example uses a four-level bucket hierarchy: **root > row > cabinet > shelf**.
 
-{{< figure src="images/en/crush-placement-rule-example.svg" alt="CRUSH descending from root and selecting one row, three cabinets, and one disk under each" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 1" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![CRUSH descending from root and selecting one row, three cabinets, and one disk under each](images/en/crush-placement-rule-example.svg "Adapted from Weil et al., CRUSH (SC'06) Figure 1")
 
 - Devices and buckets each have their own weight.
   - **Device weight**: the relative amount of data the device should store. It is usually proportional to capacity.
@@ -178,14 +178,14 @@ osd.1 weight = 1
 osd.2 weight = 2
 ```
 
-{{< figure src="images/en/bucket-weight-tree.svg" alt="A tree of four devices with weight 1, two child buckets with weight 2, and a parent bucket with weight 4" align="center" class="full-width" >}}
+![A tree of four devices with weight 1, two child buckets with weight 2, and a parent bucket with weight 4](images/en/bucket-weight-tree.svg)
 
 - The parent bucket's weight is the sum of its child bucket weights `(2+2)`.
 - Each child bucket's weight is the sum of its device weights `(1+1)`.
 
 > By **mapping real failure domains to hierarchical buckets** in the cluster map, such as IDC sites, racks, and network switches, you can model the physical environment.
 
-{{< figure src="images/en/cluster-map-failure-domains.svg" alt="A cluster map with IDC, rack, switch, and device levels under root, and the replica placement strategy at each level" align="center" class="full-width" >}}
+![A cluster map with IDC, rack, switch, and device levels under root, and the replica placement strategy at each level](images/en/cluster-map-failure-domains.svg)
 
 - Assign different IDC sites to buckets under root to build a **cross-IDC data cluster**.
 - Assign each rack to an upper-level bucket and **spread replicas across different racks**. If one rack goes down, replicas in the other racks survive, which raises availability.
@@ -298,7 +298,7 @@ emit -> [disk2107, disk2313]
 
 The whole process, seen from the working vector `i`, looks like this.
 
-{{< figure src="images/en/select-walkthrough.svg" alt="Running take, select, select, and emit in order turns the working vector into root, then two rows, then two disks, which become the final result" align="center" class="full-width" >}}
+![Running take, select, select, and emit in order turns the working vector into root, then two rows, then two disks, which become the final result](images/en/select-walkthrough.svg)
 
 ### Failure Handling
 
@@ -320,7 +320,7 @@ select(1,disk) - i: [row1, row2], f:0,
 - [r=1, f:0]. i: row1, b: cab21, o: disk2107 (disk2107 Fail!!)
 ```
 
-{{< figure src="images/en/failure-mutation-f.svg" alt="With r' = r + f, when candidate 2 fails the replicas after it shift left by one and g fills slot 6" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 2 (left)" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+![With r' = r + f, when candidate 2 fails the replicas after it shift left by one and g fills slot 6](images/en/failure-mutation-f.svg "Adapted from Weil et al., CRUSH (SC'06) Figure 2 (left)")
 
 - When the selected candidate fails, CRUSH increments the failure count (`f += 1`) and mutates the index to `r' = r + f`.
   - As the figure shows, when slot 2 fails, the replicas after it shift left by one and the next candidate, g, fills slot 6.
@@ -348,9 +348,9 @@ select(1,disk) - i: [row1, row2], f:0,
 > - **Collision**: the disk itself is fine, so CRUSH only needs to spread replicas within the bucket to avoid duplicates.
 > - **Crushed/Overload**: CRUSH steers data into a different bucket branch so it reaches a healthy disk.
 
-{{< figure src="images/en/failure-retry-paths.svg" alt="On collision CRUSH picks disk3421 again inside cab21, while on crushed or overload it restarts from row1 and picks disk5679 in cab23" align="center" class="full-width" >}}
+![On collision CRUSH picks disk3421 again inside cab21, while on crushed or overload it restarts from row1 and picks disk5679 in cab23](images/en/failure-retry-paths.svg)
 
-{{< figure src="images/en/failure-mutation-fr.svg" alt="With r' = r + fr·n, only the failed slot 2 is replaced by the next candidate h, and the other replicas stay in place" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 2 (right)" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+![With r' = r + fr·n, only the failed slot 2 is replaced by the next candidate h, and the other replicas stay in place](images/en/failure-mutation-fr.svg "Adapted from Weil et al., CRUSH (SC'06) Figure 2 (right)")
 
 - `fr`, the failure count for a specific replica, is used to **keep positions stable when replica rank matters**, as in erasure coding.
   - Like `f`, `fr` is incremented on every failure, but it is reset to 0 each time a candidate search finishes.
@@ -381,7 +381,7 @@ B1(1)  B2(2)
 ```
 {{< /columns >}}
 
-{{< figure src="images/en/reweight-data-ratio.svg" alt="Changing the weight of B2 from 1 to 2 shifts the data ratio from 50:50 to 33:67, moving about 1/6 of all data" align="center" class="full-width" >}}
+![Changing the weight of B2 from 1 to 2 shifts the data ratio from 50:50 to 33:67, moving about 1/6 of all data](images/en/reweight-data-ratio.svg)
 
 - When a disk's weight changes as in the example above, data has to move to match the new ratio (`B1 → B2`).
 - Ideally, only **the data matching the weight change** migrates from `B1` to `B2`.
@@ -415,7 +415,7 @@ B1(1)  B2(2)
   - Then `B1`, whose share should shrink, actually gains data and drifts from the target weight distribution.
   - As a result, additional `B1 → B2` movement occurs to restore the target weight distribution inside B.
 
-{{< figure src="images/en/hierarchical-remapping.svg" alt="When a new item is added, the weights along the path from the leaf to the root change together" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 3" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![When a new item is added, the weights along the path from the leaf to the root change together](images/en/hierarchical-remapping.svg "Adapted from Weil et al., CRUSH (SC'06) Figure 3")
 
 > In other words, data does not move straight to the leaf whose weight increased. **Different objects are remapped independently at each level of the hierarchy**, which can cause extra, unintended data movement.
 >
@@ -443,7 +443,7 @@ B1(1)  B2(2)
 
 > Distributes data across items with perfectly equal probability.
 
-{{< figure src="images/en/uniform-bucket.svg" alt="A uniform bucket hashes object x and replica r and picks an item by the remainder modulo the number of items" align="center" class="full-width" >}}
+![A uniform bucket hashes object x and replica r and picks an item by the remainder modulo the number of items](images/en/uniform-bucket.svg)
 
 - It divides the hash value by the number of items and picks each child item with equal probability.
   - `c(r,x) = hash(r,x) mod m`, where `m` is the number of items.
@@ -466,7 +466,7 @@ for item, weight in items:
 
 - If the hash value is smaller than the current item's share, `weight / sum(remaining_weights)`, that item is selected. Otherwise the search moves to the next item.
 
-{{< figure src="images/en/list-bucket.svg" alt="A list bucket checking items from the newest, E, down to A, deciding with a conditional probability at each step" align="center" class="full-width" >}}
+![A list bucket checking items from the newest, E, down to A, deciding with a conditional probability at each step](images/en/list-bucket.svg)
 
 - Because it walks the items in order from the head, placement costs `O(n)`.
 - **When a new item is added**, every object except those that now pick the new item **keeps its mapping**.
@@ -490,14 +490,14 @@ Conditional probabilities, new list: E(3/6) -> D(1/3) -> C(1/2) -> B(1/1)
 
 - The probability-based selection is the same as in List, but the data structure is a **weighted binary tree**.
 
-{{< figure src="images/en/tree-bucket-labeling.svg" alt="Node labeling in a tree bucket, with binary labels such as 1, 11, 101, and 111 on the leaves" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 4" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![Node labeling in a tree bucket, with binary labels such as 1, 11, 101, and 111 on the leaves](images/en/tree-bucket-labeling.svg "Adapted from Weil et al., CRUSH (SC'06) Figure 4")
 
 - All items live in the leaves, and internal nodes only branch.
 - **The leftmost leaf always has label 1**. Leaf labels are odd, and branch node labels are even.
 - Each time the tree grows by one level, the old root becomes the left child of a new root, and the new root's label is the old root's label **shifted left by one bit** (`100 → 1000`).
 - As a result, existing node labels never change as the tree grows, so the paths to existing items stay the same.
 
-{{< figure src="images/en/tree-bucket-expansion.svg" alt="Adding a new item E to a four-item tree extends it under the right subtree" align="center" class="full-width" >}}
+![Adding a new item E to a four-item tree extends it under the right subtree](images/en/tree-bucket-expansion.svg)
 
 - Item lookup descends from the root, going left or right with probabilities based on the weight ratio.
 - When adding an item expands the tree, **a lot of data moves to the new branch, but most mappings in existing branches are preserved**.
@@ -512,7 +512,7 @@ Conditional probabilities, new list: E(3/6) -> D(1/3) -> C(1/2) -> B(1/1)
   - Ceph now uses an improved version, **straw2**, by default. It computes the score as `ln(hash(x, r, i)) / w_i`.
   - Because hash values lie in `(0, 1]`, `ln` is at most 0. A larger weight pulls the score closer to 0, which makes the item more likely to win.
 
-{{< figure src="images/en/straw-bucket.svg" alt="A straw bucket scoring every item and choosing item B, the one with the highest score, as the winner" align="center" class="full-width" >}}
+![A straw bucket scoring every item and choosing item B, the one with the highest score, as the winner](images/en/straw-bucket.svg)
 
 - Every item competes independently every time, so **data moves only when the winning item changes after a cluster change**.
 - However, every selection must score every item, so placement costs `O(n)`.

@@ -49,7 +49,7 @@ bucket
   - 대규모 데이터 R/W 시 여러 Storage Device에서 병렬 처리합니다.
   - 장애에 대비해 Replica와 Erasure Coding Shard를 분산 배치합니다.
 
-{{< figure src="images/ko/object-storage-overview.svg" alt="디렉토리와 inode로 관리하는 파일 스토리지와 key로 Object에 바로 접근하는 Object Storage 비교, 큰 데이터를 Object 4개로 나눠 OSD 4개에 분산 저장하는 모습" align="center" class="full-width" >}}
+![디렉토리와 inode로 관리하는 파일 스토리지와 key로 Object에 바로 접근하는 Object Storage 비교, 큰 데이터를 Object 4개로 나눠 OSD 4개에 분산 저장하는 모습](images/ko/object-storage-overview.svg)
 
 > Object Storage의 과제는 **수많은 Object를 어떤 Device에 저장할 것인가?** 입니다.
 
@@ -72,7 +72,7 @@ object-C → osd.3
 
 - Object와 Disk의 매핑 정보를 모두 저장한다면 Metadata 부하로 확장성과 가용성이 떨어집니다.
 
-{{< figure src="images/ko/metadata-table-vs-crush.svg" alt="모든 client가 Metadata Server에 위치를 조회하는 방식과 각 client가 CRUSH로 위치를 직접 계산하는 방식 비교" align="center" class="full-width" >}}
+![모든 client가 Metadata Server에 위치를 조회하는 방식과 각 client가 CRUSH로 위치를 직접 계산하는 방식 비교](images/ko/metadata-table-vs-crush.svg)
 
 - 왼쪽처럼 모든 요청이 Metadata Server를 거치면, 이 서버가 병목이자 단일 장애점이 됩니다.
 - 오른쪽은 이 글에서 다룰 CRUSH 방식입니다. 각 client가 위치를 직접 계산하므로 중앙 조회가 필요 없습니다.
@@ -85,7 +85,7 @@ object-C → osd.3
 
 데이터를 여러 Device에 분산 저장한다고 해도 반드시 안전한 것은 아닙니다.
 
-{{< figure src="images/ko/failure-domain-racks.svg" alt="replica 3개를 한 rack에 모두 둔 경우와 rack 3개에 하나씩 나눠 둔 경우의 rack-1 전원 장애 영향 비교" align="center" class="full-width" >}}
+![replica 3개를 한 rack에 모두 둔 경우와 rack 3개에 하나씩 나눠 둔 경우의 rack-1 전원 장애 영향 비교](images/ko/failure-domain-racks.svg)
 
 - 왼쪽처럼 **동일한 rack domain에 replica가 모두 배치** 된다면, power fail 시 데이터에 접근할 수 없습니다.
 - 오른쪽처럼 rack마다 replica를 하나씩 두면, rack 하나가 멈춰도 남은 replica로 데이터에 접근할 수 있습니다.
@@ -112,7 +112,7 @@ hash(x) % 10 -> hash(x) % 11 ...?
 
 아래는 Device를 4개에서 5개로 늘렸을 때 Object 12개의 위치가 어떻게 바뀌는지 보여 주는 예시입니다.
 
-{{< figure src="images/ko/hash-mod-remapping.svg" alt="hash % 4에서 hash % 5로 바꾸면 Object 12개 중 9개가 다른 Device로 이동하는 예시" align="center" class="full-width" >}}
+![hash % 4에서 hash % 5로 바꾸면 Object 12개 중 9개가 다른 Device로 이동하는 예시](images/ko/hash-mod-remapping.svg)
 
 - **Device의 개수가 바뀌게 되면** 기존 Object의 매핑이 대부분 변경됩니다. 결과적으로 **대량의 relocation** 이 필요합니다.
 
@@ -165,7 +165,7 @@ root
 - Tree Node는 Device를 계층적 구조로 관리하기 위한 Node로, `Bucket` 이라고 부릅니다.
   - 논문 예시에서는 **root > row > cabinet > shelf** 순서의 4계층 Bucket을 사용합니다.
 
-{{< figure src="images/ko/crush-placement-rule-example.svg" alt="root에서 row 하나, cabinet 세 개, disk 하나씩을 차례로 선택하는 CRUSH 계층 탐색 예시" attr="Weil et al., CRUSH (SC'06) Figure 1 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![root에서 row 하나, cabinet 세 개, disk 하나씩을 차례로 선택하는 CRUSH 계층 탐색 예시](images/ko/crush-placement-rule-example.svg "Weil et al., CRUSH (SC'06) Figure 1 재구성")
 
 - Device와 Bucket은 각각 개별적인 Weight를 가집니다.
   - **Device Weight**: 해당 Device가 저장할 상대적인 데이터의 양입니다. 일반적으로 용량에 비례합니다.
@@ -178,14 +178,14 @@ osd.1 weight = 1
 osd.2 weight = 2
 ```
 
-{{< figure src="images/ko/bucket-weight-tree.svg" alt="leaf weight가 1인 네 개의 Device, weight 2인 두 개의 하위 Bucket, weight 4인 상위 Bucket으로 구성된 트리" align="center" class="full-width" >}}
+![leaf weight가 1인 네 개의 Device, weight 2인 두 개의 하위 Bucket, weight 4인 상위 Bucket으로 구성된 트리](images/ko/bucket-weight-tree.svg)
 
 - 상위 Bucket의 Weight는 하위 Bucket Weight의 합 `(2+2)` 입니다.
 - 하위 Bucket의 Weight는 하위 Device Weight의 합 `(1+1)` 입니다.
 
 > cluster map을 통해 각 IDC site, Rack, Network Switch 등 **실제 Failure Domain을 계층적 Bucket에 할당** 함으로써 물리적인 환경을 구조화할 수 있습니다.
 
-{{< figure src="images/ko/cluster-map-failure-domains.svg" alt="root 아래에 IDC, Rack, Switch, Device 순서로 Bucket을 구성한 cluster map과 계층별 replica 배치 전략" align="center" class="full-width" >}}
+![root 아래에 IDC, Rack, Switch, Device 순서로 Bucket을 구성한 cluster map과 계층별 replica 배치 전략](images/ko/cluster-map-failure-domains.svg)
 
 - 서로 다른 IDC site를 root Bucket에 할당하여 **cross-IDC 데이터 클러스터** 를 구축합니다.
 - 각 Rack을 상위 Bucket에 할당하고, replica를 **서로 다른 Rack에 나눠 배치** 합니다. Rack 하나가 멈춰도 다른 Rack의 replica가 남으므로 가용성이 높아집니다.
@@ -298,7 +298,7 @@ emit -> [disk2107, disk2313]
 
 지금까지의 과정을 working vector `i` 기준으로 정리하면 다음과 같습니다.
 
-{{< figure src="images/ko/select-walkthrough.svg" alt="take, select, select, emit을 차례로 실행할 때 working vector가 root, row 두 개, disk 두 개로 바뀌고 최종 결과가 되는 과정" align="center" class="full-width" >}}
+![take, select, select, emit을 차례로 실행할 때 working vector가 root, row 두 개, disk 두 개로 바뀌고 최종 결과가 되는 과정](images/ko/select-walkthrough.svg)
 
 ### Failure Handling
 
@@ -320,7 +320,7 @@ select(1,disk) - i: [row1, row2], f:0,
 - [r=1, f:0]. i: row1, b: cab21, o: disk2107 (disk2107 Fail!!)
 ```
 
-{{< figure src="images/ko/failure-mutation-f.svg" alt="r' = r + f 방식에서 2번 candidate가 실패하자 뒤의 replica가 한 칸씩 당겨지고 g가 6번 자리를 채우는 과정" attr="Weil et al., CRUSH (SC'06) Figure 2 왼쪽 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+![r' = r + f 방식에서 2번 candidate가 실패하자 뒤의 replica가 한 칸씩 당겨지고 g가 6번 자리를 채우는 과정](images/ko/failure-mutation-f.svg "Weil et al., CRUSH (SC'06) Figure 2 왼쪽 재구성")
 
 - 선택된 candidate가 실패하면 탐색 실패 횟수를 늘리고(`f += 1`), index를 `r' = r + f` 로 mutation합니다.
   - 그림처럼 2번 자리가 실패하면 뒤의 replica가 한 칸씩 당겨지고, 다음 후보인 g가 6번 자리를 채웁니다.
@@ -348,9 +348,9 @@ select(1,disk) - i: [row1, row2], f:0,
 > - **Collision**: 디스크 자체는 문제가 없으므로 중복 저장되지 않게 bucket 안에서 분산 배치만 해 주면 됩니다.
 > - **Crushed/Overload**: 정상 디스크 쪽으로 데이터가 갈 수 있게 다른 bucket 분기로 유도합니다.
 
-{{< figure src="images/ko/failure-retry-paths.svg" alt="Collision은 같은 cab21 안에서 disk3421을 다시 고르고, Crushed와 Overload는 row1부터 다시 탐색해 cab23의 disk5679를 고르는 경로 비교" align="center" class="full-width" >}}
+![Collision은 같은 cab21 안에서 disk3421을 다시 고르고, Crushed와 Overload는 row1부터 다시 탐색해 cab23의 disk5679를 고르는 경로 비교](images/ko/failure-retry-paths.svg)
 
-{{< figure src="images/ko/failure-mutation-fr.svg" alt="r' = r + fr·n 방식에서 실패한 2번 자리만 다음 후보 h로 바뀌고 나머지 replica는 제자리에 남는 과정" attr="Weil et al., CRUSH (SC'06) Figure 2 오른쪽 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+![r' = r + fr·n 방식에서 실패한 2번 자리만 다음 후보 h로 바뀌고 나머지 replica는 제자리에 남는 과정](images/ko/failure-mutation-fr.svg "Weil et al., CRUSH (SC'06) Figure 2 오른쪽 재구성")
 
 - 특정 replica의 실패 횟수인 `fr` 은 Erasure Coding처럼 **replica rank가 의미를 가지는 경우, 위치를 유지** 하기 위해 사용됩니다.
   - `fr` 은 `f` 와 마찬가지로 실패할 때마다 카운트되지만, candidate 탐색이 종료될 때마다 0으로 초기화됩니다.
@@ -381,7 +381,7 @@ B1(1)  B2(2)
 ```
 {{< /columns >}}
 
-{{< figure src="images/ko/reweight-data-ratio.svg" alt="B2의 weight를 1에서 2로 바꾸면 데이터 비율이 50:50에서 33:67로 바뀌고 전체의 약 1/6이 이동하는 모습" align="center" class="full-width" >}}
+![B2의 weight를 1에서 2로 바꾸면 데이터 비율이 50:50에서 33:67로 바뀌고 전체의 약 1/6이 이동하는 모습](images/ko/reweight-data-ratio.svg)
 
 - 위 예시와 같이 Disk의 Weight가 변경되면, 변경된 비율에 따라 데이터가 이동해야 합니다(`B1 → B2`).
 - 이상적으로는 **Weight의 변경분만큼** 의 데이터를 `B1` 에서 `B2` 로 마이그레이션하면 됩니다.
@@ -415,7 +415,7 @@ B1(1)  B2(2)
   - 이 경우 데이터 비중이 상대적으로 감소해야 하는 `B1` 의 데이터가 증가하여 목표 weight 분포에서 벗어납니다.
   - 그 결과 B 내부의 목표 weight 분포를 맞추기 위해 추가적으로 `B1 → B2` 데이터 이동이 발생합니다.
 
-{{< figure src="images/ko/hierarchical-remapping.svg" alt="새 item이 추가되면 leaf부터 root까지 경로상의 weight가 함께 바뀌는 모습" attr="Weil et al., CRUSH (SC'06) Figure 3 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![새 item이 추가되면 leaf부터 root까지 경로상의 weight가 함께 바뀌는 모습](images/ko/hierarchical-remapping.svg "Weil et al., CRUSH (SC'06) Figure 3 재구성")
 
 > 즉, Weight가 증가한 leaf로 모든 데이터가 직접 이동하는 것이 아니라, **Hierarchy의 각 Level에서 서로 다른 Object가 독립적으로 재배치** 되기 때문에 의도치 않은 추가적 데이터 이동이 발생할 수 있습니다.
 >
@@ -443,7 +443,7 @@ B1(1)  B2(2)
 
 > item들에 데이터를 완전히 균등한 확률로 분산하는 알고리즘입니다.
 
-{{< figure src="images/ko/uniform-bucket.svg" alt="object x와 replica r을 hash 후 item 개수로 나눈 나머지로 item을 고르는 Uniform bucket 구조" align="center" class="full-width" >}}
+![object x와 replica r을 hash 후 item 개수로 나눈 나머지로 item을 고르는 Uniform bucket 구조](images/ko/uniform-bucket.svg)
 
 - hash 값을 item 개수로 나누어 bucket의 하위 item들을 서로 동등한 확률로 선택하는 알고리즘입니다.
   - `c(r,x) = hash(r,x) mod m` 이며, `m` 은 item 개수입니다.
@@ -466,7 +466,7 @@ for item, weight in items:
 
 - hash 값이 현재 item의 몫인 `weight / sum(remaining_weights)` 보다 작으면 해당 item을 선택합니다. 그렇지 않으면 다음 item으로 넘어갑니다.
 
-{{< figure src="images/ko/list-bucket.svg" alt="가장 최근에 추가된 item E부터 A까지 순서대로 조건부 확률로 선택 여부를 판단하는 List bucket 구조" align="center" class="full-width" >}}
+![가장 최근에 추가된 item E부터 A까지 순서대로 조건부 확률로 선택 여부를 판단하는 List bucket 구조](images/ko/list-bucket.svg)
 
 - head부터 순서대로 item을 순회하며 탐색하기 때문에 Placement 계산 비용은 `O(n)` 입니다.
 - **새로 item이 추가되는 경우**, 해당 item을 선택하는 데이터를 제외한 **나머지 데이터는 Object mapping이 유지** 됩니다.
@@ -490,14 +490,14 @@ for item, weight in items:
 
 - 확률에 기반한 선택 알고리즘 자체는 List와 동일하지만, 자료구조를 **weighted binary tree** 로 구성한 알고리즘입니다.
 
-{{< figure src="images/ko/tree-bucket-labeling.svg" alt="leaf에 1, 11, 101, 111 등 이진 라벨이 붙은 Tree bucket의 node 라벨링 구조" attr="Weil et al., CRUSH (SC'06) Figure 4 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+![leaf에 1, 11, 101, 111 등 이진 라벨이 붙은 Tree bucket의 node 라벨링 구조](images/ko/tree-bucket-labeling.svg "Weil et al., CRUSH (SC'06) Figure 4 재구성")
 
 - 모든 item은 leaf에 존재하며, node는 분기를 수행합니다.
 - **가장 왼쪽 leaf가 항상 1번 라벨** 을 가집니다. leaf 라벨은 홀수, 분기 node 라벨은 짝수입니다.
 - 트리가 한 단계 커질 때마다 기존 root는 새 root의 왼쪽 자식이 되고, 새 root는 기존 root 라벨을 **left bit shifting** 한 라벨을 가집니다(`100 → 1000`).
 - 덕분에 트리가 커져도 기존 node의 라벨이 바뀌지 않아, 기존 item으로 가는 경로가 유지됩니다.
 
-{{< figure src="images/ko/tree-bucket-expansion.svg" alt="item 4개인 기존 트리에 새로운 item E를 추가하면 오른쪽 서브트리 아래로 확장되는 모습" align="center" class="full-width" >}}
+![item 4개인 기존 트리에 새로운 item E를 추가하면 오른쪽 서브트리 아래로 확장되는 모습](images/ko/tree-bucket-expansion.svg)
 
 - item 탐색은 root부터 weight 비율에 따라 확률적으로 좌우를 재귀적으로 탐색합니다.
 - item 추가로 tree가 확장되면 **새로운 분기로 데이터가 다수 이동하지만, 기존 분기의 mapping은 대부분 유지** 됩니다.
@@ -512,7 +512,7 @@ for item, weight in items:
   - 현재 Ceph는 이를 개선한 **straw2** 를 기본으로 사용하며, score를 `ln(hash(x, r, i)) / w_i` 로 계산합니다.
   - hash 값이 `(0, 1]` 범위이므로 `ln` 값은 0 이하입니다. 따라서 weight가 클수록 score가 0에 가까워져 선택될 확률이 높아집니다.
 
-{{< figure src="images/ko/straw-bucket.svg" alt="모든 item의 score를 계산한 뒤 최대 score인 item B를 winner로 선택하는 Straw bucket 구조" align="center" class="full-width" >}}
+![모든 item의 score를 계산한 뒤 최대 score인 item B를 winner로 선택하는 Straw bucket 구조](images/ko/straw-bucket.svg)
 
 - 모든 item이 매번 독립적으로 경쟁하므로 **cluster 변경 시 winner item이 바뀌는 경우에만 데이터가 이동** 합니다.
 - 그러나 선택할 때마다 모든 item에 대해 score를 계산해야 하므로 Placement 계산 비용이 `O(n)` 입니다.
