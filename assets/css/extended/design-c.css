@@ -41,6 +41,15 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 .tr-tools { margin-left: auto; flex: 0 0 auto; display: flex; align-items: center; gap: 10px; }
 .tr-pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--tr-line); font-size: 0.82rem; font-weight: 600; color: var(--tr-muted); }
 .tr-pill:hover { border-color: var(--tr-cyan); color: var(--tr-cyan-soft); }
+.tr-session-logout { display: inline-flex; width: 34px; height: 34px; padding: 0; align-items: center; justify-content: center; background: transparent; cursor: pointer; }
+.tr-session-logout[hidden] { display: none; }
+.tr-session-logout:focus-visible { outline: 2px solid var(--tr-cyan); outline-offset: 2px; }
+.tr-session-logout:active { opacity: 0.7; }
+.tr-session-logout:disabled { opacity: 0.5; cursor: wait; }
+@media (max-width: 600px) {
+  .tr-header-in:has(.tr-session-logout:not([hidden])) { column-gap: 8px; }
+  .tr-tools:has(.tr-session-logout:not([hidden])) { gap: 6px; }
+}
 .tr-search-link { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; }
 .tr-lang-switch { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; padding: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0; }
 .tr-editor-menu { position: relative; display: inline-flex; }
