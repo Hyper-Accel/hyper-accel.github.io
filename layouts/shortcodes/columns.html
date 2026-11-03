@@ -1,0 +1,20 @@
+{{- /*
+  Side-by-side columns for post bodies. Separate columns with a line containing only <--->.
+  Markdown (code fences, images, lists) inside each column is rendered normally.
+  Stacks vertically on narrow screens (see .md-columns in assets/css/extended/custom.css).
+
+  Usage:
+    {{< columns >}}
+    left markdown
+    <--->
+    right markdown
+    {{< /columns >}}
+*/ -}}
+{{- $cols := split .Inner "<--->" -}}
+<div class="md-columns">
+{{- range $cols }}
+<div class="md-column">
+{{ $.Page.RenderString (dict "display" "block") (trim . "\n") }}
+</div>
+{{- end }}
+</div>

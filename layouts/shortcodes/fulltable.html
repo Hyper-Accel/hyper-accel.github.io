@@ -1,0 +1,15 @@
+{{- /*
+  Opt-in full-width markdown table. PaperMod sets table { display: block },
+  so a plain markdown table shrinks to its content width. Wrapping it here lets
+  the table fill the post width and scroll horizontally when it is wider.
+
+  Usage:
+    {{< fulltable >}}
+    | A | B |
+    |---|---|
+    | 1 | 2 |
+    {{< /fulltable >}}
+*/ -}}
+<div class="table-wrapper">
+{{ .Page.RenderString (dict "display" "block") (trim .Inner "\n") }}
+</div>
