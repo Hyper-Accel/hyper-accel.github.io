@@ -1,17 +1,16 @@
 ---
 date: '2026-04-29T02:00:00+09:00'
-draft: false
-title: 'Memory in the AI Era, Part 2: Where Does HBF Actually Fit?'
+title: '[Memory in the AI Era - Part 02] Where Does HBF Actually Fit?'
 cover:
   image: "images/cover.jpg"
   alt: "HBF workload cover image"
   caption: "HBF"
   relative: true
 authors: [Jaewon Lim]
-tags: ["HBF", "CAG", "H3"]
-series: ["Memory in the AI Era"]
+tags: ["HBF", "CAG", "H3", "Semiconductor"]
+series: ['Memory in the AI Era']
 series_idx: 2
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "Centered on SK hynix's H³ architecture, we explore workloads that can overcome HBF's weaknesses."
 description: "Centered on SK hynix's H³ architecture, we explore workloads that can overcome HBF's weaknesses."
 comments: true

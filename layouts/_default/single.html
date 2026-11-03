@@ -1,10 +1,22 @@
 {{- define "main" }}
+{{- $isPost := eq .Type "posts" }}
+{{- $hasReadingToc := partialCached "d/has_reading_toc.html" . .Page }}
+{{- if $isPost }}
+<div class="post-reading-layout{{ if $hasReadingToc }} has-toc{{ end }}">
+{{- end }}
 
 <article class="post-single">
   <header class="post-header">
     {{ partial "breadcrumbs.html" . }}
+    {{- $t := partial "d/titleparts.html" . }}
+    {{- if or $t.tag (.GetTerms "categories") }}
+    <p class="post-kicker" style="{{ partial "d/catvars.html" . }}">
+      {{- with .GetTerms "categories" }}{{ with index . 0 }}<a class="tr-cat" href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}{{ end }}
+      {{- with $t.tag }}<span class="tr-part">{{ . }}</span>{{ end }}
+    </p>
+    {{- end }}
     <h1 class="post-title entry-hint-parent">
-      {{ .Title }}
+      {{ $t.text }}
       {{- if .Draft }}
       <span class="entry-hint" title="Draft">
         <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
@@ -29,10 +41,12 @@
     {{- end }}
   </header>
   {{- partial "reaction_summary.html" . }}
+  {{- if not $isPost }}
   {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
   {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
   {{- if (.Param "ShowToc") }}
-  {{- partial "toc.html" . }}
+    {{- partial "toc.html" . }}
+  {{- end }}
   {{- end }}
 
   {{- if .Content }}
@@ -64,5 +78,9 @@
   {{- partial "comments.html" . }}
   {{- end }}
 </article>
+{{- if $hasReadingToc }}
+  {{- partial "reading_toc.html" . }}
+{{- end }}
+{{- if $isPost }}</div>{{ end }}
 
 {{- end }}{{/* end main */}}

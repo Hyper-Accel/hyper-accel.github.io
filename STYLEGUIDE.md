@@ -357,6 +357,10 @@ def hello():
 - **Image placement**: Place images **BEFORE** the content they illustrate (recommended)
   - This allows readers to see the visual context before reading the explanation
   - Example: Place a diagram before the paragraph that explains it, not after
+- **Side images**: Append `#side` to the image path to float a small illustration beside the paragraph that follows it: `![Hopper SM block diagram](images/hopper-sm.png#side "Optional caption")`
+  - Use it for narrow or square images (portrait diagrams, photos); keep wide diagrams, charts, and code screenshots full width
+  - Put it after a heading, directly before the paragraph it explains; a following heading clears it
+  - It sits in the page margin on very wide screens, beside the text on desktop, and inline on mobile
 
 **Links**:
 - Use descriptive link text: `[descriptive text](URL)`
@@ -436,24 +440,23 @@ TPU는 Systolic Array 구조를 사용합니다. 이 구조는...
 **Rules**:
 - All posts must have frontmatter with required fields
 - `date` should be in ISO 8601 format: `'2026-01-03T17:20:16+09:00'`
-- `draft: false` for published posts
+- Do not add a `draft` field; a post is published when its PR merges to `main`
 - `title` should be descriptive and match the H1 heading
 - `tags` should be relevant and consistent (use existing tags when possible)
 - `authors` must match entries in `content/authors/`
 - `summary` should be a concise one-line description
 - `description` can be longer (used for SEO)
-- For series posts, include `series: ["시리즈 이름"]`
+- For series posts, include `series: ["시리즈 이름"]` and `series_idx: N`, and write the title as `[Short Series Name - Part 0N] Post Title` (e.g. `[지피지기 - Part 02] TPU의 등장과 부상`). Use the same short name across every part; a side story uses `번외편` / `Extra` instead of the part number. The site renders the bracket as a colored series label
 - `cover` image is optional but recommended
 
 **Required Fields**:
 ```yaml
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: false
 title: 'Post Title'
 authors: ["Author Name"]
 tags: ["Tag1", "Tag2"]
-categories: ["Category"]
+categories: ["AI Hardware"]  # exactly one; see content/posts/AGENTS.md for the list
 summary: "One-line summary"
 description: "Longer description for SEO"
 ---
@@ -513,12 +516,12 @@ TPU는 Systolic Array라는 특별한 연산 유닛을 사용합니다. 이는 �
 ```markdown
 ---
 date: '2026-01-03T17:20:16+09:00'
-draft: false
-title: '지피지기면 백전불태 2편: TPU의 등장과 부상'
+title: '[지피지기 - Part 02] TPU의 등장과 부상'
 authors: ["Jaewon Lim"]
 tags: ["TPU", "Google", "Ironwood"]
 categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]
+series_idx: 2
 summary: "TPU의 등장 배경과 하드웨어/소프트웨어 구조를 분석합니다."
 ---
 
@@ -602,7 +605,7 @@ When reviewing a blog post, check the following items in order of priority:
 
 Based on existing posts, here are common patterns to follow:
 
-- **Series Posts**: Use series tag for series like `series: ["지피지기면 백전불태"]`
+- **Series Posts**: Use series tag for series like `series: ["지피지기면 백전불태"]` plus `series_idx`, and title as `[지피지기 - Part 0N] ...`
 - **Code Languages**: Python, CUDA, Bash, C, Go, F# are commonly used
 - **Image Formats**: `.webp`, `.png`, `.jpg` are used
 - **Technical Terms**: GPU, TPU, SM, CUDA, HBM, Systolic Array, Tensor Core, etc.

@@ -1,0 +1,25 @@
+{{- define "main" }}
+{{- $ko := eq site.Language.Lang "ko" }}
+{{- if $ko }}
+<script>
+(() => {
+  const path = location.pathname;
+  {{- range site.Home.Translations }}
+  if (path.startsWith('{{ .RelPermalink }}') && path !== '{{ .RelPermalink }}404.html') {
+    location.replace('{{ .RelPermalink }}404.html');
+  }
+  {{- end }}
+})();
+</script>
+{{- end }}
+<section class="tr-not-found" aria-labelledby="not-found-title">
+  <p class="tr-not-found-code">404 · PAGE NOT FOUND</p>
+  <h1 id="not-found-title">{{ cond $ko "페이지를 찾을 수 없습니다" "We couldn't find that page" }}</h1>
+  <p>{{ cond $ko "주소가 바뀌었거나 페이지가 삭제되었을 수 있습니다. 홈으로 돌아가거나 검색과 전체 글 목록에서 원하는 글을 찾아보세요." "The address may have changed or the page may have been removed. Return home, search the blog, or browse all posts." }}</p>
+  <nav class="tr-not-found-actions" aria-label="{{ cond $ko "404 복구 메뉴" "404 recovery" }}">
+    <a href="{{ "" | relLangURL }}">{{ cond $ko "홈으로" "Go home" }}</a>
+    <a href="{{ "search/" | relLangURL }}">{{ cond $ko "검색" "Search" }}</a>
+    <a href="{{ "posts/" | relLangURL }}">{{ cond $ko "전체 글" "All posts" }}</a>
+  </nav>
+</section>
+{{- end }}

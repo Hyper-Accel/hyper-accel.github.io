@@ -1,6 +1,5 @@
 ---
 date: '2025-11-10T09:38:03+09:00'
-draft: false
 title: 'Pytorchcon2025 Report'
 cover:
   image: "moscone_center.JPG"
@@ -10,8 +9,8 @@ cover:
   caption: "moscone center"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Minho Park] # must match with content/authors
-tags: [conference, pytorch, report]
-categories: [report]
+tags: ["conference", "pytorch", "report"]
+categories: ["Conference Reports"]
 summary: ['A comprehensive report from HyperAccel ML Team on PyTorch Conference 2025. Covers the latest PyTorch technologies including Monarch, TorchComms, PrivateUse1, and torch.accelerator for distributed training and hardware backends, as well as LLM inference engine trends like vLLM and SGLang, sharing technical insights for AI chip development.']
 comments: true
 ---

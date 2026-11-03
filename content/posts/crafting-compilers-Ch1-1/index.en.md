@@ -1,7 +1,6 @@
 ---
 date: '2025-12-13T15:10:28+09:00'
-draft: false
-title: 'Crafting Compilers (Chapter 1.1) : Building a Programming Language'
+title: '[Crafting Compilers - Part 02] Building a Programming Language'
 cover:
   image: "macintosh.jpeg"
   # can also paste direct link from external site
@@ -10,14 +9,13 @@ cover:
   caption: "Crafting Compiler Ch1.1"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewoo Kim] # must match with content/authors
-tags: [compiler]
-categories: [compiler]
-series: ["Crafting Compilers"]
+tags: ["compiler"]
+categories: ["Compilers and Kernels"]
+series: ['Crafting Compilers']
+series_idx: 2
 summary: [First article about building a programming language]
 comments: true
 ---
-
-# **Building a Programming Language**
 
 Before building a compiler, we need to define the language it will compile. A programming language isn’t just syntax and semantics—it’s the user interface between humans and computers.
 

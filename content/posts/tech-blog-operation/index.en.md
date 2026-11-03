@@ -1,6 +1,5 @@
 ---
 date: '2025-12-26T10:38:16+09:00'
-draft: false
 title: 'Starting Our Tech Blog'
 cover:
   image: "timeline.png"
@@ -10,8 +9,8 @@ cover:
   caption: "Tech Blog Build Timeline"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Minho Park"] # must match with content/authors
-tags: [tech-blog, hugo, engineering-culture]
-categories: [engineering-culture]
+tags: ["tech-blog", "hugo", "engineering-culture"]
+categories: ["Engineering Culture"]
 summary: ["This post shares the journey of starting HyperAccel's tech blog, from the initial motivation to building it with Hugo, operating through an Editor Group, and implementing a Bus Factor-aware operation strategy."]
 comments: true
 ---

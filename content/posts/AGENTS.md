@@ -13,8 +13,10 @@ Each post = one page bundle: `content/posts/<kebab-case-slug>/` with per-languag
 Bilingual (ko+en) is the norm (~40 posts); some are single-language.
 
 ## FRONT MATTER
-Required: `date` (ISO 8601 +09:00), `title`, `draft`, `authors`, `comments`, `cover` (`image`, `alt`, `relative: true` for bundled images).
-Optional: `tags`, `categories`, `series` + `series_idx` (1-based), `summary`, `description`, `keywords`.
+Required: `date` (ISO 8601 +09:00), `title`, `authors`, `comments`, `cover` (`image`, `alt`, `relative: true` for bundled images).
+Optional: `tags`, `series` + `series_idx` (1-based), `summary`, `description`, `keywords`.
+Series titles: `[<short series name> - Part 0N] <title>` (side story: `번외편` / `Extra`); templates split the bracket into a colored label, so keep the format exact.
+`categories`: exactly ONE of `AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` (English term; localized titles live in `content/categories/<slug>/_index*.md`). Fine-grained topics go in `tags`, not `categories`.
 
 ## CONVENTIONS
 - `authors: [Full Name]` must exactly match a directory under `content/authors/`.
@@ -28,12 +30,12 @@ Optional: `tags`, `categories`, `series` + `series_idx` (1-based), `summary`, `d
 - **Capitalization**: pick once, keep consistent. Acronyms uppercase (GPU, HBM, XLA); common nouns lowercase (loop, thread, warp); brands official (NVIDIA, TensorFlow, PyTorch).
 - **Headings**: body starts at H2 (`##`); never skip levels (H2→H3→H4); H1 reserved for the title.
 - **Code blocks**: always tag language (```python, ```bash, ```cuda...); explain code before/after; mark pseudocode as such.
-- **Images**: descriptive alt text (not "image"); place image BEFORE the paragraph explaining it; meaningful kebab-case filenames.
+- **Images**: descriptive alt text (not "image"); place image BEFORE the paragraph explaining it; meaningful kebab-case filenames. Append `#side` to the path (`![alt](images/x.png#side "caption")`) to float a narrow image beside the next paragraph; wide diagrams stay full width.
 - **Readability**: short sentences (~50 chars), 5-7 sentences per paragraph, one idea each; define technical terms on first appearance.
 - **New posts must ship both ko + en versions** (README mandate); same slug so Hugo links translations.
 
 ## ANTI-PATTERNS
-- No `draft: true` in merged PRs - CI blocks the merge.
+- No `draft` field: posts publish when the PR merges to `main` (CI still rejects `draft: true`).
 - No external hotlinked cover images unless `relative: false` is set deliberately.
 - No author names in front matter that lack a profile directory (breaks author_info partial).
 - New authors need both `_index.md` and `_index.en.md` under `content/authors/<Name>/`.

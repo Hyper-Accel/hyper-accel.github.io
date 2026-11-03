@@ -1,7 +1,6 @@
 ---
 date: '2026-02-09T10:38:13+09:00'
-draft: false
-title: 'Building an Internal Development Environment with Kubernetes Chapter 1: Why Kubernetes?'
+title: '[K8s Dev Environment - Part 01] Why Kubernetes?'
 cover:
   image: "images/kubernetes_logo.png"
   # can also paste direct link from external site
@@ -10,9 +9,10 @@ cover:
   caption: "Kubernetes Logo"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ["Younghoon Jun"] # must match with content/authors
-tags: [development-environment, kubernetes, container]
-categories: [kubernetes]
-series: ["Building an Internal Development Environment with Kubernetes"]
+tags: ["development-environment", "kubernetes", "container"]
+categories: ["Infra and DevOps"]
+series: ['Building an In-House Dev Environment on Kubernetes']
+series_idx: 1
 summary: ['We share our journey of building a Kubernetes-based development environment at HyperAccel.']
 comments: true
 description: ""
@@ -21,8 +21,6 @@ keywords: [
   "Server", "FPGA", "GPU"
 ]
 ---
-
-# Building an Internal Development Environment with Kubernetes Chapter 1: Why Kubernetes?
 
 Hello! I'm Younghoon Jun, a DevOps Engineer on the ML team at HyperAccel.
 

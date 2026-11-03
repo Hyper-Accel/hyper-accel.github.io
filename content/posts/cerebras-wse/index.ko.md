@@ -1,16 +1,15 @@
 ---
 date: '2026-04-27T10:00:00+09:00'
-draft: false
-title: '지피지기면 백전불태 5편: Cerebras와 웨이퍼 스케일 엔진'
+title: '[지피지기 - Part 05] Cerebras와 웨이퍼 스케일 엔진'
 cover:
   image: "images/00-cover-cerebras-wse.png"
   alt: "Cerebras WSE-3 또는 CS-3 시스템"
   caption: "Cerebras 웨이퍼 스케일 엔진"
   relative: true
 authors: ["Donghyeon Choi"]
-tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI"]
-categories: ["AI Hardware", "Architecture", "Accelerator"]
-series: ["지피지기면 백전불태"]
+tags: ["Cerebras", "WSE", "Wafer Scale Engine", "AI Hardware", "Inference", "OpenAI", "Accelerator"]
+categories: ["AI Hardware"]
+series: ['지피지기면 백전불태']
 series_idx: 5
 summary: "OpenAI와의 대형 계약 보도로 주목받은 Cerebras의 최근 근황과 WSE-3 아키텍처, 웨이퍼 스케일 칩의 장단점을 비전공자도 이해할 수 있게 정리합니다."
 description: "OpenAI와의 대형 계약 보도로 주목받은 Cerebras의 최근 근황과 WSE-3 아키텍처, 웨이퍼 스케일 칩의 장단점을 비전공자도 이해할 수 있게 정리합니다."
@@ -20,8 +19,6 @@ keywords: [
   "AI Inference", "CS-3", "AI Hardware", "웨이퍼 스케일"
 ]
 ---
-
-# 지피지기면 백전불태 5편: Cerebras와 웨이퍼 스케일 엔진
 
 > **지피지기면 백전불태(知彼知己 百戰不殆)**  
 > 상대를 알고 나를 알면 백 번 싸워도 위태롭지 않다는 뜻입니다.  

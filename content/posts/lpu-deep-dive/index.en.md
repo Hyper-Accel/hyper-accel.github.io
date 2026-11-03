@@ -1,7 +1,6 @@
 ---
 date: '2026-02-03T11:24:57+09:00'
-draft: false
-title: "Know Your Enemy, Know Yourself, Part 3: Groq's LPU (Acquired by NVIDIA for $20B)"
+title: '[Know Your Enemy - Part 03] Groq''s LPU (Acquired by NVIDIA for $20B)'
 cover:
   image: "images/groq_logo.jpg"
   # can also paste direct link from external site
@@ -10,16 +9,14 @@ cover:
   caption: "groq logo"
   relative: true # To use relative path for cover image, used in hugo Page-bundles
 authors: [Jaewon Lim] # must match with content/authors
-tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC"]
-series: ["Know Your Enemy, Know Yourself"]
+tags: ["LPU", "groq", "TSP", "computer architecture", "Nvidia", "ASIC", "Accelerator", "Semiconductor"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 3
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor"]
+categories: ["AI Hardware"]
 summary: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
 comments: true
 description: We explore the background of Groq and LPU, their hardware/software design philosophy, and analyze NVIDIA's intentions behind acquiring Groq.
 ---
-
-# Know Your Enemy, Know Yourself, Part 3: Groq's LPU (Acquired by NVIDIA for $20B)
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**  
 > This series aims to deeply understand competitors' hardware for AI accelerator design.  

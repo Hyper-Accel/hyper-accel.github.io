@@ -1,0 +1,7 @@
+{{- /* Splits "[Series - Part 01] Title" into tag and text. */ -}}
+{{- $out := dict "tag" "" "text" .Title }}
+{{- with findRESubmatch `^\[([^\]]+)\]\s*(.+)$` .Title 1 }}
+{{- $m := index . 0 }}
+{{- $out = dict "tag" (index $m 1) "text" (index $m 2) }}
+{{- end }}
+{{- return $out -}}

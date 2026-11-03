@@ -1,6 +1,5 @@
 ---
 date: '2026-02-03T10:17:33+09:00'
-draft: false
 title: 'Specs are All You Need: Spec-Driven Development (SDD)란 무엇인가?'
 cover:
   image: "sdd.png"
@@ -9,7 +8,7 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: [Seungbin Shin]
 tags: ["Spec-Driven Development", "SDD", "AI Engineering", "LLM", "Prompt Engineering"]
-categories: ["AI Engineering", "AI Trends"]
+categories: ["Engineering Culture"]
 summary: AI 시대의 새로운 개발 방법론, Spec-Driven Development에 대해 알아보고, 프롬프트 엔지니어링을 넘어 스펙(Spec) 엔지니어링으로 나아가는 방향을 제시합니다.
 comments: true
 ---

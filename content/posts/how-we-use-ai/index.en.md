@@ -1,7 +1,6 @@
 ---
 date: '2026-02-19T14:16:19+09:00'
-draft: false
-title: 'From Copy-Paste to Autonomous Agents: A Subtle Introduction'
+title: '[AI Agent - Part 01] From Copy-Paste to Autonomous Agents: A Subtle Introduction'
 cover:
   image: "images/using-ai.png"
   # can also paste direct link from external site
@@ -11,13 +10,12 @@ cover:
   relative: false # To use relative path for cover image, used in hugo Page-bundles
 authors: ['Taeseo Um'] # must match with content/authors
 tags: ["Agents", "AI", "Tools", "Coding"]
-categories: ["Agentic Workflow"]
-series: ["From Copy-Paste to Autonomous Agents"]
+categories: ["Engineering Culture"]
+series: ['AI Agent Series']
+series_idx: 1
 summary: ["How the ML team at HyperAccel started implemented AI into our development workflow."]
 comments: true
 ---
-
-# From Copy-Paste to Autonomous Coding Agents: A Subtle Introduction
 
 Hello, my name is Taeseo Um, currently on the ML team at HyperAccel.
 

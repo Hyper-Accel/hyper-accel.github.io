@@ -1,8 +1,14 @@
 import { existsSync } from "node:fs"
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path"
-import { parse } from "yaml"
+import { isScalar, parse, parseDocument } from "yaml"
 import { z } from "zod"
-import { type PostDocument, type PostSummary, postPathSchema } from "../shared/contracts"
+import {
+  type PostCover,
+  type PostDocument,
+  type PostSummary,
+  postPathSchema,
+} from "../shared/contracts"
+import { normalizeCover, patchCoverFrontmatter, validateCoverForSave } from "./cover"
 import { ContentError, HugoBuildError, RevisionConflictError } from "./errors"
 import { prepareCommand } from "./process-command"
 
@@ -57,11 +63,22 @@ export function splitMarkdownDocument(source: string): MarkdownParts {
 }
 
 export function patchFrontmatterScalar(frontmatter: string, key: "title", value: string): string {
-  const line = new RegExp(`^${key}:.*$`, "m")
-  if (!line.test(frontmatter)) {
-    throw new ContentError(`프론트매터에 ${key} 필드가 없습니다.`)
+  const document = parseDocument(frontmatter)
+  const node = document.get(key, true)
+  if (document.errors.length || !isScalar(node) || node.anchor || !node.range) {
+    throw new ContentError(`프론트매터에 올바른 ${key} 필드가 없습니다.`)
   }
-  return frontmatter.replace(line, `${key}: ${JSON.stringify(value)}`)
+  if (node.value === value) return frontmatter
+  const original = frontmatter.slice(node.range[0], node.range[1])
+  const comment = /^[|>][^\r\n]*?(#[^\r\n]*)/.exec(original)?.[1]
+  const endOfLine = original.endsWith("\r\n") ? "\r\n" : original.endsWith("\n") ? "\n" : ""
+  return (
+    frontmatter.slice(0, node.range[0]) +
+    JSON.stringify(value) +
+    (comment ? ` ${comment}` : "") +
+    endOfLine +
+    frontmatter.slice(node.range[1])
+  )
 }
 
 export function resolveContentPath(root: string, contentPath: string): string {
@@ -134,8 +151,8 @@ export async function listPosts(): Promise<readonly PostSummary[]> {
     .map((entry) => entry.summary)
 }
 
-export async function readPost(contentPath: string): Promise<PostDocument> {
-  const absolute = resolveContentPath(repositoryRoot, contentPath)
+export async function readPost(contentPath: string, root = repositoryRoot): Promise<PostDocument> {
+  const absolute = resolveContentPath(root, contentPath)
   const source = await Bun.file(absolute).text()
   const parts = splitMarkdownDocument(source)
   const metadata = frontmatterSchema.parse(parse(parts.frontmatter))
@@ -147,14 +164,15 @@ export async function readPost(contentPath: string): Promise<PostDocument> {
     draft: metadata.draft,
     body: parts.body,
     revision: revisionOf(source),
+    cover: normalizeCover(metadata["cover"]),
   }
 }
 
-async function validateHugoBuild(): Promise<void> {
+async function validateHugoBuild(root = repositoryRoot): Promise<void> {
   const process = Bun.spawn(
     prepareCommand(["hugo", "--renderToMemory", "--quiet", "--noBuildLock"]),
     {
-      cwd: repositoryRoot,
+      cwd: root,
       stdout: "pipe",
       stderr: "pipe",
     },
@@ -173,18 +191,26 @@ export async function savePost(
   title: string,
   body: string,
   expectedRevision: string,
+  cover?: PostCover | null,
+  root = repositoryRoot,
 ): Promise<string> {
-  const absolute = resolveContentPath(repositoryRoot, contentPath)
+  const absolute = resolveContentPath(root, contentPath)
   const original = await Bun.file(absolute).text()
   if (revisionOf(original) !== expectedRevision) {
     throw new RevisionConflictError()
   }
-  const parts = splitMarkdownDocument(original)
-  const frontmatter = patchFrontmatterScalar(parts.frontmatter, "title", title)
-  const next = `---\n${frontmatter}---\n\n${body.trimEnd()}\n`
+  const frame = /^(---\r?\n)([\s\S]*?)(\r?\n---\r?\n(?:\r?\n)?)/.exec(original)
+  if (!frame?.[1] || frame[2] === undefined || !frame[3])
+    throw new ContentError("YAML 프론트매터를 찾을 수 없습니다.")
+  let frontmatter = patchFrontmatterScalar(frame[2], "title", title)
+  if (cover !== undefined) {
+    validateCoverForSave(contentPath, cover, root)
+    frontmatter = patchCoverFrontmatter(frontmatter, cover)
+  }
+  const next = `${frame[1]}${frontmatter}${frame[3]}${body}`
   await Bun.write(absolute, next)
   try {
-    await validateHugoBuild()
+    await validateHugoBuild(root)
   } catch (error: unknown) {
     await Bun.write(absolute, original)
     if (error instanceof HugoBuildError) {

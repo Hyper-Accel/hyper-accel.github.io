@@ -1,17 +1,16 @@
 ---
 date: '2026-07-02T14:33:50+09:00'
-draft: false
-title: 'Know Your Enemy, Know Yourself, Part 6: The Agentic AI Era — The Revival of the CPU and the Dawn of the CPU Three Kingdoms'
+title: '[Know Your Enemy - Part 06] The Agentic AI Era — The Revival of the CPU and the Dawn of the CPU Three Kingdoms'
 cover:
   image: "images/cover.png"
   alt: "The three datacenter-CPU powers of the Agentic AI era — Intel, AMD, NVIDIA"
   caption: "The datacenter CPU, rising again"
   relative: true
 authors: [Jaewon Lim]
-tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference"]
-series: ["Know Your Enemy, Know Yourself"]
+tags: ["CPU", "Agentic AI", "Datacenter", "Intel", "AMD", "NVIDIA", "Xeon", "EPYC", "Vera", "LLM Inference", "Accelerator", "Computer Architecture", "Semiconductor"]
+series: ['Know Your Enemy, Know Yourself']
 series_idx: 6
-categories: ["AI Hardware", "Accelerator", "Computer Architecture", "Semiconductor", "Datacenter"]
+categories: ["AI Hardware"]
 summary: "We analyze why the CPU became the bottleneck of inference infrastructure in Agentic AI workloads, walk through the latest datacenter CPU lineups from the three CPU vendors, and explore why the CPU has risen to prominence again in the Agentic AI era."
 description: "We analyze why the CPU became the bottleneck of inference infrastructure in Agentic AI workloads, walk through the latest datacenter CPU lineups from the three CPU vendors, and explore why the CPU has risen to prominence again in the Agentic AI era."
 comments: true
@@ -21,8 +20,6 @@ keywords: [
   "NVIDIA Vera", "Vera Rubin", "AMX", "LLM inference bottleneck"
 ]
 ---
-
-# Know Your Enemy, Know Yourself, Part 6: The Agentic AI Era — The Revival of the CPU and the Dawn of the CPU Three Kingdoms
 
 > **"If you know the enemy and know yourself, you need not fear the result of a hundred battles."**
 > This series aims to deeply understand competitors' hardware for the sake of designing AI accelerators.

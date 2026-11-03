@@ -204,7 +204,6 @@ content/posts/
 ---
 title: '나의 첫 포스트'
 date: '2025-01-15T10:00:00+09:00'
-draft: false
 authors: ['Minho Park']
 ---
 
@@ -218,7 +217,6 @@ authors: ['Minho Park']
 ---
 title: 'My First Post'
 date: '2025-01-15T10:00:00+09:00'
-draft: false
 authors: ['Minho Park']
 ---
 
@@ -239,10 +237,9 @@ This is the English version.
 ---
 title: '지피지기면 백전불태 2편: TPU의 등장과 부상'
 date: '2026-01-03T17:20:16+09:00'
-draft: false
 authors: [Jaewon Lim]
 tags: ["TPU", "Google", "Ironwood"]
-categories: ["AI Hardware", "Computer Architecture"]
+categories: ["AI Hardware"]
 series: ["지피지기면 백전불태"]  # 시리즈 이름 추가
 ---
 ```
@@ -309,7 +306,6 @@ series_idx: 3
 포스트 생성 시 자동으로 생성되는 메타데이터 필드들:
 
 - **`date`**: 포스트 작성일 (자동 생성)
-- **`draft`**: 초안 여부 (`true`: 초안, `false`: 발행)
 - **`title`**: 포스트 제목 (파일명에서 자동 생성, 수정 가능)
 - **`cover`**: 커버 이미지 설정
   - `image`: 이미지 경로 또는 URL
@@ -319,7 +315,7 @@ series_idx: 3
 
 추가로 설정할 수 있는 메타데이터:
 - **`tags`**: 포스트 태그 (배열)
-- **`categories`**: 포스트 카테고리 (배열)
+- **`categories`**: 포스트 카테고리. **정확히 1개**만 지정합니다 (`AI Hardware`, `Memory and Storage`, `Compilers and Kernels`, `LLM and Models`, `Infra and DevOps`, `Engineering Culture`, `Conference Reports` 중 택 1). 세부 주제는 `tags`에 넣습니다. 한/영 표시 이름은 `content/categories/<slug>/_index*.md`에 있습니다.
 - **`summary`**: 포스트 요약
 
 #### SEO 최적화를 위한 메타데이터
@@ -361,12 +357,11 @@ series_idx: 3
 date: '2025-01-15T10:00:00+09:00'
 lastmod: '2025-01-20T15:30:00+09:00'
 title: 'Hugo 블로그 SEO 가이드'
-draft: false
 authors: ['Minho Park']
 description: 'Hugo와 PaperMod 테마를 사용한 블로그의 SEO 최적화 방법을 알아봅니다. 메타 태그, Open Graph, Schema.org 설정 등을 포함합니다.'
 keywords: ['Hugo', 'SEO', '블로그', 'PaperMod', '검색엔진최적화']
 tags: ['Hugo', 'SEO', 'Tutorial']
-categories: ['Tech']
+categories: ['Engineering Culture']
 summary: 'Hugo 블로그의 SEO 최적화 가이드입니다.'
 cover:
   image: 'seo-guide.png'
@@ -456,11 +451,21 @@ techblog-editor
 hugo server -D
 ```
 
-### 프로덕션 모드
+### 일반 미리보기 (발행일 자동 적용)
+
+Hugo extended **0.152.2**에서 저장소 루트의 기존 명령을 그대로 사용합니다. Bun·별도 서버·GitHub 인증은 필요하지 않습니다.
 
 ```bash
 hugo server
 ```
+
+- 개발 환경의 네이티브 content adapter가 실제 `Page.Date`를 설정하므로 본문·카드·검색·RSS·날짜 정렬에 같은 발행일이 적용됩니다. Hugo 기본 hot reload를 그대로 사용합니다.
+- 이미 배포된 글은 공개 `publication-state.json`의 언어별 날짜를 우선 사용합니다. 아직 기록이 없는 기존 배포는 실제 공개 글 HTML의 발행일로 확인합니다. 네트워크 오류나 잘못된 기록·누락된 공개 발행일은 임의로 현재 시각으로 바꾸지 않고 빌드를 중단합니다. 최초 조회에 인터넷 연결이 필요합니다.
+- 새 글의 날짜는 첫 로컬 미리보기 시각입니다. 초안은 `-D`, 예약 글은 `--buildFuture` 등 Hugo 옵션으로 확인하며, 개발 중 날짜가 실제 최초 배포일과 달라도 정상입니다.
+- 기본 출력의 `public/__hugo_preview_dates_*.json`은 로컬 신규 날짜만 보관합니다. 기본 출력 디렉터리를 지우거나 다른 destination·메모리 렌더링을 쓰면 신규 날짜는 초기화될 수 있습니다. 원본 Markdown은 바뀌지 않으며 이 기록은 실제 배포 빌더로 전달되지 않습니다.
+- 로컬에서는 Git rename 이력을 추적하지 않습니다. 이미 배포된 글의 번들명·URL을 바꾸면 원래 공개 URL과 자동 연결되지 않을 수 있습니다. 실제 배포 빌더의 기존 검증은 그대로 유지됩니다.
+
+기록이 아직 없는 첫 실제 배포의 마이그레이션은 기존 배포 빌더가 마지막 성공한 Pages 배포 commit에서 초기화합니다(현재 작업 트리에서 초기화하지 않음). 위 HTML 조회는 첫 관리형 배포 전의 로컬 미리보기 전용 연결 장치이며 실제 배포 초기화 경로를 바꾸지 않습니다.
 
 ### 특정 포트로 실행
 
@@ -504,9 +509,9 @@ PR 또는 `main`에 push할 때 [Check large files](.github/workflows/check-larg
 
 ## 📤 포스트 배포
 
-### 1. 포스트 완성 후 초안 해제
+### 1. 포스트 완성 확인
 
-포스트 파일에서 `draft: true`를 `draft: false`로 변경합니다.
+`draft` 필드는 쓰지 않습니다. PR이 `main`에 머지되면 바로 발행되므로, 공개할 준비가 된 글만 머지합니다.
 
 ### 2. 새 브랜치 생성 및 변경사항 커밋
 

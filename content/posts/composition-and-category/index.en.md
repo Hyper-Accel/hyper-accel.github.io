@@ -1,7 +1,6 @@
 ---
 date: '2026-09-25T09:00:00+09:00'
-draft: false
-title: 'Monads and Category Theory ① When Functions Do Not Compose'
+title: '[Monads and Category Theory - Part 01] When Functions Do Not Compose'
 cover:
   image: "composition-cover.ko.png"
   alt: "When functions do not compose: a connecting rule between functions f and g joins their computations"
@@ -11,7 +10,7 @@ authors: [Jaeho Choi]
 tags: ["category theory", "functional programming", "Lean4", "monad", "composition", "flatMap", "Option"]
 series: ["Monads and Category Theory Starting from Code"]
 series_idx: 1
-categories: ["Programming Language"]
+categories: ["Compilers and Kernels"]
 summary: "Starting with a type mismatch between functions that return Option, we explore how branching, map, join, and bind express the same computation."
 description: "Connect computations that may produce no value and build a first composition rule on the way to understanding monads."
 comments: true

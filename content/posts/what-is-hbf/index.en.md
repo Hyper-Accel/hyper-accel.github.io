@@ -1,17 +1,16 @@
 ---
 date: '2026-04-23T12:34:00+09:00'
-draft: false
-title: 'Memory in the AI Era, Part 1: Understanding HBF'
+title: '[Memory in the AI Era - Part 01] Understanding HBF'
 cover:
   image: "01-memory-hierarchy-pyramid.jpg"
   alt: "Memory hierarchy pyramid — SRAM, DRAM, HBM, HBF, SSD"
   caption: "Memory hierarchy in the AI era"
   relative: true
 authors: [Seungbin Shin]
-tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV"]
-series: ["Memory in the AI Era"]
+tags: ["HBF", "High Bandwidth Flash", "memory", "NAND", "HBM", "SRAM", "DRAM", "TSV", "Semiconductor"]
+series: ['Memory in the AI Era']
 series_idx: 1
-categories: ["AI hardware", "Semiconductor"]
+categories: ["Memory and Storage"]
 summary: "Why are there so many types of memory, and where does HBF fit in? From SRAM to HBF, we explore the physical principles behind the memory hierarchy and the technical architecture of HBF."
 description: "We explain the cell structures and physical characteristics of SRAM, DRAM, HBM, and NAND, and analyze how High Bandwidth Flash (HBF) fills the gap in the memory hierarchy."
 comments: true

@@ -14,12 +14,17 @@ HyperAccel tech blog. Hugo 0.152.2 extended + PaperMod theme (git submodule). Bi
 ├── content/
 │   ├── posts/                 # Page bundles; see content/posts/AGENTS.md
 │   ├── authors/               # 10 author profiles: authors/<Full Name>/_index.md
+│   ├── categories/            # 7 categories: <slug>/_index{,.en}.md (title, description, color order, aliases)
 │   └── about/                 # index.md + index.en.md
-├── layouts/                   # PaperMod overrides ONLY (7 custom files)
-│   ├── _default/{list,single}.html
-│   ├── partials/{author_info,post_meta,extend_head,comments}.html
-│   └── posts/giscus.html
-├── assets/css/extended/custom.css   # Custom CSS (author boxes, post grid)
+├── layouts/                   # PaperMod overrides
+│   ├── index.html             # Home: hero + full-stack layer menu, latest, series, category shelves
+│   ├── 404.html
+│   ├── _default/              # baseof, list, single, terms, search, index.json, _markup/render-image
+│   ├── partials/header.html   # Category nav, search, careers, language switch
+│   ├── partials/d/            # Shared pieces: card, cover, colors (category palette), catvars, titleparts
+│   └── partials/              # author_info, series_list, post_meta, extend_head, comments, ...
+├── assets/css/extended/       # custom.css (post body, author boxes) + design-c.css (site design)
+├── assets/js/fastsearch.js    # Exact-match search with context snippets
 ├── archetypes/posts.md        # Post template = authoring guide (read it)
 ├── i18n/{ko,en}.yaml          # UI translation strings
 └── themes/PaperMod/           # SUBMODULE - never edit directly
@@ -31,7 +36,8 @@ HyperAccel tech blog. Hugo 0.152.2 extended + PaperMod theme (git submodule). Bi
 | Write/edit post | `content/posts/<slug>/` | See content/posts/AGENTS.md |
 | New author | `content/authors/<Full Name>/_index.md` | Name must match `authors:` field in posts exactly |
 | Template change | `layouts/` | Copy from themes/PaperMod first, then modify the copy |
-| Styling | `assets/css/extended/custom.css` | Never touch theme CSS |
+| Styling | `assets/css/extended/design-c.css`, `custom.css` | Never touch theme CSS. Site is dark-only by design |
+| Category colors | `layouts/partials/d/colors.html` | Brand palette from Pantone 2925C (#009EE2) |
 | Site config, Giscus, analytics | `hugo.yaml` | Taxonomies: tags, categories, authors, series |
 | UI strings | `i18n/ko.yaml`, `i18n/en.yaml` | |
 | Writing style rules | `STYLEGUIDE.md` | Summary in content/posts/AGENTS.md; enforced by reviewers/agents, no bot |

@@ -79,7 +79,6 @@ Recommended fields:
 ```yaml
 ---
 date: 'YYYY-MM-DDTHH:MM:SS+09:00'
-draft: true
 title: 'Korean title'
 cover:
   image: "images/01-cover.png"
@@ -88,7 +87,7 @@ cover:
   relative: true
 authors: ["Author Name"]
 tags: ["Tag1", "Tag2"]
-categories: ["Category"]
+categories: ["AI Hardware"]  # exactly one; list in content/posts/AGENTS.md
 series: ["Korean Series Name"] # only for series posts
 series_idx: 1                  # only for ordered series posts
 summary: "One-line summary"
@@ -102,7 +101,7 @@ Notes:
 - `authors` must match `content/authors/` entries.
 - Korean and English files share the same slug, author, tags, categories, and `series_idx` unless there is a deliberate reason not to.
 - `series` should be localized: Korean in `index.ko.md` or `index.md`, English in `index.en.md`.
-- Keep `draft: true` while co-authoring unless the user explicitly asks to prepare for publishing.
+- Do not add a `draft` field. The post publishes when its PR merges to `main`, so keep work on a branch until it is ready.
 
 ### Section Scaffold
 
@@ -199,7 +198,6 @@ Checklist before handing off:
 
 - Korean and English files share the same slug/folder.
 - Author names match `content/authors/`.
-- `draft` state is intentional.
 - Frontmatter includes useful `summary` and `description`.
 - Series posts include localized `series` names and consistent `series_idx`.
 - Images are present, referenced with relative paths, and have descriptive alt text.

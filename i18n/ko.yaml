@@ -4,6 +4,12 @@
 - id: next_page
   translation: "다음 페이지"
 
+- id: prev_post
+  translation: "이전 글"
+
+- id: next_post
+  translation: "다음 글"
+
 - id: read_time
   translation:
     one : "1 분"
@@ -17,6 +23,12 @@
 - id: toc
   translation: "목차"
 
+- id: close_toc
+  translation: "목차 닫기"
+
+- id: toc_short
+  translation: "목차"
+
 - id: translations
   translation: "번역"
 
@@ -24,7 +36,7 @@
   translation: "홈"
 
 - id: edit_post
-  translation: "편집"
+  translation: "수정 제안"
 
 - id: code_copy
   translation: "복사"

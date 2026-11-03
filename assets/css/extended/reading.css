@@ -1,0 +1,143 @@
+/* Article reading layout: the introduction, not cover art, leads the page. */
+body.reading-page {
+  --main-width: 1048px;
+  --reading-width: 760px;
+  --reading-rail-width: 240px;
+  --reading-gap: 48px;
+  --reading-offset: 132px;
+}
+.post-reading-layout {
+  max-width: var(--reading-width);
+  margin-inline: auto;
+}
+.post-reading-layout .post-single { min-width: 0; font-size: 16px; }
+.reading-page .post-content { font-size: 16px; line-height: 1.75; }
+.reading-page .post-title, .reading-page .post-content h1 { font-size: 36px; }
+.reading-page .post-content h2 { font-size: 28px; }
+.reading-page .post-content h3 { font-size: 22px; }
+.reading-page .post-content :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: var(--reading-offset);
+}
+.reading-toc {
+  min-width: 0;
+  margin-top: 24px;
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.reading-toc-header { display: flex; align-items: center; gap: 16px; }
+.reading-toc-header h2 {
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+.reading-toc-links { overflow-y: auto; overscroll-behavior: contain; }
+.reading-toc ul { list-style: none; padding: 0; margin: 0; }
+.reading-toc ul ul { padding-left: 14px; }
+.reading-toc li { margin: 0; }
+.reading-toc a {
+  display: block;
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid transparent;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.reading-toc a:hover { color: var(--primary); }
+.reading-toc a[aria-current="location"] {
+  color: var(--tr-cyan-soft);
+  border-left-color: var(--tr-cyan-soft);
+  font-weight: 650;
+}
+.reading-toc a:focus-visible,
+.reading-toc-toggle:focus-visible,
+.reading-toc-close:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.reading-toc-toggle, .reading-toc-close { display: none; }
+
+@media (min-width: 1100px) {
+  .post-reading-layout.has-toc {
+    display: grid;
+    grid-template-columns: var(--reading-rail-width) minmax(0, var(--reading-width));
+    gap: var(--reading-gap);
+    max-width: none;
+  }
+  .reading-toc {
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: var(--reading-offset);
+    align-self: start;
+    border-left: 1px solid var(--border);
+    padding-left: 20px;
+    max-height: calc(100dvh - var(--reading-offset) - 24px);
+    display: flex;
+    flex-direction: column;
+  }
+  .post-reading-layout.has-toc .post-single { grid-column: 2; grid-row: 1; }
+  .reading-toc-links { min-height: 0; }
+}
+
+@media (max-width: 1099px) {
+  /* Without JS, a useful plain TOC remains after the article, never before it. */
+  .reading-toc-ready .reading-toc { display: none; }
+  .reading-toc-ready .reading-toc.is-open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 30;
+    right: 16px;
+    top: var(--reading-offset);
+    margin-top: 0;
+    width: min(340px, calc(100vw - 32px));
+    max-height: min(60dvh, calc(100dvh - var(--reading-offset) - 16px));
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--theme);
+  }
+  .reading-toc-ready .reading-toc-toggle {
+    position: absolute;
+    right: 8px;
+    bottom: 0;
+    width: 96px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 8px;
+    border-left: 1px solid var(--tr-line);
+    background: transparent;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 650;
+  }
+  .reading-toc-toggle:hover, .reading-toc-toggle[aria-expanded="true"] { border-color: var(--tr-cyan-soft); }
+  /* The TOC toggle sits at the bottom-right of the header, so categories move to their own row beside it. */
+  .reading-toc-ready .tr-header-in { flex-wrap: wrap; row-gap: 0; }
+  .reading-toc-ready .tr-nav { order: 3; flex-basis: 100%; max-width: calc(100% - 104px); min-height: 44px; border-top: 1px solid var(--tr-line); }
+  .reading-toc-close {
+    display: block;
+    flex: 0 0 44px;
+    height: 44px;
+    margin: -10px -10px 0 auto;
+    color: var(--primary);
+    font-size: 24px;
+  }
+  .reading-toc-header { flex: 0 0 auto; }
+  .reading-toc-links { min-height: 0; }
+}
+@media (max-width: 640px) {
+  .reading-page .main { padding-inline: 16px; }
+  .reading-page .post-title, .reading-page .post-content h1 { font-size: 28px; }
+  .reading-page .post-content h2 { font-size: 24px; }
+  .reading-page .post-content h3 { font-size: 20px; }
+}
+@media (min-width: 641px) {
+  /* Preserve #side figures, but do not let them spill into the TOC rail. */
+  .reading-page .post-content .side-figure { width: 36%; margin: 4px 0 16px 28px; }
+}
+@media print {
+  .post-reading-layout.has-toc { display: block; max-width: var(--reading-width); }
+  .reading-toc, .reading-toc-ready .reading-toc.is-open, .reading-toc-ready .reading-toc-toggle { display: none; }
+}

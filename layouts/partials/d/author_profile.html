@@ -1,0 +1,26 @@
+{{- $ko := eq site.Language.Lang "ko" }}
+<header class="tr-author-profile">
+  <div class="tr-author-avatar">
+    {{- with .Params.image }}
+    <img src="{{ . | safeURL }}" alt="{{ $.Title }}" width="144" height="144">
+    {{- else }}
+    <span aria-hidden="true">{{ substr .Title 0 1 }}</span>
+    {{- end }}
+  </div>
+  <div class="tr-author-copy">
+    <span class="tr-crumb">{{ cond $ko "작성자" "Author" }}</span>
+    <h1>{{ .Title }}</h1>
+    {{- with .Params.role }}<p class="tr-author-role">{{ . }}{{ with $.Params.team }} · {{ . }}{{ end }}</p>{{ end }}
+    {{- with .Params.bio }}<p class="tr-author-bio">{{ . | markdownify }}</p>{{ end }}
+    {{- with .Params.expertise }}
+    <ul class="tr-author-expertise">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
+    {{- end }}
+    <div class="tr-author-links">
+      {{- with .Params.github }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>{{ end }}
+      {{- with .Params.linkedin }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>{{ end }}
+      {{- with .Params.website }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">Website ↗</a>{{ end }}
+    </div>
+    {{- with .Content }}<div class="tr-author-longform">{{ . }}</div>{{ end }}
+  </div>
+</header>
+<h2 class="tr-author-posts-title">{{ cond $ko "작성한 글" "Articles" }} <span>{{ len .RegularPages }}</span></h2>

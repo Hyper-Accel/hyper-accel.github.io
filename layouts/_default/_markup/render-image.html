@@ -1,0 +1,28 @@
+{{- /* PaperMod hook + opt-in side figures: ![alt](img.png#side "caption") floats beside the following paragraph. */ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $side := eq $u.Fragment "side" -}}
+{{- $src := $u.String -}}
+{{- if $side }}{{ $src = strings.TrimSuffix "#side" $src }}{{ end -}}
+{{- if not $u.IsAbs -}}
+  {{- $path := strings.TrimPrefix "./" $u.Path }}
+  {{- with or (.PageInner.Resources.Get $path) (resources.Get $path) -}}
+    {{- $src = .RelPermalink -}}
+    {{- with $u.RawQuery -}}
+      {{- $src = printf "%s?%s" $src . -}}
+    {{- end -}}
+    {{- with and (not $side) $u.Fragment -}}
+      {{- $src = printf "%s#%s" $src . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $title := cond $side "" .Title -}}
+{{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" ($title | transform.HTMLEscape) "loading" "lazy") -}}
+{{- if $side }}<span class="side-figure">{{ end -}}
+<img
+  {{- range $k, $v := $attributes -}}
+    {{- if $v -}}
+      {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+    {{- end -}}
+  {{- end -}}>
+{{- if $side }}{{ with .Title }}<span class="side-caption">{{ . }}</span>{{ end }}</span>{{ end -}}
+{{- /**/ -}}
