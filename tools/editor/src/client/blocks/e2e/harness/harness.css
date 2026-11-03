@@ -1,0 +1,34 @@
+body.reading-page {
+  --reading-width: 760px;
+  --reading-figure-expand: 0px;
+  margin: 0;
+  background: var(--theme);
+  color: var(--primary);
+}
+
+@media (min-width: 1100px) {
+  body.reading-page {
+    --reading-figure-expand: 52px;
+  }
+}
+
+.harness {
+  width: min(100% - 32px, var(--reading-width));
+  margin: 0 auto;
+  padding-block: var(--gap);
+}
+
+.harness-title {
+  margin: 0 0 var(--gap);
+  font-size: 1.25rem;
+}
+
+.post-content {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.ProseMirror {
+  min-height: 60vh;
+  outline: 0;
+}

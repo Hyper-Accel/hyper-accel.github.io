@@ -1,0 +1,706 @@
+/*
+ * Every selector carries .composer-form on purpose: the hosted shell's generic `.site-editor
+ * label` / `input` / `button` rules (0,1,1) otherwise inflate checkbox and radio inputs to 44px
+ * boxes, add 24px label margins and strip the primary button. Do not shorten the selectors.
+ */
+
+.composer-form {
+  /* DESIGN.md §4: 44px minimum targets. composer.css sets 40px on .composer; the form raises it. */
+  --editor-touch-target: 44px;
+  /* DESIGN.md §2: H3 scale (24px) for the two title inputs while creating a post. */
+  --metadata-font-title: 24px;
+  --metadata-title-height: 56px;
+  --metadata-control-size: 18px;
+  --metadata-label-column: 9rem;
+  --metadata-choice-min: 14rem;
+  --metadata-list-rows: 5.5;
+  --metadata-surface: var(--entry);
+  container-type: inline-size;
+  container-name: metadata-form;
+}
+
+/* Inside the edit panel (an --entry surface) fields need the darker --theme well to stay visible. */
+.composer-form[data-mode="edit"] {
+  --metadata-surface: var(--theme);
+}
+
+.composer-form .metadata-groups {
+  display: grid;
+  min-width: 0;
+}
+
+.composer-form .metadata-group {
+  display: grid;
+  gap: var(--editor-space-3) var(--content-gap);
+  min-width: 0;
+  padding-block: var(--gap);
+  border-top: 1px solid var(--border);
+}
+
+.composer-form .metadata-group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.composer-form .metadata-group:last-child {
+  padding-bottom: 0;
+}
+
+.composer-form .metadata-group__title {
+  max-width: none;
+  margin: 0;
+  color: var(--primary);
+  font-size: var(--editor-font-control);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.composer-form .metadata-group__note {
+  margin-left: var(--editor-space-2);
+  color: var(--secondary);
+  font-size: var(--editor-font-ui);
+  font-weight: 500;
+}
+
+.composer-form .metadata-group__fields {
+  display: grid;
+  gap: var(--editor-space-4) var(--content-gap);
+  min-width: 0;
+}
+
+.composer-form .metadata-field {
+  display: grid;
+  gap: var(--editor-space-1);
+  min-width: 0;
+  margin: 0;
+}
+
+.composer-form .metadata-field > input,
+.composer-form .metadata-choices__query {
+  width: 100%;
+  min-height: var(--editor-touch-target);
+  margin: 0;
+  padding: 0 var(--editor-space-3);
+  border: 1px solid var(--editor-control-border);
+  border-radius: var(--radius);
+  background: var(--metadata-surface);
+  color: var(--primary);
+  font: inherit;
+  font-size: var(--editor-font-control);
+  line-height: 1.4;
+}
+
+.composer-form .metadata-field > input::placeholder,
+.composer-form .metadata-choices__query::placeholder {
+  color: var(--secondary);
+}
+
+.composer-form .metadata-field--title > input {
+  min-height: var(--metadata-title-height);
+  padding: 0 var(--editor-space-4);
+  font-size: var(--metadata-font-title);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.composer-form[data-mode="edit"] .metadata-field--title > input {
+  min-height: var(--editor-touch-target);
+  padding: 0 var(--editor-space-3);
+  font-size: var(--editor-font-body);
+  font-weight: 600;
+}
+
+.composer-form .metadata-slug {
+  display: flex;
+  align-items: center;
+  min-height: var(--editor-touch-target);
+  border: 1px solid var(--editor-control-border);
+  border-radius: var(--radius);
+  background: var(--metadata-surface);
+  color: var(--secondary);
+  font-size: var(--editor-font-control);
+}
+
+.composer-form .metadata-slug:focus-within {
+  outline: 2px solid var(--editor-focus);
+  outline-offset: 2px;
+}
+
+.composer-form .metadata-slug:has(input:read-only) {
+  background: var(--code-bg);
+}
+
+.composer-form .metadata-slug__affix {
+  flex: none;
+  padding-left: var(--editor-space-3);
+}
+
+.composer-form .metadata-slug__affix:last-child {
+  padding-right: var(--editor-space-3);
+  padding-left: 0;
+}
+
+.composer-form .metadata-slug input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: calc(var(--editor-touch-target) - 2px);
+  margin: 0;
+  padding: 0 var(--editor-space-1);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+}
+
+.composer-form .metadata-slug input:focus-visible {
+  outline: 0;
+}
+
+.composer-form .metadata-slug input:read-only {
+  color: var(--secondary);
+}
+
+.composer-form .metadata-choices {
+  display: grid;
+  gap: var(--editor-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-form .metadata-choices > legend {
+  margin-bottom: var(--editor-space-2);
+  padding: 0;
+}
+
+.composer-form .metadata-choices__query {
+  max-width: 24rem;
+}
+
+.composer-form .metadata-choices__status,
+.composer-form .metadata-choices__empty {
+  margin: 0;
+  color: var(--secondary);
+  font-size: var(--editor-font-caption);
+}
+
+.composer-form .metadata-choices__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--metadata-choice-min), 100%), 1fr));
+  gap: var(--editor-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.composer-form .metadata-choices__list--authors {
+  max-height: calc(
+    var(--metadata-list-rows) *
+    var(--editor-touch-target) +
+    (var(--metadata-list-rows) - 1) *
+    var(--editor-space-2) +
+    2 *
+    var(--editor-space-1)
+  );
+  margin: calc(-1 * var(--editor-space-1));
+  padding: var(--editor-space-1);
+  overflow: auto;
+}
+
+.composer-form .metadata-choices__list > li {
+  min-width: 0;
+}
+
+.composer-form .metadata-choice,
+.composer-form .metadata-check {
+  display: flex;
+  align-items: center;
+  gap: var(--editor-space-3);
+  min-height: var(--editor-touch-target);
+  margin: 0;
+  color: var(--primary);
+  font-size: var(--editor-font-control);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.composer-form .metadata-choice {
+  padding: 0 var(--editor-space-3);
+  border: 1px solid var(--editor-control-border);
+  border-radius: var(--radius);
+  background: var(--metadata-surface);
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.composer-form .metadata-choice:hover {
+  background: var(--code-bg);
+}
+
+.composer-form .metadata-choice:has(input:checked) {
+  border-color: var(--editor-accent);
+  background: var(--editor-selection);
+}
+
+.composer-form .metadata-choice:has(input:focus-visible),
+.composer-form .metadata-check:has(input:focus-visible) {
+  outline: 2px solid var(--editor-focus);
+  outline-offset: 2px;
+}
+
+.composer-form .metadata-choice input,
+.composer-form .metadata-check input {
+  flex: none;
+  width: var(--metadata-control-size);
+  height: var(--metadata-control-size);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--editor-accent);
+}
+
+.composer-form .metadata-choice input:focus-visible,
+.composer-form .metadata-check input:focus-visible {
+  outline: 0;
+}
+
+.composer-form .metadata-choice__name {
+  min-width: 0;
+}
+
+.composer-form .metadata-cover {
+  display: grid;
+  gap: var(--editor-space-2);
+  min-width: 0;
+}
+
+.composer-form .metadata-cover__media {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--editor-space-3) var(--editor-space-4);
+  align-items: center;
+}
+
+.composer-form .metadata-cover__media:has(> .composer-cover__preview[hidden]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.composer-form .composer-cover__preview {
+  grid-row: auto;
+  width: 120px;
+  height: 120px;
+}
+
+.composer-form .metadata-cover__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--editor-space-2);
+}
+
+/* Buttons: restate composer.css inside the form so the hosted `.site-editor button` rule loses. */
+
+.composer-form .composer-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--editor-space-2);
+  min-height: var(--editor-touch-target);
+  margin: 0;
+  padding: 0 var(--editor-space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--metadata-surface);
+  color: var(--primary);
+  font-size: var(--editor-font-ui);
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.composer-form .composer-button:hover {
+  background: var(--code-bg);
+}
+
+.composer-form .composer-button--primary,
+.composer-form .composer-button--primary:hover,
+.composer-form .composer-button--primary:active {
+  border-color: var(--editor-accent);
+  background: var(--editor-accent);
+  color: var(--editor-on-accent);
+}
+
+.composer-form .composer-button--primary:hover {
+  filter: brightness(0.94);
+}
+
+.composer-form .composer-button--primary:active {
+  filter: brightness(0.88);
+}
+
+.composer-form .composer-form__errors {
+  display: grid;
+  gap: var(--editor-space-1);
+  font-size: var(--editor-font-control);
+}
+
+.composer-form .composer-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@container metadata-form (width >= 44rem) {
+  .composer-form .metadata-group {
+    grid-template-columns: var(--metadata-label-column) minmax(0, 1fr);
+  }
+
+  .composer-form .metadata-group__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .composer-form .metadata-field--wide,
+  .composer-form .metadata-choices,
+  .composer-form .metadata-check,
+  .composer-form .metadata-cover {
+    grid-column: 1 / -1;
+  }
+}
+
+@container metadata-form (width < 44rem) {
+  .composer-form .composer-form__actions > .composer-button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer-form .metadata-choice {
+    transition: none;
+  }
+}
+
+/* Dropdown pickers: chosen values as chips, a search box, and the list as a dropdown. */
+.composer-form .metadata-picker__anchor {
+  position: relative;
+}
+
+.composer-form .metadata-picker__box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--editor-space-2);
+  min-height: var(--editor-touch-target);
+  padding: 4px var(--editor-space-2);
+  border: 1px solid var(--editor-control-border);
+  border-radius: var(--radius);
+  background: var(--metadata-surface);
+}
+
+.composer-form .metadata-picker__box:focus-within {
+  outline: 2px solid var(--editor-focus, var(--primary));
+  outline-offset: 1px;
+}
+
+.composer-form .metadata-picker__chips {
+  display: contents;
+}
+
+.composer-form .metadata-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px 2px 10px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  color: var(--primary);
+  font-size: var(--editor-font-control);
+  line-height: 1.6;
+}
+
+.composer-form .metadata-chip__remove {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.composer-form .metadata-chip__remove:hover {
+  color: var(--primary);
+}
+
+.composer-form .metadata-picker .metadata-picker__query {
+  flex: 1 1 8rem;
+  min-width: 6rem;
+  max-width: none;
+  min-height: 36px;
+  padding: 0 4px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.composer-form .metadata-picker__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  inset-inline: 0;
+  z-index: 20;
+  display: grid;
+  max-height: min(320px, 50dvh);
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.composer-form .metadata-picker__menu[hidden] {
+  display: none;
+}
+
+.composer-form .metadata-picker__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.composer-form .metadata-picker__list > li[hidden] {
+  display: none;
+}
+
+.composer-form .metadata-picker .metadata-choice {
+  border: 0;
+  background: none;
+}
+
+.composer-form .metadata-picker li.is-active .metadata-choice,
+.composer-form .metadata-picker .metadata-choice:hover,
+.composer-form .metadata-picker__create.is-active,
+.composer-form .metadata-picker__create:hover {
+  background: var(--code-bg);
+}
+
+.composer-form .metadata-choice__detail {
+  margin-left: auto;
+  color: var(--secondary);
+  font-size: var(--editor-font-caption);
+}
+
+.composer-form .metadata-picker__create {
+  min-height: var(--editor-touch-target);
+  padding: 0 var(--editor-space-3);
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--editor-accent, var(--primary));
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+
+.composer-form .metadata-picker__empty {
+  margin: 0;
+  padding: var(--editor-space-2) var(--editor-space-3);
+  color: var(--secondary);
+  font-size: var(--editor-font-caption);
+}
+
+.composer-form .metadata-picker__self {
+  justify-self: start;
+}
+
+/* New author profile */
+.author-profile-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+  color: var(--primary);
+}
+
+.author-profile-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.author-profile-dialog .author-profile {
+  padding: var(--editor-space-4, 24px);
+}
+
+.author-profile-dialog .author-profile__title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.author-profile-dialog .composer-form__errors:not([hidden]) {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--editor-danger, #f87171);
+}
+
+/* 글 정보 수정 inside the post: a compact sheet, not a page form. Slimmer controls, tighter gaps and
+   the pickers two to a row (작성자 · 카테고리, 태그 · 편집 허용) instead of one per line. */
+.composer-meta .composer-form {
+  --editor-touch-target: 34px;
+  --metadata-label-column: 7rem;
+  font-size: 14px;
+}
+
+.composer-meta .composer-form .metadata-group {
+  gap: var(--editor-space-2) var(--editor-space-4);
+  padding-block: var(--editor-space-3);
+}
+
+.composer-meta .composer-form .metadata-group__fields {
+  gap: var(--editor-space-3) var(--editor-space-4);
+}
+
+.composer-meta .composer-form .metadata-picker__box {
+  gap: var(--editor-space-1);
+  padding: 2px var(--editor-space-1);
+}
+
+.composer-meta .composer-form .metadata-picker__query {
+  min-height: 28px;
+}
+
+.composer-meta .composer-form :is(input:not([type="checkbox"]), select) {
+  min-height: 34px;
+  font-size: 14px;
+}
+
+.composer-meta .composer-form .composer-cover__preview {
+  width: 72px;
+  height: 72px;
+}
+
+@container metadata-form (width >= 44rem) {
+  .composer-meta .composer-form .metadata-choices {
+    grid-column: auto;
+  }
+
+  .composer-meta .composer-form .metadata-check {
+    align-self: end;
+  }
+}
+
+/* Categories as chips (create-layout.ts categoryChips): all seven at once, each in the site's colour. */
+.composer-form .metadata-picker--chips .metadata-picker__box {
+  display: none;
+}
+
+.composer-form .metadata-picker--chips .metadata-picker__menu {
+  position: static;
+  display: block;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.composer-form .metadata-picker--chips .metadata-picker__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.composer-form .metadata-picker--chips .metadata-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--editor-touch-target);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--theme);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.composer-form .metadata-picker--chips .metadata-choice::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip, var(--editor-accent, #009ee2));
+}
+
+.composer-form .metadata-picker--chips .metadata-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-form .metadata-picker--chips .metadata-choice:has(input:checked) {
+  border-color: var(--chip, var(--editor-accent, #009ee2));
+  background: color-mix(in srgb, var(--chip, #009ee2) 18%, var(--theme));
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.composer-form .metadata-picker--chips .metadata-choice:has(input:focus-visible) {
+  outline: 2px solid var(--chip, var(--editor-accent, #009ee2));
+  outline-offset: 2px;
+}
+
+/* 사이트에 숨김: a switch instead of a checkbox. */
+.composer-form .metadata-check input[name="draft"] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 20px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.composer-form .metadata-check input[name="draft"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.composer-form .metadata-check input[name="draft"]:checked {
+  background: var(--editor-accent, #009ee2);
+}
+
+.composer-form .metadata-check input[name="draft"]:checked::after {
+  transform: translateX(14px);
+}
+
+/* The cover's alt text appears once there is a cover; until then the cover is a drop box. */
+.composer-form
+  .metadata-cover:has([name="removeCover"][hidden])
+  .metadata-field:has([name="coverAlt"]) {
+  display: none;
+}
+
+.composer-form .metadata-cover__media:has(> .composer-cover__preview[hidden]) {
+  place-items: center;
+  min-height: 96px;
+  border: 1px dashed color-mix(in srgb, var(--secondary) 45%, transparent);
+  border-radius: var(--radius);
+}

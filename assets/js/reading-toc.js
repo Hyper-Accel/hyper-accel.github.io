@@ -1,7 +1,8 @@
 (() => {
   const toc = document.querySelector('.reading-toc');
-  const toggle = document.querySelector('.reading-toc-toggle');
-  if (!toc || !toggle) return;
+  const handle = document.querySelector('.reading-toc-handle');
+  if (!toc || !handle) return;
+  const scrim = document.querySelector('.reading-toc-scrim');
   const narrow = matchMedia('(max-width: 1099px)');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const links = [...toc.querySelectorAll('a[href^="#"]')];
@@ -19,11 +20,13 @@
   let frame = 0;
   let active = null;
 
+  const isOpen = () => toc.classList.contains('is-open');
   const setOpen = (open, restoreFocus = false) => {
-    toc.classList.toggle('is-open', open && narrow.matches);
-    toggle.setAttribute('aria-expanded', String(open && narrow.matches));
-    if (open && narrow.matches) (active?.link || links[0])?.focus({ preventScroll: true });
-    if (restoreFocus && narrow.matches) toggle.focus({ preventScroll: true });
+    const next = open && narrow.matches;
+    toc.classList.toggle('is-open', next);
+    handle.setAttribute('aria-expanded', String(next));
+    if (next) (active?.link || links[0])?.focus({ preventScroll: true });
+    else if (restoreFocus && narrow.matches) handle.focus({ preventScroll: true });
   };
   const update = () => {
     frame = 0;
@@ -53,13 +56,14 @@
     document.body.style.setProperty('--reading-offset', `${offset}px`);
     schedule();
   };
-  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  handle.addEventListener('click', () => setOpen(!isOpen(), isOpen()));
   toc.querySelector('.reading-toc-close')?.addEventListener('click', () => setOpen(false, true));
+  scrim?.addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && toc.classList.contains('is-open')) setOpen(false, true);
+    if (event.key === 'Escape' && isOpen()) setOpen(false, true);
   });
   document.addEventListener('click', event => {
-    if (toc.classList.contains('is-open') && !toc.contains(event.target) && !toggle.contains(event.target)) setOpen(false);
+    if (isOpen() && !toc.contains(event.target) && !handle.contains(event.target)) setOpen(false);
   });
   sections.forEach(({ link, heading }) => {
     // Capture before PaperMod's generic smooth-anchor listener. Preserve modified clicks.

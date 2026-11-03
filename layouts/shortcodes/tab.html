@@ -1,0 +1,8 @@
+{{- if not .Parent }}{{ errorf "The %q shortcode must be nested inside {{< tabs >}}. See %s" .Name .Position }}{{ end -}}
+{{- $name := .Get "name" | default (printf "Tab %d" (add .Ordinal 1)) -}}
+{{- $id := printf "tabs-%d-panel-%d" .Parent.Ordinal .Ordinal -}}
+{{- .Parent.Store.Add "tabs" (slice (dict "id" $id "name" $name)) -}}
+<div class="tabs-panel" role="tabpanel" id="{{ $id }}" aria-labelledby="{{ $id }}-tab" tabindex="0">
+<h4 class="tabs-panel-title">{{ $name }}</h4>
+{{ .Inner | $.Page.RenderString (dict "display" "block") }}
+</div>

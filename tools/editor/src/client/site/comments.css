@@ -1,0 +1,235 @@
+/* Inline comments (Confluence live docs): highlighted text, a popover thread, @mentions. */
+.composer-comment-mark {
+  border-bottom: 2px solid #f5c542;
+  background: color-mix(in srgb, #f5c542 18%, transparent);
+  cursor: pointer;
+}
+
+.composer-comment-mark.is-active {
+  background: color-mix(in srgb, #f5c542 38%, transparent);
+}
+
+.composer-comment-popover {
+  position: fixed;
+  z-index: 80;
+  display: grid;
+  gap: 10px;
+  width: min(380px, calc(100vw - 16px));
+  max-height: min(70dvh, 560px);
+  padding: 12px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  color: var(--primary);
+  font:
+    14px / 1.5 system-ui,
+    -apple-system,
+    "Apple SD Gothic Neo",
+    sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.composer-comment-popover[hidden] {
+  display: none;
+}
+
+.composer-comment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.composer-comment-popover button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.composer-comment-popover .composer-comment-head button {
+  min-width: 36px;
+  padding: 0;
+  border: 0;
+}
+
+.composer-comment-popover button:hover:not(:disabled) {
+  background: var(--code-bg);
+}
+
+.composer-comment-popover .composer-comment-primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--theme);
+  font-weight: 600;
+}
+
+.composer-comment-popover .composer-comment-primary:hover:not(:disabled) {
+  background: var(--content);
+}
+
+.composer-comment-popover button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.composer-comment-quote {
+  margin: 0;
+  padding: 2px 0 2px 10px;
+  border-left: 3px solid #f5c542;
+  color: var(--secondary);
+}
+
+.composer-comment-form {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.composer-comment-form textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px 10px;
+  border: 1px solid var(--editor-control-border, var(--border));
+  border-radius: 6px;
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+  resize: vertical;
+}
+
+.composer-comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.composer-comment-error {
+  margin: 0;
+  color: var(--editor-danger, #f87171);
+}
+
+.composer-comment-thread,
+.composer-comment-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.composer-comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.composer-comment-meta img {
+  border-radius: 50%;
+}
+
+.composer-comment-meta strong {
+  color: var(--primary);
+}
+
+.composer-comment-body {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.composer-mention {
+  color: var(--editor-accent, #60a5fa);
+  font-weight: 600;
+}
+
+.composer-comment-popover .composer-comment-item {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 8px 10px;
+  text-align: start;
+}
+
+.composer-comment-item__quote {
+  overflow: hidden;
+  border-left: 3px solid #f5c542;
+  padding-left: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-comment-item__meta {
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.composer-mention-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--entry);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.composer-mention-list[hidden] {
+  display: none;
+}
+
+.composer-mention-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.composer-mention-list li[aria-selected="true"],
+.composer-mention-list li:hover {
+  background: var(--code-bg);
+}
+
+.composer-mention-list img,
+.composer-mention-list__blank {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--code-bg);
+}
+
+.composer-mention-list span {
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.site-editor .composer-comments-count[hidden] {
+  display: none;
+}
+
+.composer-comment-form .composer-mention-list {
+  position: static;
+  margin: 0;
+  box-shadow: none;
+}
+
+.composer-comment-mark.is-pending {
+  border-bottom-style: dashed;
+}

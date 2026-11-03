@@ -1,0 +1,95 @@
+{
+  "slug": "math-and-legacy",
+  "ko": {
+    "language": "ko",
+    "path": "content/posts/math-and-legacy/index.md",
+    "frontMatter": {
+      "title": "문법 검증: math-and-legacy",
+      "date": "2026-10-27T00:00:00Z",
+      "draft": true,
+      "authors": ["Fixture Author"],
+      "categories": ["Engineering"]
+    },
+    "rawFrontMatter": "title: \"문법 검증: math-and-legacy\"\ndate: \"2026-10-27T00:00:00Z\"\ndraft: true\nauthors: [\"Fixture Author\"]\ncategories: [\"Engineering\"]\n",
+    "blocks": [
+      {
+        "id": "math-and-legacy-1",
+        "markdown": "인라인 수식 $E=mc^2$와 **강조**를 확인합니다."
+      },
+      {
+        "id": "math-and-legacy-2",
+        "markdown": "$$\n\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}\n$$"
+      },
+      {
+        "id": "math-and-legacy-3",
+        "markdown": "```python\ndef square(x):\n    return x * x\n```"
+      },
+      {
+        "id": "math-and-legacy-4",
+        "markdown": "[관련 글]({{< ref \"/posts/image-layouts\" >}})을 읽으세요."
+      },
+      {
+        "id": "math-and-legacy-5",
+        "markdown": "{{< figure src=\"images/a.svg\" title=\"구조도\" caption=\"기존 그림\" alt=\"구조\" >}}"
+      },
+      {
+        "id": "math-and-legacy-6",
+        "markdown": "{{< rawhtml >}}\n<table><tr><th>항목</th><td>값</td></tr></table>\n{{< /rawhtml >}}"
+      }
+    ]
+  },
+  "en": {
+    "language": "en",
+    "path": "content/posts/math-and-legacy/index.en.md",
+    "frontMatter": {
+      "title": "Syntax fixture: math-and-legacy",
+      "date": "2026-10-27T00:00:00Z",
+      "draft": true,
+      "authors": ["Fixture Author"],
+      "categories": ["Engineering"]
+    },
+    "rawFrontMatter": "title: \"Syntax fixture: math-and-legacy\"\ndate: \"2026-10-27T00:00:00Z\"\ndraft: true\nauthors: [\"Fixture Author\"]\ncategories: [\"Engineering\"]\n",
+    "blocks": [
+      {
+        "id": "math-and-legacy-1",
+        "markdown": "Check inline math $E=mc^2$ and **emphasis**."
+      },
+      {
+        "id": "math-and-legacy-2",
+        "markdown": "$$\n\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}\n$$"
+      },
+      {
+        "id": "math-and-legacy-3",
+        "markdown": "```python\ndef square(x):\n    return x * x\n```"
+      },
+      {
+        "id": "math-and-legacy-4",
+        "markdown": "Read the [related post]({{< ref \"/posts/image-layouts\" >}})."
+      },
+      {
+        "id": "math-and-legacy-5",
+        "markdown": "{{< figure src=\"images/a.svg\" title=\"Diagram\" caption=\"Existing figure\" alt=\"Structure\" >}}"
+      },
+      {
+        "id": "math-and-legacy-6",
+        "markdown": "{{< rawhtml >}}\n<table><tr><th>Item</th><td>Value</td></tr></table>\n{{< /rawhtml >}}"
+      }
+    ]
+  },
+  "images": [
+    {
+      "status": "committed",
+      "path": "images/a.svg",
+      "sha": "f2160b2bf4520f7cd174a78ac296188a98b3ccdc",
+      "mime": "image/svg+xml"
+    },
+    {
+      "status": "committed",
+      "path": "images/b.svg",
+      "sha": "a8f91c735e61d5280f2a6ae35c4af64d215d04b1",
+      "mime": "image/svg+xml"
+    }
+  ],
+  "headSha": "1111111111111111111111111111111111111111",
+  "snapshotHash": "397e10b7e384305a8e16ced6df2dc4d64d851cd6e94575424656c5ca19967f9d"
+}

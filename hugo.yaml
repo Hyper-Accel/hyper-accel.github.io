@@ -135,6 +135,10 @@ params:
 pygmentsUseClasses: true
 markup:
   goldmark:
+    parser:
+      wrapStandAloneImageWithinParagraph: false
+      attribute:
+        block: true
     renderer:
       unsafe: true
   highlight:

@@ -1,0 +1,421 @@
+/* The shell lives inside the Hugo page (layouts/_default/editor.html); the post itself is styled by the site. */
+.site-editor {
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.site-editor *,
+.site-editor *::before,
+.site-editor *::after {
+  box-sizing: border-box;
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: var(--radius);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)):hover,
+.site-editor a[aria-current="page"]:where(:not(.post-single a)) {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.site-editor a:where(:not(.post-single a, .reading-toc a)):active {
+  background: var(--tertiary);
+}
+
+.site-editor :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+#site-content {
+  padding-block: calc(2 * var(--gap));
+  outline: none;
+}
+
+#site-content[data-route="compose"] {
+  padding-block: 0;
+}
+
+#site-content > h1 {
+  margin: 0 0 var(--gap);
+  font-size: 32px;
+  line-height: 1.25;
+}
+
+#site-content[data-route="compose"] > h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.site-editor p:where(:not(.post-single p)) {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--secondary);
+}
+
+.site-editor [hidden] {
+  display: none;
+}
+
+.site-editor #site-session {
+  padding-block: 8px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.site-editor [data-site-controls]:has([data-site-save][hidden]):has([data-site-save-status]:empty) {
+  display: none;
+}
+
+.site-editor [data-site-controls] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.site-editor [data-site-save] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--theme);
+  font-weight: 600;
+}
+
+.site-editor [data-site-save]:hover:not(:disabled) {
+  background: var(--content);
+  color: var(--theme);
+}
+
+.site-editor [data-site-save-status] {
+  flex-basis: 100%;
+  font-size: 14px;
+}
+
+@media (max-width: 699px) {
+  .site-editor #site-session,
+  .site-editor [data-site-save-status] {
+    font-size: 15px;
+  }
+}
+
+.site-editor #site-conflict {
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.site-editor button,
+.site-editor input,
+.site-editor select,
+.site-editor textarea {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  color: var(--primary);
+  font: inherit;
+  padding: 8px 16px;
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.site-editor button {
+  cursor: pointer;
+}
+
+.site-editor button:hover:not(:disabled) {
+  background: var(--code-bg);
+}
+
+.site-editor button:active:not(:disabled) {
+  background: var(--tertiary);
+}
+
+.site-editor button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.site-editor [data-site-save]:disabled {
+  opacity: 0.75;
+}
+
+.site-editor label {
+  display: grid;
+  gap: 8px;
+  margin-block: 24px;
+}
+
+.site-editor textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.site-editor dialog {
+  width: min(560px, calc(100% - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  color: var(--primary);
+}
+
+.site-editor dialog::backdrop {
+  background: var(--content);
+  opacity: 0.6;
+}
+
+/* Session expired: the title, then a white GitHub button and a dark "홈으로 돌아가기". */
+.site-editor dialog {
+  width: min(420px, calc(100% - 48px));
+}
+
+.site-editor dialog h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+}
+
+.site-editor dialog #site-login {
+  display: grid;
+  gap: 8px;
+}
+
+.site-editor dialog #site-login [role="status"]:empty,
+.site-editor dialog #site-login button[hidden] {
+  display: none;
+}
+
+.site-editor dialog #site-login [role="status"] {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.site-editor dialog :is(.auth-github, .site-login-home) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.site-editor dialog .auth-github {
+  border: 0;
+  background: #fff;
+  color: #1b1f23;
+}
+
+.site-editor dialog .auth-github:hover {
+  background: #f0f0f0;
+}
+
+.site-editor dialog .auth-github:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.site-editor dialog .site-login-home {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  background: #0d0f12;
+  color: var(--primary);
+}
+
+.site-editor dialog .site-login-home:hover {
+  background: #16191e;
+}
+
+.site-editor [data-recovery] > p {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+/* No menu bar of its own: the session line shows only when the login has expired. */
+.reading-page .site-editor #site-session {
+  max-width: var(--reading-width);
+  margin-inline: auto;
+}
+
+/* The paged guide to the editor or the review screen (intro.ts). */
+.site-editor dialog.onsite-intro {
+  width: min(560px, calc(100% - 32px));
+}
+
+.onsite-intro__media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  object-fit: cover;
+}
+
+.onsite-intro__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.onsite-intro__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.onsite-intro__dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  transition: width 0.2s;
+}
+
+.onsite-intro__dots span.is-current {
+  width: 20px;
+  background: var(--editor-accent, #4dabf7);
+}
+
+.site-editor dialog .onsite-intro__close {
+  width: 36px;
+  height: 36px;
+  margin: -8px -8px 0 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--secondary);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.site-editor dialog.onsite-intro h2 {
+  margin: 0 0 10px;
+}
+
+.onsite-intro__body {
+  min-height: 4.65em;
+  margin: 0;
+  color: var(--primary);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.onsite-intro__foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.site-editor dialog .onsite-intro__skip {
+  margin: 0 auto 0 0;
+  padding: 0 4px;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--secondary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.site-editor dialog :is(.onsite-intro__prev, .onsite-intro__next) {
+  min-width: 84px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.site-editor dialog .onsite-intro__next {
+  border-color: transparent;
+  background: var(--editor-accent, #4dabf7);
+  color: #0d1117;
+}
+
+.site-editor dialog :is(.onsite-intro__skip, .onsite-intro__prev)[hidden] {
+  display: none;
+}
+
+/* After 다시 보지 않기: a bubble pointing at the ⓘ button. */
+.onsite-help-tip {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 24px));
+  padding: 12px 12px 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--theme);
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+}
+
+.onsite-help-tip::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--arrow, 28px) - 7px);
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  border: solid var(--border);
+  border-width: 0 1px 1px 0;
+  background: var(--theme);
+  transform: rotate(45deg);
+}
+
+.onsite-help-tip__text {
+  margin: 0;
+}
+
+.onsite-help-tip__ok {
+  flex: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--editor-accent, #4dabf7);
+  color: #0d1117;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.site-editor dialog .onsite-intro__next:hover,
+.onsite-help-tip__ok:hover {
+  background: color-mix(in srgb, var(--editor-accent, #4dabf7) 85%, #fff);
+}
+
+.site-editor dialog .onsite-intro__prev:hover {
+  background: color-mix(in srgb, var(--entry) 85%, #fff);
+}

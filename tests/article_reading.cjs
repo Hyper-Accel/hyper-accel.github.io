@@ -50,7 +50,11 @@ const routes = ['posts/how-gpu-works/', 'en/posts/how-gpu-works/', 'posts/what-i
 
    // Manual scrolling, hash landing, and resizing must keep section state coherent.
    await content.locator('h2[id]').nth(1).evaluate(e=>e.scrollIntoView());
-   await page.waitForTimeout(100);
+   await page.waitForFunction(() => {
+    const target = document.querySelectorAll('.post-content h2[id]')[1];
+    const active = document.querySelector('.reading-toc a[aria-current="location"]');
+    return target && decodeURIComponent(active?.getAttribute('href') || '') === `#${target.id}`;
+   });
    assert.ok(await toc.locator('a[aria-current="location"]').count()===1);
    // A reload may restore the reader's scroll position rather than the URL hash.
    // Check a fresh deep-link navigation separately from that browser behavior.
@@ -62,19 +66,21 @@ const routes = ['posts/how-gpu-works/', 'en/posts/how-gpu-works/', 'posts/what-i
    for (const width of [1440,1280,1100,1099,768,375]) {
     await page.setViewportSize({width,height:900});
     await page.evaluate(()=>scrollTo(0,0));
-    await page.waitForTimeout(100);
+    await page.waitForFunction(expected => innerWidth === expected && scrollY === 0, width);
     rect = await content.boundingBox();
     const overflow = await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
     assert.ok(overflow <= 1, `${route} @${width}: horizontal overflow ${overflow}`);
     assert.ok(rect.width <= 780);
-    const button = page.locator('.reading-toc-toggle');
+    const button = page.locator('.reading-toc-handle');
     if (width < 1100) {
      assert.equal(await button.isVisible(),true);
      assert.equal(await button.getAttribute('aria-expanded'),'false');
      assert.equal(await toc.isVisible(),false);
      const toggleRect = await button.boundingBox();
-     const liveHeaderHeight = await page.locator('.tr-header').evaluate(e=>e.getBoundingClientRect().height);
-     assert.ok(toggleRect.y + toggleRect.height <= liveHeaderHeight + 1, 'TOC toggle must stay within header, not cover body');
+     assert.ok(toggleRect.x <= 1, 'TOC handle must sit at the left edge');
+     const handleCenter = toggleRect.y + toggleRect.height / 2;
+     assert.ok(Math.abs(handleCenter - 450) <= 2, `TOC handle must be vertically centered, got ${handleCenter}`);
+     assert.ok(toggleRect.height > toggleRect.width, 'TOC handle must be a slim vertical button');
      assert.ok((await content.locator('p').first().boundingBox()).y < 820, `${route} @${width}: intro pushed below first screen`);
      await button.click();
      assert.equal(await toc.evaluate(el=>el.contains(document.activeElement)),true,'Opening TOC must focus an entry');
@@ -102,13 +108,13 @@ const routes = ['posts/how-gpu-works/', 'en/posts/how-gpu-works/', 'posts/what-i
    assert.deepEqual(errors,[],`${route}: browser errors`);
    await page.emulateMedia({media:'print'});
    assert.equal(await toc.isVisible(),false);
-   assert.equal(await page.locator('.reading-toc-toggle').isVisible(),false);
+   assert.equal(await page.locator('.reading-toc-handle').isVisible(),false);
    await page.close();
   }
   for (const viewport of [{width:375,height:900},{width:568,height:320},{width:768,height:320}]) {
    const page = await browser.newPage({viewport,reducedMotion:'reduce'});
    await page.goto(new URL(routes[0],baseURL).href,{waitUntil:'domcontentloaded'});
-   const toggle = page.locator('.reading-toc-toggle');
+   const toggle = page.locator('.reading-toc-handle');
    const toc = page.locator('.reading-toc');
    await toggle.focus();
    await page.keyboard.press('Enter');
@@ -117,7 +123,7 @@ const routes = ['posts/how-gpu-works/', 'en/posts/how-gpu-works/', 'posts/what-i
    await page.keyboard.press('Tab');
    assert.equal(await toc.evaluate(el=>el.contains(document.activeElement)),true,'Forward Tab must remain in TOC entries');
    const panelRect = await toc.boundingBox();
-   assert.ok(panelRect.y + panelRect.height <= viewport.height - 8, `${viewport.width}x${viewport.height}: panel must stay inside viewport, bottom=${panelRect.y + panelRect.height}`);
+   assert.ok(panelRect.y >= 0 && panelRect.y + panelRect.height <= viewport.height + 1, `${viewport.width}x${viewport.height}: panel must stay inside viewport, bottom=${panelRect.y + panelRect.height}`);
    const dimensions = await page.locator('.reading-toc-links').evaluate(el=>({height:el.clientHeight,scrollHeight:el.scrollHeight}));
    assert.ok(dimensions.height >= 44, `${viewport.width}x${viewport.height}: links need usable scroll area, got ${dimensions.height}px`);
    await page.locator('.reading-toc-links').evaluate(el=>{el.scrollTop=el.scrollHeight});

@@ -1,3 +1,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Noto+Sans+KR:wght@300;400;700&display=swap">
+{{- /* Fonts writers can pick in the editor's font menu (tools/editor/src/client/blocks/text-style.ts):
+     loaded by the editor's pages and by posts that use one (assets/js/editor-entry.js adds them
+     when a post is opened for editing). */}}
+{{- if or (eq .Layout "editor") (and .IsPage (strings.Contains .RawContent "font-family:")) }}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Gowun+Dodum&family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+{{- end }}

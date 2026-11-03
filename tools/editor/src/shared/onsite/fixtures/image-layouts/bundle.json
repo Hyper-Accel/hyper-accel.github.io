@@ -1,0 +1,119 @@
+{
+  "slug": "image-layouts",
+  "ko": {
+    "language": "ko",
+    "path": "content/posts/image-layouts/index.md",
+    "frontMatter": {
+      "title": "문법 검증: image-layouts",
+      "date": "2026-10-27T00:00:00Z",
+      "draft": true,
+      "authors": ["Fixture Author"],
+      "categories": ["Engineering"]
+    },
+    "rawFrontMatter": "title: \"문법 검증: image-layouts\"\ndate: \"2026-10-27T00:00:00Z\"\ndraft: true\nauthors: [\"Fixture Author\"]\ncategories: [\"Engineering\"]\n",
+    "blocks": [
+      {
+        "id": "image-layouts-1",
+        "markdown": "## 이미지 배치"
+      },
+      {
+        "id": "image-layouts-2",
+        "markdown": "![본문](images/a.svg \"본문 캡션\")"
+      },
+      {
+        "id": "image-layouts-3",
+        "markdown": "![넓게](images/a.svg#wide \"와이드 캡션\")"
+      },
+      {
+        "id": "image-layouts-4",
+        "markdown": "![오른쪽](images/a.svg#side-right)"
+      },
+      {
+        "id": "image-layouts-5",
+        "markdown": "![별칭](images/a.svg#side)"
+      },
+      {
+        "id": "image-layouts-6",
+        "markdown": "![왼쪽](images/a.svg#side-left)"
+      },
+      {
+        "id": "image-layouts-7",
+        "markdown": "{{< pair >}}\n![첫째](images/a.svg)\n![둘째](images/b.svg)\n{{< /pair >}}"
+      },
+      {
+        "id": "image-layouts-8",
+        "markdown": "{{< pair >}}\n![첫째](images/a.svg \"첫째 캡션\")\n![둘째](images/b.svg)\n![셋째](images/a.svg)\n{{< /pair >}}"
+      },
+      {
+        "id": "image-layouts-9",
+        "markdown": "{{< slides >}}\n![첫 장](images/a.svg \"첫 장 캡션\")\n![둘째 장](images/b.svg)\n{{< /slides >}}"
+      }
+    ]
+  },
+  "en": {
+    "language": "en",
+    "path": "content/posts/image-layouts/index.en.md",
+    "frontMatter": {
+      "title": "Syntax fixture: image-layouts",
+      "date": "2026-10-27T00:00:00Z",
+      "draft": true,
+      "authors": ["Fixture Author"],
+      "categories": ["Engineering"]
+    },
+    "rawFrontMatter": "title: \"Syntax fixture: image-layouts\"\ndate: \"2026-10-27T00:00:00Z\"\ndraft: true\nauthors: [\"Fixture Author\"]\ncategories: [\"Engineering\"]\n",
+    "blocks": [
+      {
+        "id": "image-layouts-1",
+        "markdown": "## Image layouts"
+      },
+      {
+        "id": "image-layouts-2",
+        "markdown": "![Body](images/a.svg \"Body caption\")"
+      },
+      {
+        "id": "image-layouts-3",
+        "markdown": "![Wide](images/a.svg#wide \"Wide caption\")"
+      },
+      {
+        "id": "image-layouts-4",
+        "markdown": "![Right](images/a.svg#side-right)"
+      },
+      {
+        "id": "image-layouts-5",
+        "markdown": "![Alias](images/a.svg#side)"
+      },
+      {
+        "id": "image-layouts-6",
+        "markdown": "![Left](images/a.svg#side-left)"
+      },
+      {
+        "id": "image-layouts-7",
+        "markdown": "{{< pair >}}\n![First](images/a.svg)\n![Second](images/b.svg)\n{{< /pair >}}"
+      },
+      {
+        "id": "image-layouts-8",
+        "markdown": "{{< pair >}}\n![First](images/a.svg \"First caption\")\n![Second](images/b.svg)\n![Third](images/a.svg)\n{{< /pair >}}"
+      },
+      {
+        "id": "image-layouts-9",
+        "markdown": "{{< slides >}}\n![First slide](images/a.svg \"First slide caption\")\n![Second slide](images/b.svg)\n{{< /slides >}}"
+      }
+    ]
+  },
+  "images": [
+    {
+      "status": "committed",
+      "path": "images/a.svg",
+      "sha": "f2160b2bf4520f7cd174a78ac296188a98b3ccdc",
+      "mime": "image/svg+xml"
+    },
+    {
+      "status": "committed",
+      "path": "images/b.svg",
+      "sha": "a8f91c735e61d5280f2a6ae35c4af64d215d04b1",
+      "mime": "image/svg+xml"
+    }
+  ],
+  "headSha": "1111111111111111111111111111111111111111",
+  "snapshotHash": "4e55ca82157701e6828f6798d361a44263bdbdf82209bf405e30647acfaba617"
+}
