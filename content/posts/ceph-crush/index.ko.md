@@ -1,7 +1,6 @@
 ---
 date: '2026-10-15T10:00:00+09:00'
-draft: false
-title: 'Ceph 뜯어먹기 1편: CRUSH'
+title: '[Ceph 뜯어먹기 - Part 01] CRUSH'
 cover:
   image: "images/ko/cover.webp"
   alt: "CRUSH가 cluster map의 row, cabinet, disk 계층을 따라 replica를 배치하는 과정"
@@ -9,7 +8,7 @@ cover:
   relative: true
 authors: [Sinhyun Park]
 tags: [ceph, crush, distributed storage, object storage]
-categories: [storage]
+categories: ["Memory and Storage"]
 series: ["Ceph 뜯어먹기"]
 series_idx: 1
 summary: "Ceph의 근간인 데이터 분산 알고리즘 CRUSH를 SC'06 논문을 바탕으로 정리합니다. Mapping Table 없이 Object 위치를 계산하는 원리, Placement Rule과 Failure Handling, Cluster 변경 시 데이터 이동, Bucket Algorithm별 Trade-off를 다룹니다."
@@ -35,6 +34,7 @@ comments: true
 > Object Storage는 데이터를 파일이나 블록이 아니라 독립적인 **Object 단위** 로 저장하고 관리합니다.
 
 - 일반 파일 스토리지는 데이터를 디렉토리 구조, inode 등 metadata를 통해 관리합니다.
+  - inode(index node)는 파일의 크기, 권한, 데이터 블록 위치 같은 정보를 담는 자료구조입니다.
 - Object Storage는 데이터를 Object ID(Key)와 Object(Value)로 관리합니다.
 
 ```text
@@ -57,6 +57,8 @@ bucket
 
 ## Challenge
 
+Object를 여러 Device에 나눠 저장하려면 세 가지 과제를 풀어야 합니다. 각 절의 끝에 그 과제에서 나오는 질문을 정리했습니다.
+
 ### Q1. Object Metadata Scalability
 
 Ceph에서 실제로 데이터를 저장하는 Disk 단위를 **Object Storage Daemon(OSD)** 라고 부릅니다. 아래는 Object와 OSD의 매핑 정보를 표로 저장하는 방식입니다.
@@ -75,6 +77,8 @@ object-C → osd.3
 - 왼쪽처럼 모든 요청이 Metadata Server를 거치면, 이 서버가 병목이자 단일 장애점이 됩니다.
 - 오른쪽은 이 글에서 다룰 CRUSH 방식입니다. 각 client가 위치를 직접 계산하므로 중앙 조회가 필요 없습니다.
 
+여기서 CRUSH가 풀어야 할 첫 번째 질문이 나옵니다.
+
 > Object Placement **정보를 저장하지 않고도** 어느 노드에서나 Object의 위치를 계산할 수 있는가?
 
 ### Q2. Reliable Replica Placement
@@ -86,6 +90,8 @@ object-C → osd.3
 - 왼쪽처럼 **동일한 rack domain에 replica가 모두 배치** 된다면, power fail 시 데이터에 접근할 수 없습니다.
 - 오른쪽처럼 rack마다 replica를 하나씩 두면, rack 하나가 멈춰도 남은 replica로 데이터에 접근할 수 있습니다.
 - Replica의 배치는 Rack, Power, Site, Server 등 여러 가지 Failure Domain을 고려해야 합니다.
+
+두 번째 질문은 Failure Domain을 배치에 반영하는 방법입니다.
 
 > 데이터 배치 과정에서 Failure Domain을 구분하고 구조화할 수 있는가?
 
@@ -109,6 +115,8 @@ hash(x) % 10 -> hash(x) % 11 ...?
 {{< figure src="images/ko/hash-mod-remapping.svg" alt="hash % 4에서 hash % 5로 바꾸면 Object 12개 중 9개가 다른 Device로 이동하는 예시" align="center" class="full-width" >}}
 
 - **Device의 개수가 바뀌게 되면** 기존 Object의 매핑이 대부분 변경됩니다. 결과적으로 **대량의 relocation** 이 필요합니다.
+
+마지막 질문은 클러스터가 바뀔 때의 데이터 이동량입니다.
 
 > 클러스터 상태 변화에 맞게 데이터를 재분배하면서도, 데이터 이동량을 최소화할 수 있는가?
 
@@ -180,8 +188,9 @@ osd.2 weight = 2
 {{< figure src="images/ko/cluster-map-failure-domains.svg" alt="root 아래에 IDC, Rack, Switch, Device 순서로 Bucket을 구성한 cluster map과 계층별 replica 배치 전략" align="center" class="full-width" >}}
 
 - 서로 다른 IDC site를 root Bucket에 할당하여 **cross-IDC 데이터 클러스터** 를 구축합니다.
-- 각 Rack을 상위 Bucket에 할당하고, Bucket별로 2개씩 **replica를 분산하여 가용성** 을 높입니다.
-- 각 Switch를 하위 Bucket에 할당하고, Bucket에 **replica를 몰아넣어 replica 간 동기화 비용** 을 줄입니다.
+- 각 Rack을 상위 Bucket에 할당하고, replica를 **서로 다른 Rack에 나눠 배치** 합니다. Rack 하나가 멈춰도 다른 Rack의 replica가 남으므로 가용성이 높아집니다.
+- 각 Switch를 하위 Bucket에 할당하고, 한 Rack에 들어간 replica는 **같은 Switch 아래에 모읍니다**. replica끼리 동기화할 때 Switch를 건너지 않아도 되므로 동기화 비용이 줄어듭니다.
+- 예를 들어 replica가 4개라면, 그림의 파란 Device처럼 rack1과 rack3에 2개씩 나누고 각 Rack의 2개는 같은 Switch 아래에 둡니다.
 
 ### Placement Rule
 
@@ -311,9 +320,10 @@ select(1,disk) - i: [row1, row2], f:0,
 - [r=1, f:0]. i: row1, b: cab21, o: disk2107 (disk2107 Fail!!)
 ```
 
-{{< figure src="images/ko/failure-handling-mutation.svg" alt="r' = r + f 방식과 r' = r + fr·n 방식으로 실패한 candidate를 대체하는 과정 비교" attr="Weil et al., CRUSH (SC'06) Figure 2 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+{{< figure src="images/ko/failure-mutation-f.svg" alt="r' = r + f 방식에서 2번 candidate가 실패하자 뒤의 replica가 한 칸씩 당겨지고 g가 6번 자리를 채우는 과정" attr="Weil et al., CRUSH (SC'06) Figure 2 왼쪽 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
 
 - 선택된 candidate가 실패하면 탐색 실패 횟수를 늘리고(`f += 1`), index를 `r' = r + f` 로 mutation합니다.
+  - 그림처럼 2번 자리가 실패하면 뒤의 replica가 한 칸씩 당겨지고, 다음 후보인 g가 6번 자리를 채웁니다.
   - Collision의 경우는 **현재 탐색 중인 bucket** 안에서 다시 탐색합니다.
 
 ```text
@@ -340,9 +350,11 @@ select(1,disk) - i: [row1, row2], f:0,
 
 {{< figure src="images/ko/failure-retry-paths.svg" alt="Collision은 같은 cab21 안에서 disk3421을 다시 고르고, Crushed와 Overload는 row1부터 다시 탐색해 cab23의 disk5679를 고르는 경로 비교" align="center" class="full-width" >}}
 
+{{< figure src="images/ko/failure-mutation-fr.svg" alt="r' = r + fr·n 방식에서 실패한 2번 자리만 다음 후보 h로 바뀌고 나머지 replica는 제자리에 남는 과정" attr="Weil et al., CRUSH (SC'06) Figure 2 오른쪽 재구성" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+
 - 특정 replica의 실패 횟수인 `fr` 은 Erasure Coding처럼 **replica rank가 의미를 가지는 경우, 위치를 유지** 하기 위해 사용됩니다.
   - `fr` 은 `f` 와 마찬가지로 실패할 때마다 카운트되지만, candidate 탐색이 종료될 때마다 0으로 초기화됩니다.
-  - mutation 시에는 `fr` 을 더하는 대신 candidate 개수만큼 곱한 `fr x N` 을 더해 위치 정보를 유지합니다. 위 그림의 오른쪽을 참고하세요.
+  - mutation 시에는 `fr` 을 더하는 대신 candidate 개수만큼 곱한 `fr x N` 을 더해 위치 정보를 유지합니다. 위 그림처럼 실패한 2번 자리만 h로 바뀌고, 나머지 replica는 제자리에 남습니다.
 
 ```text
 select(1,disk) - i: [row1, row2], f:0,

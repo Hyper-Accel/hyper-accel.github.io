@@ -1,7 +1,6 @@
 ---
 date: '2026-10-15T10:00:00+09:00'
-draft: false
-title: 'Ceph Deep-Dive Part 1: CRUSH'
+title: '[Ceph Deep-Dive - Part 01] CRUSH'
 cover:
   image: "images/en/cover.webp"
   alt: "CRUSH placing replicas by descending the row, cabinet, and disk levels of a cluster map"
@@ -9,7 +8,7 @@ cover:
   relative: true
 authors: [Sinhyun Park]
 tags: [ceph, crush, distributed storage, object storage]
-categories: [storage]
+categories: ["Memory and Storage"]
 series: ["Ceph Deep-Dive"]
 series_idx: 1
 summary: "A walkthrough of CRUSH, the data distribution algorithm at the heart of Ceph, based on the SC'06 paper. It covers how object locations are computed without a mapping table, placement rules and failure handling, data movement on cluster changes, and the trade-offs between bucket algorithms."
@@ -35,6 +34,7 @@ This first part covers **Controlled Replication Under Scalable Hashing(CRUSH)**,
 > Object storage stores and manages data as independent **objects**, not as files or blocks.
 
 - A conventional file system manages data through metadata such as the directory tree and inodes.
+  - An inode (index node) is a data structure that holds a file's size, permissions, and the locations of its data blocks.
 - Object storage manages data as an object ID (key) and an object (value).
 
 ```text
@@ -57,6 +57,8 @@ bucket
 
 ## Challenge
 
+Spreading objects across many devices raises three problems. Each subsection ends with the question that problem poses.
+
 ### Q1. Object Metadata Scalability
 
 In Ceph, the unit that actually stores data on a disk is called an **Object Storage Daemon(OSD)**. The example below stores the object-to-OSD mapping in a table.
@@ -75,6 +77,8 @@ object-C → osd.3
 - On the left, every request goes through the metadata server, which becomes both a bottleneck and a single point of failure (SPOF).
 - On the right is the CRUSH approach covered in this post. Each client computes the location itself, so no central lookup is needed.
 
+This leads to the first question CRUSH has to answer.
+
 > Can any node compute an object's location **without storing placement information**?
 
 ### Q2. Reliable Replica Placement
@@ -86,6 +90,8 @@ Spreading data across devices does not by itself make it safe.
 - As on the left, if **all replicas land in the same rack domain**, a power failure makes the data unreachable.
 - As on the right, with one replica per rack, the remaining replicas keep the data reachable even if one rack goes down.
 - Replica placement must take several failure domains into account, such as rack, power, site, and server.
+
+The second question is how to reflect failure domains in placement.
 
 > Can the placement process distinguish and structure failure domains?
 
@@ -109,6 +115,8 @@ The example below shows how the locations of 12 objects change when the cluster 
 {{< figure src="/posts/ceph-crush/images/en/hash-mod-remapping.svg" alt="Switching from hash % 4 to hash % 5 moves 9 of 12 objects to a different device" align="center" class="full-width" >}}
 
 - **When the number of devices changes**, most existing object mappings change. The result is **massive relocation**.
+
+The last question is about how much data moves when the cluster changes.
 
 > Can data be redistributed as the cluster changes while keeping data movement to a minimum?
 
@@ -180,8 +188,9 @@ osd.2 weight = 2
 {{< figure src="/posts/ceph-crush/images/en/cluster-map-failure-domains.svg" alt="A cluster map with IDC, rack, switch, and device levels under root, and the replica placement strategy at each level" align="center" class="full-width" >}}
 
 - Assign different IDC sites to buckets under root to build a **cross-IDC data cluster**.
-- Assign each rack to an upper-level bucket and place two replicas per bucket to **spread replicas and raise availability**.
-- Assign each switch to a lower-level bucket and **keep replicas together to cut replica synchronization cost**.
+- Assign each rack to an upper-level bucket and **spread replicas across different racks**. If one rack goes down, replicas in the other racks survive, which raises availability.
+- Assign each switch to a lower-level bucket and **keep the replicas within a rack under the same switch**. Replicas can then sync without crossing switches, which cuts synchronization cost.
+- For example, with four replicas, place two each in rack1 and rack3, as the blue devices show, and keep the two in each rack under the same switch.
 
 ### Placement Rule
 
@@ -311,9 +320,10 @@ select(1,disk) - i: [row1, row2], f:0,
 - [r=1, f:0]. i: row1, b: cab21, o: disk2107 (disk2107 Fail!!)
 ```
 
-{{< figure src="/posts/ceph-crush/images/en/failure-handling-mutation.svg" alt="Replacing a rejected candidate with r' = r + f versus r' = r + fr·n" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 2" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" class="full-width" >}}
+{{< figure src="/posts/ceph-crush/images/en/failure-mutation-f.svg" alt="With r' = r + f, when candidate 2 fails the replicas after it shift left by one and g fills slot 6" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 2 (left)" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
 
 - When the selected candidate fails, CRUSH increments the failure count (`f += 1`) and mutates the index to `r' = r + f`.
+  - As the figure shows, when slot 2 fails, the replicas after it shift left by one and the next candidate, g, fills slot 6.
   - On a collision, it searches again **inside the bucket currently being descended**.
 
 ```text
@@ -340,9 +350,11 @@ select(1,disk) - i: [row1, row2], f:0,
 
 {{< figure src="/posts/ceph-crush/images/en/failure-retry-paths.svg" alt="On collision CRUSH picks disk3421 again inside cab21, while on crushed or overload it restarts from row1 and picks disk5679 in cab23" align="center" class="full-width" >}}
 
+{{< figure src="/posts/ceph-crush/images/en/failure-mutation-fr.svg" alt="With r' = r + fr·n, only the failed slot 2 is replaced by the next candidate h, and the other replicas stay in place" attr="Adapted from Weil et al., CRUSH (SC'06) Figure 2 (right)" attrlink="https://ceph.io/assets/pdfs/weil-crush-sc06.pdf" align="center" >}}
+
 - `fr`, the failure count for a specific replica, is used to **keep positions stable when replica rank matters**, as in erasure coding.
   - Like `f`, `fr` is incremented on every failure, but it is reset to 0 each time a candidate search finishes.
-  - During mutation, CRUSH adds `fr x N`, `fr` multiplied by the number of candidates, instead of `fr` itself. This preserves position information, as shown on the right side of the figure above.
+  - During mutation, CRUSH adds `fr x N`, `fr` multiplied by the number of candidates, instead of `fr` itself. This preserves position information: as the figure above shows, only the failed slot 2 changes to h, and the other replicas stay in place.
 
 ```text
 select(1,disk) - i: [row1, row2], f:0,
