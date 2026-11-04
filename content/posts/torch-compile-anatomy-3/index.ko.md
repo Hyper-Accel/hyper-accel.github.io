@@ -46,6 +46,8 @@ keywords: [
 <!-- b:torch-compile-anatomy-3-7 -->
 ## Part 1. Agent: 빨라진 개발 속도를 감당하기 {#part1}
 
+![여러 개발자가 PyTorch를 중심으로 코드를 작성하고 함께 검토하는 모습을 그린 일러스트](images/part1-pytorch-contributors.webp)
+
 <!-- b:torch-compile-anatomy-3-8 -->
 ### 병목이 리뷰로 옮겨 가다
 
@@ -101,6 +103,8 @@ vLLM의 PR 수는 2년 만에 약 10배로 늘었습니다. 이 수치에는 프
 <!-- b:torch-compile-anatomy-3-24 -->
 ## Part 2. Acceleration: PyTorch와 vLLM은 어디를 빠르게 만들고 있나 {#part2}
 
+![PyTorch와 vLLM 로고를 나란히 배치한 이미지](images/part2-pytorch-vllm.webp)
+
 <!-- b:torch-compile-anatomy-3-25 -->
 Part 1이 개발 속도의 이야기였다면, Part 2는 컴파일부터 실제 서빙까지 걸리는 시간의 이야기입니다. 제가 들은 세션에서는 **생성된 코드의 속도** 뿐 아니라 컴파일 비용과 런타임의 대기 시간을 줄이는 작업도 함께 강조되었습니다.
 
@@ -155,6 +159,8 @@ graph break 처리도 개선되고 있습니다. 1편에서 graph break가 발�
 
 <!-- b:torch-compile-anatomy-3-41 -->
 ## Part 3. Ecosystem: 공통 기반 위에 쌓는 하드웨어 지원 {#part3}
+
+![Huawei 로고와 IBM 로고 아래 Spyre 제품명을 나란히 배치한 이미지](images/part3-huawei-spyre.webp)
 
 <!-- b:torch-compile-anatomy-3-42 -->
 2편에서는 각 가속기가 `torch.compile()` 의 어느 단계에 연결되는지 살펴봤습니다. 이번에는 연결한 뒤의 이야기입니다. 새 하드웨어에서 성능을 내고, PyTorch가 바뀌어도 호환성을 유지하려면 무엇이 필요할까요? Huawei와 IBM Spyre의 사례를 차례로 살펴보겠습니다.
