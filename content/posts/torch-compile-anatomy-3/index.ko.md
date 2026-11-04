@@ -1,13 +1,13 @@
 ---
 date: '2026-11-02T18:00:00+09:00'
-title: '[torch.compile() 알아보기 - Part 03] PyTorch Conference 2026에서 본 세 키워드: Agent, Acceleration, Ecosystem'
+title: "[torch.compile() 알아보기 - Part 03] PyTorch Conference 2026 참관기"
 cover:
   image: "images/pytorch.jpg"
   alt: "PyTorch 로고"
   caption: "PyTorch"
   relative: true
 authors: [Hyunjun Park]
-tags: ["torch.compile", "PyTorch", "PyTorch Conference", "vLLM", "TorchInductor", "AI Agent", "NPU", "CI"]
+tags: ["PyTorch", "torch.compile", "TorchInductor", "PyTorch Conference", "vLLM", "AI Agent", "NPU", "CI"]
 series: ['torch.compile() 알아보기']
 series_idx: 3
 categories: ["Compilers and Kernels"]
@@ -31,9 +31,6 @@ keywords: [
 컨퍼런스를 다녀온 뒤 에이전트에게 주요 연구 동향을 물어보니 학습, 추론, PyTorch 핵심 모듈, 커널 최적화 등을 꼽았습니다. 저는 이 가운데 추론과 컴파일러, 가속기 세션을 주로 들었습니다. 따라서 이 글은 컨퍼런스 전체의 요약이 아니라, **제가 고른 세션에서 본 흐름을 제 관점으로 해석한 글** 입니다. 직접 듣지 못한 세션은 공개된 소개를 바탕으로 정리하고, 본문에 따로 표시했습니다.
 
 여러 세션에서 공통으로 느낀 흐름을 **Agent**, **Acceleration**, **Ecosystem** 세 키워드로 묶었습니다. 본문도 이에 맞춰 세 부분으로 구성했습니다.
-
-<!-- b:torch-compile-anatomy-3-4 -->
-
 
 <!-- b:torch-compile-anatomy-3-5 -->
 1. 에이전트로 개발 속도가 빨라지면서, 프로젝트들이 **Continuous Integration(CI)** 과 구조를 어떻게 바꾸고 있는가
@@ -125,15 +122,6 @@ graph break 처리도 개선되고 있습니다. 1편에서 graph break가 발�
 <!-- b:torch-compile-anatomy-3-30 -->
 [Lightweight FX Tracing in PyTorch](https://events.linuxfoundation.org/pytorch-conference-north-america/program/schedule/?id=1256183)는 전체 그래프를 얻으려는 사용자에게 Dynamo가 너무 무겁다는 피드백에서 출발합니다. 파이썬 부수 효과 없이 텐서 계산으로 표현되는 코드처럼 조건이 맞는 경우를 위해, `make_fx` 기반의 경량 추적 경로를 제안했습니다.
 
-<!-- b:torch-compile-anatomy-3-31 -->
-
-
-<!-- b:torch-compile-anatomy-3-32 -->
-
-
-<!-- b:torch-compile-anatomy-3-33 -->
-
-
 <!-- b:torch-compile-anatomy-3-34 -->
 ### 실행을 빠르게: 에이전트 워크로드와 vLLM
 
@@ -147,12 +135,6 @@ graph break 처리도 개선되고 있습니다. 1편에서 graph break가 발�
 
 <!-- b:torch-compile-anatomy-3-37 -->
 이 작업들은 `torch.compile()` 만으로 해결할 수 있는 문제가 아닙니다. 예를 들어 KV 오프로딩은 디코드 커널 자체를 빠르게 만드는 최적화가 아닙니다. 캐시 용량과 재사용을 늘리는 대신 전송 비용이 생기므로, 효과는 워크로드와 메모리 사용량에 따라 달라집니다. TPU 메가커널 데모도 커널 최적화와 함께 프리필·디코드 분리와 캐시 재사용이 필요하다고 설명했습니다. 커널 하나의 속도를 넘어 서빙 전체를 봐야 한다는 메시지를 여러 세션에서 들을 수 있었습니다.
-
-<!-- b:torch-compile-anatomy-3-38 -->
-
-
-<!-- b:torch-compile-anatomy-3-39 -->
-
 
 <!-- b:torch-compile-anatomy-3-40 -->
 ---
@@ -201,9 +183,6 @@ Spyre도 앞서 설명한 CRCR를 활용합니다. 흥미로운 점은 테스트
 <!-- b:torch-compile-anatomy-3-54 -->
 두 사례에서 강조한 작업은 다르지만 방향은 같았습니다. 공통 인터페이스와 컴파일러를 재사용하고, 하드웨어에 필요한 부분을 확장하며, upstream의 변화에 맞춰 검증을 이어 가는 것입니다. 각자 만든 확장을 다른 장치도 활용할 수 있도록 공유하려는 움직임도 보였습니다.
 
-<!-- b:torch-compile-anatomy-3-55 -->
-
-
 <!-- b:torch-compile-anatomy-3-56 -->
 이 지점에서 세 키워드가 연결됩니다. 하드웨어의 **Acceleration** 을 구현하는 데 공통 **Ecosystem** 을 활용하고, 그 생태계를 따라가기 위한 검증에는 **Agent** 를 도입합니다. Part 1에서 본 에이전트의 제안과 사람의 판단이라는 역할 분담이 가속기 지원에서도 이어지고 있었습니다.
 
@@ -221,9 +200,6 @@ Spyre도 앞서 설명한 CRCR를 활용합니다. 흥미로운 점은 테스트
 
 둘째, 하드웨어에 특화된 부분은 공통 코드와 경계를 분명히 해야 합니다. 에이전트의 도움으로 구조 개선을 시도하기 쉬워진 만큼, 그동안 미뤄 온 모듈화도 돌아볼 필요가 있습니다. 저희 소프트웨어 스택이 오픈소스와 어떻게 자연스럽게 맞물릴 수 있을지 고민하게 된 이틀이었습니다.
 
-<!-- b:torch-compile-anatomy-3-61 -->
-
-
 <!-- b:torch-compile-anatomy-3-62 -->
 ## Reference
 
@@ -237,12 +213,6 @@ Spyre도 앞서 설명한 CRCR를 활용합니다. 흥미로운 점은 테스트
 - [Agentic AI and Next-Gen Intelligence Sessions](https://pytorch.org/blog/agentic-ai-and-next-gen-intelligence-sessions-at-pytorch-conference-north-america-2026/)
 - [Hardware Acceleration & Compute Infrastructure Guide](https://pytorch.org/blog/your-guide-to-hardware-acceleration-compute-infrastructure-at-pytorch-conference-north-america-2026/)
 
-<!-- b:torch-compile-anatomy-3-65 -->
-
-
-<!-- b:torch-compile-anatomy-3-66 -->
-
-
 <!-- b:torch-compile-anatomy-3-67 -->
 **문서와 기사**
 
@@ -250,12 +220,6 @@ Spyre도 앞서 설명한 CRCR를 활용합니다. 흥미로운 점은 테스트
 - [vLLM Contributing Guide](https://docs.vllm.ai/en/v0.28.0/contributing/)
 - [Extending Inductor for the IBM Spyre Accelerator](https://pytorch.org/blog/extending-inductor-for-the-ibm-spyre-accelerator/)
 - [From Upstream Changes to Downstream Confidence](https://pytorch.org/blog/from-upstream-changes-to-downstream-confidence-inside-torch-spyres-integration-with-pytorch-crcr/)
-
-<!-- b:torch-compile-anatomy-3-69 -->
-
-
-<!-- b:torch-compile-anatomy-3-70 -->
-
 
 <!-- b:torch-compile-anatomy-3-71 -->
 ## 추신: HyperAccel은 채용 중입니다!

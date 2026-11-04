@@ -3,12 +3,12 @@ date: '2026-11-02T18:00:00+09:00'
 title: '[Exploring torch.compile() - Part 03] Three Keywords from PyTorch Conference 2026: Agent, Acceleration, Ecosystem'
 cover:
   image: "images/pytorch.jpg"
-  alt: "PyTorch logo"
+  alt: "PyTorch 로고"
   caption: "PyTorch"
   relative: true
 authors: [Hyunjun Park]
-tags: ["torch.compile", "PyTorch", "PyTorch Conference", "vLLM", "TorchInductor", "AI Agent", "NPU", "CI"]
-series: ['Exploring torch.compile()']
+tags: ["PyTorch", "torch.compile", "TorchInductor", "PyTorch Conference", "vLLM", "AI Agent", "NPU", "CI"]
+series: ["torch.compile() 알아보기"]
 series_idx: 3
 categories: ["Compilers and Kernels"]
 summary: 'Where the industry is heading, as seen at PyTorch Conference 2026, through three keywords: Agent, Acceleration, Ecosystem. We look at how agents are changing development, what PyTorch and vLLM are speeding up, and how NPU companies are joining the ecosystem.'
@@ -31,9 +31,6 @@ Hello, this is Hyunjun Park from the CL (Compute Library) team at HyperAccel. In
 After the conference, I asked an agent about its main research themes. It named training, inference, PyTorch core modules, and kernel optimization. I mainly attended inference, compiler, and accelerator sessions. This post is therefore **my interpretation of the trends in the sessions I chose**, rather than a summary of the entire conference. Where I did not attend a session, I use its public description and mark that explicitly.
 
 I grouped the recurring themes into three keywords: **Agent**, **Acceleration**, and **Ecosystem**. The post follows those three themes.
-
-<!-- b:torch-compile-anatomy-3-4 -->
-
 
 <!-- b:torch-compile-anatomy-3-5 -->
 1. As agents speed up development, how are projects changing their **Continuous Integration (CI)** and code structure?
@@ -125,15 +122,6 @@ Graph-break handling is improving too. In Part 1 of this series, I explained tha
 <!-- b:torch-compile-anatomy-3-30 -->
 [Lightweight FX Tracing in PyTorch](https://events.linuxfoundation.org/pytorch-conference-north-america/program/schedule/?id=1256183) starts from feedback that Dynamo is too heavy for users who need a full graph. It proposes a lightweight tracing path based on `make_fx` for suitable code, such as tensor computations without Python side effects.
 
-<!-- b:torch-compile-anatomy-3-31 -->
-
-
-<!-- b:torch-compile-anatomy-3-32 -->
-
-
-<!-- b:torch-compile-anatomy-3-33 -->
-
-
 <!-- b:torch-compile-anatomy-3-34 -->
 ### Faster execution: agent workloads and vLLM
 
@@ -147,12 +135,6 @@ Agents are changing inference workloads as well as development. More requests ma
 
 <!-- b:torch-compile-anatomy-3-37 -->
 These problems cannot be solved by `torch.compile()` alone. KV offloading, for example, does not make the decode kernel itself faster. It increases cache capacity and reuse at the cost of data transfers, so its effect depends on the workload and memory usage. The TPU mega-kernel demo also explained the need for prefill/decode disaggregation and cache reuse alongside kernel optimization. Across several sessions, I heard the same message: look beyond the speed of an individual kernel to the serving system as a whole.
-
-<!-- b:torch-compile-anatomy-3-38 -->
-
-
-<!-- b:torch-compile-anatomy-3-39 -->
-
 
 <!-- b:torch-compile-anatomy-3-40 -->
 ---
@@ -201,9 +183,6 @@ Spyre also uses CRCR. Its approach to selecting tests is particularly interestin
 <!-- b:torch-compile-anatomy-3-54 -->
 The two examples emphasized different tasks, but their direction was the same: reuse common interfaces and compilers, extend what the hardware needs, and keep validating as upstream evolves. Both also showed an interest in sharing extensions so other devices could benefit.
 
-<!-- b:torch-compile-anatomy-3-55 -->
-
-
 <!-- b:torch-compile-anatomy-3-56 -->
 This is where the three keywords connect. A shared **Ecosystem** supports hardware **Acceleration**, while **Agents** help with the validation needed to keep up with that ecosystem. The division of responsibilities from Part 1—agents making proposals and people exercising judgment—also appears in accelerator support.
 
@@ -221,9 +200,6 @@ As a developer at a chip company, I took away two things. First, before building
 
 Second, hardware-specific code should have clear boundaries with shared code. As agents make structural improvements easier to attempt, it is worth revisiting modularization work that has been put off. These two days left me thinking about how our software stack could fit more naturally with open-source projects.
 
-<!-- b:torch-compile-anatomy-3-61 -->
-
-
 <!-- b:torch-compile-anatomy-3-62 -->
 ## Reference
 
@@ -237,12 +213,6 @@ Second, hardware-specific code should have clear boundaries with shared code. As
 - [Agentic AI and Next-Gen Intelligence Sessions](https://pytorch.org/blog/agentic-ai-and-next-gen-intelligence-sessions-at-pytorch-conference-north-america-2026/)
 - [Hardware Acceleration & Compute Infrastructure Guide](https://pytorch.org/blog/your-guide-to-hardware-acceleration-compute-infrastructure-at-pytorch-conference-north-america-2026/)
 
-<!-- b:torch-compile-anatomy-3-65 -->
-
-
-<!-- b:torch-compile-anatomy-3-66 -->
-
-
 <!-- b:torch-compile-anatomy-3-67 -->
 **Docs and articles**
 
@@ -250,12 +220,6 @@ Second, hardware-specific code should have clear boundaries with shared code. As
 - [vLLM Contributing Guide](https://docs.vllm.ai/en/v0.28.0/contributing/)
 - [Extending Inductor for the IBM Spyre Accelerator](https://pytorch.org/blog/extending-inductor-for-the-ibm-spyre-accelerator/)
 - [From Upstream Changes to Downstream Confidence](https://pytorch.org/blog/from-upstream-changes-to-downstream-confidence-inside-torch-spyres-integration-with-pytorch-crcr/)
-
-<!-- b:torch-compile-anatomy-3-69 -->
-
-
-<!-- b:torch-compile-anatomy-3-70 -->
-
 
 <!-- b:torch-compile-anatomy-3-71 -->
 ## P.S. HyperAccel is hiring!
