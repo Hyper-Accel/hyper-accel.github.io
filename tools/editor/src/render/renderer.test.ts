@@ -138,6 +138,33 @@ test("renders math while preserving code and literal shortcode examples", async 
   expect(result.codes).toEqual(["$x$", "{{< pair >}}\n$x$\n{{< /pair >}}\n"])
 })
 
+test("renders anchored math headings after the editor has initialized Markdown extensions", async () => {
+  const isolated = await browser.newPage()
+  try {
+    await isolated.goto(server.url.href)
+    await isolated.waitForFunction(() => Boolean(window.onsiteRenderer))
+    const result = await isolated.evaluate(() => {
+      window.initializeEditorMarkdown()
+      const language = window.fixtureBundles[0]?.ko
+      if (!language) throw new TypeError("Missing fixture")
+      const rendered = window.onsiteRenderer.createRenderer().render({
+        ...language,
+        blocks: [{ id: "heading", markdown: "## Formula $x^2$ {#part1}" }],
+      })
+      const dom = document.createElement("div")
+      dom.innerHTML = rendered.html
+      return {
+        id: dom.querySelector("h2")?.id,
+        maths: dom.querySelectorAll("h2 .katex").length,
+        leaked: dom.textContent?.includes("{#part1}"),
+      }
+    })
+    expect(result).toEqual({ id: "part1", maths: 1, leaked: false })
+  } finally {
+    await isolated.close()
+  }
+})
+
 test("emits UTF-16 multi-block selection rectangles from an opaque sandbox", async () => {
   // Given: subscribe before loading the frame or selecting any text.
   const result = await page.evaluate(async () => {

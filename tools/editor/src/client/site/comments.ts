@@ -261,10 +261,15 @@ export class SiteComments {
   private people: readonly Person[] = []
   private disposed = false
   private detachMention: (() => void) | null = null
+  private pressedMark: {
+    readonly id: string
+    readonly editor: Editor
+    readonly x: number
+    readonly y: number
+  } | null = null
 
   constructor(private readonly options: SiteCommentsOptions) {
     const registry = this.editors
-    const open = (id: string, editor: Editor): void => this.openThread(id, editor)
     this.extension = Extension.create({
       name: "siteCommentMarks",
       onCreate() {
@@ -275,7 +280,6 @@ export class SiteComments {
           registry.delete(editorLanguage(this.editor))
       },
       addProseMirrorPlugins() {
-        const editor = this.editor
         return [
           new Plugin<DecorationSet>({
             key: marksKey,
@@ -288,15 +292,6 @@ export class SiteComments {
             },
             props: {
               decorations: (state) => marksKey.getState(state),
-              handleClick(_view, _pos, event) {
-                const target =
-                  event.target instanceof Element
-                    ? event.target.closest<HTMLElement>("[data-comment-thread]")
-                    : null
-                const id = target?.dataset["commentThread"]
-                if (id) open(id, editor)
-                return false
-              },
             },
           }),
         ]
@@ -304,18 +299,43 @@ export class SiteComments {
     })
     this.countButton = h(
       "button",
-      { type: "button", class: "composer-comments-count", "data-site-comments": "", hidden: true },
+      { type: "button", class: "composer-comments-count", "data-site-comments": "" },
       "댓글",
     )
     this.countButton.addEventListener("click", () => this.openList())
     this.popover = h("div", { class: "composer-comment-popover", role: "dialog", hidden: true })
     document.body.append(this.popover)
     document.addEventListener("mousedown", this.onOutside, true)
+    document.addEventListener("mousedown", this.onMarkDown, true)
+    document.addEventListener("mouseup", this.onMarkUp, true)
     document.addEventListener("keydown", this.onEscape)
     window.addEventListener("scroll", this.onScroll, { passive: true })
     void options.people().then((people) => {
       this.people = people
     })
+  }
+
+  private readonly onMarkDown = (event: MouseEvent): void => {
+    this.pressedMark = null
+    if (event.button !== 0) return
+    const mark =
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>("[data-comment-thread]")
+        : null
+    const id = mark?.dataset["commentThread"]
+    if (!mark || !id) return
+    const editor = [...this.editors.values()].find((entry) => entry.view.dom.contains(mark))
+    if (!editor) return
+    // Keep the thread identity before the editor rebuilds its selection decorations.
+    this.pressedMark = { id, editor, x: event.clientX, y: event.clientY }
+  }
+
+  private readonly onMarkUp = (event: MouseEvent): void => {
+    const pressed = this.pressedMark
+    this.pressedMark = null
+    if (!pressed || event.button !== 0) return
+    if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > 4) return
+    this.openThread(pressed.id, pressed.editor)
   }
 
   private readonly onOutside = (event: MouseEvent): void => {
@@ -374,10 +394,11 @@ export class SiteComments {
 
   private async place_threads(): Promise<void> {
     const open = this.threads.filter((thread) => !thread.resolved)
-    this.countButton.hidden = this.threads.length === 0
     this.countButton.textContent = open.length
       ? `댓글 ${open.length}`
-      : `댓글 ${this.threads.length} ✓`
+      : this.threads.length
+        ? `댓글 ${this.threads.length} ✓`
+        : "댓글"
     for (const language of ["ko", "en"] as const) {
       const context = await this.context(language)
       const editor = this.editors.get(language)
@@ -435,6 +456,21 @@ export class SiteComments {
       .trim()
     this.anchorRect = () => rectFor(editor, from, to)
     this.pending = { language, from, to }
+    this.writeComment(language, portions, quoted, editor, to)
+  }
+
+  private writeComment(
+    language: Language,
+    portions: readonly {
+      readonly id: string
+      readonly text: string
+      readonly start: number
+      readonly index: Indexed
+    }[],
+    quoted: string,
+    editor?: Editor,
+    to = 0,
+  ): void {
     const textarea = h("textarea", {
       "aria-label": "댓글",
       placeholder: "댓글을 입력하세요. @로 사람을 멘션할 수 있습니다.",
@@ -445,11 +481,13 @@ export class SiteComments {
     const form = h(
       "form",
       { class: "composer-comment-form" },
-      h(
-        "blockquote",
-        { class: "composer-comment-quote" },
-        quoted.length > 120 ? `${quoted.slice(0, 120)}…` : quoted,
-      ),
+      quoted
+        ? h(
+            "blockquote",
+            { class: "composer-comment-quote" },
+            quoted.length > 120 ? `${quoted.slice(0, 120)}…` : quoted,
+          )
+        : null,
       textarea,
       error,
       h(
@@ -475,7 +513,7 @@ export class SiteComments {
         .then((thread) => {
           this.close()
           this.active = thread.id
-          editor.commands.setTextSelection(to)
+          editor?.commands.setTextSelection(to)
           this.openThread(thread.id, editor)
         })
         .catch((value: unknown) => {
@@ -485,7 +523,7 @@ export class SiteComments {
           submit.textContent = "댓글 달기"
         })
     })
-    this.show("댓글 달기", form, this.anchorRect())
+    this.show("댓글 달기", form, this.anchorRect?.() ?? null)
     this.paint(language)
     this.detachMention = attachMentions(textarea, () => this.people)
     textarea.focus()
@@ -502,6 +540,21 @@ export class SiteComments {
     body: string,
   ): Promise<ReviewThread> {
     const pull = await this.options.ensureSaved()
+    if (portions.length === 0) {
+      const result = await this.options.github.addRangeComment(
+        pull.number,
+        pull.headSha,
+        null,
+        body,
+      )
+      if (!result.ok) throw new Error(describeGitHubError(result.error))
+      this.threads = [
+        ...this.threads.filter((thread) => thread.id !== result.value.id),
+        result.value,
+      ]
+      await this.place_threads()
+      return result.value
+    }
     const context = await this.context(language)
     if (!context) throw new Error("글을 불러오지 못했습니다.")
     const range = locate(portions, context.blockTexts)
@@ -521,14 +574,14 @@ export class SiteComments {
     return result.value
   }
 
-  private openThread(id: string, editor: Editor): void {
+  private openThread(id: string, editor?: Editor): void {
     const thread = this.threads.find((entry) => entry.id === id)
     if (!thread) return
     this.active = id
-    const language = editorLanguage(editor)
+    const language = editor ? editorLanguage(editor) : "ko"
     this.paint(language)
     this.anchorRect = () => {
-      const mark = editor.view.dom.querySelector<HTMLElement>(
+      const mark = editor?.view.dom.querySelector<HTMLElement>(
         `[data-comment-thread="${CSS.escape(id)}"]`,
       )
       return mark?.getBoundingClientRect() ?? null
@@ -608,9 +661,9 @@ export class SiteComments {
     const quote = h(
       "blockquote",
       { class: "composer-comment-quote" },
-      thread.anchor.quotedText.length > 120
+      thread.anchor && thread.anchor.quotedText.length > 120
         ? `${thread.anchor.quotedText.slice(0, 120)}…`
-        : thread.anchor.quotedText,
+        : (thread.anchor?.quotedText ?? "글 전체"),
     )
     this.show(
       thread.resolved ? "해결된 댓글" : "댓글",
@@ -627,11 +680,15 @@ export class SiteComments {
     }
     const editorFor = (language: Language): Editor | undefined => this.editors.get(language)
     const items = this.threads.map((thread) => {
-      const language: Language = thread.anchor.markdown.path.endsWith(".en.md") ? "en" : "ko"
+      const language: Language = thread.anchor?.markdown.path.endsWith(".en.md") ? "en" : "ko"
       const button = h(
         "button",
         { type: "button", class: "composer-comment-item" },
-        h("span", { class: "composer-comment-item__quote" }, thread.anchor.quotedText),
+        h(
+          "span",
+          { class: "composer-comment-item__quote" },
+          thread.anchor?.quotedText ?? "글 전체",
+        ),
         h(
           "span",
           { class: "composer-comment-item__meta" },
@@ -640,6 +697,10 @@ export class SiteComments {
       )
       button.addEventListener("click", () => {
         const editor = editorFor(language)
+        if (!thread.anchor) {
+          this.openThread(thread.id)
+          return
+        }
         if (!editor) return
         const panel = editor.view.dom.closest<HTMLElement>("[data-lang]")
         if (panel?.hidden)
@@ -657,7 +718,24 @@ export class SiteComments {
     this.anchorRect = () => this.countButton.getBoundingClientRect()
     this.show(
       "이 글의 댓글",
-      h("ol", { class: "composer-comment-list" }, ...items),
+      h(
+        "div",
+        {},
+        h("ol", { class: "composer-comment-list" }, ...items),
+        h(
+          "button",
+          {
+            type: "button",
+            class: "composer-comment-primary",
+            onclick: () => {
+              this.pending = null
+              this.anchorRect = () => this.countButton.getBoundingClientRect()
+              this.writeComment("ko", [], "")
+            },
+          },
+          "일반 댓글 쓰기",
+        ),
+      ),
       this.anchorRect(),
     )
     this.popover.dataset["view"] = "list"
@@ -710,6 +788,8 @@ export class SiteComments {
     this.disposed = true
     this.close()
     document.removeEventListener("mousedown", this.onOutside, true)
+    document.removeEventListener("mousedown", this.onMarkDown, true)
+    document.removeEventListener("mouseup", this.onMarkUp, true)
     document.removeEventListener("keydown", this.onEscape)
     window.removeEventListener("scroll", this.onScroll)
     this.popover.remove()

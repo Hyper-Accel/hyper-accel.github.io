@@ -254,8 +254,8 @@ export const mountComposer: SiteMount = async (root, deps) => {
     await deps.repairs.flush()
   }
   let saving: Promise<DraftPullRequest> | null = null
-  const saveRemote = (): Promise<DraftPullRequest> => {
-    if (saving) return saving
+  const saveRemote = (purpose?: "review"): Promise<DraftPullRequest> => {
+    if (saving) return purpose === "review" ? saving.then(() => saveRemote("review")) : saving
     remoteSaving = true
     remoteError = null
     showSavedState()
@@ -263,8 +263,19 @@ export const mountComposer: SiteMount = async (root, deps) => {
       saveButton.disabled = true
       try {
         await flush()
-        const bundle = latest
+        let bundle = latest
         if (!bundle) throw new Error("먼저 글 정보를 입력해 주세요.")
+        if (purpose === "review") {
+          const prepared = {
+            ...bundle,
+            ko: { ...bundle.ko, frontMatter: { ...bundle.ko.frontMatter, draft: false } },
+            en: { ...bundle.en, frontMatter: { ...bundle.en.frontMatter, draft: false } },
+          }
+          const issues = deps.codec.validate(prepared, "review")
+          if (issues.length) throw new Error(issues.map((issue) => issue.message).join("\n"))
+          await composer?.setDraft(false)
+          bundle = latest ?? prepared
+        }
         const validation = deps.codec.validate(bundle, "save")
         if (validation.length) throw new Error(validation.map((issue) => issue.message).join("\n"))
         const serialized = await deps.codec.serialize(bundle)
@@ -346,7 +357,6 @@ export const mountComposer: SiteMount = async (root, deps) => {
       return pr ? { number: pr.number, headSha: remoteHead ?? pr.headSha } : null
     },
   })
-  saveButton.before(comments.countButton)
   const registry = new EditorRegistry()
   let blockContext: BlockExtensionContext | null = null
   const panels: SidePanel[] = []
@@ -446,6 +456,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     if (!dock) return
     help ??= mountHelp(readOnly ? "reviewer" : "author", root)
     if (help.parentElement !== dock) dock.prepend(help)
+    if (comments.countButton.parentElement !== dock) help.after(comments.countButton)
   }
   // The site header's language pill switches the editing language, like reading /en/.
   const wrapper = host.querySelector<HTMLElement>(".composer")

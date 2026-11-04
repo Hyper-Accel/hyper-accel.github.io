@@ -71,7 +71,7 @@ export interface GitHubAdapter {
   addRangeComment(
     pullNumber: number,
     expectedHeadSha: string,
-    anchor: RangeAnchor,
+    anchor: RangeAnchor | null,
     body: string,
   ): Promise<GitHubResult<ReviewThread>>
   replyComment(thread: ReviewThread, body: string): Promise<GitHubResult<ReviewComment>>

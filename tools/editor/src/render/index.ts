@@ -1,6 +1,7 @@
 import DOMPurify from "dompurify"
 import renderMathInElement from "katex/contrib/auto-render"
 import { Marked } from "marked"
+import { headingAnchor, headingTokens } from "../document/heading-anchor"
 import {
   YOUTUBE_ALLOW,
   YOUTUBE_CONTAINER_STYLE,
@@ -78,8 +79,9 @@ export function createRenderer(options: RendererOptions = {}): Renderer {
         async: false,
         gfm: true,
         renderer: {
-          heading({ depth, tokens }) {
-            const content = this.parser.parseInline(tokens)
+          heading({ depth, tokens, text: source }) {
+            const heading = headingAnchor(source)
+            const content = this.parser.parseInline(heading.id ? headingTokens(tokens) : tokens)
             const text = document.createElement("span")
             text.innerHTML = DOMPurify.sanitize(content)
             const base = (text.textContent ?? "")
@@ -88,11 +90,11 @@ export function createRenderer(options: RendererOptions = {}): Renderer {
               .replace(/ /g, "-")
             const occurrence = headings.get(base) ?? 0
             headings.set(base, occurrence + 1)
-            const id = occurrence ? `${base}-${occurrence}` : base
+            const id = heading.id ?? (occurrence ? `${base}-${occurrence}` : base)
             const anchor =
               language.frontMatter["disableAnchoredHeadings"] === true
                 ? ""
-                : `<a hidden class="anchor" aria-hidden="true" href="#${id}">#</a>`
+                : `<a hidden class="anchor" aria-hidden="true" href="#${escapeHtml(id)}">#</a>`
             return `<h${depth} id="${escapeHtml(id)}">${content}${anchor}</h${depth}>\n`
           },
           image({ href, title, tokens }) {

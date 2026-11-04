@@ -7,6 +7,7 @@ import { history, redo, undo } from "@tiptap/pm/history"
 import { EditorState, TextSelection, type Transaction } from "@tiptap/pm/state"
 import StarterKit from "@tiptap/starter-kit"
 import { createBlockExtensions } from "../blocks"
+import { ArticleHeading } from "../blocks/heading"
 import { createMarkdownTransport } from "../markdown"
 import { ArticleDocument, articlePoint, articlePosition } from "./article-document"
 import {
@@ -17,7 +18,8 @@ import {
 } from "./article-identity"
 
 const extensions = [
-  StarterKit.configure({ undoRedo: false }),
+  StarterKit.configure({ undoRedo: false, heading: false }),
+  ArticleHeading,
   ...createBlockExtensions(),
   articleIdentity(() => "a"),
 ]
@@ -52,6 +54,46 @@ function fixture(
 }
 
 describe("continuous article identity", () => {
+  test("hides explicit heading IDs and retains them after editing the heading", () => {
+    const markdown = "## Part **one** {#part1}"
+    const f = fixture([{ id: "a", markdown }])
+    expect(f.state.doc.firstChild?.textContent).toBe("Part one")
+    expect(f.state.doc.firstChild?.attrs["id"]).toBe("part1")
+    expect(f.document.read(f.state.doc).get("a")).toBe(markdown)
+    f.dispatch(f.state.tr.insertText("New ", 1))
+    expect(f.document.read(f.state.doc).get("a")).toBe("## New Part **one** {#part1}")
+  })
+
+  test("keeps spaced anchor-like text and code examples literal", () => {
+    const f = fixture([
+      { id: "a", markdown: "## Heading {# part1}" },
+      { id: "b", markdown: "```\n## Literal {#part1}\n```" },
+    ])
+    expect(f.state.doc.child(0).textContent).toBe("Heading {# part1}")
+    expect(f.state.doc.child(0).attrs["id"]).toBeNull()
+    expect(f.state.doc.child(1).textContent).toBe("## Literal {#part1}")
+  })
+
+  test.each(["", " {#part1}"])("preserves reference links in edited headings: %s", (suffix) => {
+    const f = fixture([
+      {
+        id: "a",
+        markdown: `## [Part][ref]${suffix}\n\n[ref]: https://example.com/part`,
+      },
+    ])
+    const link = f.state.doc.firstChild?.firstChild?.marks.find((mark) => mark.type.name === "link")
+    expect(link?.attrs["href"]).toBe("https://example.com/part")
+    f.dispatch(f.state.tr.insertText("New ", 1))
+    expect(f.document.read(f.state.doc).get("a")).toContain("](https://example.com/part)")
+  })
+
+  test("preserves math tokens in headings with explicit IDs after editing", () => {
+    const f = fixture([{ id: "a", markdown: "## Formula $x^2$ {#part1}" }])
+    expect(f.state.doc.firstChild?.lastChild?.type.name).toBe("mathInline")
+    f.dispatch(f.state.tr.insertText("New ", 1))
+    expect(f.document.read(f.state.doc).get("a")).toBe("## New Formula $x^2$ {#part1}")
+  })
+
   test("keeps source identities when Enter splits a paragraph", () => {
     // Given one native document with three separately anchored source blocks.
     const f = fixture()

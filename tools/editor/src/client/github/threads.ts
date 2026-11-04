@@ -15,7 +15,7 @@ import { commentResponse, pullResponse, threadsResponse, type WireComment } from
 const metadataSchema = z.object({
   kind: z.enum(["root", "reply", "state"]),
   operationId: z.string(),
-  anchor: rangeAnchorSchema,
+  anchor: rangeAnchorSchema.nullable(),
   commitSha: gitShaSchema,
   rootCommentId: z.number().int().positive().optional(),
   resolved: z.boolean().optional(),
@@ -142,7 +142,7 @@ export class Discussions {
         anchor: root.meta.anchor,
         commitSha: root.meta.commitSha,
         resolved: state?.meta?.resolved ?? false,
-        outdated: root.meta.commitSha !== pr.head.sha,
+        outdated: root.meta.anchor !== null && root.meta.commitSha !== pr.head.sha,
         comments: [
           comment(root.entry),
           ...related
@@ -157,15 +157,16 @@ export class Discussions {
   async add(
     pullNumber: number,
     sha: string,
-    anchor: RangeAnchor,
+    anchor: RangeAnchor | null,
     body: string,
   ): Promise<ReviewThread> {
-    rangeAnchorSchema.parse(anchor)
+    rangeAnchorSchema.nullable().parse(anchor)
     validateBody(body)
     const pr = await this.checkedPull(pullNumber, sha)
     if (
       !pr.head.ref.startsWith("post/") ||
-      !anchor.markdown.path.startsWith(`content/posts/${pr.head.ref.slice(5)}/`)
+      (anchor !== null &&
+        !anchor.markdown.path.startsWith(`content/posts/${pr.head.ref.slice(5)}/`))
     )
       invalid("The comment anchor must belong to the pull request's post.", ["path"])
     const key = JSON.stringify(["root", pullNumber, sha, anchor, body])
@@ -191,6 +192,13 @@ export class Discussions {
       posted = await this.http.reconcile(
         key,
         async () => {
+          if (anchor === null) {
+            return this.http.request(
+              `${this.http.repo}/issues/${pullNumber}/comments`,
+              commentResponse,
+              { method: "POST", body: { body: wireBody } },
+            )
+          }
           const { start_line, start_side, ...range } = anchor.markdown
           try {
             return await this.http.request(

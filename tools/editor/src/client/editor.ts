@@ -8,6 +8,7 @@ import { NodeSelection } from "@tiptap/pm/state"
 import type { EditorView } from "@tiptap/pm/view"
 import StarterKit from "@tiptap/starter-kit"
 import { HighlightedCodeBlock } from "./blocks/code-highlight"
+import { ArticleHeading } from "./blocks/heading"
 import {
   markPictureSpot,
   PAIR_NODE,
@@ -104,9 +105,11 @@ export function createBlockEditor(element: HTMLElement, options: BlockEditorOpti
         link: false,
         paragraph: false,
         codeBlock: false,
+        heading: false,
         trailingNode: { notAfter: ["footnoteSection"] },
       }),
       ArticleParagraph,
+      ArticleHeading,
       HighlightedCodeBlock,
       ...textFormatExtensions(),
       EditorShortcuts,

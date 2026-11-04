@@ -791,6 +791,14 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
     setBundle(next) {
       renderEditor(next, null)
     },
+    async setDraft(draft) {
+      if (emitting) await emitting
+      if (!bundle || !form || deps.readOnly) return
+      const next = { ...form.read(), draft }
+      form.setMetadata(next)
+      bundle = applyMetadata(bundle, next)
+      await emit()
+    },
     getCursor() {
       return pairEditor?.getCursor() ?? null
     },

@@ -17,8 +17,8 @@ export interface ReviewFlowOptions {
   readonly bundle: () => PostBundle | null
   readonly validate: Validate
   readonly isPublished: (slug: string, pullNumber: number) => Promise<boolean>
-  /** Saves the post to GitHub and returns its draft pull request (authors only). */
-  readonly save?: () => Promise<DraftPullRequest>
+  /** Review saves validate content and clear Hugo draft before returning the saved PR. */
+  readonly save?: (purpose?: "review") => Promise<DraftPullRequest>
   readonly status: (text: string) => void
 }
 
@@ -186,7 +186,7 @@ export class ReviewFlow {
   private async requestReview(): Promise<void> {
     const save = this.options.save
     if (!save) return
-    const pr = await save()
+    const pr = await save("review")
     const bundle = this.options.bundle()
     if (!bundle) return
     this.pr = pr
