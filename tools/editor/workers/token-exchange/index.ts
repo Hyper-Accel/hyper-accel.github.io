@@ -32,7 +32,8 @@ export function createTokenExchange(fetcher: HttpFetch = globalThis.fetch.bind(g
     timeout: 15_000,
     retry: 0,
     throwHttpErrors: false,
-    redirect: "error",
+    // Workers reject redirect "error"; with "manual" a 3xx is not ok and fails closed below.
+    redirect: "manual",
   })
   return {
     async fetch(request, env) {

@@ -20,6 +20,7 @@ test("exchanges PKCE with server credentials and returns only the memory-token c
   const requests: Request[] = []
   const worker = createTokenExchange(async (input, init) => {
     const outgoing = new Request(input, init)
+    if (outgoing.redirect === "error") throw new TypeError("Invalid redirect value")
     requests.push(outgoing)
     expect(outgoing.url).toBe("https://github.com/login/oauth/access_token")
     expect(outgoing.headers.get("Accept")).toBe("application/json")
@@ -46,6 +47,18 @@ test("exchanges PKCE with server credentials and returns only the memory-token c
     tokenType: "bearer",
   })
   expect(requests).toHaveLength(1)
+})
+
+test("a GitHub redirect is never followed and fails closed", async () => {
+  let calls = 0
+  const worker = createTokenExchange(async () => {
+    calls += 1
+    return new Response(null, { status: 302, headers: { Location: "https://evil.test/" } })
+  })
+  const response = await worker.fetch(request(), env)
+  expect(response.status).toBe(502)
+  expect(await response.json()).toEqual({ error: "exchange_failed" })
+  expect(calls).toBe(1)
 })
 
 test("rejects untrusted origins redirect substitution invalid verifier and methods before fetch", async () => {
