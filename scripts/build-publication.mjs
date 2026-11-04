@@ -13,6 +13,7 @@ import { isAlias, isMap, isScalar, parseDocument, visit } from 'yaml';
 
 const POST_NAMES = new Map([['index.md', 'ko'], ['index.ko.md', 'ko'], ['index.en.md', 'en']]);
 const SOURCE_PATHS = ['hugo.yaml', 'assets', 'content', 'layouts', 'i18n', 'static', 'themes/PaperMod'];
+const BUILD_PATHS = [...SOURCE_PATHS, 'tools/editor/dist-site/editor/manifest.json'];
 export const STATE_NAME = 'publication-state.json';
 
 export function timestamp(value) {
@@ -361,7 +362,7 @@ function within(path, parent) {
 
 function copySite(root, site) {
   mkdirSync(site, { recursive: true });
-  for (const relativePath of SOURCE_PATHS) {
+  for (const relativePath of BUILD_PATHS) {
     const source = join(root, relativePath);
     assertRawNoSymlinks(source);
     assertTreeNoSymlinks(source);
@@ -423,7 +424,7 @@ export function productionBuild(root, requestedWork, previous, { now = nowKst(),
   const work = resolve(requestedWork);
   if (within(work, root) || within(root, work)) throw new Error('Build workspace must be outside the source repository');
   if (existsSync(work)) throw new Error('Build workspace already exists; use a fresh directory');
-  for (const relativePath of SOURCE_PATHS) {
+  for (const relativePath of BUILD_PATHS) {
     const source = join(root, relativePath);
     assertRawNoSymlinks(source);
     assertTreeNoSymlinks(source);

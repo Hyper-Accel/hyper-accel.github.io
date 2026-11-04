@@ -1,4 +1,5 @@
 import "./site.css"
+import { mountAccount } from "./site/account"
 import { relayPopupCallback } from "./site/auth"
 import { createSiteServices } from "./site/services"
 import { mountSiteShell } from "./site/shell"
@@ -12,5 +13,6 @@ if (relayPopupCallback()) {
   root.textContent = "로그인이 완료되었습니다. 편집기로 돌아갑니다."
 } else {
   const services = await createSiteServices()
+  mountAccount(services)
   mountSiteShell(root, services)
 }

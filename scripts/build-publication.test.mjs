@@ -309,6 +309,29 @@ function hugoFixture() {
   return f;
 }
 
+test('real Hugo: editor routes consume an untracked build manifest in the isolated workspace', () => {
+  const f = hugoFixture();
+  writeFileSync(join(f.root, '.gitignore'), 'tools/editor/dist-site/\n');
+  writeFileSync(join(f.root, 'layouts/_default/baseof.html'), '{{ block "main" . }}{{ .Content }}{{ end }}');
+  writeFileSync(join(f.root, 'layouts/_default/editor.html'), readFileSync(new URL('../layouts/_default/editor.html', import.meta.url)));
+  for (const route of ['editor-login', 'editor-new']) {
+    mkdirSync(join(f.root, 'content', route), { recursive: true });
+    writeFileSync(join(f.root, 'content', route, '_index.md'), '---\ntitle: Editor\nlayout: editor\n---\n');
+  }
+  f.git('add', '.'); f.git('commit', '-m', 'Editor routes');
+  const directory = join(f.root, 'tools/editor/dist-site/editor');
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(join(directory, 'manifest.json'), JSON.stringify({
+    '../src/client/site.ts': { file: 'assets/site-fixture.js', css: ['assets/site-fixture.css'] },
+  }));
+  const { work } = f.build(f.empty(), 'editor-output');
+  for (const route of ['editor-login', 'editor-new']) {
+    const html = readFileSync(join(work, 'public', route, 'index.html'), 'utf8');
+    assert.match(html, /src=["']?\/editor\/assets\/site-fixture\.js/);
+    assert.match(html, /href=["']?\/editor\/assets\/site-fixture\.css/);
+  }
+});
+
 for (const hiddenBy of ['render', 'cascade']) test(`real Hugo: ${hiddenBy}-hidden posts get a date only when HTML first appears`, () => {
   const f = hugoFixture();
   const previous = f.empty();
