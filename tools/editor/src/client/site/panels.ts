@@ -1,6 +1,5 @@
 import { Extension } from "@tiptap/core"
 import { NodeSelection, Plugin } from "@tiptap/pm/state"
-import { createRenderer } from "../../render"
 import type { DocumentCodec, Language, PostBundle } from "../../shared/onsite/document"
 import { EMPTY_IMAGE } from "../blocks/attrs"
 import { IMAGE_NODE } from "../blocks/image"
@@ -405,7 +404,10 @@ export class MobilePreview extends SidePanel {
     const language = this.options.language()
     const media = this.options.context()?.mediaUrl ?? ((source: string) => source)
     try {
-      const serialized = await this.options.codec.serialize(bundle)
+      const [serialized, { createRenderer }] = await Promise.all([
+        this.options.codec.serialize(bundle),
+        import("../../render"),
+      ])
       if (run !== this.run || !this.isOpen) return
       // Keep sources relative through sanitising, then point them at the editor's previews.
       const renderer = createRenderer({

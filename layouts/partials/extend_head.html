@@ -1,5 +1,6 @@
 {{ if or .Params.math .Site.Params.math }}
-{{ partial "math.html" . }}
+{{- /* The editor bundles its own KaTeX; the CDN copy would only delay the editor's scripts. */}}
+{{ if ne .Layout "editor" }}{{ partial "math.html" . }}{{ end }}
 {{ partial "naver_search.html" . }}
 {{ end }}
 {{ partial "d/fonts.html" . }}

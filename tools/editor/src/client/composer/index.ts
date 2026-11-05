@@ -86,6 +86,7 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
       if (!knownAuthors.includes(profile.name)) knownAuthors.push(profile.name)
       deps.onNewAuthor?.(profile)
     },
+    ...(deps.onProfileEdit && !deps.readOnly ? { onProfileEdit: deps.onProfileEdit } : {}),
   }
   // The signed-in writer is the new post's author when their GitHub user ID has a profile.
   const currentAuthor =

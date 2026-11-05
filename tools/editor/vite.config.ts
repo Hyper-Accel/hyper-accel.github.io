@@ -29,11 +29,23 @@ export default defineConfig(({ mode }) => ({
               })
               // GitHub handles for @mentions in review comments, from each author's profile.
               const people = []
+              const frontMatter = (source: string): Record<string, unknown> => {
+                const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(source)
+                const parsed: unknown = match?.[1] ? parseYaml(match[1]) : null
+                return parsed && typeof parsed === "object"
+                  ? Object.fromEntries(Object.entries(parsed))
+                  : {}
+              }
+              const text = (value: unknown): string => (typeof value === "string" ? value : "")
               for (const name of authors) {
-                const profile = await readFile(
-                  resolve(import.meta.dirname, "../../content/authors", name, "_index.md"),
-                  "utf8",
-                ).catch(() => "")
+                const read = (file: string): Promise<string> =>
+                  readFile(
+                    resolve(import.meta.dirname, "../../content/authors", name, file),
+                    "utf8",
+                  ).catch(() => "")
+                const profile = await read("_index.md")
+                const ko = frontMatter(profile)
+                const en = frontMatter(await read("_index.en.md"))
                 const handle = /^github:\s*["']?https:\/\/github\.com\/([A-Za-z0-9-]+)/m.exec(
                   profile,
                 )?.[1]
@@ -46,6 +58,12 @@ export default defineConfig(({ mode }) => ({
                     handle,
                     ...(id ? { id: Number(id) } : {}),
                     ...(avatar ? { avatar } : {}),
+                    // The owner changes these in the editor (내 프로필 수정).
+                    profile: {
+                      image: text(ko["image"]),
+                      linkedin: text(ko["linkedin"]),
+                      bio: { ko: text(ko["bio"]), en: text(en["bio"]) },
+                    },
                   })
               }
               this.emitFile({

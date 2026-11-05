@@ -658,6 +658,38 @@ try {
       await page.locator(".composer[data-mode=edit]").waitFor()
       await page.locator('[data-site-save-status][data-state="saved"]').waitFor()
       assert.equal(await repairState(page), null)
+
+      // The writer changes their own published profile; the post's next save carries it.
+      await page.locator(".composer-info-toggle").click()
+      await page.locator(".metadata-picker__self", { hasText: "내 프로필 수정" }).click()
+      const profileDialog = page.locator(".author-profile-dialog")
+      const bioKo = profileDialog.locator('input[name="authorBioKo"]')
+      const publishedBio = await bioKo.inputValue()
+      assert.match(publishedBio, /\S/, "the published bio is filled in")
+      assert.equal(
+        await profileDialog.locator('input[name="authorName"]').getAttribute("readonly"),
+        "",
+      )
+      await bioKo.fill(`프로필 수정 ${width}`)
+      await profileDialog.screenshot({ path: join(artifacts, `${width}-profile-edit.png`) })
+      await profileDialog.locator("button[type=submit]").click()
+      await profileDialog.waitFor({ state: "detached" })
+      await page.locator("[data-site-save]").click()
+      await page.locator('[data-site-save-status][data-remote-state="saved"]').waitFor()
+      {
+        const state = harness.github.state
+        const head = state.refs.get("heads/post/crafting-compilers")
+        const tree = head ? state.trees.get(state.commits.get(head)?.tree.sha ?? "") : undefined
+        const read = (path: string): string => {
+          const entry = tree?.tree.find((candidate) => candidate.path === path)
+          const blob = entry ? state.blobs.get(entry.sha) : undefined
+          return Buffer.from(blob?.content ?? "", "base64").toString()
+        }
+        const ko = read("content/authors/Jaewoo Kim/_index.md")
+        assert.ok(ko.includes(`bio: "프로필 수정 ${width}"`), ko)
+        assert.match(ko, /^github_id: 1$/m)
+        assert.match(read("content/authors/Jaewoo Kim/_index.en.md"), /^bio: "\S/m)
+      }
       assert.deepEqual(errors, [])
       console.info(`Integrated new-post/save/restore/review/publish flow passed at ${width}.`)
     } finally {

@@ -1,6 +1,10 @@
 import "./metadata-form.css"
 import type { GitHubUser } from "../../shared/onsite/github"
-import { type NewAuthorProfile, requestAuthorProfile } from "./author-profile"
+import {
+  type AuthorProfileFields,
+  type NewAuthorProfile,
+  requestAuthorProfile,
+} from "./author-profile"
 import { h, replaceChildren } from "./dom"
 import { imageChooser } from "./image-chooser"
 import {
@@ -26,6 +30,8 @@ export interface MetadataFormOptions {
     readonly name: string
     readonly handle: string
     readonly id?: number
+    /** The published profile, so its owner can change it (내 프로필 수정). */
+    readonly profile?: AuthorProfileFields
   }[]
   /** Existing tags and series across the blog, offered in their dropdowns. */
   readonly tags?: readonly string[]
@@ -40,6 +46,8 @@ export interface MetadataFormOptions {
   readonly resolveUser?: (login: string) => Promise<GitHubUser | null>
   /** A new author was added; the site saves their profile with the post. */
   readonly onNewAuthor?: (profile: NewAuthorProfile) => void
+  /** The signed-in writer changed their own profile; the site saves it with the post. */
+  readonly onProfileEdit?: (profile: NewAuthorProfile) => void
   /** Lets the category dropdown add a category that is not in the list. */
   readonly createCategory?: PickerCreate
   /** Only authors may change who else can edit; others see the list read-only. */
@@ -134,17 +142,29 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
   }
   const login = options.currentLogin
   const userId = options.currentUserId
+  const own =
+    userId === undefined ? undefined : options.people?.find((person) => person.id === userId)
   const ownProfile =
-    login &&
-    userId !== undefined &&
-    resolveUser &&
-    !options.people?.some((person) => person.id === userId)
+    login && userId !== undefined && resolveUser && !own
       ? h(
           "button",
           { type: "button", class: "composer-link metadata-picker__self" },
           `내 프로필 추가 (@${login})`,
         )
       : null
+  // The signed-in writer's own profile, as last saved here or as published.
+  let ownSaved: NewAuthorProfile | null =
+    own?.profile && userId !== undefined && options.onProfileEdit
+      ? { name: own.name, github: own.handle, githubId: userId, ...own.profile }
+      : null
+  const ownEdit = ownSaved
+    ? h(
+        "button",
+        { type: "button", class: "composer-link metadata-picker__self" },
+        "내 프로필 수정",
+      )
+    : null
+  const authorFooter = ownProfile ?? ownEdit
   const authorPicker = createPicker({
     onChange: () => emit(),
     id: `${prefix}-authors`,
@@ -161,7 +181,19 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     ...(resolveUser
       ? { create: { label: (text: string) => `‘${text}’ 새 작성자로 추가`, run: addAuthor } }
       : {}),
-    ...(ownProfile ? { footer: ownProfile } : {}),
+    ...(authorFooter ? { footer: authorFooter } : {}),
+  })
+  ownEdit?.addEventListener("click", () => {
+    if (!ownSaved) return
+    void requestAuthorProfile({
+      existing: ownSaved,
+      taken: [],
+      host: form.closest<HTMLElement>(".composer") ?? document.body,
+    }).then((profile) => {
+      if (!profile) return
+      ownSaved = profile
+      options.onProfileEdit?.(profile)
+    })
   })
   ownProfile?.addEventListener("click", () => {
     void addAuthor("", login).then((name) => {

@@ -3,7 +3,7 @@ import type { UnpairedBundle } from "../../document/repair"
 import type { DocumentIssue, PostBundle } from "../../shared/onsite/document"
 import type { DraftCursor } from "../../shared/onsite/drafts"
 import type { GitHubUser } from "../../shared/onsite/github"
-import type { NewAuthorProfile } from "./author-profile"
+import type { AuthorProfileFields, NewAuthorProfile } from "./author-profile"
 
 export interface ImageChoice {
   readonly src: string
@@ -48,6 +48,7 @@ export interface ComposerDeps {
     readonly name: string
     readonly handle: string
     readonly id?: number
+    readonly profile?: AuthorProfileFields
   }[]
   /** Existing tags and series across the blog, offered in the metadata dropdowns. */
   readonly tags?: readonly string[]
@@ -62,6 +63,8 @@ export interface ComposerDeps {
   readonly resolveUser?: (login: string) => Promise<GitHubUser | null>
   /** A new author was added in the metadata form; the host saves their profile with the post. */
   readonly onNewAuthor?: (profile: NewAuthorProfile) => void
+  /** The signed-in writer changed their own profile; the host saves it with the post. */
+  readonly onProfileEdit?: (profile: NewAuthorProfile) => void
   /** Set when the writer may not edit this post: the post is shown read-only with this notice. */
   readonly readOnly?: string
   /** The writer may edit but is not an author, so they cannot change who else may edit. */

@@ -16,7 +16,7 @@ import type { SiteMount } from "./contracts"
 import { observeEditorOcclusion } from "./editor-occlusion"
 import { mountHelp } from "./intro"
 import type { Person } from "./mentions"
-import { NewAuthors } from "./new-authors"
+import { NewAuthors, ProfileEdits } from "./new-authors"
 import { ImageLibrary, MobilePreview, type SidePanel } from "./panels"
 import { prepareSiteImages } from "./renderer"
 import { ReviewFlow } from "./review-flow"
@@ -29,6 +29,13 @@ const peopleSchema = z.array(
     handle: z.string(),
     id: z.number().int().positive().optional(),
     avatar: z.string().url().optional(),
+    profile: z
+      .object({
+        image: z.string(),
+        linkedin: z.string(),
+        bio: z.object({ ko: z.string(), en: z.string() }),
+      })
+      .optional(),
   }),
 )
 
@@ -42,6 +49,7 @@ async function loadPeople(): Promise<readonly Person[]> {
         handle: person.handle,
         ...(person.id ? { id: person.id } : {}),
         ...(person.avatar ? { avatar: person.avatar } : {}),
+        ...(person.profile ? { profile: person.profile } : {}),
       }))
     : []
 }
@@ -79,14 +87,20 @@ export const mountComposer: SiteMount = async (root, deps) => {
     deps.authors,
   )
   // Editors are looked up alongside the profile lists, not after them: each lookup is a GitHub call.
+  // A login already resolved to its account is not looked up again by ID.
+  const resolved = new Map<number, GitHubUser>()
   const editorsLoad = initial
     ? editorIds(initial.ko.frontMatter["editors"], async (login) => {
         const user = await deps.github.getUser(login)
-        return user.ok ? (user.value?.id ?? null) : null
+        if (!user.ok || !user.value) return null
+        resolved.set(user.value.id, user.value)
+        return user.value.id
       }).then(async (editors) => ({
         editors,
         users: await Promise.all(
           editors.map(async (id) => {
+            const known = resolved.get(id)
+            if (known) return known
             const user = await deps.github.getUserById(id)
             return user.ok ? user.value : null
           }),
@@ -99,6 +113,10 @@ export const mountComposer: SiteMount = async (root, deps) => {
     taxonomiesLoad,
     editorsLoad,
   ])
+  const profileEdits = new ProfileEdits(
+    `onsite:profile-edits:${session.repository.owner}/${session.repository.name}`,
+    new Map(people.flatMap((person) => (person.profile ? [[person.name, person.profile]] : []))),
+  )
   // Editing is limited to the post's authors and the people they list under `editors:`.
   // Existing posts use repository profiles, never local author registrations.
   const ids = new Map(
@@ -170,7 +188,11 @@ export const mountComposer: SiteMount = async (root, deps) => {
   let remoteError: string | null = null
   let recovery: { dispose(): void } | undefined
   const showSavedState = (): void => {
-    const remoteSaved = remoteSnapshotHash !== null && remoteSnapshotHash === latest?.snapshotHash
+    // A profile change waiting for this post's next save also needs "GitHub에 저장".
+    const remoteSaved =
+      remoteSnapshotHash !== null &&
+      remoteSnapshotHash === latest?.snapshotHash &&
+      profileEdits.files(latest.slug).length === 0
     status.dataset["state"] = remoteSaving ? "saving" : "saved"
     status.dataset["remoteState"] = remoteSaving
       ? "saving"
@@ -345,6 +367,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
         const validation = deps.codec.validate(bundle, "save")
         if (validation.length) throw new Error(validation.map((issue) => issue.message).join("\n"))
         const serialized = await deps.codec.serialize(bundle)
+        const profileFiles = profileEdits.files(bundle.slug)
         const pulls = await deps.github.listDrafts()
         if (!pulls.ok) throw new Error(pulls.error.message)
         const existing = pulls.value.find((pull) => pull.slug === bundle.slug)
@@ -353,12 +376,13 @@ export const mountComposer: SiteMount = async (root, deps) => {
           : await deps.github.ensureDraftPR(bundle.slug, bundle.ko.frontMatter.title, [
               ...serialized.files,
               ...newAuthors.files(bundle),
+              ...profileFiles,
             ])
         if (!pr.ok) throw new Error(pr.error.message)
         if (existing) {
           const readBack = await deps.github.loadBundle(bundle.slug)
           if (!readBack.ok) throw new Error(readBack.error.message)
-          if (readBack.value.snapshotHash === serialized.snapshotHash) {
+          if (readBack.value.snapshotHash === serialized.snapshotHash && !profileFiles.length) {
             remoteHead = readBack.value.headSha
           } else {
             if (!remoteHead || readBack.value.headSha !== remoteHead) {
@@ -368,6 +392,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
             const committed = await deps.github.commitBundle(bundle.slug, remoteHead, [
               ...serialized.files,
               ...newAuthors.files(bundle),
+              ...profileFiles,
             ])
             if (!committed.ok) {
               if (committed.error.kind === "conflict") compareConflict(committed.error.message)
@@ -384,6 +409,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
           remoteHead = pr.value.headSha
         }
         if (!remoteHead) throw new Error("원격 저장 커밋을 확인하지 못했습니다.")
+        if (profileFiles.length) profileEdits.committed(bundle.slug)
         if (disposed) return { ...pr.value, headSha: remoteHead }
         await flush()
         sessionStorage.removeItem("onsite:new-draft")
@@ -475,11 +501,19 @@ export const mountComposer: SiteMount = async (root, deps) => {
     cursor: deps.restored.status === "restored" ? deps.restored.snapshot.cursor : null,
     authors: [...deps.authors, ...newAuthors.list().map((profile) => profile.name)],
     people: [
-      ...people.map((person) => ({
-        name: person.name,
-        handle: person.handle,
-        ...(person.id ? { id: person.id } : {}),
-      })),
+      ...people.map((person) => {
+        // A change made here and not yet published is what the writer sees when editing again.
+        const edited = profileEdits.list().find((profile) => profile.name === person.name)
+        const profile = edited
+          ? { image: edited.image, linkedin: edited.linkedin, bio: edited.bio }
+          : person.profile
+        return {
+          name: person.name,
+          handle: person.handle,
+          ...(person.id ? { id: person.id } : {}),
+          ...(profile ? { profile } : {}),
+        }
+      }),
       ...newAuthors.list().map((profile) => ({
         name: profile.name,
         handle: profile.github,
@@ -497,6 +531,11 @@ export const mountComposer: SiteMount = async (root, deps) => {
       return user.value
     },
     onNewAuthor: (profile) => newAuthors.remember(profile),
+    onProfileEdit: (profile) => {
+      profileEdits.remember(profile)
+      saveButton.hidden = false
+      showSavedState()
+    },
     ...(readOnly ? { readOnly } : {}),
     ...(lockEditors ? { lockEditors } : {}),
     onComment: (editor) => comments.start(editor),

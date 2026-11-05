@@ -6,7 +6,11 @@ import type { PostMetadata } from "./metadata"
 export interface MetadataFormHarness {
   readonly changes: PostMetadata[]
   readonly submitted: PostMetadata[]
-  mount(mode: MetadataFormOptions["mode"], initial?: Partial<PostMetadata>): void
+  mount(
+    mode: MetadataFormOptions["mode"],
+    initial?: Partial<PostMetadata>,
+    extra?: Pick<MetadataFormOptions, "users">,
+  ): void
   read(): PostMetadata
 }
 
@@ -42,7 +46,7 @@ let form: MetadataForm | null = null
 window.__metadataForm = {
   changes,
   submitted,
-  mount(mode, initial = {}) {
+  mount(mode, initial = {}, extra = {}) {
     form?.element.remove()
     changes.length = 0
     submitted.length = 0
@@ -59,6 +63,7 @@ window.__metadataForm = {
       },
       onCoverFile: (file) => Promise.resolve(`images/${file.name.replace(/\.[^.]+$/, "")}.webp`),
       coverPreviewUrl: () => undefined,
+      ...extra,
     })
     root.append(form.element)
   },

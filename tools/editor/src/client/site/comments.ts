@@ -3,7 +3,6 @@ import type { Node as PMNode } from "@tiptap/pm/model"
 import { Plugin, PluginKey } from "@tiptap/pm/state"
 import { Decoration, DecorationSet } from "@tiptap/pm/view"
 import katex from "katex"
-import { createRenderer } from "../../render"
 import type { DocumentCodec, Language, PostBundle } from "../../shared/onsite/document"
 import type { GitHubAdapter } from "../../shared/onsite/github"
 import type { ReviewThread } from "../../shared/onsite/review"
@@ -376,7 +375,11 @@ export class SiteComments {
   private async context(language: Language): Promise<AnchorContext | null> {
     const bundle = this.options.bundle()
     if (!bundle) return null
-    const serialized = await this.options.codec.serialize(bundle)
+    // The renderer is a separate download, fetched once comments are placed, not with the editor.
+    const [serialized, { createRenderer }] = await Promise.all([
+      this.options.codec.serialize(bundle),
+      import("../../render"),
+    ])
     const renderer = createRenderer({
       serializedMarkdown: (entry) => {
         const file = serialized.files.find((candidate) => candidate.path === entry.path)

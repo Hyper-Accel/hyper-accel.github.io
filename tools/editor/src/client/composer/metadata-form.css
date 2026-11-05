@@ -558,6 +558,13 @@
   padding: var(--editor-space-4, 24px);
 }
 
+/* 내 프로필: the name and GitHub account stay as they are, and look it. */
+.author-profile-dialog .metadata-field > input[readonly] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--secondary);
+}
+
 .author-profile-dialog .author-profile__image {
   display: flex;
   align-items: center;

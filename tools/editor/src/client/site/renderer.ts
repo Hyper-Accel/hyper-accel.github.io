@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { createRenderer } from "../../render"
 import type { BundleImage, PostBundle } from "../../shared/onsite/document"
 import type { Renderer } from "../../shared/onsite/render"
 import type { SiteServices } from "./contracts"
@@ -15,8 +14,9 @@ export async function prepareSiteImages(
   const urls = new Map<string, string>()
   const sizes = new Map<string, { width: number; height: number }>()
   const pathOf = (path: string): string => path.replace(/^\.\//, "").split("#")[0] ?? path
-  try {
-    for (const image of bundle.images) {
+  // The pictures download together, not one after another.
+  const loads = await Promise.allSettled(
+    bundle.images.map(async (image) => {
       let blob: Blob
       if (image.status === "pending") blob = image.blob
       else {
@@ -38,7 +38,11 @@ export async function prepareSiteImages(
         sizes.set(image.path, { width: bitmap.width, height: bitmap.height })
         bitmap.close()
       }
-    }
+    }),
+  )
+  try {
+    const failed = loads.find((load) => load.status === "rejected")
+    if (failed) throw failed.reason
     return {
       imageUrl(path) {
         return urls.get(pathOf(path))
@@ -79,7 +83,10 @@ export async function prepareSiteRenderer(
         }),
       )
     }
-    const serialized = await services.codec.serialize(bundle)
+    const [serialized, { createRenderer }] = await Promise.all([
+      services.codec.serialize(bundle),
+      import("../../render"),
+    ])
     const resolveImage = (source: string, language: "ko" | "en"): string =>
       dataUrls.get(source.replace(/^\.\//, "").split("#")[0] ?? source) ??
       new URL(source, `${location.origin}${language === "en" ? "/en" : ""}/posts/${bundle.slug}/`)

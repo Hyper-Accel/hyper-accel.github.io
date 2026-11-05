@@ -8,7 +8,7 @@ cover:
   alt: "Crafting Compiler"
   caption: "Crafting Compiler"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
-authors: [jaewoo kim] # must match with content/authors
+authors: [Jaewoo Kim] # must match with content/authors
 tags: ["compiler"]
 categories: ["Compilers and Kernels"]
 series: ['Crafting Compilers']
