@@ -380,8 +380,31 @@
   margin-top: 20px;
 }
 
+/* 다시 보지 않기 and 예시 글 보기 sit on the left, 이전·다음 on the right. */
+.onsite-intro__aside {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  margin-right: auto;
+}
+
+.site-editor dialog .onsite-intro__showcase {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--editor-accent, #4dabf7);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.site-editor dialog .onsite-intro__showcase:hover {
+  text-decoration: underline;
+}
+
 .site-editor dialog .onsite-intro__skip {
-  margin: 0 auto 0 0;
+  margin: 0;
   padding: 0 4px;
   min-height: 44px;
   border: 0;

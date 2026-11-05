@@ -107,6 +107,20 @@ export function mountHelp(role: Role, host: HTMLElement): HTMLButtonElement {
     const next = h("button", { type: "button", class: "onsite-intro__next" }, "다음")
     const skip = h("button", { type: "button", class: "onsite-intro__skip" }, "다시 보지 않기")
     skip.hidden = !automatic
+    // A finished post that uses every tool, for writers looking for ideas (content/posts/editor-showcase).
+    const showcase =
+      role === "author"
+        ? h(
+            "a",
+            {
+              class: "onsite-intro__showcase",
+              href: "/posts/editor-showcase/",
+              target: "_blank",
+              rel: "noopener",
+            },
+            "예시 글 보기 ↗",
+          )
+        : null
     const dialog = h(
       "dialog",
       { class: "onsite-intro", "aria-labelledby": "onsite-intro-title" },
@@ -114,7 +128,13 @@ export function mountHelp(role: Role, host: HTMLElement): HTMLButtonElement {
       media,
       title,
       body,
-      h("div", { class: "onsite-intro__foot" }, skip, prev, next),
+      h(
+        "div",
+        { class: "onsite-intro__foot" },
+        h("div", { class: "onsite-intro__aside" }, skip, showcase),
+        prev,
+        next,
+      ),
     )
     const show = (to: number): void => {
       index = Math.max(0, Math.min(pages.length - 1, to))
