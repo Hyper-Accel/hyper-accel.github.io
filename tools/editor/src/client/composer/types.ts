@@ -2,6 +2,7 @@ import type { AnyExtension, Editor } from "@tiptap/core"
 import type { UnpairedBundle } from "../../document/repair"
 import type { DocumentIssue, PostBundle } from "../../shared/onsite/document"
 import type { DraftCursor } from "../../shared/onsite/drafts"
+import type { GitHubUser } from "../../shared/onsite/github"
 import type { NewAuthorProfile } from "./author-profile"
 
 export interface ImageChoice {
@@ -42,13 +43,23 @@ export interface ComposerDeps {
   readonly cursor?: DraftCursor | null
   /** Directory names under content/authors. */
   readonly authors: readonly string[]
-  /** Author names with their GitHub handles (`github:` in each author profile). */
-  readonly people?: readonly { readonly name: string; readonly handle: string }[]
+  /** Author names with their GitHub handles and user IDs (`github:`/`github_id:` in each profile). */
+  readonly people?: readonly {
+    readonly name: string
+    readonly handle: string
+    readonly id?: number
+  }[]
   /** Existing tags and series across the blog, offered in the metadata dropdowns. */
   readonly tags?: readonly string[]
   readonly series?: readonly string[]
   /** Signed-in GitHub login: picks the writer as the new post's author. */
   readonly currentLogin?: string
+  /** Signed-in GitHub user ID: matched against profile IDs, which survive login renames. */
+  readonly currentUserId?: number
+  /** GitHub accounts allowed to edit that have no author profile, to label them by login. */
+  readonly users?: readonly GitHubUser[]
+  /** Resolves a GitHub login to its account when a new author or editor is added. */
+  readonly resolveUser?: (login: string) => Promise<GitHubUser | null>
   /** A new author was added in the metadata form; the host saves their profile with the post. */
   readonly onNewAuthor?: (profile: NewAuthorProfile) => void
   /** Set when the writer may not edit this post: the post is shown read-only with this notice. */

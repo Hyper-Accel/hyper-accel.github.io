@@ -237,6 +237,13 @@ describe("access and immutable bundle reads", () => {
     })
     expect(fake.state.refs.get("heads/post/test")).toBe(pr.headSha)
   })
+
+  test("resolves a login to its stable user ID and an unknown login to null", async () => {
+    expect(value(await adapter().getUser("REVIEWER"))).toEqual({ login: "reviewer", id: 2 })
+    expect(value(await adapter().getUser("nobody"))).toBeNull()
+    expect(value(await adapter().getUserById(2))).toEqual({ login: "reviewer", id: 2 })
+    expect(value(await adapter().getUserById(999))).toBeNull()
+  })
 })
 
 describe("atomic saves and idempotent draft creation", () => {
@@ -633,6 +640,23 @@ describe("approval and publication", () => {
       error: { kind: "validation" },
     })
     expect(fake.state.pulls.get(pr.number)?.merged).toBe(false)
+  })
+
+  test("a reviewer who renamed their login has one verdict, the latest", async () => {
+    const pr = await setup()
+    value(await adapter().markReady(pr.number, pr.headSha))
+    // The same account (ID 2) asked for changes under its former login, then approved.
+    fake.state.reviews.set(900, {
+      id: 900,
+      pull: pr.number,
+      user: { login: "former-reviewer", id: 2 },
+      commit_id: pr.headSha,
+      state: "CHANGES_REQUESTED",
+      body: "",
+    })
+    value(await adapter(fake.reviewerToken).approve(pr.number, pr.headSha))
+    expect(value(await adapter().getPullState(pr.number)).approvedHeadShas).toContain(pr.headSha)
+    expect(await adapter().squashMerge(pr.number, pr.headSha)).toMatchObject({ ok: true })
   })
 
   test("takes a pull request in review back to draft", async () => {

@@ -83,6 +83,9 @@ export class GitHubHttp {
   private token: string | null = null
   // Pending writes are only read back on another invocation, never blindly replayed.
   private readonly pending = new Set<string>()
+  // Identical reads issued together (the comments and the review controls both read the pull
+  // request as the editor opens) share one call.
+  private readonly inflight = new Map<string, Promise<unknown>>()
 
   constructor(private readonly options: HttpOptions) {
     this.repo = `/repos/${encodeURIComponent(options.owner)}/${encodeURIComponent(options.repository)}`
@@ -100,6 +103,30 @@ export class GitHubHttp {
       readonly fresh?: boolean
       readonly mutation?: boolean
     } = {},
+  ): Promise<T> {
+    if ((options.method ?? "GET") !== "GET") return this.send(path, schema, options)
+    const key = JSON.stringify([
+      this.options.tokenProvider.getAccessToken(),
+      options.fresh ?? false,
+      path,
+    ])
+    let shared = this.inflight.get(key)
+    if (!shared) {
+      shared = this.send(path, z.unknown(), options).finally(() => this.inflight.delete(key))
+      this.inflight.set(key, shared)
+    }
+    return schema.parse(await shared)
+  }
+
+  private async send<T>(
+    path: string,
+    schema: z.ZodType<T>,
+    options: {
+      readonly method?: "GET" | "POST" | "PATCH" | "PUT"
+      readonly body?: unknown
+      readonly fresh?: boolean
+      readonly mutation?: boolean
+    },
   ): Promise<T> {
     const token = this.options.tokenProvider.getAccessToken()
     if (token !== this.token) {

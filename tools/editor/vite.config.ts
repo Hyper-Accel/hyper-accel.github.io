@@ -38,7 +38,15 @@ export default defineConfig(({ mode }) => ({
                   profile,
                 )?.[1]
                 const avatar = /^image:\s*["']?(https:\/\/[^"'\s]+)/m.exec(profile)?.[1]
-                if (handle) people.push({ name, handle, ...(avatar ? { avatar } : {}) })
+                // The numeric user ID survives login renames; edit access is decided by it.
+                const id = /^github_id:\s*(\d+)\s*$/m.exec(profile)?.[1]
+                if (handle)
+                  people.push({
+                    name,
+                    handle,
+                    ...(id ? { id: Number(id) } : {}),
+                    ...(avatar ? { avatar } : {}),
+                  })
               }
               this.emitFile({
                 type: "asset",

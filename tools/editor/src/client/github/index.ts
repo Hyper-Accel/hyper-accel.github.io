@@ -18,6 +18,7 @@ import {
   draftPullRequestSchema,
   type GitHubAdapter,
   type GitHubResult,
+  type GitHubUser,
   type PullState,
 } from "../../shared/onsite/github"
 import type { RangeAnchor, ReviewComment, ReviewThread } from "../../shared/onsite/review"
@@ -71,6 +72,8 @@ function draft(pr: z.infer<typeof pullResponse>): DraftPullRequest {
 }
 
 const AUTHOR_PROFILE = /^content\/authors\/[A-Za-z][A-Za-z .'-]*[A-Za-z]\/_index(?:\.en)?\.md$/
+const AUTHOR_AVATAR = /^content\/authors\/[A-Za-z][A-Za-z .'-]*[A-Za-z]\/avatar\.webp$/
+const BASE64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
 
 function validateFiles(slug: string, files: readonly BundleFile[]): void {
   slugSchema.parse(slug)
@@ -82,6 +85,13 @@ function validateFiles(slug: string, files: readonly BundleFile[]): void {
     if (AUTHOR_PROFILE.test(file.path)) {
       if (paths.has(file.path) || file.encoding !== "utf-8")
         invalid("Author profiles must be unique UTF-8 Markdown.", [file.path])
+      paths.add(file.path)
+      continue
+    }
+    // ...and that author's profile picture.
+    if (AUTHOR_AVATAR.test(file.path)) {
+      if (paths.has(file.path) || file.encoding !== "base64" || !BASE64.test(file.content))
+        invalid("Author pictures must be unique base64 WebP.", [file.path])
       paths.add(file.path)
       continue
     }
@@ -98,10 +108,7 @@ function validateFiles(slug: string, files: readonly BundleFile[]): void {
     ) {
       invalid("Markdown requires UTF-8; images require base64.", [file.path])
     }
-    if (
-      file.encoding === "base64" &&
-      !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(file.content)
-    ) {
+    if (file.encoding === "base64" && !BASE64.test(file.content)) {
       invalid("Invalid base64 image.", [file.path])
     }
   }
@@ -133,6 +140,25 @@ export class FetchGitHubAdapter implements GitHubAdapter {
     })
   }
 
+  getUser(login: string): Promise<GitHubResult<GitHubUser | null>> {
+    return this.readUser(`/users/${encodeURIComponent(login)}`)
+  }
+
+  getUserById(id: number): Promise<GitHubResult<GitHubUser | null>> {
+    return this.readUser(`/user/${z.number().int().positive().parse(id)}`)
+  }
+
+  private readUser(path: string): Promise<GitHubResult<GitHubUser | null>> {
+    return result(async () => {
+      try {
+        return await this.http.request(path, userResponse, { fresh: true })
+      } catch (error: unknown) {
+        if (error instanceof GitHubFailure && error.status === 404) return null
+        throw error
+      }
+    })
+  }
+
   listDrafts(): Promise<GitHubResult<readonly DraftPullRequest[]>> {
     return result(async () => (await this.openPulls()).map(draft))
   }
@@ -143,16 +169,15 @@ export class FetchGitHubAdapter implements GitHubAdapter {
 
   getPullState(pullNumber: number): Promise<GitHubResult<PullState>> {
     return result(async () => {
-      const pr = await this.pull(pullNumber)
-      const reviews = await this.http.list(
-        `${this.http.repo}/pulls/${pullNumber}/reviews`,
-        reviewResponse,
-        true,
-      )
-      const latest = new Map<string, z.infer<typeof reviewResponse>>()
+      const [pr, reviews] = await Promise.all([
+        this.pull(pullNumber),
+        this.http.list(`${this.http.repo}/pulls/${pullNumber}/reviews`, reviewResponse, true),
+      ])
+      // One verdict per reviewer, keyed by the account ID a login rename does not change.
+      const latest = new Map<number, z.infer<typeof reviewResponse>>()
       for (const review of reviews) {
         if (review.user && ["APPROVED", "CHANGES_REQUESTED", "DISMISSED"].includes(review.state)) {
-          latest.set(review.user.login, review)
+          latest.set(review.user.id, review)
         }
       }
       const current = await this.pull(pullNumber)
@@ -184,38 +209,28 @@ export class FetchGitHubAdapter implements GitHubAdapter {
         : ((await this.ref(`post/${slug}`)) ?? (await this.ref(await this.defaultBranch())))
       if (!head) invalid("The repository has no default-branch head.")
       const prefix = `content/posts/${slug}/`
-      const sources: string[] = []
       const paths = { ko: `${prefix}index.md`, en: `${prefix}index.en.md` }
-      for (const name of ["index.md", "index.en.md"]) {
-        let file: z.infer<typeof contentResponse>
-        try {
-          file = await this.http.request(
-            `${this.http.repo}/contents/${encodePath(prefix + name)}?ref=${head}`,
-            contentResponse,
-          )
-        } catch (error: unknown) {
-          if (name !== "index.md" || !(error instanceof GitHubFailure) || error.status !== 404)
-            throw error
-          paths.ko = `${prefix}index.ko.md`
-          file = await this.http.request(
-            `${this.http.repo}/contents/${encodePath(paths.ko)}?ref=${head}`,
-            contentResponse,
-          )
-        }
-        sources.push(
-          new TextDecoder("utf-8", { fatal: true }).decode(
-            Uint8Array.from(atob(file.content.replace(/\s/g, "")), (char) => char.charCodeAt(0)),
-          ),
+      const read = async (path: string): Promise<string> => {
+        const file = await this.http.request(
+          `${this.http.repo}/contents/${encodePath(path)}?ref=${head}`,
+          contentResponse,
+        )
+        return new TextDecoder("utf-8", { fatal: true }).decode(
+          Uint8Array.from(atob(file.content.replace(/\s/g, "")), (char) => char.charCodeAt(0)),
         )
       }
-      const commit = await this.http.request(
-        `${this.http.repo}/git/commits/${head}`,
-        commitResponse,
-      )
-      const tree = await this.http.request(
-        `${this.http.repo}/git/trees/${commit.tree.sha}?recursive=1`,
-        treeResponse,
-      )
+      // Every read names the same immutable head, so they run together instead of one by one.
+      const [ko, en, tree] = await Promise.all([
+        read(paths.ko).catch((error: unknown) => {
+          if (!(error instanceof GitHubFailure) || error.status !== 404) throw error
+          paths.ko = `${prefix}index.ko.md`
+          return read(paths.ko)
+        }),
+        read(paths.en),
+        // GitHub resolves a commit SHA to that commit's tree.
+        this.http.request(`${this.http.repo}/git/trees/${head}?recursive=1`, treeResponse),
+      ])
+      const sources = [ko, en]
       if (tree.truncated) invalid("The Git tree is truncated; cannot load a complete bundle.")
       const images: BundleImage[] = []
       const mime: Readonly<Record<string, string>> = {
@@ -371,7 +386,7 @@ export class FetchGitHubAdapter implements GitHubAdapter {
     return result(async () => {
       await this.checkedPull(pullNumber, expectedHeadSha)
       const user = await this.http.request("/user", userResponse)
-      const key = `approval:${pullNumber}:${expectedHeadSha}:${user.login}`
+      const key = `approval:${pullNumber}:${expectedHeadSha}:${user.id}`
       const read = async (): Promise<true | undefined> => {
         const reviews = await this.http.list(
           `${this.http.repo}/pulls/${pullNumber}/reviews`,
@@ -379,7 +394,7 @@ export class FetchGitHubAdapter implements GitHubAdapter {
           true,
         )
         const latest = reviews
-          .filter((review) => review.user?.login === user.login && review.state !== "COMMENTED")
+          .filter((review) => review.user?.id === user.id && review.state !== "COMMENTED")
           .at(-1)
         return latest?.commit_id === expectedHeadSha && latest.state === "APPROVED"
           ? true
@@ -491,10 +506,10 @@ export class FetchGitHubAdapter implements GitHubAdapter {
         reviewResponse,
         true,
       )
-      const latest = new Map<string, z.infer<typeof reviewResponse>>()
+      const latest = new Map<number, z.infer<typeof reviewResponse>>()
       for (const review of reviews) {
         if (review.user && ["APPROVED", "CHANGES_REQUESTED", "DISMISSED"].includes(review.state)) {
-          latest.set(review.user.login, review)
+          latest.set(review.user.id, review)
         }
       }
       if (

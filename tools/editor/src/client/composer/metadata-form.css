@@ -76,6 +76,7 @@
 }
 
 .composer-form .metadata-field > input,
+.composer-form .author-profile__image > input,
 .composer-form .metadata-choices__query {
   width: 100%;
   min-height: var(--editor-touch-target);
@@ -91,6 +92,7 @@
 }
 
 .composer-form .metadata-field > input::placeholder,
+.composer-form .author-profile__image > input::placeholder,
 .composer-form .metadata-choices__query::placeholder {
   color: var(--secondary);
 }
@@ -382,6 +384,12 @@
 }
 
 /* Dropdown pickers: chosen values as chips, a search box, and the list as a dropdown. */
+/* A taller neighbour (the category chips) must not stretch the picker's rows: 내 프로필 추가 stays
+   right under the author box. */
+.composer-form .metadata-picker {
+  align-content: start;
+}
+
 .composer-form .metadata-picker__anchor {
   position: relative;
 }
@@ -429,6 +437,19 @@
   color: var(--secondary);
   font: inherit;
   cursor: pointer;
+}
+
+/* Touch: the × keeps its look; an invisible margin makes it 44px to tap. */
+@media (pointer: coarse) {
+  .composer-form .metadata-chip__remove {
+    position: relative;
+  }
+
+  .composer-form .metadata-chip__remove::after {
+    position: absolute;
+    inset: -8px;
+    content: "";
+  }
 }
 
 .composer-form .metadata-chip__remove:hover {
@@ -537,6 +558,38 @@
   padding: var(--editor-space-4, 24px);
 }
 
+.author-profile-dialog .author-profile__image {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-profile-dialog .author-profile__image > input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.author-profile-dialog .author-profile__image > :is(input, button)[hidden] {
+  display: none;
+}
+
+.author-profile-dialog .author-profile__image > .composer-button {
+  flex: none;
+  min-height: var(--editor-touch-target);
+}
+
+.author-profile-dialog .author-profile__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author-profile-dialog .author-profile__avatar[hidden] {
+  display: none;
+}
+
 .author-profile-dialog .author-profile__title {
   margin: 0;
   font-size: 20px;
@@ -555,6 +608,17 @@
   --editor-touch-target: 34px;
   --metadata-label-column: 7rem;
   font-size: 14px;
+}
+
+/* The compact sheet stays compact for a mouse; a finger still gets 44px controls. */
+@media (pointer: coarse) {
+  .composer-meta .composer-form {
+    --editor-touch-target: 44px;
+  }
+
+  .composer .composer-form .metadata-picker__self {
+    min-height: 44px;
+  }
 }
 
 .composer-meta .composer-form .metadata-group {

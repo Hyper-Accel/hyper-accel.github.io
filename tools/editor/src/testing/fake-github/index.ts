@@ -195,6 +195,15 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
     if (pathname === "/user" && method === "GET") {
       return json({ login: user.login, id: user.id })
     }
+    if ((pathname.startsWith("/users/") || pathname.startsWith("/user/")) && method === "GET") {
+      const key = pathname.slice(pathname.indexOf("/", 1) + 1).toLowerCase()
+      const byId = pathname.startsWith("/user/")
+      const found = [...state.tokens.values()].find((entry) =>
+        byId ? String(entry.id) === key : entry.login.toLowerCase() === key,
+      )
+      if (!found) throw new HttpFailure(404, "Not Found")
+      return json({ login: found.login, id: found.id })
+    }
     if (pathname === "/graphql" && method === "POST") {
       const input = graphqlSchema.parse(await body())
       const variables = input.variables
@@ -324,7 +333,8 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         object[1] === "blobs"
           ? state.blobs.get(sha)
           : object[1] === "trees"
-            ? state.trees.get(sha)
+            ? // Like GitHub, a commit SHA names that commit's tree.
+              (state.trees.get(sha) ?? state.trees.get(state.commits.get(sha)?.tree.sha ?? ""))
             : state.commits.get(sha)
       if (!result) throw new HttpFailure(404, "Git object not found")
       return json(result)
@@ -562,7 +572,7 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         const review = {
           id: nextId++,
           pull: pr.number,
-          user: { login: user.login },
+          user: { login: user.login, id: user.id },
           commit_id: commit,
           state:
             input.event === "APPROVE"
@@ -582,14 +592,14 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         if (pr.state !== "open" || pr.draft)
           throw new HttpFailure(405, "Pull is not ready to merge")
         if (input.sha !== head(pr)) throw new HttpFailure(409, "Head SHA changed")
-        const reviews = new Map<string, string>()
+        const reviews = new Map<number, string>()
         for (const review of state.reviews.values()) {
           if (
             review.pull === pr.number &&
             review.commit_id === head(pr) &&
             review.state !== "COMMENTED"
           ) {
-            reviews.set(review.user.login, review.state)
+            reviews.set(review.user.id, review.state)
           }
         }
         if (

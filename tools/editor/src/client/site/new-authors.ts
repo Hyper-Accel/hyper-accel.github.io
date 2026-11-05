@@ -10,7 +10,9 @@ import { authorProfileMarkdown } from "../composer/author-profile"
 const profileSchema = z.object({
   name: z.string().min(1),
   github: z.string().min(1),
+  githubId: z.number().int().positive(),
   image: z.string(),
+  avatar: z.string().optional(),
   linkedin: z.string(),
   bio: z.object({ ko: z.string(), en: z.string() }),
 })
@@ -25,7 +27,11 @@ export class NewAuthors {
     const raw = localStorage.getItem(this.key)
     const parsed = z.array(profileSchema).safeParse(raw ? JSON.parse(raw) : [])
     // Once the profile is on the site the stored copy is no longer needed.
-    return parsed.success ? parsed.data.filter((profile) => !this.known.includes(profile.name)) : []
+    return parsed.success
+      ? parsed.data
+          .filter((profile) => !this.known.includes(profile.name))
+          .map(({ avatar, ...profile }) => (avatar ? { ...profile, avatar } : profile))
+      : []
   }
 
   remember(profile: NewAuthorProfile): void {
@@ -49,6 +55,15 @@ export class NewAuthors {
           encoding: "utf-8" as const,
           content: authorProfileMarkdown(profile, "en"),
         },
+        ...(profile.avatar
+          ? [
+              {
+                path: `content/authors/${profile.name}/avatar.webp`,
+                encoding: "base64" as const,
+                content: profile.avatar,
+              },
+            ]
+          : []),
       ])
   }
 }

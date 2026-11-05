@@ -257,6 +257,34 @@ try {
       await page.locator('[data-picker="authors"] .metadata-picker__create').click()
       await page.locator('.author-profile-dialog input[name="authorGithub"]').fill("author")
       await page
+        .locator(".author-profile-dialog")
+        .screenshot({ path: join(artifacts, `${width}-author-empty.png`) })
+      // A picture pasted into the dialog becomes the profile photo, as a pasted cover does.
+      await page
+        .locator('.author-profile-dialog input[name="authorImage"]')
+        .evaluate(async (input) => {
+          const canvas = document.createElement("canvas")
+          canvas.width = 320
+          canvas.height = 200
+          const context = canvas.getContext("2d")
+          if (!context) throw new Error("Missing canvas")
+          context.fillStyle = "#009ee2"
+          context.fillRect(0, 0, 320, 200)
+          const png = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve, "image/png"),
+          )
+          if (!png) throw new Error("Missing PNG")
+          const data = new DataTransfer()
+          data.items.add(new File([png], "me.png", { type: "image/png" }))
+          input.dispatchEvent(
+            new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }),
+          )
+        })
+      await page.locator(".author-profile-dialog .author-profile__avatar:not([hidden])").waitFor()
+      await page
+        .locator(".author-profile-dialog")
+        .screenshot({ path: join(artifacts, `${width}-author-avatar.png`) })
+      await page
         .locator('.author-profile-dialog input[name="authorBioKo"]')
         .fill("흐름 시험 작성자")
       await page.locator(".author-profile-dialog button[type=submit]").click()
@@ -340,6 +368,26 @@ try {
           : []
         assert.ok(paths.includes(`content/authors/${newAuthor}/_index.md`), paths.join("\n"))
         assert.ok(paths.includes(`content/authors/${newAuthor}/_index.en.md`))
+        // The profile records the account's user ID that "author" resolves to, not only the login.
+        const profile = commit
+          ? state.trees
+              .get(commit.tree.sha)
+              ?.tree.find((e) => e.path === `content/authors/${newAuthor}/_index.md`)
+          : undefined
+        const blob = profile ? state.blobs.get(profile.sha) : undefined
+        const markdown = Buffer.from(blob?.content ?? "", "base64").toString()
+        assert.match(markdown, /^github_id: 1$/m)
+        // The pasted picture is committed beside the profile and linked by its published address.
+        const slugged = newAuthor.toLowerCase().replaceAll(" ", "-")
+        assert.ok(markdown.includes(`image: "/authors/${slugged}/avatar.webp"`), markdown)
+        const avatar = commit
+          ? state.trees
+              .get(commit.tree.sha)
+              ?.tree.find((e) => e.path === `content/authors/${newAuthor}/avatar.webp`)
+          : undefined
+        const avatarBlob = avatar ? state.blobs.get(avatar.sha) : undefined
+        const bytes = Buffer.from(avatarBlob?.content ?? "", "base64")
+        assert.equal(bytes.subarray(8, 12).toString(), "WEBP")
       }
 
       // Confluence-style inline comment: select text, "댓글", @mention a GitHub handle.
@@ -361,12 +409,14 @@ try {
         throw new Error("No text to comment on")
       })
       await page.locator('.composer-bubble:not([hidden]) [aria-label="댓글"]').click()
-      const commentBox = page.locator(".composer-comment-popover textarea")
+      const commentBox = page.locator(".composer-comment-popover:not(.site-ci-panel) textarea")
       await commentBox.pressSequentially("Please check @opu")
       await page.locator(".composer-mention-list li[data-handle='opus24']").waitFor()
       await commentBox.press("Enter")
       assert.equal(await commentBox.inputValue(), "Please check @opus24 ")
-      await page.locator(".composer-comment-popover .composer-comment-primary").click()
+      await page
+        .locator(".composer-comment-popover:not(.site-ci-panel) .composer-comment-primary")
+        .click()
       await page
         .locator(".composer-comment-thread .composer-mention", { hasText: "@opus24" })
         .waitFor()
@@ -378,7 +428,9 @@ try {
       )
       await page.locator("[data-site-comments]", { hasText: "댓글 1" }).waitFor()
       await page.keyboard.press("Escape")
-      await page.locator(".composer-comment-popover[hidden]").waitFor({ state: "attached" })
+      await page
+        .locator(".composer-comment-popover:not(.site-ci-panel)[hidden]")
+        .waitFor({ state: "attached" })
       // Return the caret to where the paste below expects it (start of the article).
       await body(page, "en").click({ position: { x: 1, y: 8 } })
       const beforeUnauthorized = await body(page, "en").elementHandle()
@@ -568,7 +620,16 @@ try {
         await reviewer.close()
       }
       // Real legacy copy: repair operations persist before a PostBundle exists.
-      // A published post is edited on its own page.
+      // A published post is edited on its own page, and only by its author: the signed-in
+      // fake account (user ID 1) plays Jaewoo Kim, the post's author.
+      await page.route("**/editor/people.json", async (route) => {
+        const people: { readonly name: string }[] = await (await route.fetch()).json()
+        await route.fulfill({
+          json: people.map((person) =>
+            person.name === "Jaewoo Kim" ? { ...person, id: 1 } : person,
+          ),
+        })
+      })
       await page.goto(`${harness.url}/posts/crafting-compilers/?edit`)
       await page.locator(".composer[data-mode=repair]").waitFor()
       await language(page, "en")

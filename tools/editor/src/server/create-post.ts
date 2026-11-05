@@ -144,6 +144,7 @@ function writeAuthor(
     title: author,
     image: profile.image ?? "",
     github: profile.github ?? "",
+    ...(profile.githubId ? { github_id: profile.githubId } : {}),
     linkedin: profile.linkedin ?? "",
   }
   writer.file(join(authorDirectory, "_index.md"), markdown({ ...common, bio: profile.bioKo }))

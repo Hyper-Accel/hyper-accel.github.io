@@ -33,6 +33,31 @@
   padding: 0;
 }
 
+/* Touch: 44px wide, and an invisible margin makes them 44px tall without thickening the bar. */
+@media (pointer: coarse) {
+  .site-editor
+    .composer-toolbox[data-layout="card"]
+    .composer-toolbox__bar
+    > button.composer-toolbox__button {
+    position: relative;
+    min-width: 44px;
+  }
+
+  .site-editor .composer-toolbox[data-layout="card"] button.composer-toolbox__insert {
+    position: relative;
+  }
+
+  .site-editor
+    .composer-toolbox[data-layout="card"]
+    .composer-toolbox__bar
+    > button.composer-toolbox__button::after,
+  .site-editor .composer-toolbox[data-layout="card"] button.composer-toolbox__insert::after {
+    position: absolute;
+    inset: -5px 0;
+    content: "";
+  }
+}
+
 .site-editor .composer-toolbox[data-layout="card"] .composer-toolbox__bar .composer-toolbox__label {
   position: absolute;
   width: 1px;

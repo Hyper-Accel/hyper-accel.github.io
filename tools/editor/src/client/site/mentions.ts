@@ -3,6 +3,8 @@ import { h } from "../composer/dom"
 export interface Person {
   readonly name: string
   readonly handle: string
+  /** GitHub user ID from the profile's `github_id:`. */
+  readonly id?: number
   readonly avatar?: string
 }
 

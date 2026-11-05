@@ -3,13 +3,13 @@ import { z } from "zod"
 import { computeSnapshotHash } from "../../document/codec"
 import type { PostBundle } from "../../shared/onsite/document"
 import type { DraftCursor } from "../../shared/onsite/drafts"
-import type { DraftPullRequest } from "../../shared/onsite/github"
+import type { DraftPullRequest, GitHubUser } from "../../shared/onsite/github"
 import { createBlockExtensions } from "../blocks"
 import { type ComposerHandle, mountComposer as mountLaneComposer } from "../composer"
 import { h } from "../composer/dom"
 import type { BlockExtensionContext } from "../composer/types"
 import { createDraftAutosave, type DraftAutosave, mountDrafts } from "../drafts"
-import { editAccess } from "./access"
+import { editAccess, editorIds } from "./access"
 import { SiteChecks } from "./ci-status"
 import { SiteComments } from "./comments"
 import type { SiteMount } from "./contracts"
@@ -24,7 +24,12 @@ import { draftAddress, parseSiteRoute } from "./routes"
 import { EditorRegistry, SiteToolbox } from "./toolbox"
 
 const peopleSchema = z.array(
-  z.object({ name: z.string(), handle: z.string(), avatar: z.string().url().optional() }),
+  z.object({
+    name: z.string(),
+    handle: z.string(),
+    id: z.number().int().positive().optional(),
+    avatar: z.string().url().optional(),
+  }),
 )
 
 async function loadPeople(): Promise<readonly Person[]> {
@@ -35,6 +40,7 @@ async function loadPeople(): Promise<readonly Person[]> {
     ? parsed.data.map((person) => ({
         name: person.name,
         handle: person.handle,
+        ...(person.id ? { id: person.id } : {}),
         ...(person.avatar ? { avatar: person.avatar } : {}),
       }))
     : []
@@ -64,35 +70,68 @@ export const mountComposer: SiteMount = async (root, deps) => {
     throw new Error("Composer host is missing")
   saveButton.hidden = deps.bundle === null
   const initial = deps.bundle ?? deps.unpaired
-  const initialImages = initial ? await prepareSiteImages(deps, initial) : null
+  // Started before the pictures are prepared, and read once for the whole editor.
+  const peopleLoad = loadPeople()
+  const taxonomiesLoad = loadTaxonomies()
+  const imagesLoad = initial ? prepareSiteImages(deps, initial) : Promise.resolve(null)
   const newAuthors = new NewAuthors(
     `onsite:new-authors:${session.repository.owner}/${session.repository.name}`,
     deps.authors,
   )
-  const [people, taxonomies] = await Promise.all([loadPeople(), loadTaxonomies()])
-  // Editing is limited to the post's authors and the GitHub logins they list under `editors:`.
+  // Editors are looked up alongside the profile lists, not after them: each lookup is a GitHub call.
+  const editorsLoad = initial
+    ? editorIds(initial.ko.frontMatter["editors"], async (login) => {
+        const user = await deps.github.getUser(login)
+        return user.ok ? (user.value?.id ?? null) : null
+      }).then(async (editors) => ({
+        editors,
+        users: await Promise.all(
+          editors.map(async (id) => {
+            const user = await deps.github.getUserById(id)
+            return user.ok ? user.value : null
+          }),
+        ),
+      }))
+    : Promise.resolve({ editors: [], users: [] })
+  const [initialImages, people, taxonomies, editorLoad] = await Promise.all([
+    imagesLoad,
+    peopleLoad,
+    taxonomiesLoad,
+    editorsLoad,
+  ])
+  // Editing is limited to the post's authors and the people they list under `editors:`.
   // Existing posts use repository profiles, never local author registrations.
-  const handles = new Map(people.map((person) => [person.name, person.handle]))
+  const ids = new Map(
+    people.flatMap((person): [string, number][] =>
+      person.id === undefined ? [] : [[person.name, person.id]],
+    ),
+  )
   let readOnly: string | undefined
   let lockEditors = false
+  // Editors without an author profile, shown by their current login in the editor picker.
+  let users: GitHubUser[] = []
+  let accessNotice: HTMLElement | null = null
   if (initial) {
     const front = initial.ko.frontMatter
-    const access = editAccess({
-      authors: front.authors,
-      editors: front["editors"],
-      handles,
-      login: session.login,
-    })
+    const { editors } = editorLoad
+    const profiled = new Set(ids.values())
+    users = editorLoad.users.filter(
+      (user): user is GitHubUser => user !== null && !profiled.has(user.id),
+    )
+    const access = editAccess({ authors: front.authors, editors, ids, userId: session.userId })
     lockEditors = access === "editor"
     // Not an author or editor: the same editor, read-only, to comment and approve.
     if (access === "read-only") readOnly = "읽기 전용"
     if (access === "unlinked-author") {
       readOnly = "읽기 전용"
-      root.insertBefore(
+      // A small closable note in the corner, clear of the post.
+      const notice = h(
+        "div",
+        { class: "site-access-toast", role: "status", "data-author-access": "unlinked" },
         h(
           "p",
-          { role: "status", "data-author-access": "unlinked" },
-          "작성자의 GitHub 계정이 연결되지 않아 편집할 수 없습니다. ",
+          {},
+          "작성자 프로필에 github_id가 없어 편집할 수 없습니다. ",
           h(
             "a",
             {
@@ -100,12 +139,17 @@ export const mountComposer: SiteMount = async (root, deps) => {
               target: "_blank",
               rel: "noopener noreferrer",
             },
-            "저장소의 작성자 프로필",
+            "작성자 프로필",
           ),
-          "에서 글의 authors 이름과 같은 폴더의 _index.md에 github 계정 URL을 추가한 뒤, 사이트 반영 후 다시 접속해 주세요.",
         ),
-        host,
+        h(
+          "button",
+          { type: "button", "aria-label": "안내 닫기", onclick: () => notice.remove() },
+          "✕",
+        ),
       )
+      accessNotice = notice
+      document.body.append(notice)
     }
   }
   if (reviewerOnly) readOnly = "읽기 전용"
@@ -365,7 +409,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   const comments = new SiteComments({
     github: deps.github,
     codec: deps.codec,
-    people: loadPeople,
+    people: () => peopleLoad,
     bundle: () => composer?.getBundle() ?? latest,
     ensureSaved: async () => {
       if (readOnly) {
@@ -431,12 +475,27 @@ export const mountComposer: SiteMount = async (root, deps) => {
     cursor: deps.restored.status === "restored" ? deps.restored.snapshot.cursor : null,
     authors: [...deps.authors, ...newAuthors.list().map((profile) => profile.name)],
     people: [
-      ...people.map((person) => ({ name: person.name, handle: person.handle })),
-      ...newAuthors.list().map((profile) => ({ name: profile.name, handle: profile.github })),
+      ...people.map((person) => ({
+        name: person.name,
+        handle: person.handle,
+        ...(person.id ? { id: person.id } : {}),
+      })),
+      ...newAuthors.list().map((profile) => ({
+        name: profile.name,
+        handle: profile.github,
+        id: profile.githubId,
+      })),
     ],
     tags: taxonomies.tags,
     series: taxonomies.series,
     currentLogin: session.login,
+    currentUserId: session.userId,
+    users,
+    resolveUser: async (login) => {
+      const user = await deps.github.getUser(login)
+      if (!user.ok) throw new Error(user.error.message)
+      return user.value
+    },
     onNewAuthor: (profile) => newAuthors.remember(profile),
     ...(readOnly ? { readOnly } : {}),
     ...(lockEditors ? { lockEditors } : {}),
@@ -586,6 +645,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     document.documentElement.style.removeProperty("--composer-sticky-top")
     document.documentElement.style.removeProperty("--composer-toolbox-height")
     document.body.style.removeProperty("--reading-offset")
+    accessNotice?.remove()
     comments.dispose()
     checks.dispose()
     toolbox.dispose()

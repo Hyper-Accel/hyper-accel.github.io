@@ -1,3 +1,6 @@
+{{- /* The editor pages (layout: editor) are a tool, not reading: no visit counting there, and the
+     two analytics scripts stay out of the editor's load. */}}
+{{- if ne .Layout "editor" }}
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CP27F7KKBJ"></script>
 <script>
@@ -17,3 +20,4 @@
         wcs_do();
     }
 </script>
+{{- end }}

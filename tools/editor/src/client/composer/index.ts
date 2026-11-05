@@ -78,18 +78,20 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
     ...(deps.tags ? { tags: deps.tags } : {}),
     ...(deps.series ? { series: deps.series } : {}),
     ...(deps.currentLogin ? { currentLogin: deps.currentLogin } : {}),
+    ...(deps.currentUserId !== undefined ? { currentUserId: deps.currentUserId } : {}),
+    ...(deps.resolveUser ? { resolveUser: deps.resolveUser } : {}),
+    ...(deps.users ? { users: deps.users } : {}),
     ...(deps.lockEditors || deps.readOnly ? { lockEditors: true } : {}),
     onNewAuthor: (profile: NewAuthorProfile) => {
       if (!knownAuthors.includes(profile.name)) knownAuthors.push(profile.name)
       deps.onNewAuthor?.(profile)
     },
   }
-  // The signed-in writer is the new post's author when their GitHub login has a profile.
-  const currentAuthor = deps.currentLogin
-    ? deps.people?.find(
-        (person) => person.handle.toLowerCase() === deps.currentLogin?.toLowerCase(),
-      )?.name
-    : undefined
+  // The signed-in writer is the new post's author when their GitHub user ID has a profile.
+  const currentAuthor =
+    deps.currentUserId !== undefined
+      ? deps.people?.find((person) => person.id === deps.currentUserId)?.name
+      : undefined
   const wrapper = h("div", { class: "composer", "data-lang": deps.cursor?.language ?? "ko" })
   root.append(wrapper)
 
@@ -604,16 +606,16 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
   async function startPost(metadata: PostMetadata, template: PostTemplate): Promise<void> {
     const ids = template.rows.length ? template.rows.map(() => newBlockId()) : [newBlockId()]
     // A writer who starts a post for other authors keeps the right to edit it.
-    const login = deps.currentLogin?.toLowerCase()
-    const authorHandles = metadata.authors.flatMap(
-      (name) => deps.people?.find((person) => person.name === name)?.handle.toLowerCase() ?? [],
+    const userId = deps.currentUserId
+    const authorIds = metadata.authors.flatMap(
+      (name) => deps.people?.find((person) => person.name === name)?.id ?? [],
     )
     const editors =
-      login &&
-      authorHandles.length > 0 &&
-      !authorHandles.includes(login) &&
-      !metadata.editors.some((editor) => editor.toLowerCase() === login)
-        ? [...metadata.editors, deps.currentLogin ?? login]
+      userId !== undefined &&
+      authorIds.length > 0 &&
+      !authorIds.includes(userId) &&
+      !metadata.editors.includes(String(userId))
+        ? [...metadata.editors, String(userId)]
         : metadata.editors
     const created = applyMetadata(await createBundle(newPostFields(metadata), ids, images), {
       ...metadata,

@@ -42,6 +42,8 @@ export const createPostRequestSchema = z.object({
       bioEn: z.string().trim().min(1).max(1000),
       image: optionalProfileUrlSchema,
       github: optionalProfileUrlSchema,
+      /** Numeric GitHub user ID; the onsite editor recognises authors by it. */
+      githubId: z.number().int().positive().optional(),
       linkedin: optionalProfileUrlSchema,
     })
     .optional(),

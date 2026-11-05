@@ -12,7 +12,10 @@ export interface PostMetadata {
   readonly cover: { readonly image: string; readonly alt: string } | null
   readonly date: string
   readonly draft: boolean
-  /** GitHub logins the authors allow to edit this post (`editors:` front matter). */
+  /**
+   * GitHub user IDs the authors allow to edit this post (`editors:` front matter), as strings.
+   * Posts saved before IDs were used may still list logins; those entries are kept as written.
+   */
   readonly editors: readonly string[]
 }
 
@@ -86,7 +89,10 @@ export function metadataFromBundle(bundle: PostBundle): PostMetadata {
         : null,
     date: typeof ko.date === "string" ? ko.date : "",
     draft: ko.draft,
-    editors: stringList(ko["editors"]),
+    editors: (Array.isArray(ko["editors"]) ? ko["editors"] : stringList(ko["editors"])).flatMap(
+      (entry: unknown) =>
+        typeof entry === "number" ? [String(entry)] : typeof entry === "string" ? [entry] : [],
+    ),
   }
 }
 
@@ -106,7 +112,9 @@ function applyToFrontMatter(
     tags: [...metadata.tags],
     series: metadata.series ? [metadata.series] : undefined,
     series_idx: metadata.seriesIndex ?? undefined,
-    editors: metadata.editors.length ? [...metadata.editors] : undefined,
+    editors: metadata.editors.length
+      ? metadata.editors.map((editor) => (/^\d+$/.test(editor) ? Number(editor) : editor))
+      : undefined,
     cover: metadata.cover
       ? {
           ...existingCover,

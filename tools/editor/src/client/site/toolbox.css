@@ -217,6 +217,16 @@
   border: 0;
 }
 
+@media (pointer: coarse) {
+  .composer-panel button {
+    min-height: 44px;
+  }
+
+  .composer-panel .composer-panel__close {
+    min-width: 44px;
+  }
+}
+
 .composer-panel__body {
   min-height: 0;
   overflow-y: auto;

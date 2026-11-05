@@ -1,48 +1,45 @@
 import { expect, test } from "bun:test"
-import { editAccess } from "./access"
+import { editAccess, editorIds } from "./access"
 
-const handles = new Map([
-  ["Seungbin Shin", "seungbinshin"],
-  ["Donghyeon Choi", "DongHyunnn"],
+const ids = new Map([
+  ["Seungbin Shin", 76479598],
+  ["Donghyeon Choi", 93566126],
 ])
 
-test("authors edit their own post, matched by GitHub handle in any case", () => {
-  expect(
-    editAccess({ authors: ["Donghyeon Choi"], editors: [], handles, login: "donghyunnn" }),
-  ).toBe("author")
+test("authors edit their own post, matched by GitHub user ID", () => {
+  expect(editAccess({ authors: ["Donghyeon Choi"], editors: [], ids, userId: 93566126 })).toBe(
+    "author",
+  )
+})
+
+test("another account that takes an author's former login is not the author", () => {
+  expect(editAccess({ authors: ["Donghyeon Choi"], editors: [], ids, userId: 1 })).toBe("read-only")
 })
 
 test("people the authors list under editors may edit but are not authors", () => {
   expect(
-    editAccess({
-      authors: ["Seungbin Shin"],
-      editors: ["@DongHyunnn"],
-      handles,
-      login: "DongHyunnn",
-    }),
+    editAccess({ authors: ["Seungbin Shin"], editors: [93566126], ids, userId: 93566126 }),
   ).toBe("editor")
+  expect(editAccess({ authors: ["Seungbin Shin"], editors: [5], ids, userId: 93566126 })).toBe(
+    "read-only",
+  )
 })
 
-test("everyone else sees the post read-only", () => {
-  expect(
-    editAccess({ authors: ["Seungbin Shin"], editors: ["someone"], handles, login: "DongHyunnn" }),
-  ).toBe("read-only")
-  expect(
-    editAccess({ authors: ["Seungbin Shin"], editors: "DongHyunnn", handles, login: "DongHyunnn" }),
-  ).toBe("read-only")
-})
-
-test.each([{ editors: [] }, { editors: ["anyone"] }])(
-  "unlinked authors block editing even for listed editors %j",
+test.each([{ editors: [] }, { editors: [5] }])(
+  "authors without a GitHub ID block editing even for listed editors %j",
   ({ editors }) => {
-    expect(editAccess({ authors: ["Fixture Author"], editors, handles, login: "anyone" })).toBe(
+    expect(editAccess({ authors: ["Fixture Author"], editors, ids, userId: 5 })).toBe(
       "unlinked-author",
     )
   },
 )
 
-test("a matching handle on a different author's profile does not grant access", () => {
-  expect(
-    editAccess({ authors: ["Seungbin Shin"], editors: [], handles, login: "DongHyunnn" }),
-  ).toBe("read-only")
+test("editors are read as user IDs; legacy logins are looked up and unknown ones grant nothing", async () => {
+  const logins = new Map([["donghyunnn", 93566126]])
+  const lookup = async (login: string): Promise<number | null> =>
+    logins.get(login.toLowerCase()) ?? null
+  expect(await editorIds([76479598, "130212029", "@DongHyunnn", "gone", 0, null], lookup)).toEqual([
+    76479598, 130212029, 93566126,
+  ])
+  expect(await editorIds("DongHyunnn", lookup)).toEqual([])
 })
