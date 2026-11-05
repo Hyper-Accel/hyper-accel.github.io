@@ -35,6 +35,13 @@ export async function checkArticleMetadata(page: Page, shot: Shot): Promise<void
   )
   await shot("08-meta")
   await noHorizontalOverflow(page)
+  // ✕ in the panel's corner closes it too, and the keyboard returns to the toggle.
+  await metaForm.getByRole("button", { name: "글 정보 닫기" }).click()
+  await metaForm.waitFor({ state: "hidden" })
+  // The details element reports the change in its (asynchronous) toggle event.
+  const toggle = composer.locator('.composer-info-toggle[aria-expanded="false"]')
+  await toggle.waitFor()
+  assert.equal(await toggle.evaluate((el) => el === document.activeElement), true)
 
   await page.goto(new URL("/?bundle=image-layouts&theme=light", page.url()).href, {
     waitUntil: "load",

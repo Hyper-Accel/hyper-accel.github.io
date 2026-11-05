@@ -167,6 +167,45 @@
   background: var(--entry);
 }
 
+/* ✕ in the panel's top right corner closes it, as the meta line's toggle does. */
+.composer .composer-post .composer-meta[open] .composer-form {
+  position: relative;
+}
+
+.composer .composer-post .composer-meta .composer-meta__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.composer .composer-post .composer-meta .composer-meta__close:hover {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+@media (pointer: coarse) {
+  .composer .composer-post .composer-meta .composer-meta__close {
+    top: 2px;
+    right: 2px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
 /* An open post's titles are written on the page itself (a new post's are in its settings form). */
 .composer[data-mode="edit"] .composer-meta .metadata-group:first-child {
   display: none;

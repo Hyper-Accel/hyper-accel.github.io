@@ -528,6 +528,22 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
       h("summary", { class: "composer-meta__summary" }, "글 정보 수정"),
       form.element,
     )
+    // The panel also closes from its own corner, not only from the meta line's toggle.
+    const metaClose = h(
+      "button",
+      {
+        type: "button",
+        class: "composer-meta__close",
+        "aria-label": "글 정보 닫기",
+        title: "닫기",
+      },
+      "✕",
+    )
+    metaClose.addEventListener("click", () => {
+      meta.open = false
+      wrapper.querySelector<HTMLElement>(".composer-info-toggle")?.focus()
+    })
+    form.element.prepend(metaClose)
     const postSurface = createPostSurface({
       mode: "edit",
       info: meta,
