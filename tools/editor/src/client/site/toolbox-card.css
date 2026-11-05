@@ -228,3 +228,14 @@ body:has(.composer-panel:not([hidden]))
   .composer-toolbox__row {
   display: none;
 }
+
+/* So does it while 글 정보, wider than the article, is open beside it (on a phone the card only
+   opens from ＋ 넣기). */
+@media (min-width: 700px) {
+  body:has(.composer-post .composer-meta[open])
+    .site-editor
+    .composer-toolbox[data-layout="card"]
+    .composer-toolbox__row {
+    display: none;
+  }
+}

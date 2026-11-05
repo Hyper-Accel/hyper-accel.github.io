@@ -155,7 +155,11 @@
   display: none;
 }
 
+/* 글 정보 is settings, not reading: wider than the article column, centred on it. */
 .composer .composer-post .composer-meta[open] .composer-form {
+  --meta-width: max(100%, min(72rem, 100vw - 48px));
+  width: var(--meta-width);
+  margin-inline: calc((100% - var(--meta-width)) / 2);
   margin-top: 8px;
   padding: var(--editor-space-4);
   border: 1px solid var(--border);
@@ -294,6 +298,11 @@ body:has(.composer-dock) .top-link {
   .composer-toc {
     display: none;
   }
+}
+
+/* While 글 정보 is open the table of contents beside the article steps back, as the 넣기 card does. */
+.composer:has(.composer-post .composer-meta[open]) .composer-toc {
+  visibility: hidden;
 }
 
 @media (max-width: 699px) {

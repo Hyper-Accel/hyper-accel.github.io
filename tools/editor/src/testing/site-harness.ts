@@ -17,7 +17,12 @@ export interface SiteHarness {
 }
 
 export async function startSiteHarness(
-  options: { readonly port?: number; readonly output?: string } = {},
+  options: {
+    readonly port?: number
+    readonly output?: string
+    /** The author profile the fake signed-in account (user ID 1) plays, as in the local demo. */
+    readonly writer?: string
+  } = {},
 ): Promise<SiteHarness> {
   const github = startFakeGitHub()
   const worker = createTokenExchange(async (input, init) => {
@@ -82,6 +87,14 @@ export async function startSiteHarness(
     port: options.port ?? 0,
     async fetch(request) {
       const url = new URL(request.url)
+      if (options.writer && url.pathname === "/editor/people.json") {
+        const people: { readonly name: string }[] = await Bun.file(
+          resolve(output, "editor/people.json"),
+        ).json()
+        return Response.json(
+          people.map((person) => (person.name === options.writer ? { ...person, id: 1 } : person)),
+        )
+      }
       if (url.pathname === "/__site/config")
         return Response.json({
           development: true,
@@ -193,7 +206,12 @@ export async function startSiteHarness(
       const file = Bun.file(absolute)
       if (!(await file.exists())) return new Response(null, { status: 404 })
       return new Response(file, {
-        headers: { "X-Robots-Tag": "noindex, nofollow", "Access-Control-Allow-Origin": "*" },
+        headers: {
+          "X-Robots-Tag": "noindex, nofollow",
+          "Access-Control-Allow-Origin": "*",
+          // Fingerprinted editor files are cached as GitHub Pages caches them (max-age=600).
+          ...(path.startsWith("/editor/assets/") ? { "Cache-Control": "max-age=600" } : {}),
+        },
       })
     },
   })

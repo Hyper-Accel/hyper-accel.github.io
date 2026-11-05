@@ -262,13 +262,21 @@ export class GitHubHttp {
     variables: Readonly<Record<string, unknown>>,
     schema: z.ZodType<T>,
     mutation = false,
+    /** Error types that still leave usable data, e.g. NOT_FOUND for a file that may not exist. */
+    tolerated: readonly string[] = [],
   ): Promise<T> {
     const envelope = await this.request("/graphql", graphEnvelope, {
       method: "POST",
       body: { query, variables },
       mutation,
     })
-    if (envelope.errors?.length) {
+    const tolerable =
+      envelope.data !== undefined &&
+      envelope.data !== null &&
+      (envelope.errors ?? []).every(
+        (error) => error.type !== undefined && tolerated.includes(error.type),
+      )
+    if (envelope.errors?.length && !tolerable) {
       const types = envelope.errors.map((error) => error.type)
       if (types.includes("RATE_LIMITED")) {
         throw new GitHubFailure({

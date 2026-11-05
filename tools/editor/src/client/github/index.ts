@@ -50,6 +50,78 @@ export interface GitHubAdapterOptions extends HttpOptions {
 }
 
 const contentResponse = z.object({ content: z.string(), encoding: z.literal("base64") })
+
+/** What loadBundle reads before parsing: one commit's two pages and the files under the post. */
+interface BundleSnapshot {
+  readonly head: string
+  readonly ko: string
+  readonly en: string
+  readonly paths: { readonly ko: string; readonly en: string }
+  readonly files: readonly { readonly path: string; readonly sha: string }[]
+}
+
+// The post branch (or, before it exists, the default branch) as one commit: both pages and the
+// post's files three folders deep, in a single round trip. Commit.file keeps every field on the
+// same commit; a page that does not exist comes back null with a NOT_FOUND error.
+const BUNDLE_QUERY = `query PostBundle($owner: String!, $name: String!, $branch: String!, $ko: String!, $koAlt: String!, $en: String!, $dir: String!) {
+  repository(owner: $owner, name: $name) {
+    post: ref(qualifiedName: $branch) { target { ...Bundle } }
+    main: defaultBranchRef { target { ...Bundle } }
+  }
+}
+fragment Bundle on Commit {
+  oid
+  ko: file(path: $ko) { object { ... on Blob { text isBinary } } }
+  koAlt: file(path: $koAlt) { object { ... on Blob { text isBinary } } }
+  en: file(path: $en) { object { ... on Blob { text isBinary } } }
+  dir: file(path: $dir) { object { ... on Tree { entries { ...Entry object { ... on Tree { entries { ...Entry object { ... on Tree { entries { ...Entry } } } } } } } } } }
+}
+fragment Entry on TreeEntry { path type oid }`
+
+interface GraphEntry {
+  readonly path: string
+  readonly type: string
+  readonly oid: string
+  readonly object?: { readonly entries?: readonly GraphEntry[] | undefined } | null | undefined
+}
+const graphEntry: z.ZodType<GraphEntry> = z.lazy(() =>
+  z.object({
+    path: z.string(),
+    type: z.string(),
+    oid: gitShaSchema,
+    object: z
+      .object({ entries: z.array(graphEntry).optional() })
+      .nullable()
+      .optional(),
+  }),
+)
+const graphFile = z
+  .object({
+    object: z
+      .object({
+        text: z.string().nullable().optional(),
+        isBinary: z.boolean().nullable().optional(),
+      })
+      .nullable(),
+  })
+  .nullable()
+  .optional()
+const graphCommit = z.object({
+  oid: gitShaSchema,
+  ko: graphFile,
+  koAlt: graphFile,
+  en: graphFile,
+  dir: z
+    .object({ object: z.object({ entries: z.array(graphEntry) }).nullable() })
+    .nullable()
+    .optional(),
+})
+const bundleGraphResponse = z.object({
+  repository: z.object({
+    post: z.object({ target: graphCommit }).nullable(),
+    main: z.object({ target: graphCommit }).nullable(),
+  }),
+})
 const treeResponse = z.object({
   tree: z.array(z.object({ path: z.string(), type: z.string(), sha: gitShaSchema })),
   truncated: z.boolean().optional(),
@@ -204,34 +276,13 @@ export class FetchGitHubAdapter implements GitHubAdapter {
   loadBundle(slug: string, sha?: string): Promise<GitHubResult<PostBundle>> {
     return result(async () => {
       slugSchema.parse(slug)
-      const head = sha
-        ? gitShaSchema.parse(sha)
-        : ((await this.ref(`post/${slug}`)) ?? (await this.ref(await this.defaultBranch())))
-      if (!head) invalid("The repository has no default-branch head.")
       const prefix = `content/posts/${slug}/`
-      const paths = { ko: `${prefix}index.md`, en: `${prefix}index.en.md` }
-      const read = async (path: string): Promise<string> => {
-        const file = await this.http.request(
-          `${this.http.repo}/contents/${encodePath(path)}?ref=${head}`,
-          contentResponse,
-        )
-        return new TextDecoder("utf-8", { fatal: true }).decode(
-          Uint8Array.from(atob(file.content.replace(/\s/g, "")), (char) => char.charCodeAt(0)),
-        )
-      }
-      // Every read names the same immutable head, so they run together instead of one by one.
-      const [ko, en, tree] = await Promise.all([
-        read(paths.ko).catch((error: unknown) => {
-          if (!(error instanceof GitHubFailure) || error.status !== 404) throw error
-          paths.ko = `${prefix}index.ko.md`
-          return read(paths.ko)
-        }),
-        read(paths.en),
-        // GitHub resolves a commit SHA to that commit's tree.
-        this.http.request(`${this.http.repo}/git/trees/${head}?recursive=1`, treeResponse),
-      ])
-      const sources = [ko, en]
-      if (tree.truncated) invalid("The Git tree is truncated; cannot load a complete bundle.")
+      // One GraphQL round trip when it can answer; the REST reads give the same bundle (and the
+      // precise errors) otherwise.
+      const snapshot =
+        (sha ? null : await this.snapshotByGraph(slug)) ?? (await this.snapshotByRest(slug, sha))
+      const { head, paths } = snapshot
+      const sources = [snapshot.ko, snapshot.en]
       const images: BundleImage[] = []
       const mime: Readonly<Record<string, string>> = {
         png: "image/png",
@@ -241,8 +292,8 @@ export class FetchGitHubAdapter implements GitHubAdapter {
         webp: "image/webp",
         svg: "image/svg+xml",
       }
-      for (const entry of tree.tree) {
-        if (entry.type !== "blob" || !entry.path.startsWith(prefix)) continue
+      for (const entry of snapshot.files) {
+        if (!entry.path.startsWith(prefix)) continue
         const candidate = imagePathSchema.safeParse(entry.path.slice(prefix.length))
         if (!candidate.success) continue
         const path = candidate.data
@@ -271,6 +322,99 @@ export class FetchGitHubAdapter implements GitHubAdapter {
         )
       return parsed.bundle
     })
+  }
+
+  private async snapshotByGraph(slug: string): Promise<BundleSnapshot | null> {
+    const prefix = `content/posts/${slug}/`
+    let data: z.infer<typeof bundleGraphResponse>
+    try {
+      data = await this.http.graph(
+        BUNDLE_QUERY,
+        {
+          owner: this.options.owner,
+          name: this.options.repository,
+          branch: `refs/heads/post/${slug}`,
+          ko: `${prefix}index.md`,
+          koAlt: `${prefix}index.ko.md`,
+          en: `${prefix}index.en.md`,
+          dir: prefix.slice(0, -1),
+        },
+        bundleGraphResponse,
+        false,
+        ["NOT_FOUND"],
+      )
+    } catch (error: unknown) {
+      if (error instanceof GitHubFailure || error instanceof z.ZodError) return null
+      throw error
+    }
+    const commit = data.repository.post?.target ?? data.repository.main?.target
+    if (!commit) return null
+    const text = (file: z.infer<typeof graphFile>): string | null =>
+      file?.object && !file.object.isBinary && typeof file.object.text === "string"
+        ? file.object.text
+        : null
+    const ko = text(commit.ko)
+    const koAlt = text(commit.koAlt)
+    const en = text(commit.en)
+    if ((ko ?? koAlt) === null || en === null) return null
+    // A folder below the third level was not listed: REST lists everything.
+    const files: { path: string; sha: string }[] = []
+    const walk = (entries: readonly GraphEntry[]): boolean =>
+      entries.every((entry) => {
+        if (entry.type === "blob") files.push({ path: entry.path, sha: entry.oid })
+        if (entry.type !== "tree") return true
+        return entry.object?.entries ? walk(entry.object.entries) : false
+      })
+    if (!walk(commit.dir?.object?.entries ?? [])) return null
+    return {
+      head: commit.oid,
+      ko: ko ?? koAlt ?? "",
+      en,
+      paths: {
+        ko: ko !== null ? `${prefix}index.md` : `${prefix}index.ko.md`,
+        en: `${prefix}index.en.md`,
+      },
+      files,
+    }
+  }
+
+  private async snapshotByRest(slug: string, sha?: string): Promise<BundleSnapshot> {
+    const head = sha
+      ? gitShaSchema.parse(sha)
+      : ((await this.ref(`post/${slug}`)) ?? (await this.ref(await this.defaultBranch())))
+    if (!head) invalid("The repository has no default-branch head.")
+    const prefix = `content/posts/${slug}/`
+    const paths = { ko: `${prefix}index.md`, en: `${prefix}index.en.md` }
+    const read = async (path: string): Promise<string> => {
+      const file = await this.http.request(
+        `${this.http.repo}/contents/${encodePath(path)}?ref=${head}`,
+        contentResponse,
+      )
+      return new TextDecoder("utf-8", { fatal: true }).decode(
+        Uint8Array.from(atob(file.content.replace(/\s/g, "")), (char) => char.charCodeAt(0)),
+      )
+    }
+    // Every read names the same immutable head, so they run together instead of one by one.
+    const [ko, en, tree] = await Promise.all([
+      read(paths.ko).catch((error: unknown) => {
+        if (!(error instanceof GitHubFailure) || error.status !== 404) throw error
+        paths.ko = `${prefix}index.ko.md`
+        return read(paths.ko)
+      }),
+      read(paths.en),
+      // GitHub resolves a commit SHA to that commit's tree.
+      this.http.request(`${this.http.repo}/git/trees/${head}?recursive=1`, treeResponse),
+    ])
+    if (tree.truncated) invalid("The Git tree is truncated; cannot load a complete bundle.")
+    return {
+      head,
+      ko,
+      en,
+      paths,
+      files: tree.tree
+        .filter((entry) => entry.type === "blob")
+        .map((entry) => ({ path: entry.path, sha: entry.sha })),
+    }
   }
 
   ensureDraftPR(

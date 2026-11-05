@@ -86,26 +86,33 @@ export const mountComposer: SiteMount = async (root, deps) => {
     `onsite:new-authors:${session.repository.owner}/${session.repository.name}`,
     deps.authors,
   )
-  // Editors are looked up alongside the profile lists, not after them: each lookup is a GitHub call.
-  // A login already resolved to its account is not looked up again by ID.
-  const resolved = new Map<number, GitHubUser>()
+  // Editors are looked up alongside the profile lists, not after them: each lookup is a GitHub call,
+  // so none is made for what is already known (the signed-in account, a profile in people.json, a
+  // login just resolved).
+  const signedIn = { login: session.login, id: session.userId }
+  const resolved = new Map<number, GitHubUser>([[signedIn.id, signedIn]])
   const editorsLoad = initial
     ? editorIds(initial.ko.frontMatter["editors"], async (login) => {
+        if (login.toLowerCase() === signedIn.login.toLowerCase()) return signedIn.id
         const user = await deps.github.getUser(login)
         if (!user.ok || !user.value) return null
         resolved.set(user.value.id, user.value)
         return user.value.id
-      }).then(async (editors) => ({
-        editors,
-        users: await Promise.all(
-          editors.map(async (id) => {
-            const known = resolved.get(id)
-            if (known) return known
-            const user = await deps.github.getUserById(id)
-            return user.ok ? user.value : null
-          }),
-        ),
-      }))
+      }).then(async (editors) => {
+        const profiled = new Set((await peopleLoad).map((person) => person.id))
+        return {
+          editors,
+          users: await Promise.all(
+            editors.map(async (id) => {
+              if (profiled.has(id)) return null
+              const known = resolved.get(id)
+              if (known) return known
+              const user = await deps.github.getUserById(id)
+              return user.ok ? user.value : null
+            }),
+          ),
+        }
+      })
     : Promise.resolve({ editors: [], users: [] })
   const [initialImages, people, taxonomies, editorLoad] = await Promise.all([
     imagesLoad,

@@ -1,11 +1,28 @@
-import { z } from "zod"
 import type { BundleImage, PostBundle } from "../../shared/onsite/document"
 import type { Renderer } from "../../shared/onsite/render"
 import type { SiteServices } from "./contracts"
 
+/**
+ * Where a committed file can be read as of a commit without the API: raw.githubusercontent.com
+ * for the public repository, the fake server's /raw locally. The address names the commit, so
+ * its content never changes.
+ */
+function rawFileUrl(apiBaseUrl: string, commit: string, path: string): string {
+  const base =
+    apiBaseUrl === "https://api.github.com"
+      ? "https://raw.githubusercontent.com"
+      : `${apiBaseUrl.replace(/\/$/, "")}/raw`
+  const encoded = path.split("/").map(encodeURIComponent).join("/")
+  return `${base}/Hyper-Accel/hyper-accel.github.io/${commit}/${encoded}`
+}
+
 export async function prepareSiteImages(
   services: SiteServices,
-  bundle: { readonly images: readonly BundleImage[] },
+  bundle: {
+    readonly slug: string
+    readonly headSha: string | null
+    readonly images: readonly BundleImage[]
+  },
 ): Promise<{
   imageUrl(path: string): string | undefined
   imageSize(path: string): { width: number; height: number } | undefined
@@ -14,27 +31,28 @@ export async function prepareSiteImages(
   const urls = new Map<string, string>()
   const sizes = new Map<string, { width: number; height: number }>()
   const pathOf = (path: string): string => path.replace(/^\.\//, "").split("#")[0] ?? path
-  // The pictures download together, not one after another.
+  const objectUrls: string[] = []
+  // Committed pictures are not downloaded first: the editor opens at once and the browser loads
+  // each picture from its commit address as it draws it. Pending ones exist only on this device.
   const loads = await Promise.allSettled(
     bundle.images.map(async (image) => {
-      let blob: Blob
-      if (image.status === "pending") blob = image.blob
-      else {
-        const response = await services.auth.fetch(
-          `${services.apiBaseUrl}/repos/Hyper-Accel/hyper-accel.github.io/git/blobs/${image.sha}`,
+      if (image.status !== "pending") {
+        if (!bundle.headSha) throw new Error("이미지를 불러오지 못했습니다.")
+        urls.set(
+          image.path,
+          rawFileUrl(
+            services.apiBaseUrl,
+            bundle.headSha,
+            `content/posts/${bundle.slug}/${image.path}`,
+          ),
         )
-        if (!response.ok) throw new Error("이미지를 불러오지 못했습니다.")
-        const data = z
-          .object({ content: z.string(), encoding: z.literal("base64") })
-          .parse(await response.json())
-        blob = new Blob(
-          [Uint8Array.from(atob(data.content.replace(/\s/g, "")), (char) => char.charCodeAt(0))],
-          { type: image.mime },
-        )
+        return
       }
-      urls.set(image.path, URL.createObjectURL(blob))
+      const url = URL.createObjectURL(image.blob)
+      objectUrls.push(url)
+      urls.set(image.path, url)
       if (image.mime !== "image/svg+xml") {
-        const bitmap = await createImageBitmap(blob)
+        const bitmap = await createImageBitmap(image.blob)
         sizes.set(image.path, { width: bitmap.width, height: bitmap.height })
         bitmap.close()
       }
@@ -51,11 +69,11 @@ export async function prepareSiteImages(
         return sizes.get(pathOf(path))
       },
       dispose() {
-        for (const url of urls.values()) URL.revokeObjectURL(url)
+        for (const url of objectUrls) URL.revokeObjectURL(url)
       },
     }
   } catch (error: unknown) {
-    for (const url of urls.values()) URL.revokeObjectURL(url)
+    for (const url of objectUrls) URL.revokeObjectURL(url)
     throw error
   }
 }

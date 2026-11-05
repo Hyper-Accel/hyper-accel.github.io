@@ -173,8 +173,30 @@ describe("access and immutable bundle reads", () => {
     expect(JSON.stringify(access)).not.toContain(fake.defaultToken)
   })
 
+  test("reads a post in a single GraphQL round trip", async () => {
+    const pr = await setup()
+    const requests: string[] = []
+    const client = adapter(undefined, {
+      fetch: extendFetch(undefined, (request, response) => {
+        requests.push(`${request.method} ${request.path}`)
+        return response
+      }),
+    })
+    const loaded = value(await client.loadBundle("test"))
+    expect(requests).toEqual(["POST /graphql"])
+    expect(loaded.headSha).toBe(pr.headSha)
+    expect(parsedInputs[0]).toMatchObject({
+      ko: "unchanged\n새 글\nsecond\n",
+      en: "unchanged\nnew\nsecond\n",
+      headSha: pr.headSha,
+      images: [{ path: "images/a.png", status: "committed", mime: "image/png" }],
+    })
+  })
+
   test("loads both languages at one captured SHA when the branch changes during reading", async () => {
     const pr = await setup()
+    // GraphQL cannot answer, so the REST reads (each naming the captured SHA) take over.
+    fake.inject({ method: "POST", path: "/graphql", status: 403 })
     let changed = false
     const client = adapter(undefined, {
       fetch: extendFetch(undefined, (request, response) => {

@@ -322,7 +322,8 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
   )
   const coverAlt = h("input", { name: "coverAlt", autocomplete: "off" })
   const coverStatus = h("span", { class: "composer-cover__status", "aria-live": "polite" })
-  const draft = h("input", { name: "draft", type: "checkbox" })
+  // Kept as it is: 리뷰 요청 clears `draft:`, so the form no longer offers it.
+  let draft = options.initial.draft
   const errors = h("ul", { class: "composer-form__errors", role: "alert", hidden: true })
 
   const form = h(
@@ -362,11 +363,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
         tagPicker.element,
         editorPicker.element,
       ),
-      group(
-        { id: `${prefix}-publish`, title: "게시" },
-        field("작성일", date),
-        h("label", { class: "metadata-check" }, draft, h("span", {}, "사이트에 숨김 (Hugo draft)")),
-      ),
+      group({ id: `${prefix}-publish`, title: "게시" }, field("작성일", date)),
       group(
         { id: `${prefix}-extras`, title: "시리즈와 커버", note: "선택" },
         seriesPicker.element,
@@ -416,7 +413,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     seriesIndex: seriesIndex.value === "" ? null : Number(seriesIndex.value),
     cover: cover ? { image: cover.image, alt: coverAlt.value.trim() } : null,
     date: fromDateTimeLocal(date.value, options.initial.date),
-    draft: draft.checked,
+    draft,
   })
 
   const renderCover = (): void => {
@@ -440,7 +437,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     seriesIndex.value = metadata.seriesIndex === null ? "" : String(metadata.seriesIndex)
     cover = metadata.cover
     coverAlt.value = metadata.cover?.alt ?? ""
-    draft.checked = metadata.draft
+    draft = metadata.draft
     renderCover()
   }
 
