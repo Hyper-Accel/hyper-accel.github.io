@@ -91,6 +91,23 @@ beforeEach(() => {
 afterEach(() => fake.stop())
 
 describe("access and immutable bundle reads", () => {
+  test.each(["", "Author review notes"])(
+    "fills an empty review body and preserves author notes: %s",
+    async (body) => {
+      const pr = await setup()
+      const stored = fake.state.pulls.get(pr.number)
+      if (!stored) throw new Error("Missing pull request")
+      const template = stored.body
+      const link = template.match(/https:\/\/\S+/)?.[0]
+      if (!link) throw new Error("Missing review link")
+      expect(new URL(link).searchParams.get("draft")).toBe("test")
+      stored.body = body
+      value(await adapter().markReady(pr.number, pr.headSha))
+      expect(stored.body).toBe(body || template)
+      expect(stored.draft).toBe(false)
+    },
+  )
+
   test("reads persisted approval after a new adapter and invalidates it at a new head", async () => {
     const pr = await setup()
     value(await adapter().markReady(pr.number, pr.headSha))
@@ -439,6 +456,32 @@ describe("atomic saves and idempotent draft creation", () => {
 })
 
 describe("anchored discussions", () => {
+  test("persists general comments with replies and resolution without attaching them to text", async () => {
+    const pr = await setup()
+    const thread = value(
+      await adapter().addRangeComment(pr.number, pr.headSha, null, "Overall feedback"),
+    )
+    expect(thread.storage).toBe("issue")
+    expect(thread.anchor).toBeNull()
+    expect(fake.state.comments.get(thread.rootCommentId)).not.toHaveProperty("line")
+    const reviewer = adapter(fake.reviewerToken)
+    value(await reviewer.replyComment(thread, "Thanks"))
+    value(await reviewer.resolveThread(thread, true))
+    value(
+      await adapter().commitBundle("test", pr.headSha, [
+        { path: koPath, encoding: "utf-8", content: "Rewritten post" },
+      ]),
+    )
+    expect(value(await adapter().getReviewThreads(pr.number))).toMatchObject([
+      {
+        anchor: null,
+        resolved: true,
+        outdated: false,
+        comments: [{ body: "Overall feedback" }, { body: "Thanks" }],
+      },
+    ])
+  })
+
   test("roundtrips multiline anchors, native replies and resolution", async () => {
     const pr = await setup()
     const author = adapter()

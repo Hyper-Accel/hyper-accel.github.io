@@ -30,3 +30,6 @@ def square(x):
 {{< rawhtml >}}
 <table><tr><th>항목</th><td>값</td></tr></table>
 {{< /rawhtml >}}
+
+<!-- b:math-and-legacy-7 -->
+## 첫 번째 **제목** {#part1}

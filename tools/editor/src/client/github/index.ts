@@ -12,6 +12,7 @@ import {
   slugSchema,
 } from "../../shared/onsite/document"
 import {
+  type CommitCheck,
   type CommitReceipt,
   type DraftPullRequest,
   draftPullRequestSchema,
@@ -20,6 +21,7 @@ import {
   type PullState,
 } from "../../shared/onsite/github"
 import type { RangeAnchor, ReviewComment, ReviewThread } from "../../shared/onsite/review"
+import { readCommitChecks } from "./checks"
 import {
   conflict,
   GitHubFailure,
@@ -133,6 +135,10 @@ export class FetchGitHubAdapter implements GitHubAdapter {
 
   listDrafts(): Promise<GitHubResult<readonly DraftPullRequest[]>> {
     return result(async () => (await this.openPulls()).map(draft))
+  }
+
+  getCommitChecks(headSha: string): Promise<GitHubResult<readonly CommitCheck[]>> {
+    return result(() => readCommitChecks(this.http, headSha))
   }
 
   getPullState(pullNumber: number): Promise<GitHubResult<PullState>> {
@@ -318,7 +324,13 @@ export class FetchGitHubAdapter implements GitHubAdapter {
           () =>
             this.http.request(`${this.http.repo}/pulls`, pullResponse, {
               method: "POST",
-              body: { title, head: branch, base, draft: true },
+              body: {
+                title,
+                head: branch,
+                base,
+                draft: true,
+                body: this.reviewBody(slug, title),
+              },
             }),
           () => this.findPull(slug),
         ),
@@ -341,7 +353,7 @@ export class FetchGitHubAdapter implements GitHubAdapter {
   addRangeComment(
     pullNumber: number,
     expectedHeadSha: string,
-    anchor: RangeAnchor,
+    anchor: RangeAnchor | null,
     body: string,
   ): Promise<GitHubResult<ReviewThread>> {
     return result(() => this.discussions.add(pullNumber, expectedHeadSha, anchor, body))
@@ -395,6 +407,12 @@ export class FetchGitHubAdapter implements GitHubAdapter {
   markReady(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<DraftPullRequest>> {
     return result(async () => {
       const pr = await this.checkedPull(pullNumber, expectedHeadSha)
+      if (!pr.body?.trim()) {
+        await this.http.request(`${this.http.repo}/pulls/${pullNumber}`, pullResponse, {
+          method: "PATCH",
+          body: { body: this.reviewBody(pr.head.ref.slice(5), pr.title ?? pr.head.ref) },
+        })
+      }
       if (!pr.draft) return draft(pr)
       await this.http.reconcile(
         `ready:${pr.node_id}`,
@@ -415,6 +433,27 @@ export class FetchGitHubAdapter implements GitHubAdapter {
       )
       return draft(await this.checkedPull(pullNumber, expectedHeadSha))
     })
+  }
+
+  private reviewBody(slug: string, title: string): string {
+    return [
+      "## 글 리뷰",
+      "",
+      title,
+      "",
+      `- 리뷰 화면: https://${this.options.owner.toLowerCase()}.github.io/editor-new/?draft=${encodeURIComponent(slug)}`,
+      `- 글 경로: content/posts/${slug}/`,
+      "",
+      "## 검토 항목",
+      "",
+      "- [ ] 한국어·영어 본문의 내용과 번역",
+      "- [ ] 제목·작성자·카테고리 및 이미지",
+      "- [ ] 기술적 정확성과 읽기 흐름",
+      "",
+      "## 게시",
+      "",
+      "리뷰 승인과 필수 CI 통과 후 에디터에서 게시합니다.",
+    ].join("\n")
   }
 
   markDraft(pullNumber: number, expectedHeadSha: string): Promise<GitHubResult<DraftPullRequest>> {

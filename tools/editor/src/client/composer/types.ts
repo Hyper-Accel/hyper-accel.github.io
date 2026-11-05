@@ -78,6 +78,8 @@ export interface ComposerHandle {
   getBundle(): PostBundle | null
   getUnpaired(): UnpairedBundle | null
   setBundle(bundle: PostBundle): void
+  /** Updates the shared visibility setting without rebuilding the article or dock. */
+  setDraft(draft: boolean): Promise<void>
   getCursor(): DraftCursor | null
   setCursor(cursor: DraftCursor | null): void
   getIssues(): readonly DocumentIssue[]

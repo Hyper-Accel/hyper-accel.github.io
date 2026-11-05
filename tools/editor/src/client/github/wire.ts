@@ -11,6 +11,8 @@ export const repositoryResponse = z.object({
 export const userResponse = z.object({ login: z.string(), id: z.number().int().positive() })
 export const pullResponse = z.object({
   number: z.number().int().positive(),
+  title: z.string().optional(),
+  body: z.string().nullable().optional(),
   node_id: z.string(),
   head: z.object({
     ref: z.string(),

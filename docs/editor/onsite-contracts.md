@@ -61,6 +61,12 @@ Consumers import the specific module; H owns changes to these contracts and pack
 
 ### Range anchors and GitHub behavior
 
+`ReviewThread.anchor: null` identifies a general comment on the entire post.
+General comments use PR issue comments with the same versioned metadata, replies,
+and resolution events as out-of-diff range comments. They have no text highlight
+and do not become outdated when the post changes. Existing range anchors retain
+their required block IDs, quote, and offsets.
+
 Offsets are zero-based UTF-16 offsets into the rendered block's `textContent`.
 `startOffset` is inclusive in the first block and `endOffset` exclusive in the last.
 `quotedText` joins selected portions of successive blocks with `\n`; R and E must
@@ -82,6 +88,11 @@ become outdated rather than attaching to unrelated text. Approval must apply to 
 current head. Ready/publish gates also require complete translations. Squash merge
 passes the expected SHA. A network error with `outcomeUnknown: true` requires read-back
 reconciliation before retry; this avoids duplicate commits, PRs, or comments.
+
+Requesting review validates a candidate with both languages' Hugo `draft: false`,
+then saves that visibility setting before marking the PR ready. Validation failure
+leaves visibility unchanged; save failure leaves the PR in draft. Ordinary saves
+preserve the chosen visibility. Review readiness does not merge or publish the post.
 
 `Renderer` emits no credentials. Review runs in a same-page `srcdoc` iframe with
 `sandbox="allow-scripts"` and without `allow-same-origin`. The parent validates the

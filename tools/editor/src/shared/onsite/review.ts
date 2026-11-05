@@ -38,7 +38,7 @@ export const reviewThreadSchema = z.object({
   pullNumber: z.number().int().positive(),
   storage: z.enum(["review", "issue"]),
   rootCommentId: z.number().int().positive(),
-  anchor: rangeAnchorSchema,
+  anchor: rangeAnchorSchema.nullable(),
   commitSha: gitShaSchema,
   resolved: z.boolean(),
   outdated: z.boolean(),

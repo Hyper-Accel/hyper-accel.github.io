@@ -7,11 +7,13 @@ import { EditorState } from "@tiptap/pm/state"
 import StarterKit from "@tiptap/starter-kit"
 import { BLOCK_ID_PATTERN } from "../../shared/onsite/blocks"
 import { createHugoShortcode } from "../shortcode"
+import { ArticleHeading } from "./heading"
 import { createBlockExtensions } from "./index"
 import { createRawTrackingPlugin } from "./raw-tracking"
 
 const extensions = [
-  StarterKit.configure({ link: false, undoRedo: false }),
+  StarterKit.configure({ link: false, undoRedo: false, heading: false }),
+  ArticleHeading,
   ...createBlockExtensions(),
 ]
 const manager = new MarkdownManager({
@@ -65,7 +67,7 @@ describe("fixture round trip", () => {
       const blocks = splitBlocks(await fixtureBody("math-and-legacy", file)).filter(
         (block) => !INLINE_REF.test(block),
       )
-      expect(blocks.length).toBe(5)
+      expect(blocks.length).toBe(6)
       expect(roundTrip(blocks.join("\n\n"))).toBe(blocks.join("\n\n"))
     })
   }

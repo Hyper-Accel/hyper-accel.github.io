@@ -1,9 +1,9 @@
 /**
  * Who may edit a post in the editor: its authors (by the GitHub handle in their profile) and
- * the GitHub logins listed under `editors:`. Posts whose authors have no handle on file stay
- * open, since nobody could be recognised as their author.
+ * the GitHub logins listed under `editors:`. Unlinked authors must be fixed in the repository
+ * before anyone may edit their post.
  */
-export type EditAccess = "author" | "editor" | "read-only"
+export type EditAccess = "author" | "editor" | "read-only" | "unlinked-author"
 
 export function editAccess(input: {
   readonly authors: readonly string[]
@@ -16,7 +16,8 @@ export function editAccess(input: {
   const authorHandles = input.authors.flatMap(
     (name) => input.handles.get(name)?.toLowerCase() ?? [],
   )
-  if (authorHandles.length === 0 || authorHandles.includes(login)) return "author"
+  if (authorHandles.length === 0) return "unlinked-author"
+  if (authorHandles.includes(login)) return "author"
   const editors = (Array.isArray(input.editors) ? input.editors : [])
     .filter((value): value is string => typeof value === "string")
     .map((value) => value.replace(/^@/, "").toLowerCase())

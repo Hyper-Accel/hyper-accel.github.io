@@ -30,3 +30,6 @@ Read the [related post]({{< ref "/posts/image-layouts" >}}).
 {{< rawhtml >}}
 <table><tr><th>Item</th><td>Value</td></tr></table>
 {{< /rawhtml >}}
+
+<!-- b:math-and-legacy-7 -->
+## First **heading** {#part1}

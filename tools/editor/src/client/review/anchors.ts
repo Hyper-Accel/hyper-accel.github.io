@@ -132,6 +132,7 @@ export function relocateQuote(anchor: RangeAnchor, texts: BlockTexts): Selection
 
 export function placeThread(thread: ReviewThread, context: AnchorContext): ThreadPlacement {
   const anchor = thread.anchor
+  if (!anchor) return { thread, status: "outdated", range: null }
   if (anchor.snapshotHash === context.snapshotHash) {
     const quoted = quoteSelection(anchor, context.blockTexts)
     if (quoted === anchor.quotedText) {
@@ -159,7 +160,7 @@ export function placeThreads(
 ): readonly ThreadPlacement[] {
   const order = new Map(context.sourceMap.map((entry, index) => [entry.blockId, index]))
   const placements = threads
-    .filter((thread) => anchorLanguage(thread.anchor) === language)
+    .filter((thread) => thread.anchor !== null && anchorLanguage(thread.anchor) === language)
     .map((thread) => placeThread(thread, context))
   const position = (placement: ThreadPlacement): readonly [number, number] => {
     const firstBlock = placement.range?.blockIds[0]

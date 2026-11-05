@@ -49,6 +49,30 @@ export const pullStateSchema = z.object({
   merged: z.boolean(),
 })
 export type PullState = z.infer<typeof pullStateSchema>
+export interface CheckAnnotation {
+  readonly path: string
+  readonly line: number
+  readonly level: "notice" | "warning" | "failure"
+  readonly message: string
+}
+export interface CommitCheck {
+  readonly id: string
+  readonly name: string
+  readonly state:
+    | "queued"
+    | "running"
+    | "success"
+    | "failure"
+    | "cancelled"
+    | "neutral"
+    | "skipped"
+    | "unknown"
+  readonly title: string
+  readonly summary: string
+  readonly text: string
+  readonly detailsUrl: string | null
+  readonly annotations: readonly CheckAnnotation[]
+}
 // An adapter instance is scoped to one owner/repository. Branch is post/<slug>.
 // Every mutation must reconcile ambiguous network outcomes before any retry.
 export interface GitHubAdapter {
@@ -56,6 +80,7 @@ export interface GitHubAdapter {
   listDrafts(): Promise<GitHubResult<readonly DraftPullRequest[]>>
   // Optional for existing injected adapters; production B implements this.
   getPullState?(pullNumber: number): Promise<GitHubResult<PullState>>
+  getCommitChecks(headSha: string): Promise<GitHubResult<readonly CommitCheck[]>>
   loadBundle(slug: string): Promise<GitHubResult<PostBundle>>
   ensureDraftPR(
     slug: string,
@@ -71,7 +96,7 @@ export interface GitHubAdapter {
   addRangeComment(
     pullNumber: number,
     expectedHeadSha: string,
-    anchor: RangeAnchor,
+    anchor: RangeAnchor | null,
     body: string,
   ): Promise<GitHubResult<ReviewThread>>
   replyComment(thread: ReviewThread, body: string): Promise<GitHubResult<ReviewComment>>

@@ -96,5 +96,32 @@ export async function createArticle(page: Page, shot: Shot): Promise<ComposerFix
   })
   await shot("05-complete")
 
+  const visibility = await page.evaluate(async () => {
+    await window.__composer.setDraft(true)
+    const digest = crypto.subtle.digest.bind(crypto.subtle)
+    let release: (() => void) | undefined
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let blockNext = true
+    crypto.subtle.digest = (algorithm, data) => {
+      const result = digest(algorithm, data)
+      if (!blockNext) return result
+      blockNext = false
+      return gate.then(() => result)
+    }
+    try {
+      const previousSave = window.__composer.setDraft(true)
+      const prepareReview = window.__composer.setDraft(false)
+      release?.()
+      await Promise.all([previousSave, prepareReview])
+      const current = window.__composer.getBundle()
+      return { ko: current?.ko.frontMatter.draft, en: current?.en.frontMatter.draft }
+    } finally {
+      crypto.subtle.digest = digest
+    }
+  })
+  assert.deepEqual(visibility, { ko: false, en: false })
+
   return { firstId, composer, koCell, enCell, review }
 }
