@@ -3,6 +3,15 @@ import { draftStatus, relativeUpdatedTime } from "./drafts"
 import { prepareSiteImages } from "./renderer"
 import { editAddress, NEW_PATH } from "./routes"
 
+/**
+ * Posts kept out of the blog's lists (`build: { list: never }`, like the editor's example post)
+ * stay out of 작성 중인 글 too, whether a copy is on this device or in a pull request.
+ */
+export function listedPost(frontMatter: Readonly<Record<string, unknown>>): boolean {
+  const build = frontMatter["build"]
+  return !(build && typeof build === "object" && "list" in build && build.list === "never")
+}
+
 type CardStatus = "local" | "draft" | "review" | "approved"
 const STATUS_LABEL: Record<CardStatus, string> = {
   local: "이 기기에만",
@@ -129,6 +138,7 @@ export async function mountHomeDrafts(root: HTMLElement, services: SiteServices)
     userId: session.userId,
   })
   for (const snapshot of snapshots) {
+    if (!listedPost(snapshot.bundle.ko.frontMatter)) continue
     const matter = snapshot.bundle[english ? "en" : "ko"].frontMatter
     place(
       snapshot.key.slug,
@@ -172,6 +182,11 @@ export async function mountHomeDrafts(root: HTMLElement, services: SiteServices)
       const pullState = await services.github.getPullState?.(draft.number)
       if (!loaded.ok) return
       const bundle = loaded.value
+      if (!listedPost(bundle.ko.frontMatter)) {
+        cards.get(draft.slug)?.remove()
+        cards.delete(draft.slug)
+        return
+      }
       const matter = bundle[english ? "en" : "ko"].frontMatter
       const coverField: unknown = bundle.ko.frontMatter["cover"]
       const coverPath =

@@ -22,6 +22,8 @@ export async function startSiteHarness(
     readonly output?: string
     /** The author profile the fake signed-in account (user ID 1) plays, as in the local demo. */
     readonly writer?: string
+    /** More of the repository's posts on the fake main branch, so they open in the editor. */
+    readonly posts?: readonly string[]
   } = {},
 ): Promise<SiteHarness> {
   const github = startFakeGitHub()
@@ -45,12 +47,14 @@ export async function startSiteHarness(
     })
   })
   const output = options.output ?? resolve(import.meta.dir, "../../dist-site")
-  const repairSource = resolve(import.meta.dir, "../../../../content/posts/crafting-compilers")
   const repairFiles: Record<string, Uint8Array> = {}
-  for await (const path of new Bun.Glob("**/*").scan({ cwd: repairSource, onlyFiles: true })) {
-    repairFiles[`content/posts/crafting-compilers/${path}`] = new Uint8Array(
-      await Bun.file(resolve(repairSource, path)).arrayBuffer(),
-    )
+  for (const slug of ["crafting-compilers", ...(options.posts ?? [])]) {
+    const source = resolve(import.meta.dir, "../../../../content/posts", slug)
+    for await (const path of new Bun.Glob("**/*").scan({ cwd: source, onlyFiles: true })) {
+      repairFiles[`content/posts/${slug}/${path}`] = new Uint8Array(
+        await Bun.file(resolve(source, path)).arrayBuffer(),
+      )
+    }
   }
   github.seed("main", repairFiles)
   const base = github.state.refs.get("heads/main")

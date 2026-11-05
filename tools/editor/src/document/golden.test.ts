@@ -102,9 +102,10 @@ describe("golden round trip of every post file", () => {
         ? ""
         : `\n${blocks.map((block) => `${markerLine(block.id)}\n${block.markdown}`).join("\n\n")}\n`)
     expect(output).toBe(expected)
-    expect(canonical(output.replace(/^<!-- b:[A-Za-z0-9][A-Za-z0-9_-]* -->\n/gm, ""))).toBe(
-      canonical(source),
-    )
+    // Markers aside, the text is the same; a post the editor wrote (marked input) has them too.
+    const unmarked = (text: string): string =>
+      text.replace(/^<!-- b:[A-Za-z0-9][A-Za-z0-9_-]* -->[ \t]*\n/gm, "")
+    expect(canonical(unmarked(output))).toBe(canonical(unmarked(source)))
   })
 })
 
