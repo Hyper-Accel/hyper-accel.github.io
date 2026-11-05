@@ -6,9 +6,11 @@ import type { DraftCursor } from "../../shared/onsite/drafts"
 import type { DraftPullRequest } from "../../shared/onsite/github"
 import { createBlockExtensions } from "../blocks"
 import { type ComposerHandle, mountComposer as mountLaneComposer } from "../composer"
+import { h } from "../composer/dom"
 import type { BlockExtensionContext } from "../composer/types"
 import { createDraftAutosave, type DraftAutosave, mountDrafts } from "../drafts"
 import { editAccess } from "./access"
+import { SiteChecks } from "./ci-status"
 import { SiteComments } from "./comments"
 import type { SiteMount } from "./contracts"
 import { observeEditorOcclusion } from "./editor-occlusion"
@@ -69,15 +71,12 @@ export const mountComposer: SiteMount = async (root, deps) => {
   )
   const [people, taxonomies] = await Promise.all([loadPeople(), loadTaxonomies()])
   // Editing is limited to the post's authors and the GitHub logins they list under `editors:`.
-  // Posts whose authors have no GitHub handle on file stay open to every writer.
-  const handles = new Map<string, string>([
-    ...people.map((person): [string, string] => [person.name, person.handle]),
-    ...newAuthors.list().map((profile): [string, string] => [profile.name, profile.github]),
-  ])
+  // Existing posts use repository profiles, never local author registrations.
+  const handles = new Map(people.map((person) => [person.name, person.handle]))
   let readOnly: string | undefined
   let lockEditors = false
-  if (deps.bundle) {
-    const front = deps.bundle.ko.frontMatter
+  if (initial) {
+    const front = initial.ko.frontMatter
     const access = editAccess({
       authors: front.authors,
       editors: front["editors"],
@@ -87,6 +86,27 @@ export const mountComposer: SiteMount = async (root, deps) => {
     lockEditors = access === "editor"
     // Not an author or editor: the same editor, read-only, to comment and approve.
     if (access === "read-only") readOnly = "읽기 전용"
+    if (access === "unlinked-author") {
+      readOnly = "읽기 전용"
+      root.insertBefore(
+        h(
+          "p",
+          { role: "status", "data-author-access": "unlinked" },
+          "작성자의 GitHub 계정이 연결되지 않아 편집할 수 없습니다. ",
+          h(
+            "a",
+            {
+              href: `https://github.com/${encodeURIComponent(session.repository.owner)}/${encodeURIComponent(session.repository.name)}/tree/main/content/authors`,
+              target: "_blank",
+              rel: "noopener noreferrer",
+            },
+            "저장소의 작성자 프로필",
+          ),
+          "에서 글의 authors 이름과 같은 폴더의 _index.md에 github 계정 URL을 추가한 뒤, 사이트 반영 후 다시 접속해 주세요.",
+        ),
+        host,
+      )
+    }
   }
   if (reviewerOnly) readOnly = "읽기 전용"
   if (readOnly) saveButton.hidden = true
@@ -223,6 +243,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     showSavedState()
   }
   const persistRepair = async (): Promise<void> => {
+    if (readOnly) return
     const unpaired = composer?.getUnpaired()
     if (!unpaired) return
     repairSequence += 1
@@ -255,6 +276,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   }
   let saving: Promise<DraftPullRequest> | null = null
   const saveRemote = (purpose?: "review"): Promise<DraftPullRequest> => {
+    if (readOnly) return Promise.reject(new Error("읽기 전용 글은 저장할 수 없습니다."))
     if (saving) return purpose === "review" ? saving.then(() => saveRemote("review")) : saving
     remoteSaving = true
     remoteError = null
@@ -330,6 +352,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
         showSavedState()
         void flow?.refresh()
         void comments.refresh().catch(error)
+        void checks.refresh()
         return { ...pr.value, headSha: remoteHead }
       } finally {
         remoteSaving = false
@@ -345,6 +368,13 @@ export const mountComposer: SiteMount = async (root, deps) => {
     people: loadPeople,
     bundle: () => composer?.getBundle() ?? latest,
     ensureSaved: async () => {
+      if (readOnly) {
+        const pulls = await deps.github.listDrafts()
+        if (!pulls.ok) throw new Error(pulls.error.message)
+        const pr = pulls.value.find((pull) => pull.slug === initial?.slug)
+        if (!pr) throw new Error("댓글을 남길 리뷰 요청을 찾지 못했습니다.")
+        return { number: pr.number, headSha: pr.headSha }
+      }
       const pr = await saveRemote()
       return { number: pr.number, headSha: pr.headSha }
     },
@@ -357,6 +387,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
       return pr ? { number: pr.number, headSha: remoteHead ?? pr.headSha } : null
     },
   })
+  const checks = new SiteChecks({ github: deps.github, head: () => remoteHead })
   const registry = new EditorRegistry()
   let blockContext: BlockExtensionContext | null = null
   const panels: SidePanel[] = []
@@ -457,6 +488,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     help ??= mountHelp(readOnly ? "reviewer" : "author", root)
     if (help.parentElement !== dock) dock.prepend(help)
     if (comments.countButton.parentElement !== dock) help.after(comments.countButton)
+    if (checks.button.parentElement !== dock) comments.countButton.after(checks.button)
   }
   // The site header's language pill switches the editing language, like reading /en/.
   const wrapper = host.querySelector<HTMLElement>(".composer")
@@ -555,6 +587,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     document.documentElement.style.removeProperty("--composer-toolbox-height")
     document.body.style.removeProperty("--reading-offset")
     comments.dispose()
+    checks.dispose()
     toolbox.dispose()
     for (const panel of panels) panel.dispose()
     recovery?.dispose()

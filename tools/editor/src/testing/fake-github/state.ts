@@ -69,6 +69,33 @@ export interface FakeReview {
   readonly state: "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED"
   readonly body: string
 }
+export interface FakeCheckRun {
+  readonly id: number
+  readonly name: string
+  readonly status: string
+  readonly conclusion: string | null
+  readonly html_url: string | null
+  readonly details_url: string | null
+  readonly output: {
+    readonly title: string | null
+    readonly summary: string | null
+    readonly text: string | null
+    readonly annotations_count: number
+  }
+}
+export interface FakeCommitStatus {
+  readonly id: number
+  readonly context: string
+  readonly state: "error" | "failure" | "pending" | "success"
+  readonly description: string | null
+  readonly target_url: string | null
+}
+export interface FakeCheckAnnotation {
+  readonly path: string
+  readonly start_line: number
+  readonly annotation_level: "notice" | "warning" | "failure"
+  readonly message: string
+}
 export interface FakeFailure {
   readonly method: string
   readonly path: string
@@ -84,6 +111,9 @@ export interface FakeGitHubState {
   readonly comments: Map<number, FakeComment>
   readonly threads: Map<string, FakeThread>
   readonly reviews: Map<number, FakeReview>
+  readonly checkRuns: Map<string, readonly FakeCheckRun[]>
+  readonly commitStatuses: Map<string, readonly FakeCommitStatus[]>
+  readonly checkAnnotations: Map<number, readonly FakeCheckAnnotation[]>
   readonly tokens: Map<string, FakeIdentity>
   readonly failures: FakeFailure[]
 }
@@ -106,6 +136,9 @@ export function createState(): FakeGitHubState {
     comments: new Map(),
     threads: new Map(),
     reviews: new Map(),
+    checkRuns: new Map(),
+    commitStatuses: new Map(),
+    checkAnnotations: new Map(),
     tokens: new Map(),
     failures: [],
   }

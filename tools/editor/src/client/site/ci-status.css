@@ -1,0 +1,63 @@
+.composer-comment-popover.site-ci-panel {
+  width: min(520px, calc(100vw - 16px));
+}
+
+.site-ci-content {
+  min-width: 0;
+}
+
+.site-ci-content details {
+  padding-block: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-ci-content summary {
+  display: flex;
+  gap: 12px;
+  min-height: 36px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.site-ci-content summary > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.site-ci-content a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.site-ci-state {
+  flex: 0 0 60px;
+  color: var(--secondary);
+}
+
+.site-ci-state[data-state="failure"],
+.site-ci-state[data-state="cancelled"],
+.composer-ci[data-state="failure"] {
+  color: #ff9696;
+}
+
+.site-ci-message {
+  margin-block: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.site-ci-version {
+  color: var(--secondary);
+  margin-block: 4px 8px;
+}
+
+.site-ci-annotation {
+  margin-block: 10px;
+}
+
+.site-ci-annotation code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

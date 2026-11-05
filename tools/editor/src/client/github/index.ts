@@ -12,6 +12,7 @@ import {
   slugSchema,
 } from "../../shared/onsite/document"
 import {
+  type CommitCheck,
   type CommitReceipt,
   type DraftPullRequest,
   draftPullRequestSchema,
@@ -20,6 +21,7 @@ import {
   type PullState,
 } from "../../shared/onsite/github"
 import type { RangeAnchor, ReviewComment, ReviewThread } from "../../shared/onsite/review"
+import { readCommitChecks } from "./checks"
 import {
   conflict,
   GitHubFailure,
@@ -133,6 +135,10 @@ export class FetchGitHubAdapter implements GitHubAdapter {
 
   listDrafts(): Promise<GitHubResult<readonly DraftPullRequest[]>> {
     return result(async () => (await this.openPulls()).map(draft))
+  }
+
+  getCommitChecks(headSha: string): Promise<GitHubResult<readonly CommitCheck[]>> {
+    return result(() => readCommitChecks(this.http, headSha))
   }
 
   getPullState(pullNumber: number): Promise<GitHubResult<PullState>> {

@@ -410,6 +410,23 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
       if (!file || !blob) throw new HttpFailure(404, "File not found")
       return json({ ...blob, path: filePath, name: filePath.split("/").at(-1), type: "file" })
     }
+    const checksPath = /^\/commits\/([a-f0-9]{40})\/(check-runs|statuses)$/.exec(path)
+    if (checksPath && method === "GET") {
+      const sha = checksPath[1] ?? ""
+      if (!state.commits.has(sha)) throw new HttpFailure(404, "Commit not found")
+      return json(
+        checksPath[2] === "check-runs"
+          ? {
+              total_count: state.checkRuns.get(sha)?.length ?? 0,
+              check_runs: paginate(state.checkRuns.get(sha) ?? [], url),
+            }
+          : paginate(state.commitStatuses.get(sha) ?? [], url),
+      )
+    }
+    const annotationsPath = /^\/check-runs\/(\d+)\/annotations$/.exec(path)
+    if (annotationsPath && method === "GET") {
+      return json(paginate(state.checkAnnotations.get(Number(annotationsPath[1])) ?? [], url))
+    }
     if (path === "/pulls" && method === "GET") {
       const requestedState = url.searchParams.get("state") ?? "open"
       const requestedHead = url.searchParams.get("head")?.split(":").at(-1)

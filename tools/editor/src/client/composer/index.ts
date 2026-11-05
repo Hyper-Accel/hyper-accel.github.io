@@ -470,6 +470,12 @@ export function mountComposer(root: HTMLElement, deps: ComposerDeps): ComposerHa
     saveState.textContent = "짝 맞춤이 끝나면 자동 보관이 시작됩니다."
     setLanguage("ko")
     refresh(initial)
+    if (deps.readOnly) {
+      wrapper.dataset["readonly"] = "true"
+      saveState.textContent = deps.readOnly
+      finish.disabled = true
+      for (const button of view.element.querySelectorAll("button")) button.disabled = true
+    }
   }
 
   function renderEditor(initial: PostBundle, cursor: DraftCursor | null): void {

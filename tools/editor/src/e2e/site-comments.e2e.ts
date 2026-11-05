@@ -117,7 +117,7 @@ try {
           { steps: 10 },
         )
         await page.mouse.up()
-        assert.equal(await page.locator(".composer-comment-popover").isVisible(), false)
+        assert.equal(await page.locator(".composer-comment-popover:visible").count(), 0)
         assert.equal(await page.evaluate(() => !!getSelection()?.toString().trim()), true)
         await page.keyboard.press("Escape")
         await nested.locator(".composer-comment-mark").first().click()

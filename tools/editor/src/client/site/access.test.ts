@@ -32,8 +32,17 @@ test("everyone else sees the post read-only", () => {
   ).toBe("read-only")
 })
 
-test("posts whose authors have no GitHub handle stay open", () => {
-  expect(editAccess({ authors: ["Fixture Author"], editors: [], handles, login: "anyone" })).toBe(
-    "author",
-  )
+test.each([{ editors: [] }, { editors: ["anyone"] }])(
+  "unlinked authors block editing even for listed editors %j",
+  ({ editors }) => {
+    expect(editAccess({ authors: ["Fixture Author"], editors, handles, login: "anyone" })).toBe(
+      "unlinked-author",
+    )
+  },
+)
+
+test("a matching handle on a different author's profile does not grant access", () => {
+  expect(
+    editAccess({ authors: ["Seungbin Shin"], editors: [], handles, login: "DongHyunnn" }),
+  ).toBe("read-only")
 })
