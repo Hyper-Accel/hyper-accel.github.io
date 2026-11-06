@@ -25,7 +25,7 @@ keywords: [
 ## 개요
 
 <!-- b:torch-compile-anatomy-3-2 -->
-안녕하세요. HyperAccel CL(Compute Library)팀 박현준입니다. [1편]({{< ref "/posts/torch-compile-anatomy" >}})에서는 `torch.compile()` 이 어떻게 동작하는지, [2편]({{< ref "/posts/torch-compile-anatomy-2" >}})에서는 왜 세 단계로 나뉘어 있고 누가 그 구조를 활용하는지 살펴봤습니다. 두 편은 이번 글을 위한 밑그림이었습니다. 이번에는 10월 20~21일 미국 산호세에서 열린 PyTorch Conference 2026에서 본 연구와 개발 동향을 정리해 보겠습니다.
+안녕하세요. HyperAccel CL(Compute Library)팀 박현준입니다. [1편](https://hyper-accel.github.io/posts/torch-compile-anatomy/)에서는 `torch.compile()` 이 어떻게 동작하는지, [2편](https://hyper-accel.github.io/posts/torch-compile-anatomy-2/)에서는 왜 세 단계로 나뉘어 있고 누가 그 구조를 활용하는지 살펴봤습니다. 두 편은 이번 글을 위한 밑그림이었습니다. 이번에는 10월 20~21일 미국 산호세에서 열린 PyTorch Conference 2026에서 본 연구와 개발 동향을 정리해 보겠습니다.
 
 <!-- b:torch-compile-anatomy-3-3 -->
 컨퍼런스를 다녀온 뒤 에이전트에게 주요 연구 동향을 물어보니 학습, 추론, PyTorch 핵심 모듈, 커널 최적화 등을 꼽았습니다. 저는 이 가운데 추론과 컴파일러, 가속기 세션을 주로 들었습니다. 따라서 이 글은 컨퍼런스 전체의 요약이 아니라, **제가 고른 세션에서 본 흐름을 제 관점으로 해석한 글** 입니다. 직접 듣지 못한 세션은 공개된 소개를 바탕으로 정리하고, 본문에 따로 표시했습니다.
@@ -207,7 +207,7 @@ Spyre도 앞서 설명한 CRCR를 활용합니다. 흥미로운 점은 테스트
 **컨퍼런스 공식 자료**
 
 <!-- b:torch-compile-anatomy-3-64 -->
-- [PyTorch Conference North America 2026 리캡](https://www.pytorch.org/blog/pytorch-conference-north-america-2026-accelerating-open-intelligence-together)
+- [PyTorch Conference North America 2026 리캡](https://pytorch.org/blog/pytorch-conference-north-america-2026-accelerating-open-intelligence-together/)
 - [Core PyTorch Sessions](https://pytorch.org/blog/core-pytorch-sessions-at-pytorch-conference-north-america-2026/)
 - [vLLM Sessions](https://pytorch.org/blog/vllm-sessions-at-pytorch-conference-north-america-2026/)
 - [Agentic AI and Next-Gen Intelligence Sessions](https://pytorch.org/blog/agentic-ai-and-next-gen-intelligence-sessions-at-pytorch-conference-north-america-2026/)

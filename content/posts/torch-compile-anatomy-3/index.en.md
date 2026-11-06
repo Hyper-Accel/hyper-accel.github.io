@@ -25,7 +25,7 @@ keywords: [
 ## Overview
 
 <!-- b:torch-compile-anatomy-3-2 -->
-Hello, this is Hyunjun Park from the CL (Compute Library) team at HyperAccel. In [Part 1]({{< ref "/posts/torch-compile-anatomy" >}}), we looked at how `torch.compile()` works. In [Part 2]({{< ref "/posts/torch-compile-anatomy-2" >}}), we explored why it is split into three stages and who makes use of that structure. Those two posts laid the groundwork for this one. Here, I will share the research and development trends I saw at PyTorch Conference 2026, held October 20–21 in San Jose.
+Hello, this is Hyunjun Park from the CL (Compute Library) team at HyperAccel. In [Part 1](https://hyper-accel.github.io/en/posts/torch-compile-anatomy/), we looked at how `torch.compile()` works. In [Part 2](https://hyper-accel.github.io/en/posts/torch-compile-anatomy-2/), we explored why it is split into three stages and who makes use of that structure. Those two posts laid the groundwork for this one. Here, I will share the research and development trends I saw at PyTorch Conference 2026, held October 20–21 in San Jose.
 
 <!-- b:torch-compile-anatomy-3-3 -->
 After the conference, I asked an agent about its main research themes. It named training, inference, PyTorch core modules, and kernel optimization. I mainly attended inference, compiler, and accelerator sessions. This post is therefore **my interpretation of the trends in the sessions I chose**, rather than a summary of the entire conference. Where I did not attend a session, I use its public description and mark that explicitly.
@@ -207,7 +207,7 @@ Second, hardware-specific code should have clear boundaries with shared code. As
 **Official conference material**
 
 <!-- b:torch-compile-anatomy-3-64 -->
-- [PyTorch Conference North America 2026 recap](https://www.pytorch.org/blog/pytorch-conference-north-america-2026-accelerating-open-intelligence-together)
+- [PyTorch Conference North America 2026 recap](https://pytorch.org/blog/pytorch-conference-north-america-2026-accelerating-open-intelligence-together/)
 - [Core PyTorch Sessions](https://pytorch.org/blog/core-pytorch-sessions-at-pytorch-conference-north-america-2026/)
 - [vLLM Sessions](https://pytorch.org/blog/vllm-sessions-at-pytorch-conference-north-america-2026/)
 - [Agentic AI and Next-Gen Intelligence Sessions](https://pytorch.org/blog/agentic-ai-and-next-gen-intelligence-sessions-at-pytorch-conference-north-america-2026/)
