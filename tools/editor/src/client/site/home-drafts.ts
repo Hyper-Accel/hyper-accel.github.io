@@ -1,16 +1,8 @@
 import type { SiteDraft, SiteServices } from "./contracts"
 import { draftStatus, relativeUpdatedTime } from "./drafts"
+import { listedPost } from "./listed"
 import { prepareSiteImages } from "./renderer"
 import { editAddress, NEW_PATH } from "./routes"
-
-/**
- * Posts kept out of the blog's lists (`build: { list: never }`, like the editor's example post)
- * stay out of 작성 중인 글 too, whether a copy is on this device or in a pull request.
- */
-export function listedPost(frontMatter: Readonly<Record<string, unknown>>): boolean {
-  const build = frontMatter["build"]
-  return !(build && typeof build === "object" && "list" in build && build.list === "never")
-}
 
 type CardStatus = "local" | "draft" | "review" | "approved"
 const STATUS_LABEL: Record<CardStatus, string> = {

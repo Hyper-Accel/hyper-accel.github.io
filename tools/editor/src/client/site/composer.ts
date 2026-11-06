@@ -1,3 +1,4 @@
+import type { Editor } from "@tiptap/core"
 import { Extension } from "@tiptap/core"
 import { z } from "zod"
 import { computeSnapshotHash } from "../../document/codec"
@@ -15,6 +16,7 @@ import { SiteComments } from "./comments"
 import type { SiteMount } from "./contracts"
 import { observeEditorOcclusion } from "./editor-occlusion"
 import { mountHelp } from "./intro"
+import { listedPost } from "./listed"
 import type { Person } from "./mentions"
 import { NewAuthors, ProfileEdits } from "./new-authors"
 import { ImageLibrary, MobilePreview, type SidePanel } from "./panels"
@@ -179,6 +181,24 @@ export const mountComposer: SiteMount = async (root, deps) => {
   }
   if (reviewerOnly) readOnly = "읽기 전용"
   if (readOnly) saveButton.hidden = true
+  // The editor's example post (kept out of the blog's lists) can be tried out but is never saved:
+  // no draft on this device, no GitHub save, review or comments.
+  const showcase = deps.bundle !== null && !readOnly && !listedPost(deps.bundle.ko.frontMatter)
+  if (showcase) {
+    saveButton.hidden = true
+    const notice = h(
+      "div",
+      { class: "site-access-toast", role: "status", "data-showcase": "" },
+      h("p", {}, "예시 글은 고쳐도 저장되지 않습니다."),
+      h(
+        "button",
+        { type: "button", "aria-label": "안내 닫기", onclick: () => notice.remove() },
+        "✕",
+      ),
+    )
+    accessNotice = notice
+    document.body.append(notice)
+  }
   let composer: ComposerHandle | undefined
   let flow: ReviewFlow | undefined
   let autosave: DraftAutosave | undefined
@@ -271,6 +291,10 @@ export const mountComposer: SiteMount = async (root, deps) => {
   const persist = async (bundle: PostBundle, cursor: DraftCursor | null): Promise<void> => {
     // A read-only post keeps no draft and offers no save.
     if (readOnly) return
+    if (showcase) {
+      latest = { ...bundle, headSha: remoteHead, snapshotHash: await computeSnapshotHash(bundle) }
+      return
+    }
     saveButton.hidden = false
     const current = ++revision
     touched = true
@@ -316,7 +340,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     showSavedState()
   }
   const persistRepair = async (): Promise<void> => {
-    if (readOnly) return
+    if (readOnly || showcase) return
     const unpaired = composer?.getUnpaired()
     if (!unpaired) return
     repairSequence += 1
@@ -350,6 +374,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   let saving: Promise<DraftPullRequest> | null = null
   const saveRemote = (purpose?: "review"): Promise<DraftPullRequest> => {
     if (readOnly) return Promise.reject(new Error("읽기 전용 글은 저장할 수 없습니다."))
+    if (showcase) return Promise.reject(new Error("예시 글은 저장되지 않습니다."))
     if (saving) return purpose === "review" ? saving.then(() => saveRemote("review")) : saving
     remoteSaving = true
     remoteError = null
@@ -545,7 +570,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     },
     ...(readOnly ? { readOnly } : {}),
     ...(lockEditors ? { lockEditors } : {}),
-    onComment: (editor) => comments.start(editor),
+    ...(showcase ? {} : { onComment: (editor: Editor) => comments.start(editor) }),
     blockExtensions: (context) => {
       blockContext = context
       return [
@@ -565,11 +590,12 @@ export const mountComposer: SiteMount = async (root, deps) => {
       return persist(composer?.getBundle() ?? change.bundle, change.cursor)
     },
   })
-  if (deps.bundle) ensureAutosave(deps.bundle)
-  if (deps.bundle?.headSha) void comments.refresh().catch(error)
+  if (deps.bundle && !showcase) ensureAutosave(deps.bundle)
+  if (deps.bundle?.headSha && !showcase) void comments.refresh().catch(error)
   // Review lives in the editor's dock: request review / publish for the post's authors, 승인 for
   // anyone else (beside the read-only notice).
-  if (deps.bundle) {
+  if (showcase) host.querySelector('button[data-action="request-review"]')?.remove()
+  else if (deps.bundle) {
     flow = new ReviewFlow({
       role: readOnly ? "reviewer" : "author",
       github: deps.github,
@@ -592,6 +618,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     if (!dock) return
     help ??= mountHelp(readOnly ? "reviewer" : "author", root)
     if (help.parentElement !== dock) dock.prepend(help)
+    if (showcase) return
     if (comments.countButton.parentElement !== dock) help.after(comments.countButton)
     if (checks.button.parentElement !== dock) comments.countButton.after(checks.button)
   }
