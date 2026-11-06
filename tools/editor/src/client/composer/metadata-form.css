@@ -76,6 +76,7 @@
 }
 
 .composer-form .metadata-field > input,
+.composer-form .author-profile__image > input,
 .composer-form .metadata-choices__query {
   width: 100%;
   min-height: var(--editor-touch-target);
@@ -91,6 +92,7 @@
 }
 
 .composer-form .metadata-field > input::placeholder,
+.composer-form .author-profile__image > input::placeholder,
 .composer-form .metadata-choices__query::placeholder {
   color: var(--secondary);
 }
@@ -382,6 +384,12 @@
 }
 
 /* Dropdown pickers: chosen values as chips, a search box, and the list as a dropdown. */
+/* A taller neighbour (the category chips) must not stretch the picker's rows: 내 프로필 추가 stays
+   right under the author box. */
+.composer-form .metadata-picker {
+  align-content: start;
+}
+
 .composer-form .metadata-picker__anchor {
   position: relative;
 }
@@ -429,6 +437,19 @@
   color: var(--secondary);
   font: inherit;
   cursor: pointer;
+}
+
+/* Touch: the × keeps its look; an invisible margin makes it 44px to tap. */
+@media (pointer: coarse) {
+  .composer-form .metadata-chip__remove {
+    position: relative;
+  }
+
+  .composer-form .metadata-chip__remove::after {
+    position: absolute;
+    inset: -8px;
+    content: "";
+  }
 }
 
 .composer-form .metadata-chip__remove:hover {
@@ -537,6 +558,45 @@
   padding: var(--editor-space-4, 24px);
 }
 
+/* 내 프로필: the name and GitHub account stay as they are, and look it. */
+.author-profile-dialog .metadata-field > input[readonly] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--secondary);
+}
+
+.author-profile-dialog .author-profile__image {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-profile-dialog .author-profile__image > input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.author-profile-dialog .author-profile__image > :is(input, button)[hidden] {
+  display: none;
+}
+
+.author-profile-dialog .author-profile__image > .composer-button {
+  flex: none;
+  min-height: var(--editor-touch-target);
+}
+
+.author-profile-dialog .author-profile__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.author-profile-dialog .author-profile__avatar[hidden] {
+  display: none;
+}
+
 .author-profile-dialog .author-profile__title {
   margin: 0;
   font-size: 20px;
@@ -555,6 +615,17 @@
   --editor-touch-target: 34px;
   --metadata-label-column: 7rem;
   font-size: 14px;
+}
+
+/* The compact sheet stays compact for a mouse; a finger still gets 44px controls. */
+@media (pointer: coarse) {
+  .composer-meta .composer-form {
+    --editor-touch-target: 44px;
+  }
+
+  .composer .composer-form .metadata-picker__self {
+    min-height: 44px;
+  }
 }
 
 .composer-meta .composer-form .metadata-group {
@@ -655,40 +726,6 @@
 .composer-form .metadata-picker--chips .metadata-choice:has(input:focus-visible) {
   outline: 2px solid var(--chip, var(--editor-accent, #009ee2));
   outline-offset: 2px;
-}
-
-/* 사이트에 숨김: a switch instead of a checkbox. */
-.composer-form .metadata-check input[name="draft"] {
-  appearance: none;
-  position: relative;
-  flex: none;
-  width: 34px;
-  height: 20px;
-  margin: 0;
-  border-radius: 999px;
-  background: var(--border);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.composer-form .metadata-check input[name="draft"]::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform 0.15s ease;
-}
-
-.composer-form .metadata-check input[name="draft"]:checked {
-  background: var(--editor-accent, #009ee2);
-}
-
-.composer-form .metadata-check input[name="draft"]:checked::after {
-  transform: translateX(14px);
 }
 
 /* The cover's alt text appears once there is a cover; until then the cover is a drop box. */

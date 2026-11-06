@@ -59,11 +59,27 @@ export const HighlightedCodeBlock = CodeBlock.extend({
         props: { decorations: (state) => key.getState(state) },
         view(view) {
           let destroyed = false
-          void import("./chroma-runtime").then((module) => {
-            tokenize = module.chromaTokens
-            if (!destroyed) view.dispatch(view.state.tr.setMeta(key, true))
-          })
+          let requested = false
+          // Chroma (a 1.9MB WebAssembly lexer) loads only once the post has a code block.
+          const load = (doc: Node): void => {
+            if (requested) return
+            let found = false
+            doc.descendants((node) => {
+              if (node.type.name === "codeBlock") found = true
+              return !found
+            })
+            if (!found) return
+            requested = true
+            void import("./chroma-runtime").then((module) => {
+              tokenize = module.chromaTokens
+              if (!destroyed) view.dispatch(view.state.tr.setMeta(key, true))
+            })
+          }
+          load(view.state.doc)
           return {
+            update: (next, previous) => {
+              if (next.state.doc !== previous.doc) load(next.state.doc)
+            },
             destroy: () => {
               destroyed = true
             },

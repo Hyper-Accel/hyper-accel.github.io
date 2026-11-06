@@ -67,6 +67,7 @@ test("registers a new author with both localized profiles and YAML-safe input", 
     bioKo: "소개\nadmin: true",
     bioEn: "Engineer: yes",
     github: "https://github.com/example",
+    githubId: 57936,
     image: "",
     linkedin: "",
   }
@@ -77,10 +78,12 @@ test("registers a new author with both localized profiles and YAML-safe input", 
     ["_index.en.md", profile.bioEn],
   ]) {
     const source = readFileSync(join(root, "content/authors", author, file ?? ""), "utf8")
+    // The onsite editor recognises the author by github_id, so the profile carries it.
     expect(parse(splitMarkdownDocument(source).frontmatter)).toEqual({
       title: author,
       bio,
       github: profile.github,
+      github_id: profile.githubId,
       image: "",
       linkedin: "",
     })

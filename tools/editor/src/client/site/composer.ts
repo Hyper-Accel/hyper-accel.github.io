@@ -1,22 +1,24 @@
+import type { Editor } from "@tiptap/core"
 import { Extension } from "@tiptap/core"
 import { z } from "zod"
 import { computeSnapshotHash } from "../../document/codec"
 import type { PostBundle } from "../../shared/onsite/document"
 import type { DraftCursor } from "../../shared/onsite/drafts"
-import type { DraftPullRequest } from "../../shared/onsite/github"
+import type { DraftPullRequest, GitHubUser } from "../../shared/onsite/github"
 import { createBlockExtensions } from "../blocks"
 import { type ComposerHandle, mountComposer as mountLaneComposer } from "../composer"
 import { h } from "../composer/dom"
 import type { BlockExtensionContext } from "../composer/types"
 import { createDraftAutosave, type DraftAutosave, mountDrafts } from "../drafts"
-import { editAccess } from "./access"
+import { editAccess, editorIds } from "./access"
 import { SiteChecks } from "./ci-status"
 import { SiteComments } from "./comments"
 import type { SiteMount } from "./contracts"
 import { observeEditorOcclusion } from "./editor-occlusion"
 import { mountHelp } from "./intro"
+import { listedPost } from "./listed"
 import type { Person } from "./mentions"
-import { NewAuthors } from "./new-authors"
+import { NewAuthors, ProfileEdits } from "./new-authors"
 import { ImageLibrary, MobilePreview, type SidePanel } from "./panels"
 import { prepareSiteImages } from "./renderer"
 import { ReviewFlow } from "./review-flow"
@@ -24,7 +26,19 @@ import { draftAddress, parseSiteRoute } from "./routes"
 import { EditorRegistry, SiteToolbox } from "./toolbox"
 
 const peopleSchema = z.array(
-  z.object({ name: z.string(), handle: z.string(), avatar: z.string().url().optional() }),
+  z.object({
+    name: z.string(),
+    handle: z.string(),
+    id: z.number().int().positive().optional(),
+    avatar: z.string().url().optional(),
+    profile: z
+      .object({
+        image: z.string(),
+        linkedin: z.string(),
+        bio: z.object({ ko: z.string(), en: z.string() }),
+      })
+      .optional(),
+  }),
 )
 
 async function loadPeople(): Promise<readonly Person[]> {
@@ -35,7 +49,9 @@ async function loadPeople(): Promise<readonly Person[]> {
     ? parsed.data.map((person) => ({
         name: person.name,
         handle: person.handle,
+        ...(person.id ? { id: person.id } : {}),
         ...(person.avatar ? { avatar: person.avatar } : {}),
+        ...(person.profile ? { profile: person.profile } : {}),
       }))
     : []
 }
@@ -64,35 +80,89 @@ export const mountComposer: SiteMount = async (root, deps) => {
     throw new Error("Composer host is missing")
   saveButton.hidden = deps.bundle === null
   const initial = deps.bundle ?? deps.unpaired
-  const initialImages = initial ? await prepareSiteImages(deps, initial) : null
+  // Started before the pictures are prepared, and read once for the whole editor.
+  const peopleLoad = loadPeople()
+  const taxonomiesLoad = loadTaxonomies()
+  const imagesLoad = initial ? prepareSiteImages(deps, initial) : Promise.resolve(null)
   const newAuthors = new NewAuthors(
     `onsite:new-authors:${session.repository.owner}/${session.repository.name}`,
     deps.authors,
   )
-  const [people, taxonomies] = await Promise.all([loadPeople(), loadTaxonomies()])
-  // Editing is limited to the post's authors and the GitHub logins they list under `editors:`.
+  // Editors are looked up alongside the profile lists, not after them: each lookup is a GitHub call,
+  // so none is made for what is already known (the signed-in account, a profile in people.json, a
+  // login just resolved).
+  const signedIn = { login: session.login, id: session.userId }
+  const resolved = new Map<number, GitHubUser>([[signedIn.id, signedIn]])
+  const editorsLoad = initial
+    ? editorIds(initial.ko.frontMatter["editors"], async (login) => {
+        if (login.toLowerCase() === signedIn.login.toLowerCase()) return signedIn.id
+        const user = await deps.github.getUser(login)
+        if (!user.ok || !user.value) return null
+        resolved.set(user.value.id, user.value)
+        return user.value.id
+      }).then(async (editors) => {
+        const profiled = new Set((await peopleLoad).map((person) => person.id))
+        return {
+          editors,
+          users: await Promise.all(
+            editors.map(async (id) => {
+              if (profiled.has(id)) return null
+              const known = resolved.get(id)
+              if (known) return known
+              const user = await deps.github.getUserById(id)
+              return user.ok ? user.value : null
+            }),
+          ),
+        }
+      })
+    : Promise.resolve({ editors: [], users: [] })
+  const [initialImages, people, taxonomies, editorLoad] = await Promise.all([
+    imagesLoad,
+    peopleLoad,
+    taxonomiesLoad,
+    editorsLoad,
+  ])
+  const profileEdits = new ProfileEdits(
+    `onsite:profile-edits:${session.repository.owner}/${session.repository.name}`,
+    new Map(people.flatMap((person) => (person.profile ? [[person.name, person.profile]] : []))),
+  )
+  // Editing is limited to the post's authors and the people they list under `editors:`.
   // Existing posts use repository profiles, never local author registrations.
-  const handles = new Map(people.map((person) => [person.name, person.handle]))
+  const ids = new Map(
+    people.flatMap((person): [string, number][] =>
+      person.id === undefined ? [] : [[person.name, person.id]],
+    ),
+  )
   let readOnly: string | undefined
   let lockEditors = false
-  if (initial) {
+  // Editors without an author profile, shown by their current login in the editor picker.
+  let users: GitHubUser[] = []
+  let accessNotice: HTMLElement | null = null
+  // The editor's example post (kept out of the blog's lists) is for trying the tools: anyone signed
+  // in edits it, whoever its authors are, and it is never saved (no draft on this device, no GitHub
+  // save, review or comments).
+  const showcase = deps.bundle !== null && !listedPost(deps.bundle.ko.frontMatter)
+  if (initial && !showcase) {
     const front = initial.ko.frontMatter
-    const access = editAccess({
-      authors: front.authors,
-      editors: front["editors"],
-      handles,
-      login: session.login,
-    })
+    const { editors } = editorLoad
+    const profiled = new Set(ids.values())
+    users = editorLoad.users.filter(
+      (user): user is GitHubUser => user !== null && !profiled.has(user.id),
+    )
+    const access = editAccess({ authors: front.authors, editors, ids, userId: session.userId })
     lockEditors = access === "editor"
     // Not an author or editor: the same editor, read-only, to comment and approve.
     if (access === "read-only") readOnly = "읽기 전용"
     if (access === "unlinked-author") {
       readOnly = "읽기 전용"
-      root.insertBefore(
+      // A small closable note in the corner, clear of the post.
+      const notice = h(
+        "div",
+        { class: "site-access-toast", role: "status", "data-author-access": "unlinked" },
         h(
           "p",
-          { role: "status", "data-author-access": "unlinked" },
-          "작성자의 GitHub 계정이 연결되지 않아 편집할 수 없습니다. ",
+          {},
+          "작성자 프로필에 github_id가 없어 편집할 수 없습니다. ",
           h(
             "a",
             {
@@ -100,16 +170,36 @@ export const mountComposer: SiteMount = async (root, deps) => {
               target: "_blank",
               rel: "noopener noreferrer",
             },
-            "저장소의 작성자 프로필",
+            "작성자 프로필",
           ),
-          "에서 글의 authors 이름과 같은 폴더의 _index.md에 github 계정 URL을 추가한 뒤, 사이트 반영 후 다시 접속해 주세요.",
         ),
-        host,
+        h(
+          "button",
+          { type: "button", "aria-label": "안내 닫기", onclick: () => notice.remove() },
+          "✕",
+        ),
       )
+      accessNotice = notice
+      document.body.append(notice)
     }
   }
-  if (reviewerOnly) readOnly = "읽기 전용"
+  if (reviewerOnly && !showcase) readOnly = "읽기 전용"
   if (readOnly) saveButton.hidden = true
+  if (showcase) {
+    saveButton.hidden = true
+    const notice = h(
+      "div",
+      { class: "site-access-toast", role: "status", "data-showcase": "" },
+      h("p", {}, "예시 글은 고쳐도 저장되지 않습니다."),
+      h(
+        "button",
+        { type: "button", "aria-label": "안내 닫기", onclick: () => notice.remove() },
+        "✕",
+      ),
+    )
+    accessNotice = notice
+    document.body.append(notice)
+  }
   let composer: ComposerHandle | undefined
   let flow: ReviewFlow | undefined
   let autosave: DraftAutosave | undefined
@@ -126,7 +216,11 @@ export const mountComposer: SiteMount = async (root, deps) => {
   let remoteError: string | null = null
   let recovery: { dispose(): void } | undefined
   const showSavedState = (): void => {
-    const remoteSaved = remoteSnapshotHash !== null && remoteSnapshotHash === latest?.snapshotHash
+    // A profile change waiting for this post's next save also needs "GitHub에 저장".
+    const remoteSaved =
+      remoteSnapshotHash !== null &&
+      remoteSnapshotHash === latest?.snapshotHash &&
+      profileEdits.files(latest.slug).length === 0
     status.dataset["state"] = remoteSaving ? "saving" : "saved"
     status.dataset["remoteState"] = remoteSaving
       ? "saving"
@@ -198,6 +292,10 @@ export const mountComposer: SiteMount = async (root, deps) => {
   const persist = async (bundle: PostBundle, cursor: DraftCursor | null): Promise<void> => {
     // A read-only post keeps no draft and offers no save.
     if (readOnly) return
+    if (showcase) {
+      latest = { ...bundle, headSha: remoteHead, snapshotHash: await computeSnapshotHash(bundle) }
+      return
+    }
     saveButton.hidden = false
     const current = ++revision
     touched = true
@@ -243,7 +341,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     showSavedState()
   }
   const persistRepair = async (): Promise<void> => {
-    if (readOnly) return
+    if (readOnly || showcase) return
     const unpaired = composer?.getUnpaired()
     if (!unpaired) return
     repairSequence += 1
@@ -277,6 +375,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   let saving: Promise<DraftPullRequest> | null = null
   const saveRemote = (purpose?: "review"): Promise<DraftPullRequest> => {
     if (readOnly) return Promise.reject(new Error("읽기 전용 글은 저장할 수 없습니다."))
+    if (showcase) return Promise.reject(new Error("예시 글은 저장되지 않습니다."))
     if (saving) return purpose === "review" ? saving.then(() => saveRemote("review")) : saving
     remoteSaving = true
     remoteError = null
@@ -301,6 +400,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
         const validation = deps.codec.validate(bundle, "save")
         if (validation.length) throw new Error(validation.map((issue) => issue.message).join("\n"))
         const serialized = await deps.codec.serialize(bundle)
+        const profileFiles = profileEdits.files(bundle.slug)
         const pulls = await deps.github.listDrafts()
         if (!pulls.ok) throw new Error(pulls.error.message)
         const existing = pulls.value.find((pull) => pull.slug === bundle.slug)
@@ -309,12 +409,13 @@ export const mountComposer: SiteMount = async (root, deps) => {
           : await deps.github.ensureDraftPR(bundle.slug, bundle.ko.frontMatter.title, [
               ...serialized.files,
               ...newAuthors.files(bundle),
+              ...profileFiles,
             ])
         if (!pr.ok) throw new Error(pr.error.message)
         if (existing) {
           const readBack = await deps.github.loadBundle(bundle.slug)
           if (!readBack.ok) throw new Error(readBack.error.message)
-          if (readBack.value.snapshotHash === serialized.snapshotHash) {
+          if (readBack.value.snapshotHash === serialized.snapshotHash && !profileFiles.length) {
             remoteHead = readBack.value.headSha
           } else {
             if (!remoteHead || readBack.value.headSha !== remoteHead) {
@@ -324,6 +425,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
             const committed = await deps.github.commitBundle(bundle.slug, remoteHead, [
               ...serialized.files,
               ...newAuthors.files(bundle),
+              ...profileFiles,
             ])
             if (!committed.ok) {
               if (committed.error.kind === "conflict") compareConflict(committed.error.message)
@@ -340,6 +442,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
           remoteHead = pr.value.headSha
         }
         if (!remoteHead) throw new Error("원격 저장 커밋을 확인하지 못했습니다.")
+        if (profileFiles.length) profileEdits.committed(bundle.slug)
         if (disposed) return { ...pr.value, headSha: remoteHead }
         await flush()
         sessionStorage.removeItem("onsite:new-draft")
@@ -365,7 +468,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
   const comments = new SiteComments({
     github: deps.github,
     codec: deps.codec,
-    people: loadPeople,
+    people: () => peopleLoad,
     bundle: () => composer?.getBundle() ?? latest,
     ensureSaved: async () => {
       if (readOnly) {
@@ -431,16 +534,44 @@ export const mountComposer: SiteMount = async (root, deps) => {
     cursor: deps.restored.status === "restored" ? deps.restored.snapshot.cursor : null,
     authors: [...deps.authors, ...newAuthors.list().map((profile) => profile.name)],
     people: [
-      ...people.map((person) => ({ name: person.name, handle: person.handle })),
-      ...newAuthors.list().map((profile) => ({ name: profile.name, handle: profile.github })),
+      ...people.map((person) => {
+        // A change made here and not yet published is what the writer sees when editing again.
+        const edited = profileEdits.list().find((profile) => profile.name === person.name)
+        const profile = edited
+          ? { image: edited.image, linkedin: edited.linkedin, bio: edited.bio }
+          : person.profile
+        return {
+          name: person.name,
+          handle: person.handle,
+          ...(person.id ? { id: person.id } : {}),
+          ...(profile ? { profile } : {}),
+        }
+      }),
+      ...newAuthors.list().map((profile) => ({
+        name: profile.name,
+        handle: profile.github,
+        id: profile.githubId,
+      })),
     ],
     tags: taxonomies.tags,
     series: taxonomies.series,
     currentLogin: session.login,
+    currentUserId: session.userId,
+    users,
+    resolveUser: async (login) => {
+      const user = await deps.github.getUser(login)
+      if (!user.ok) throw new Error(user.error.message)
+      return user.value
+    },
     onNewAuthor: (profile) => newAuthors.remember(profile),
+    onProfileEdit: (profile) => {
+      profileEdits.remember(profile)
+      saveButton.hidden = false
+      showSavedState()
+    },
     ...(readOnly ? { readOnly } : {}),
     ...(lockEditors ? { lockEditors } : {}),
-    onComment: (editor) => comments.start(editor),
+    ...(showcase ? {} : { onComment: (editor: Editor) => comments.start(editor) }),
     blockExtensions: (context) => {
       blockContext = context
       return [
@@ -460,11 +591,12 @@ export const mountComposer: SiteMount = async (root, deps) => {
       return persist(composer?.getBundle() ?? change.bundle, change.cursor)
     },
   })
-  if (deps.bundle) ensureAutosave(deps.bundle)
-  if (deps.bundle?.headSha) void comments.refresh().catch(error)
+  if (deps.bundle && !showcase) ensureAutosave(deps.bundle)
+  if (deps.bundle?.headSha && !showcase) void comments.refresh().catch(error)
   // Review lives in the editor's dock: request review / publish for the post's authors, 승인 for
   // anyone else (beside the read-only notice).
-  if (deps.bundle) {
+  if (showcase) host.querySelector('button[data-action="request-review"]')?.remove()
+  else if (deps.bundle) {
     flow = new ReviewFlow({
       role: readOnly ? "reviewer" : "author",
       github: deps.github,
@@ -487,6 +619,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     if (!dock) return
     help ??= mountHelp(readOnly ? "reviewer" : "author", root)
     if (help.parentElement !== dock) dock.prepend(help)
+    if (showcase) return
     if (comments.countButton.parentElement !== dock) help.after(comments.countButton)
     if (checks.button.parentElement !== dock) comments.countButton.after(checks.button)
   }
@@ -586,6 +719,7 @@ export const mountComposer: SiteMount = async (root, deps) => {
     document.documentElement.style.removeProperty("--composer-sticky-top")
     document.documentElement.style.removeProperty("--composer-toolbox-height")
     document.body.style.removeProperty("--reading-offset")
+    accessNotice?.remove()
     comments.dispose()
     checks.dispose()
     toolbox.dispose()

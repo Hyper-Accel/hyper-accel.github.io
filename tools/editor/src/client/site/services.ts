@@ -17,6 +17,11 @@ const configSchema = z.object({
 })
 
 export async function createSiteServices(): Promise<SiteServices> {
+  // The editor's manifest and author list are read alongside the config, not after it.
+  const manifestLoad = ky.get("/editor/manifest.json", { retry: 0 }).json()
+  const authorsLoad = ky.get("/editor/authors.json", { retry: 0 }).json()
+  // Awaited below; this only keeps an early failure from being reported as unhandled meanwhile.
+  Promise.all([manifestLoad, authorsLoad]).catch(() => undefined)
   let config = {
     development: false,
     clientId: import.meta.env["VITE_EDITOR_GITHUB_CLIENT_ID"] ?? "",
@@ -69,15 +74,13 @@ export async function createSiteServices(): Promise<SiteServices> {
     baseUrl: config.apiBaseUrl,
     codec,
   })
-  const manifest = z
-    .record(z.string(), z.object({ file: z.string() }))
-    .parse(await ky.get("/editor/manifest.json", { retry: 0 }).json())
+  const manifest = z.record(z.string(), z.object({ file: z.string() })).parse(await manifestLoad)
   const stylesheet = manifest["preview.css"]
   if (!stylesheet) throw new Error("Compiled site preview stylesheet is missing")
   const authors = z
     .array(z.string().min(1))
     .min(1)
-    .parse(await ky.get("/editor/authors.json", { retry: 0 }).json())
+    .parse(await authorsLoad)
   return {
     auth,
     tokens: auth.tokens,

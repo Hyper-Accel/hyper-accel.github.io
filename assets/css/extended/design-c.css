@@ -59,6 +59,20 @@ body.list { background: var(--tr-bg); --main-width: 1200px; }
 @media (prefers-reduced-motion: reduce) { .tr-editor-tip { transition: none; } }
 .tr-pill-careers { background: var(--tr-cyan); color: #031117; border-color: var(--tr-cyan); }
 .tr-pill-careers:hover { background: var(--tr-cyan-soft); color: #031117; border-color: var(--tr-cyan-soft); }
+/* Same 34px height as the round buttons beside it. */
+.tr-pill-careers { display: inline-flex; align-items: center; height: 34px; }
+/* Touch: the 34px header buttons take a 44px tap through an invisible margin, so the bar keeps its size. */
+@media (pointer: coarse) {
+  .tr-tools .tr-pill, .tr-brand a { position: relative; }
+  .tr-tools .tr-pill::after { content: ""; position: absolute; inset: -5px; }
+  .tr-brand-logo::after { content: ""; position: absolute; inset: -8px; }
+  .tr-brand-name::after { content: ""; position: absolute; inset: -11px 0 -11px -5px; }
+  /* The category row scrolls sideways, which clips overflow: a bottom padding cancelled by a
+     negative margin gives the 44px tap room without moving the page. */
+  .tr-nav { padding-bottom: 6px; margin-bottom: -6px; }
+  .tr-nav a { position: relative; }
+  .tr-nav a::after { content: ""; position: absolute; inset: -6px 0; }
+}
 
 /* hero: copy + full-stack layers */
 .tr-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 36px; padding: 44px 0 36px; }

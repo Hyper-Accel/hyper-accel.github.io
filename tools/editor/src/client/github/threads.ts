@@ -70,23 +70,8 @@ export class Discussions {
 
   async list(pullNumber: number): Promise<ReviewThread[]> {
     z.number().int().positive().parse(pullNumber)
-    const pr = await this.http.request(`${this.http.repo}/pulls/${pullNumber}`, pullResponse, {
-      fresh: true,
-    })
-    const native = await this.http.list(
-      `${this.http.repo}/pulls/${pullNumber}/comments`,
-      commentResponse,
-      true,
-    )
-    const issues = await this.http.list(
-      `${this.http.repo}/issues/${pullNumber}/comments`,
-      commentResponse,
-      true,
-    )
-    const threads: ReviewThread[] = []
-    let cursor: string | null = null
-    for (;;) {
-      const data: z.infer<typeof threadsResponse> = await this.http.graph(
+    const page = (cursor: string | null): Promise<z.infer<typeof threadsResponse>> =>
+      this.http.graph(
         `query($owner: String!, $name: String!, $number: Int!, $cursor: String) {
           repository(owner: $owner, name: $name) {
             pullRequest(number: $number) {
@@ -100,6 +85,17 @@ export class Discussions {
         { owner: this.options.owner, name: this.options.repository, number: pullNumber, cursor },
         threadsResponse,
       )
+    // The four reads are independent, so they go out together.
+    const [pr, native, issues, first] = await Promise.all([
+      this.http.request(`${this.http.repo}/pulls/${pullNumber}`, pullResponse, { fresh: true }),
+      this.http.list(`${this.http.repo}/pulls/${pullNumber}/comments`, commentResponse, true),
+      this.http.list(`${this.http.repo}/issues/${pullNumber}/comments`, commentResponse, true),
+      page(null),
+    ])
+    const threads: ReviewThread[] = []
+    let cursor: string | null = null
+    let data = first
+    for (;;) {
       const connection = data.repository.pullRequest.reviewThreads
       for (const thread of connection.nodes) {
         const rootId = thread.comments.nodes[0]?.databaseId
@@ -126,6 +122,7 @@ export class Discussions {
         invalid("GitHub returned an invalid review-thread cursor.")
       }
       cursor = connection.pageInfo.endCursor
+      data = await page(cursor)
     }
     const events = issues
       .map((entry) => ({ entry, meta: metadata(entry.body)?.value }))

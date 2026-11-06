@@ -17,6 +17,10 @@ async function fixture(): Promise<string> {
   const root = await mkdtemp(resolve(tmpdir(), "editor-ci-"))
   sandboxes.push(root)
   await mkdir(resolve(root, "content/authors/Fixture Author"), { recursive: true })
+  await writeFile(
+    resolve(root, "content/authors/Fixture Author/_index.md"),
+    '---\ntitle: "Fixture Author"\ngithub: "https://github.com/fixture"\ngithub_id: 1\n---\n',
+  )
   await mkdir(resolve(root, "content/posts"), { recursive: true })
   await cp(resolve(fixtureRoot, "passing"), resolve(root, "content/posts/example"), {
     recursive: true,
@@ -89,6 +93,20 @@ test("accepts a complete publishable bundle when both languages match", async ()
   // Then
   expect(result.status).toBe(0)
   expect(result.stdout).not.toContain("::error ")
+})
+
+test("rejects a post whose author profile has no GitHub user ID", async () => {
+  // Given: the profile names a login only, which the editor no longer trusts.
+  const root = await fixture()
+  await writeFile(
+    resolve(root, "content/authors/Fixture Author/_index.md"),
+    '---\ntitle: "Fixture Author"\ngithub: "https://github.com/fixture"\n---\n',
+  )
+  // When
+  const result = await run(root)
+  // Then
+  expect(result.status).toBe(1)
+  expect(result.stdout).toContain("(github_id)::")
 })
 
 test("accepts index.ko.md when it is the Korean page", async () => {

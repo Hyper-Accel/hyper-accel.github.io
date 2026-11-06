@@ -35,7 +35,11 @@ try {
         await page.locator('.composer[data-readonly="true"]').waitFor()
         const notice = page.locator("[data-author-access=unlinked]")
         await notice.waitFor()
-        assert.match(await notice.innerText(), /_index\.md.*github/)
+        assert.match(await notice.innerText(), /github_id/)
+        // The note sits in the corner, clear of the article.
+        const box = await notice.boundingBox()
+        const article = await page.locator(".composer").boundingBox()
+        assert.ok(box && article && box.x + box.width <= (page.viewportSize()?.width ?? 0))
         const profile = notice.getByRole("link")
         assert.equal(
           await profile.getAttribute("href"),
@@ -46,9 +50,10 @@ try {
         await page.screenshot({
           path: join(artifacts, `${width}-${draft ? "draft" : "review"}.png`),
         })
+        await notice.getByRole("button", { name: "안내 닫기", exact: true }).click()
+        assert.equal(await notice.count(), 0)
         const comments = page.locator("[data-site-comments]")
         await comments.click()
-        await page.getByRole("button", { name: "일반 댓글 쓰기", exact: true }).click()
         await page.locator('textarea[aria-label="댓글"]').fill("Read-only feedback")
         await page.getByRole("button", { name: "댓글 달기", exact: true }).click()
         await page.locator(".composer-comment-thread", { hasText: "Read-only feedback" }).waitFor()

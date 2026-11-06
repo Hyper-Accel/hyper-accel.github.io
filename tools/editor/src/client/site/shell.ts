@@ -192,6 +192,16 @@ export function mountSiteShell(
       screen.innerHTML = '<a href="/">홈으로 돌아가기</a>'
       return
     }
+    // The screen's code downloads while the post is read from GitHub, not after it.
+    const mountLoading = loadMount(
+      route.kind === "compose"
+        ? "mountComposer"
+        : route.kind === "callback"
+          ? "mountCallback"
+          : "mountLogin",
+    )
+    // Awaited below; this only keeps an early failure from being reported as unhandled meanwhile.
+    mountLoading.catch(() => undefined)
     if (route.kind === "compose" && !services.auth.getSession()) {
       screen.innerHTML = "<p>계속하려면 로그인해 주세요.</p>"
       await showRelogin()
@@ -317,13 +327,7 @@ export function mountSiteShell(
       }
     }
     if (signal.aborted) return
-    const name =
-      route.kind === "compose"
-        ? "mountComposer"
-        : route.kind === "callback"
-          ? "mountCallback"
-          : "mountLogin"
-    const mount = await loadMount(name)
+    const mount = await mountLoading
     if (signal.aborted) return
     const mountRoot = document.createElement("div")
     screen.replaceChildren(mountRoot)

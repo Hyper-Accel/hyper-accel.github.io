@@ -59,6 +59,17 @@
   border: 0;
 }
 
+@media (pointer: coarse) {
+  .composer-comment-popover button {
+    min-height: 44px;
+  }
+
+  .composer-comment-popover .composer-comment-head button {
+    min-width: 44px;
+    margin-block: -4px;
+  }
+}
+
 .composer-comment-popover button:hover:not(:disabled) {
   background: var(--code-bg);
 }

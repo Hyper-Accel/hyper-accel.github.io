@@ -109,4 +109,24 @@ describe("composer metadata", () => {
       draft: true,
     })
   })
+
+  test("stores editors as numeric user IDs and keeps legacy login entries as written", () => {
+    const [fixture] = fixtureBundles
+    if (!fixture) throw new Error("Missing fixture")
+    const legacy = {
+      ...fixture,
+      ko: {
+        ...fixture.ko,
+        frontMatter: { ...fixture.ko.frontMatter, editors: [93566126, "author"] },
+      },
+    }
+    const metadata = metadataFromBundle(legacy)
+    expect(metadata.editors).toEqual(["93566126", "author"])
+    const applied = applyMetadata(legacy, {
+      ...metadata,
+      editors: [...metadata.editors, "76479598"],
+    })
+    expect(applied.ko.frontMatter["editors"]).toEqual([93566126, "author", 76479598])
+    expect(applied.en.frontMatter["editors"]).toEqual([93566126, "author", 76479598])
+  })
 })

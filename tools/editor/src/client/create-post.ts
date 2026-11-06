@@ -1,3 +1,4 @@
+import { z } from "zod"
 import type { CreatePostRequest } from "../shared/contracts"
 import { createPostRequestSchema, registerAuthorRequestSchema } from "../shared/contracts"
 import { createPost, fetchAuthors, registerAuthor } from "./api"
@@ -32,8 +33,8 @@ export function createPostMarkup(): string {
             <textarea id="new-author-bio-en" name="bioEn" rows="2" required maxlength="1000"></textarea>
             <label for="new-author-image">프로필 이미지 URL <span>(선택)</span></label>
             <input id="new-author-image" name="image" type="url" maxlength="2048" placeholder="https://…" />
-            <label for="new-author-github">GitHub URL <span>(선택)</span></label>
-            <input id="new-author-github" name="github" type="url" maxlength="2048" placeholder="https://github.com/…" />
+            <label for="new-author-github">GitHub URL</label>
+            <input id="new-author-github" name="github" type="url" required maxlength="2048" placeholder="https://github.com/…" />
             <label for="new-author-linkedin">LinkedIn URL <span>(선택)</span></label>
             <input id="new-author-linkedin" name="linkedin" type="url" maxlength="2048" placeholder="https://www.linkedin.com/in/…" />
             <button class="secondary-button" id="register-author-button" type="button">저자 추가</button>
@@ -214,18 +215,22 @@ export function setupCreatePost(options: CreatePostOptions): void {
     }
     const data = new FormData(form)
     const value = (key: string): string => String(data.get(key) ?? "").trim()
-    const parsed = registerAuthorRequestSchema.safeParse({
-      author: unregisteredAuthor,
-      profile: {
-        bioKo: value("bioKo"),
-        bioEn: value("bioEn"),
-        image: value("image"),
-        github: value("github"),
-        linkedin: value("linkedin"),
-      },
-    })
-    if (!parsed.success) {
-      showError("저자 소개와 URL을 확인해 주세요. URL은 http 또는 https 주소여야 합니다.")
+    const newAuthor = unregisteredAuthor
+    const fields = {
+      bioKo: value("bioKo"),
+      bioEn: value("bioEn"),
+      image: value("image"),
+      github: value("github"),
+      linkedin: value("linkedin"),
+    }
+    const login = /^https:\/\/github\.com\/([A-Za-z0-9-]+)\/?$/.exec(fields.github)?.[1]
+    if (
+      !registerAuthorRequestSchema.safeParse({ author: newAuthor, profile: fields }).success ||
+      !login
+    ) {
+      showError(
+        "저자 소개와 URL을 확인해 주세요. GitHub URL은 https://github.com/<아이디> 형식이어야 합니다.",
+      )
       return
     }
     error.hidden = true
@@ -233,7 +238,19 @@ export function setupCreatePost(options: CreatePostOptions): void {
     void (async () => {
       let registered = false
       try {
-        const name = await registerAuthor(parsed.data)
+        // The onsite editor recognises authors by their numeric GitHub ID, not the login.
+        const response = await fetch(`https://api.github.com/users/${login}`, {
+          headers: { Accept: "application/vnd.github+json" },
+        })
+        if (response.status === 404) throw new Error("GitHub 아이디를 찾을 수 없습니다.")
+        if (!response.ok) throw new Error("GitHub에서 계정을 확인하지 못했습니다.")
+        const { id } = z.object({ id: z.number().int().positive() }).parse(await response.json())
+        const name = await registerAuthor(
+          registerAuthorRequestSchema.parse({
+            author: newAuthor,
+            profile: { ...fields, githubId: id },
+          }),
+        )
         registered = true
         const authors = await refreshAuthors()
         if (!authors.includes(name)) throw new Error("등록한 저자를 목록에서 확인하지 못했습니다.")

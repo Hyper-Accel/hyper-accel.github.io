@@ -34,6 +34,24 @@
   margin-block: -12px;
 }
 
+/* Touch: the meta-line controls and the category chip take a 44px tap without moving the line. */
+@media (pointer: coarse) {
+  .composer .post-meta .composer-inline {
+    padding-block: 14px;
+    margin-block: -14px;
+  }
+
+  .composer .post-kicker .tr-cat {
+    position: relative;
+  }
+
+  .composer .post-kicker .tr-cat::after {
+    position: absolute;
+    inset: -10px -4px;
+    content: "";
+  }
+}
+
 .composer .composer-inline:hover,
 .composer .composer-inline:focus-visible {
   text-decoration-color: currentColor;
@@ -118,6 +136,13 @@
   color: var(--primary);
 }
 
+@media (pointer: coarse) {
+  .site-editor .composer .post-meta button.composer-tab {
+    margin-block: -14px;
+    padding-block: 14px;
+  }
+}
+
 /* Post information opens in place, directly under the meta line it edits. */
 .composer .composer-post .composer-meta {
   margin-top: 4px;
@@ -130,12 +155,55 @@
   display: none;
 }
 
+/* 글 정보 is settings, not reading: wider than the article column, centred on it. */
 .composer .composer-post .composer-meta[open] .composer-form {
+  --meta-width: max(100%, min(72rem, 100vw - 48px));
+  width: var(--meta-width);
+  margin-inline: calc((100% - var(--meta-width)) / 2);
   margin-top: 8px;
   padding: var(--editor-space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--entry);
+}
+
+/* ✕ in the panel's top right corner closes it, as the meta line's toggle does. */
+.composer .composer-post .composer-meta[open] .composer-form {
+  position: relative;
+}
+
+.composer .composer-post .composer-meta .composer-meta__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.composer .composer-post .composer-meta .composer-meta__close:hover {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+@media (pointer: coarse) {
+  .composer .composer-post .composer-meta .composer-meta__close {
+    top: 2px;
+    right: 2px;
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* An open post's titles are written on the page itself (a new post's are in its settings form). */
@@ -269,6 +337,11 @@ body:has(.composer-dock) .top-link {
   .composer-toc {
     display: none;
   }
+}
+
+/* While 글 정보 is open the table of contents beside the article steps back, as the 넣기 card does. */
+.composer:has(.composer-post .composer-meta[open]) .composer-toc {
+  visibility: hidden;
 }
 
 @media (max-width: 699px) {
@@ -727,9 +800,11 @@ body:has(.composer-dock) .top-link {
 
 /* 내 프로필 추가 is a small link under the author picker, not a second button (both forms). */
 .composer-form .metadata-picker__self {
+  display: inline-flex;
+  align-items: center;
   justify-self: start;
-  min-height: 0;
-  padding: 2px 0;
+  min-height: 28px;
+  padding: 0;
   border: 0;
   background: none;
   color: var(--editor-accent, #009ee2);
