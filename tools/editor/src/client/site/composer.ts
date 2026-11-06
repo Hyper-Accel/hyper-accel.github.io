@@ -138,7 +138,11 @@ export const mountComposer: SiteMount = async (root, deps) => {
   // Editors without an author profile, shown by their current login in the editor picker.
   let users: GitHubUser[] = []
   let accessNotice: HTMLElement | null = null
-  if (initial) {
+  // The editor's example post (kept out of the blog's lists) is for trying the tools: anyone signed
+  // in edits it, whoever its authors are, and it is never saved (no draft on this device, no GitHub
+  // save, review or comments).
+  const showcase = deps.bundle !== null && !listedPost(deps.bundle.ko.frontMatter)
+  if (initial && !showcase) {
     const front = initial.ko.frontMatter
     const { editors } = editorLoad
     const profiled = new Set(ids.values())
@@ -179,11 +183,8 @@ export const mountComposer: SiteMount = async (root, deps) => {
       document.body.append(notice)
     }
   }
-  if (reviewerOnly) readOnly = "읽기 전용"
+  if (reviewerOnly && !showcase) readOnly = "읽기 전용"
   if (readOnly) saveButton.hidden = true
-  // The editor's example post (kept out of the blog's lists) can be tried out but is never saved:
-  // no draft on this device, no GitHub save, review or comments.
-  const showcase = deps.bundle !== null && !readOnly && !listedPost(deps.bundle.ko.frontMatter)
   if (showcase) {
     saveButton.hidden = true
     const notice = h(

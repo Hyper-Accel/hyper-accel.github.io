@@ -107,16 +107,18 @@ export function mountHelp(role: Role, host: HTMLElement): HTMLButtonElement {
     const next = h("button", { type: "button", class: "onsite-intro__next" }, "다음")
     const skip = h("button", { type: "button", class: "onsite-intro__skip" }, "다시 보지 않기")
     skip.hidden = !automatic
-    // A finished post that uses every tool, for writers looking for ideas (content/posts/editor-showcase).
+    // A finished post that uses every tool (content/posts/editor-showcase), opened in the editor to
+    // try things out; it is never saved. The new tab keeps its opener so it starts signed in (the
+    // login lives in this tab's sessionStorage, which a noopener tab does not receive).
     const showcase =
       role === "author"
         ? h(
             "a",
             {
               class: "onsite-intro__showcase",
-              href: "/posts/editor-showcase/",
+              href: "/posts/editor-showcase/?edit",
               target: "_blank",
-              rel: "noopener",
+              rel: "opener",
             },
             "예시 글 보기 ↗",
           )
