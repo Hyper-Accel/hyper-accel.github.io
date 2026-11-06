@@ -1,0 +1,9 @@
+{{- /* Shared bundle resources may be published under another language's URL. */ -}}
+{{- $url := .Params.cover.image | absURL -}}
+{{- if eq .Params.cover.relative true -}}
+  {{- $url = (path.Join .RelPermalink .Params.cover.image) | absURL -}}
+  {{- with .Resources.GetMatch .Params.cover.image -}}
+    {{- $url = .Permalink -}}
+  {{- end -}}
+{{- end -}}
+{{- return $url -}}

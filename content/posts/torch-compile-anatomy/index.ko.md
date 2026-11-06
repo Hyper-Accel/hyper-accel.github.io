@@ -2,10 +2,11 @@
 date: '2026-08-04T18:00:00+09:00'
 title: '[torch.compile() 알아보기 - Part 01] 세 가지 구성 요소'
 cover:
-  image: "images/pytorch.jpg"
-  alt: "PyTorch 로고"
-  caption: "PyTorch"
+  image: "images/torch-compile-speed-cover.webp"
+  alt: "torch.compile() 문구와 주황색 가속 궤적을 남기는 Python 로고"
+  caption: "torch.compile()"
   relative: true
+  fit: contain
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
 series: ['torch.compile() 알아보기']

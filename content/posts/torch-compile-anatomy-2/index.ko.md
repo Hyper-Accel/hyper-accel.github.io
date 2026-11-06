@@ -2,10 +2,11 @@
 date: '2026-10-16T18:00:00+09:00'
 title: '[torch.compile() 알아보기 - Part 02] 왜 세 단계로 나눠 설계했을까'
 cover:
-  image: "images/pytorch.jpg"
-  alt: "PyTorch 로고"
-  caption: "PyTorch"
+  image: "images/torch-compile-speed-cover.webp"
+  alt: "torch.compile() 문구와 주황색 가속 궤적을 남기는 Python 로고"
+  caption: "torch.compile()"
   relative: true
+  fit: contain
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "PrivateUse1", "Compiler"]
 series: ['torch.compile() 알아보기']

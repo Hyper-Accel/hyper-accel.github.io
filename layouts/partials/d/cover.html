@@ -2,8 +2,14 @@
 {{- with $p.Params.cover.image }}
 {{- $img := ($p.Resources.ByType "image").GetMatch (printf "*%s*" .) }}
 {{- with $img }}
-{{- $r := .Fill (printf "%dx%d Center" $w $h) }}
-<img src="{{ $r.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" loading="lazy" alt="">
+{{- $contain := eq $p.Params.cover.fit "contain" }}
+{{- $r := . }}
+{{- if $contain }}
+  {{- $r = .Fit (printf "%dx%d" $w $h) }}
+{{- else }}
+  {{- $r = .Fill (printf "%dx%d Center" $w $h) }}
+{{- end }}
+<img src="{{ $r.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" loading="lazy" alt=""{{ if $contain }} style="object-fit: contain;"{{ end }}>
 {{- else }}
 <img src="{{ . | relURL }}" loading="lazy" alt="">
 {{- end }}
