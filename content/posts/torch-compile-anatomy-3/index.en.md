@@ -2,10 +2,11 @@
 date: '2026-11-02T18:00:00+09:00'
 title: '[Exploring torch.compile() - Part 03] Three Keywords from PyTorch Conference 2026: Agent, Acceleration, Ecosystem'
 cover:
-  image: "images/pytorch.jpg"
-  alt: "PyTorch logo"
-  caption: "PyTorch"
+  image: "images/torch-compile-speed-cover.webp"
+  alt: "torch.compile() lettering beside a Python logo with orange acceleration trails"
+  caption: "torch.compile()"
   relative: true
+  fit: contain
 authors: [Hyunjun Park]
 tags: ["PyTorch", "torch.compile", "TorchInductor", "PyTorch Conference", "vLLM", "AI Agent", "NPU", "CI"]
 series: ["torch.compile() 알아보기"]

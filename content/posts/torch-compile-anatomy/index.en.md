@@ -2,10 +2,11 @@
 date: '2026-08-04T18:00:00+09:00'
 title: '[Exploring torch.compile() - Part 01] The Three Components'
 cover:
-  image: "images/pytorch.jpg"
-  alt: "PyTorch logo"
-  caption: "PyTorch"
+  image: "images/torch-compile-speed-cover.webp"
+  alt: "torch.compile() lettering beside a Python logo with orange acceleration trails"
+  caption: "torch.compile()"
   relative: true
+  fit: contain
 authors: [Hyunjun Park]
 tags: ["torch.compile", "PyTorch", "TorchDynamo", "TorchInductor", "AOTAutograd", "FX", "Triton", "Compiler", "Kernel Fusion"]
 series: ['Exploring torch.compile()']

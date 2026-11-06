@@ -2,10 +2,11 @@
 date: '2026-11-02T18:00:00+09:00'
 title: "[torch.compile() 알아보기 - Part 03] PyTorch Conference 2026 참관기"
 cover:
-  image: "images/pytorch.jpg"
-  alt: "PyTorch 로고"
-  caption: "PyTorch"
+  image: "images/torch-compile-speed-cover.webp"
+  alt: "torch.compile() 문구와 주황색 가속 궤적을 남기는 Python 로고"
+  caption: "torch.compile()"
   relative: true
+  fit: contain
 authors: [Hyunjun Park]
 tags: ["PyTorch", "torch.compile", "TorchInductor", "PyTorch Conference", "vLLM", "AI Agent", "NPU", "CI"]
 series: ['torch.compile() 알아보기']
