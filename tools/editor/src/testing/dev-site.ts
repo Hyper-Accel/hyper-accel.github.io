@@ -1,7 +1,13 @@
 import { seedDemoPost } from "./demo-post"
 import { startSiteHarness } from "./site-harness"
 
-const harness = await startSiteHarness({ port: Number(process.env["EDITOR_SITE_PORT"] ?? 4175) })
+// The signed-in fake account is the demo post's author, so 내 프로필 수정 can be tried.
+const harness = await startSiteHarness({
+  port: Number(process.env["EDITOR_SITE_PORT"] ?? 4175),
+  writer: "Donghyeon Choi",
+  // The editor's example post, as published: it opens in the editor from its page (?edit).
+  posts: ["editor-showcase"],
+})
 // The local site also carries a finished demo post that uses every editor tool.
 await seedDemoPost(harness.github)
 console.info(

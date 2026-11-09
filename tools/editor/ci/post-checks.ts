@@ -85,6 +85,19 @@ export async function checkBundle(root: string, slug: string): Promise<Finding[]
         file,
         "Authors must be an array matching author directory names exactly.",
       )
+    // The editor recognises authors by GitHub user ID; a profile without one locks its posts.
+    if (authors.success && name === korean)
+      for (const author of authors.data.filter((entry) => names.includes(entry))) {
+        const profile = resolve(root, "content/authors", author, "_index.md")
+        const source = (await Bun.file(profile).exists()) ? await Bun.file(profile).text() : ""
+        if (!/^github_id:\s*\d+\s*$/m.test(source))
+          add(
+            "authors",
+            "github_id",
+            profile,
+            "Author profile needs github_id (the numeric GitHub user ID from https://api.github.com/users/<login>).",
+          )
+      }
     const category = z.array(z.enum(categories)).length(1).safeParse(fields["categories"])
     if (!category.success)
       add(

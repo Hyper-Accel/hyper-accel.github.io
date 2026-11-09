@@ -10,6 +10,8 @@ const runSchema = z.object({
   conclusion: z.string().nullable(),
   html_url: z.url().nullable(),
   details_url: z.url().nullable(),
+  started_at: z.string().nullable().optional(),
+  completed_at: z.string().nullable().optional(),
   output: z.object({
     title: z.string().nullable(),
     summary: z.string().nullable(),
@@ -51,6 +53,14 @@ function checkState(run: z.infer<typeof runSchema>): CommitCheck["state"] {
   }
 }
 
+function duration(run: z.infer<typeof runSchema>): number | null {
+  const started = Date.parse(run.started_at ?? "")
+  const completed = Date.parse(run.completed_at ?? "")
+  return Number.isFinite(started) && Number.isFinite(completed) && completed >= started
+    ? completed - started
+    : null
+}
+
 function detailsUrl(value: string | null): string | null {
   return value && new URL(value).protocol === "https:" ? value : null
 }
@@ -88,6 +98,7 @@ export async function readCommitChecks(http: GitHubHttp, headSha: string): Promi
         title: run.output.title ?? "",
         summary: run.output.summary ?? "",
         text: run.output.text ?? "",
+        durationMs: duration(run),
         detailsUrl: detailsUrl(run.details_url ?? run.html_url),
         annotations: annotations.map((entry) => ({
           path: entry.path,
@@ -113,6 +124,7 @@ export async function readCommitChecks(http: GitHubHttp, headSha: string): Promi
       title: "",
       summary: status.description ?? "",
       text: "",
+      durationMs: null,
       detailsUrl: detailsUrl(status.target_url),
       annotations: [],
     })

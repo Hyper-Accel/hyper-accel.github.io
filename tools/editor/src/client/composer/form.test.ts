@@ -116,6 +116,21 @@ test("reports the new author list when an author is checked", async () => {
   expect(authors).toEqual(Array.from(authors, () => ["Donghyeon Choi", "Hyunjun Park"]))
 })
 
+test("labels each allowed editor by account, even when GitHub could not name it", async () => {
+  await page.evaluate(() =>
+    window.__metadataForm.mount(
+      "edit",
+      { editors: ["2", "12345"] },
+      { users: [{ login: "reviewer", id: 2 }] },
+    ),
+  )
+  const chip = (value: string) =>
+    page.locator(`.metadata-chip[data-value="${value}"]`).first().textContent()
+  expect(await chip("2")).toContain("reviewer")
+  expect(await chip("12345")).toContain("GitHub 계정 #12345")
+  expect(await page.evaluate(() => window.__metadataForm.read().editors)).toEqual(["2", "12345"])
+})
+
 test("stores the converted cover path with its alt text", async () => {
   // Given: an existing post whose cover image is chosen; its alt field appears with the image.
   await mount("edit", { slug: "example-post" })

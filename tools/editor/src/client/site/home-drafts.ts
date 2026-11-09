@@ -1,5 +1,6 @@
 import type { SiteDraft, SiteServices } from "./contracts"
 import { draftStatus, relativeUpdatedTime } from "./drafts"
+import { listedPost } from "./listed"
 import { prepareSiteImages } from "./renderer"
 import { editAddress, NEW_PATH } from "./routes"
 
@@ -129,6 +130,7 @@ export async function mountHomeDrafts(root: HTMLElement, services: SiteServices)
     userId: session.userId,
   })
   for (const snapshot of snapshots) {
+    if (!listedPost(snapshot.bundle.ko.frontMatter)) continue
     const matter = snapshot.bundle[english ? "en" : "ko"].frontMatter
     place(
       snapshot.key.slug,
@@ -172,6 +174,11 @@ export async function mountHomeDrafts(root: HTMLElement, services: SiteServices)
       const pullState = await services.github.getPullState?.(draft.number)
       if (!loaded.ok) return
       const bundle = loaded.value
+      if (!listedPost(bundle.ko.frontMatter)) {
+        cards.get(draft.slug)?.remove()
+        cards.delete(draft.slug)
+        return
+      }
       const matter = bundle[english ? "en" : "ko"].frontMatter
       const coverField: unknown = bundle.ko.frontMatter["cover"]
       const coverPath =

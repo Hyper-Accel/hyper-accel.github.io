@@ -9,6 +9,7 @@ import {
   type FakePull,
   filesAt,
   isAncestor,
+  objectSha,
   putBlob,
   putCommit,
   putTree,
@@ -195,11 +196,95 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
     if (pathname === "/user" && method === "GET") {
       return json({ login: user.login, id: user.id })
     }
+    if ((pathname.startsWith("/users/") || pathname.startsWith("/user/")) && method === "GET") {
+      const key = pathname.slice(pathname.indexOf("/", 1) + 1).toLowerCase()
+      const byId = pathname.startsWith("/user/")
+      const found = [...state.tokens.values()].find((entry) =>
+        byId ? String(entry.id) === key : entry.login.toLowerCase() === key,
+      )
+      if (!found) throw new HttpFailure(404, "Not Found")
+      return json({ login: found.login, id: found.id })
+    }
     if (pathname === "/graphql" && method === "POST") {
       const input = graphqlSchema.parse(await body())
       const variables = input.variables
       const graphInput = z.record(z.string(), z.unknown()).parse(variables["input"] ?? variables)
       const canWrite = user.permission !== "read"
+      // Like GitHub: a branch's commit with Commit.file reads; a missing file is null plus a
+      // NOT_FOUND error, and folders are listed three levels deep.
+      if (input.query.includes("query PostBundle")) {
+        const read = z
+          .object({
+            branch: z.string(),
+            ko: z.string(),
+            koAlt: z.string(),
+            en: z.string(),
+            dir: z.string(),
+          })
+          .parse(variables)
+        const errors: { type: string; path: string[]; message: string }[] = []
+        const commitAt = (alias: string, sha: string | undefined): unknown => {
+          const commit = sha ? state.commits.get(sha) : undefined
+          if (!commit) return null
+          const flat = state.trees.get(commit.tree.sha)?.tree ?? []
+          const missing = (field: string, path: string): null => {
+            errors.push({
+              type: "NOT_FOUND",
+              path: ["repository", alias, "target", field],
+              message: `Could not resolve file for path '${path}'.`,
+            })
+            return null
+          }
+          const file = (field: string, path: string): unknown => {
+            const entry = flat.find((candidate) => candidate.path === path)
+            const blob = entry ? state.blobs.get(entry.sha) : undefined
+            return blob
+              ? {
+                  object: {
+                    text: Buffer.from(blob.content, "base64").toString("utf8"),
+                    isBinary: false,
+                  },
+                }
+              : missing(field, path)
+          }
+          const entries = (dir: string, depth: number): unknown[] => {
+            const children = new Map<string, string | null>()
+            for (const entry of flat) {
+              if (!entry.path.startsWith(`${dir}/`)) continue
+              const [name = "", ...deeper] = entry.path.slice(dir.length + 1).split("/")
+              children.set(name, deeper.length ? null : entry.sha)
+            }
+            return [...children].map(([name, blobSha]) => {
+              const path = `${dir}/${name}`
+              const listed = depth < 3
+              return blobSha
+                ? { path, type: "blob", oid: blobSha, ...(listed ? { object: {} } : {}) }
+                : {
+                    path,
+                    type: "tree",
+                    oid: objectSha("tree", path),
+                    ...(listed ? { object: { entries: entries(path, depth + 1) } } : {}),
+                  }
+            })
+          }
+          const listing = entries(read.dir, 1)
+          return {
+            oid: commit.sha,
+            ko: file("ko", read.ko),
+            koAlt: file("koAlt", read.koAlt),
+            en: file("en", read.en),
+            dir: listing.length ? { object: { entries: listing } } : missing("dir", read.dir),
+          }
+        }
+        const postSha = state.refs.get(read.branch.replace(/^refs\//, ""))
+        const data = {
+          repository: {
+            post: postSha ? { target: commitAt("post", postSha) } : null,
+            main: { target: commitAt("main", state.refs.get("heads/main")) },
+          },
+        }
+        return json({ data, ...(errors.length ? { errors } : {}) })
+      }
       if (
         input.query.includes("resolveReviewThread") ||
         input.query.includes("unresolveReviewThread")
@@ -324,7 +409,8 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         object[1] === "blobs"
           ? state.blobs.get(sha)
           : object[1] === "trees"
-            ? state.trees.get(sha)
+            ? // Like GitHub, a commit SHA names that commit's tree.
+              (state.trees.get(sha) ?? state.trees.get(state.commits.get(sha)?.tree.sha ?? ""))
             : state.commits.get(sha)
       if (!result) throw new HttpFailure(404, "Git object not found")
       return json(result)
@@ -562,7 +648,7 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         const review = {
           id: nextId++,
           pull: pr.number,
-          user: { login: user.login },
+          user: { login: user.login, id: user.id },
           commit_id: commit,
           state:
             input.event === "APPROVE"
@@ -582,14 +668,14 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
         if (pr.state !== "open" || pr.draft)
           throw new HttpFailure(405, "Pull is not ready to merge")
         if (input.sha !== head(pr)) throw new HttpFailure(409, "Head SHA changed")
-        const reviews = new Map<string, string>()
+        const reviews = new Map<number, string>()
         for (const review of state.reviews.values()) {
           if (
             review.pull === pr.number &&
             review.commit_id === head(pr) &&
             review.state !== "COMMENTED"
           ) {
-            reviews.set(review.user.login, review.state)
+            reviews.set(review.user.id, review.state)
           }
         }
         if (
@@ -676,6 +762,31 @@ export function startFakeGitHub(options: FakeGitHubOptions = {}): FakeGitHub {
             },
           )
         if (injection && !injection.afterMutation) return injected()
+        // Like raw.githubusercontent.com: a file as of a commit, served without a token.
+        const raw = /^\/raw\/[^/]+\/[^/]+\/([a-f0-9]{40})\/(.+)$/.exec(url.pathname)
+        if (raw && request.method === "GET") {
+          const commit = state.commits.get(raw[1] ?? "")
+          const file = decodeURIComponent(raw[2] ?? "")
+          const entry = commit
+            ? state.trees.get(commit.tree.sha)?.tree.find((candidate) => candidate.path === file)
+            : undefined
+          const blob = entry ? state.blobs.get(entry.sha) : undefined
+          if (!blob) throw new HttpFailure(404, "Not Found")
+          const types: Readonly<Record<string, string>> = {
+            webp: "image/webp",
+            png: "image/png",
+            jpg: "image/jpeg",
+            jpeg: "image/jpeg",
+            gif: "image/gif",
+            svg: "image/svg+xml",
+          }
+          return new Response(Buffer.from(blob.content, "base64"), {
+            headers: {
+              ...headers,
+              "Content-Type": types[file.split(".").at(-1)?.toLowerCase() ?? ""] ?? "text/plain",
+            },
+          })
+        }
         if (url.pathname === "/oauth/token" && request.method === "POST") {
           const input = tokenExchangeRequestSchema.parse(await request.json())
           const grant = codes.get(input.code)

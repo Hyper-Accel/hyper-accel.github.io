@@ -10,6 +10,55 @@
   box-sizing: border-box;
 }
 
+/* Why the post is read-only: a closable note in the top-right corner, clear of the post. */
+.site-access-toast {
+  position: fixed;
+  z-index: 60;
+  top: calc(var(--composer-sticky-top, 64px) + 12px);
+  right: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  width: min(340px, calc(100vw - 32px));
+  padding: 10px 6px 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--entry);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  color: var(--primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.site-access-toast p {
+  flex: 1;
+  margin: 0;
+  padding-block: 6px;
+}
+
+.site-access-toast a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.site-access-toast button {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+}
+
+.site-access-toast button:hover {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
 .site-editor a:where(:not(.post-single a, .reading-toc a)) {
   display: inline-flex;
   align-items: center;
@@ -32,7 +81,7 @@
 
 .site-editor :focus-visible {
   outline: 2px solid var(--primary);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
 #site-content {
@@ -295,10 +344,14 @@
   background: var(--editor-accent, #4dabf7);
 }
 
+/* 44px to tap; the equal negative margins keep the ✕ on the dots' centre line and the text edge. */
 .site-editor dialog .onsite-intro__close {
-  width: 36px;
-  height: 36px;
-  margin: -8px -8px 0 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -12px -10px 0;
+  padding: 0;
   border: 0;
   border-radius: 8px;
   background: none;
@@ -327,8 +380,31 @@
   margin-top: 20px;
 }
 
+/* 다시 보지 않기 and 예시 글 보기 sit on the left, 이전·다음 on the right. */
+.onsite-intro__aside {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  margin-right: auto;
+}
+
+.site-editor dialog .onsite-intro__showcase {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--editor-accent, #4dabf7);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.site-editor dialog .onsite-intro__showcase:hover {
+  text-decoration: underline;
+}
+
 .site-editor dialog .onsite-intro__skip {
-  margin: 0 auto 0 0;
+  margin: 0;
   padding: 0 4px;
   min-height: 44px;
   border: 0;

@@ -62,6 +62,38 @@ export async function encodeWebP(file: Blob, limit = MAX_IMAGE_BYTES): Promise<B
   }
 }
 
+/** A square profile picture: the picture's centre, at most 288px (twice the largest avatar). */
+export async function encodeAvatar(file: Blob, edge = 288): Promise<Blob> {
+  const bitmap = await createImageBitmap(file)
+  try {
+    const side = Math.min(bitmap.width, bitmap.height)
+    const size = Math.min(edge, side)
+    const canvas = createCanvas(size, size)
+    const context = canvas.getContext("2d") as
+      | OffscreenCanvasRenderingContext2D
+      | CanvasRenderingContext2D
+      | null
+    if (!context) throw new Error("캔버스를 만들 수 없습니다.")
+    const left = (bitmap.width - side) / 2
+    const top = (bitmap.height - side) / 2
+    context.drawImage(bitmap, left, top, side, side, 0, 0, size, size)
+    const blob = await canvasToWebP(canvas, 0.85)
+    if (blob.type !== "image/webp")
+      throw new Error("이 브라우저는 WebP 인코딩을 지원하지 않습니다.")
+    return blob
+  } finally {
+    bitmap.close()
+  }
+}
+
+export async function blobToBase64(blob: Blob): Promise<string> {
+  const bytes = new Uint8Array(await blob.arrayBuffer())
+  let binary = ""
+  for (let start = 0; start < bytes.length; start += 0x8000)
+    binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000))
+  return btoa(binary)
+}
+
 export function pendingImageName(now: Date, suffix = crypto.randomUUID().slice(0, 6)): string {
   const compact = now.toISOString().replace(/\D/g, "").slice(0, 14)
   return `images/pasted-${compact.slice(0, 8)}-${compact.slice(8)}-${suffix}.webp`

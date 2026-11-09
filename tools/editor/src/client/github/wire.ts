@@ -36,7 +36,7 @@ export const commentResponse = z.object({
 export type WireComment = z.infer<typeof commentResponse>
 export const reviewResponse = z.object({
   id: z.number().int().positive(),
-  user: z.object({ login: z.string() }).nullable(),
+  user: z.object({ login: z.string(), id: z.number().int().positive() }).nullable(),
   commit_id: gitShaSchema,
   state: z.string(),
   body: z.string().nullable(),

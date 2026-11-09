@@ -95,6 +95,10 @@ try {
   }
   browser = await chromium.launch({ channel: "chrome", headless: true })
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  // GitHub's user lookup answers locally; the profile records the account ID it returns.
+  await page.route("https://api.github.com/users/*", (route) =>
+    route.fulfill({ json: { login: "example", id: 57936 } }),
+  )
   const pageErrors: string[] = []
   let postWrites = 0
   let authorWrites = 0
@@ -266,6 +270,7 @@ try {
     assert.equal(metadata.title, author)
     assert.equal(metadata.bio, language ? "Verification engineer." : "검증 엔지니어입니다.")
     assert.equal(metadata.github, "https://github.com/example")
+    assert.equal(metadata.github_id, 57936)
   }
   // Registered author survives cancellation and is selectable as an existing author.
   await page.locator("#create-post-cancel").click()

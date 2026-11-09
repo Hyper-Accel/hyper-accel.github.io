@@ -1,5 +1,10 @@
 import "./metadata-form.css"
-import { type NewAuthorProfile, requestAuthorProfile } from "./author-profile"
+import type { GitHubUser } from "../../shared/onsite/github"
+import {
+  type AuthorProfileFields,
+  type NewAuthorProfile,
+  requestAuthorProfile,
+} from "./author-profile"
 import { h, replaceChildren } from "./dom"
 import { imageChooser } from "./image-chooser"
 import {
@@ -20,15 +25,29 @@ export interface MetadataFormOptions {
   readonly onSubmit?: (metadata: PostMetadata) => void
   readonly onCoverFile: (file: File) => Promise<string | null>
   readonly coverPreviewUrl: (path: string) => string | undefined
-  /** GitHub handles shown beside author names, and used to find the signed-in writer. */
-  readonly people?: readonly { readonly name: string; readonly handle: string }[]
+  /** GitHub handles shown beside author names; the user ID finds the signed-in writer. */
+  readonly people?: readonly {
+    readonly name: string
+    readonly handle: string
+    readonly id?: number
+    /** The published profile, so its owner can change it (내 프로필 수정). */
+    readonly profile?: AuthorProfileFields
+  }[]
   /** Existing tags and series across the blog, offered in their dropdowns. */
   readonly tags?: readonly string[]
   readonly series?: readonly string[]
   /** The signed-in GitHub login; offers "내 프로필 추가" when no author has it yet. */
   readonly currentLogin?: string
+  /** The signed-in GitHub user ID: no author profile carries it yet → "내 프로필 추가". */
+  readonly currentUserId?: number
+  /** GitHub accounts allowed to edit that have no author profile, to label them by login. */
+  readonly users?: readonly GitHubUser[]
+  /** Resolves a login to its GitHub account; new authors and editors can be added only with it. */
+  readonly resolveUser?: (login: string) => Promise<GitHubUser | null>
   /** A new author was added; the site saves their profile with the post. */
   readonly onNewAuthor?: (profile: NewAuthorProfile) => void
+  /** The signed-in writer changed their own profile; the site saves it with the post. */
+  readonly onProfileEdit?: (profile: NewAuthorProfile) => void
   /** Lets the category dropdown add a category that is not in the list. */
   readonly createCategory?: PickerCreate
   /** Only authors may change who else can edit; others see the list read-only. */
@@ -106,11 +125,14 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
   const knownAuthors = new Set(options.authors)
   const handleOf = (name: string): string | undefined =>
     options.people?.find((person) => person.name === name)?.handle
+  const resolveUser = options.resolveUser
   const addAuthor = async (text: string, github?: string): Promise<string | null> => {
+    if (!resolveUser) return null
     const profile = await requestAuthorProfile({
       name: text,
       ...(github ? { github } : {}),
       taken: [...knownAuthors],
+      resolveUser,
       host: form.closest<HTMLElement>(".composer") ?? document.body,
     })
     if (!profile) return null
@@ -119,14 +141,30 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     return profile.name
   }
   const login = options.currentLogin
+  const userId = options.currentUserId
+  const own =
+    userId === undefined ? undefined : options.people?.find((person) => person.id === userId)
   const ownProfile =
-    login && !options.people?.some((person) => person.handle.toLowerCase() === login.toLowerCase())
+    login && userId !== undefined && resolveUser && !own
       ? h(
           "button",
           { type: "button", class: "composer-link metadata-picker__self" },
           `내 프로필 추가 (@${login})`,
         )
       : null
+  // The signed-in writer's own profile, as last saved here or as published.
+  let ownSaved: NewAuthorProfile | null =
+    own?.profile && userId !== undefined && options.onProfileEdit
+      ? { name: own.name, github: own.handle, githubId: userId, ...own.profile }
+      : null
+  const ownEdit = ownSaved
+    ? h(
+        "button",
+        { type: "button", class: "composer-link metadata-picker__self" },
+        "내 프로필 수정",
+      )
+    : null
+  const authorFooter = ownProfile ?? ownEdit
   const authorPicker = createPicker({
     onChange: () => emit(),
     id: `${prefix}-authors`,
@@ -140,8 +178,22 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
       return handle ? { value, detail: `@${handle}` } : { value }
     }),
     selected: options.initial.authors,
-    create: { label: (text) => `‘${text}’ 새 작성자로 추가`, run: (text) => addAuthor(text) },
-    ...(ownProfile ? { footer: ownProfile } : {}),
+    ...(resolveUser
+      ? { create: { label: (text: string) => `‘${text}’ 새 작성자로 추가`, run: addAuthor } }
+      : {}),
+    ...(authorFooter ? { footer: authorFooter } : {}),
+  })
+  ownEdit?.addEventListener("click", () => {
+    if (!ownSaved) return
+    void requestAuthorProfile({
+      existing: ownSaved,
+      taken: [],
+      host: form.closest<HTMLElement>(".composer") ?? document.body,
+    }).then((profile) => {
+      if (!profile) return
+      ownSaved = profile
+      options.onProfileEdit?.(profile)
+    })
   })
   ownProfile?.addEventListener("click", () => {
     void addAuthor("", login).then((name) => {
@@ -183,20 +235,55 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     queryName: "editorQuery",
     multiple: true,
     placeholder: "이름 또는 @아이디로 찾기",
-    // People, as in 작성자: the name shown with the handle; the stored value is the handle.
-    options: (options.people ?? []).map((person) => ({
-      value: person.handle,
-      label: person.name,
-      detail: `@${person.handle}`,
-    })),
+    // People, as in 작성자: the name shown with the handle. The stored value is the numeric
+    // GitHub user ID, which survives login renames; posts saved earlier may still list logins.
+    options: [
+      ...(options.people ?? []).flatMap((person) =>
+        person.id === undefined
+          ? []
+          : [{ value: String(person.id), label: person.name, detail: `@${person.handle}` }],
+      ),
+      ...(options.users ?? [])
+        .filter((user) => !options.people?.some((person) => person.id === user.id))
+        .map((user) => ({ value: String(user.id), label: user.login, detail: `@${user.login}` })),
+      // An ID GitHub could not name right now still reads as an account, not a bare number.
+      ...options.initial.editors
+        .filter(
+          (value) =>
+            /^\d+$/.test(value) &&
+            !options.people?.some((person) => String(person.id) === value) &&
+            !options.users?.some((user) => String(user.id) === value),
+        )
+        .map((value) => ({ value, label: `GitHub 계정 #${value}` })),
+    ],
     selected: options.initial.editors,
-    create: {
-      label: (text) => `@${text.replace(/^@/, "")} 추가`,
-      run: (text) => {
-        const handle = text.trim().replace(/^@/, "")
-        return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(handle) ? handle : null
-      },
-    },
+    ...(resolveUser
+      ? {
+          create: {
+            label: (text: string) => `@${text.replace(/^@/, "")} 추가`,
+            run: async (text: string): Promise<string | null> => {
+              const handle = text.trim().replace(/^@/, "")
+              if (!/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(handle)) return null
+              const showError = (message: string): null => {
+                errors.hidden = false
+                replaceChildren(errors, h("li", {}, message))
+                return null
+              }
+              let user: GitHubUser | null
+              try {
+                user = await resolveUser(handle)
+              } catch (failure: unknown) {
+                if (!(failure instanceof Error)) throw failure
+                return showError(failure.message)
+              }
+              if (!user) return showError(`GitHub 아이디 @${handle}을(를) 찾을 수 없습니다.`)
+              const value = String(user.id)
+              editorPicker.add({ value, label: user.login, detail: `@${user.login}` })
+              return value
+            },
+          },
+        }
+      : {}),
   })
   if (options.lockEditors) {
     editorPicker.element.disabled = true
@@ -235,7 +322,8 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
   )
   const coverAlt = h("input", { name: "coverAlt", autocomplete: "off" })
   const coverStatus = h("span", { class: "composer-cover__status", "aria-live": "polite" })
-  const draft = h("input", { name: "draft", type: "checkbox" })
+  // Kept as it is: 리뷰 요청 clears `draft:`, so the form no longer offers it.
+  let draft = options.initial.draft
   const errors = h("ul", { class: "composer-form__errors", role: "alert", hidden: true })
 
   const form = h(
@@ -275,11 +363,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
         tagPicker.element,
         editorPicker.element,
       ),
-      group(
-        { id: `${prefix}-publish`, title: "게시" },
-        field("작성일", date),
-        h("label", { class: "metadata-check" }, draft, h("span", {}, "사이트에 숨김 (Hugo draft)")),
-      ),
+      group({ id: `${prefix}-publish`, title: "게시" }, field("작성일", date)),
       group(
         { id: `${prefix}-extras`, title: "시리즈와 커버", note: "선택" },
         seriesPicker.element,
@@ -329,7 +413,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     seriesIndex: seriesIndex.value === "" ? null : Number(seriesIndex.value),
     cover: cover ? { image: cover.image, alt: coverAlt.value.trim() } : null,
     date: fromDateTimeLocal(date.value, options.initial.date),
-    draft: draft.checked,
+    draft,
   })
 
   const renderCover = (): void => {
@@ -353,7 +437,7 @@ export function createMetadataForm(options: MetadataFormOptions): MetadataForm {
     seriesIndex.value = metadata.seriesIndex === null ? "" : String(metadata.seriesIndex)
     cover = metadata.cover
     coverAlt.value = metadata.cover?.alt ?? ""
-    draft.checked = metadata.draft
+    draft = metadata.draft
     renderCover()
   }
 

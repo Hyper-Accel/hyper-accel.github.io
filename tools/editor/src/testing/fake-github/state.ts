@@ -64,7 +64,7 @@ export interface FakeThread {
 export interface FakeReview {
   readonly id: number
   readonly pull: number
-  readonly user: { readonly login: string }
+  readonly user: { readonly login: string; readonly id: number }
   readonly commit_id: string
   readonly state: "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED"
   readonly body: string
@@ -76,6 +76,8 @@ export interface FakeCheckRun {
   readonly conclusion: string | null
   readonly html_url: string | null
   readonly details_url: string | null
+  readonly started_at?: string | null
+  readonly completed_at?: string | null
   readonly output: {
     readonly title: string | null
     readonly summary: string | null

@@ -4,10 +4,26 @@ import { el, UI_ATTRIBUTE } from "./dom"
 
 let loading: Promise<typeof MathfieldElement> | null = null
 
+let preloadArmed = false
+
 /**
- * MathLive is large, so it is a separate chunk; the editor preloads it once it is idle so that a
- * new formula takes typing at once (a key pressed before it loads would replace the formula).
+ * MathLive (about 800KB) stays out of the page load: the writer's first click or key press starts
+ * it, which is still before a new formula can take typing (a key pressed before it loads would
+ * replace the formula).
  */
+export function preloadMathfieldOnFirstInput(): void {
+  if (preloadArmed) return
+  preloadArmed = true
+  const start = (): void => {
+    document.removeEventListener("pointerdown", start, true)
+    document.removeEventListener("keydown", start, true)
+    void loadMathfield()
+  }
+  document.addEventListener("pointerdown", start, true)
+  document.addEventListener("keydown", start, true)
+}
+
+/** MathLive is large, so it is a separate chunk loaded at most once. */
 export function loadMathfield(): Promise<typeof MathfieldElement> {
   loading ??= import("mathlive").then(({ MathfieldElement }) => {
     // The KaTeX stylesheet, already loaded for the rendered formulas, provides the same fonts.

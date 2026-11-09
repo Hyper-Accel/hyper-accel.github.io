@@ -173,8 +173,30 @@ describe("access and immutable bundle reads", () => {
     expect(JSON.stringify(access)).not.toContain(fake.defaultToken)
   })
 
+  test("reads a post in a single GraphQL round trip", async () => {
+    const pr = await setup()
+    const requests: string[] = []
+    const client = adapter(undefined, {
+      fetch: extendFetch(undefined, (request, response) => {
+        requests.push(`${request.method} ${request.path}`)
+        return response
+      }),
+    })
+    const loaded = value(await client.loadBundle("test"))
+    expect(requests).toEqual(["POST /graphql"])
+    expect(loaded.headSha).toBe(pr.headSha)
+    expect(parsedInputs[0]).toMatchObject({
+      ko: "unchanged\n새 글\nsecond\n",
+      en: "unchanged\nnew\nsecond\n",
+      headSha: pr.headSha,
+      images: [{ path: "images/a.png", status: "committed", mime: "image/png" }],
+    })
+  })
+
   test("loads both languages at one captured SHA when the branch changes during reading", async () => {
     const pr = await setup()
+    // GraphQL cannot answer, so the REST reads (each naming the captured SHA) take over.
+    fake.inject({ method: "POST", path: "/graphql", status: 403 })
     let changed = false
     const client = adapter(undefined, {
       fetch: extendFetch(undefined, (request, response) => {
@@ -236,6 +258,13 @@ describe("access and immutable bundle reads", () => {
       error: { kind: "forbidden" },
     })
     expect(fake.state.refs.get("heads/post/test")).toBe(pr.headSha)
+  })
+
+  test("resolves a login to its stable user ID and an unknown login to null", async () => {
+    expect(value(await adapter().getUser("REVIEWER"))).toEqual({ login: "reviewer", id: 2 })
+    expect(value(await adapter().getUser("nobody"))).toBeNull()
+    expect(value(await adapter().getUserById(2))).toEqual({ login: "reviewer", id: 2 })
+    expect(value(await adapter().getUserById(999))).toBeNull()
   })
 })
 
@@ -633,6 +662,23 @@ describe("approval and publication", () => {
       error: { kind: "validation" },
     })
     expect(fake.state.pulls.get(pr.number)?.merged).toBe(false)
+  })
+
+  test("a reviewer who renamed their login has one verdict, the latest", async () => {
+    const pr = await setup()
+    value(await adapter().markReady(pr.number, pr.headSha))
+    // The same account (ID 2) asked for changes under its former login, then approved.
+    fake.state.reviews.set(900, {
+      id: 900,
+      pull: pr.number,
+      user: { login: "former-reviewer", id: 2 },
+      commit_id: pr.headSha,
+      state: "CHANGES_REQUESTED",
+      body: "",
+    })
+    value(await adapter(fake.reviewerToken).approve(pr.number, pr.headSha))
+    expect(value(await adapter().getPullState(pr.number)).approvedHeadShas).toContain(pr.headSha)
+    expect(await adapter().squashMerge(pr.number, pr.headSha)).toMatchObject({ ok: true })
   })
 
   test("takes a pull request in review back to draft", async () => {

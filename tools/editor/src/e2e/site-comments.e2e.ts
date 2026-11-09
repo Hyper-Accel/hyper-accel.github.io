@@ -80,8 +80,14 @@ try {
         const comments = page.locator("[data-site-comments]")
         await comments.waitFor({ state: "visible" })
         await comments.click()
-        await page.getByRole("button", { name: "일반 댓글 쓰기", exact: true }).click()
-        await page.locator('textarea[aria-label="댓글"]').fill("General post feedback")
+        // The comment button opens the box for a comment on the whole post, ready to type in.
+        const box = page.locator('textarea[aria-label="댓글"]')
+        await box.waitFor()
+        assert.equal(
+          await box.evaluate((element) => element === element.ownerDocument.activeElement),
+          true,
+        )
+        await box.fill("General post feedback")
         await page.getByRole("button", { name: "댓글 달기", exact: true }).click()
         await page
           .locator(".composer-comment-thread", { hasText: "General post feedback" })

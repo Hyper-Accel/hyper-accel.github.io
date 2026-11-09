@@ -3,7 +3,6 @@ import type { Node as PMNode } from "@tiptap/pm/model"
 import { Plugin, PluginKey } from "@tiptap/pm/state"
 import { Decoration, DecorationSet } from "@tiptap/pm/view"
 import katex from "katex"
-import { createRenderer } from "../../render"
 import type { DocumentCodec, Language, PostBundle } from "../../shared/onsite/document"
 import type { GitHubAdapter } from "../../shared/onsite/github"
 import type { ReviewThread } from "../../shared/onsite/review"
@@ -376,7 +375,11 @@ export class SiteComments {
   private async context(language: Language): Promise<AnchorContext | null> {
     const bundle = this.options.bundle()
     if (!bundle) return null
-    const serialized = await this.options.codec.serialize(bundle)
+    // The renderer is a separate download, fetched once comments are placed, not with the editor.
+    const [serialized, { createRenderer }] = await Promise.all([
+      this.options.codec.serialize(bundle),
+      import("../../render"),
+    ])
     const renderer = createRenderer({
       serializedMarkdown: (entry) => {
         const file = serialized.files.find((candidate) => candidate.path === entry.path)
@@ -470,6 +473,8 @@ export class SiteComments {
     quoted: string,
     editor?: Editor,
     to = 0,
+    /** The post's comment list: the box for a comment on the whole post opens under it. */
+    list?: { readonly title: string; readonly element: HTMLElement | null },
   ): void {
     const textarea = h("textarea", {
       "aria-label": "댓글",
@@ -523,7 +528,11 @@ export class SiteComments {
           submit.textContent = "댓글 달기"
         })
     })
-    this.show("댓글 달기", form, this.anchorRect?.() ?? null)
+    this.show(
+      list?.title ?? "댓글 달기",
+      list ? h("div", {}, list.element, form) : form,
+      this.anchorRect?.() ?? null,
+    )
     this.paint(language)
     this.detachMention = attachMentions(textarea, () => this.people)
     textarea.focus()
@@ -715,29 +724,13 @@ export class SiteComments {
       })
       return h("li", {}, button)
     })
+    this.pending = null
     this.anchorRect = () => this.countButton.getBoundingClientRect()
-    this.show(
-      "이 글의 댓글",
-      h(
-        "div",
-        {},
-        h("ol", { class: "composer-comment-list" }, ...items),
-        h(
-          "button",
-          {
-            type: "button",
-            class: "composer-comment-primary",
-            onclick: () => {
-              this.pending = null
-              this.anchorRect = () => this.countButton.getBoundingClientRect()
-              this.writeComment("ko", [], "")
-            },
-          },
-          "일반 댓글 쓰기",
-        ),
-      ),
-      this.anchorRect(),
-    )
+    // The existing threads, then the box for a comment on the whole post, ready to type in.
+    this.writeComment("ko", [], "", undefined, 0, {
+      title: "이 글의 댓글",
+      element: items.length ? h("ol", { class: "composer-comment-list" }, ...items) : null,
+    })
     this.popover.dataset["view"] = "list"
   }
 

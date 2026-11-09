@@ -113,6 +113,7 @@ test("keeps only the latest commit status when its context changes case", async 
         title: "",
         summary: "Fixed",
         text: "",
+        durationMs: null,
         detailsUrl: null,
         annotations: [],
       },

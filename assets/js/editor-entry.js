@@ -45,6 +45,35 @@
     if (!(error instanceof DOMException)) throw error
   }
   if (!returning) return
+  // While a returning editor reads the blog, the editor's code downloads in the background, so
+  // opening the editor reads it from the browser cache. The formula editor and the code
+  // highlighter stay out: they are large and load only when a post needs them.
+  if (!document.querySelector(".onsite-app")) {
+    const prefetch = () =>
+      fetch("/editor/manifest.json")
+        .then((response) => response.json())
+        .then((manifest) => {
+          const seen = new Set()
+          const visit = (key) => {
+            const entry = manifest[key]
+            if (!entry || seen.has(key) || /mathlive|chroma/.test(key)) return
+            seen.add(key)
+            for (const file of [entry.file, ...(entry.css ?? [])]) {
+              const link = document.createElement("link")
+              link.rel = "prefetch"
+              link.href = `/editor/${file}`
+              // Same credentials mode as the module script that will use it.
+              if (file.endsWith(".js")) link.crossOrigin = "anonymous"
+              document.head.append(link)
+            }
+            for (const next of [...(entry.imports ?? []), ...(entry.dynamicImports ?? [])]) visit(next)
+          }
+          visit("../src/client/site.ts")
+        })
+        .catch(() => undefined)
+    if ("requestIdleCallback" in window) requestIdleCallback(prefetch, { timeout: 4000 })
+    else setTimeout(prefetch, 2000)
+  }
   // Home page: load the editor's "작성 중인 글" shelf, for returning editors only.
   const shelf = document.querySelector("[data-editor-drafts]")
   if (shelf?.dataset.module) {

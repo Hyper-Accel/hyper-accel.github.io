@@ -5,7 +5,7 @@ import type { NodeView } from "@tiptap/pm/view"
 import katex from "katex"
 import "katex/dist/katex.min.css"
 import { attrNullableString, attrString, el, isUiTarget } from "./dom"
-import { loadMathfield, MathInput, type MathLeave, mathError } from "./math-input"
+import { MathInput, type MathLeave, mathError, preloadMathfieldOnFirstInput } from "./math-input"
 import type { MathToken } from "./tokenizers"
 import { mathBlockTokenizer, mathInlineTokenizer } from "./tokenizers"
 
@@ -220,8 +220,7 @@ export function createMathBlockNode() {
     },
 
     onCreate() {
-      if (typeof requestIdleCallback === "function")
-        requestIdleCallback(() => void loadMathfield().catch(reportError))
+      preloadMathfieldOnFirstInput()
     },
 
     markdownTokenizer: mathBlockTokenizer,

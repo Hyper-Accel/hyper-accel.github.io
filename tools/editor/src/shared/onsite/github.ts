@@ -49,6 +49,11 @@ export const pullStateSchema = z.object({
   merged: z.boolean(),
 })
 export type PullState = z.infer<typeof pullStateSchema>
+/** A GitHub account: the login may be renamed, the numeric ID never changes. */
+export interface GitHubUser {
+  readonly login: string
+  readonly id: number
+}
 export interface CheckAnnotation {
   readonly path: string
   readonly line: number
@@ -70,6 +75,8 @@ export interface CommitCheck {
   readonly title: string
   readonly summary: string
   readonly text: string
+  /** How long a finished check run took, when GitHub reports both times. */
+  readonly durationMs: number | null
   readonly detailsUrl: string | null
   readonly annotations: readonly CheckAnnotation[]
 }
@@ -77,6 +84,10 @@ export interface CommitCheck {
 // Every mutation must reconcile ambiguous network outcomes before any retry.
 export interface GitHubAdapter {
   getAccess(): Promise<GitHubResult<AuthSession>>
+  /** The account currently using this login, or null when no such account exists. */
+  getUser(login: string): Promise<GitHubResult<GitHubUser | null>>
+  /** The account with this user ID under its current login, or null when it no longer exists. */
+  getUserById(id: number): Promise<GitHubResult<GitHubUser | null>>
   listDrafts(): Promise<GitHubResult<readonly DraftPullRequest[]>>
   // Optional for existing injected adapters; production B implements this.
   getPullState?(pullNumber: number): Promise<GitHubResult<PullState>>
