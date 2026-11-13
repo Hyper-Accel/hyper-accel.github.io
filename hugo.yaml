@@ -32,6 +32,9 @@ minify:
 
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  # Address readers use: hyperaccel.ai/techblog reverse-proxies this site. Sets every page's
+  # canonical link and where github.io visitors are sent (layouts/partials/moved_site_redirect.html).
+  canonicalBase: "https://hyperaccel.ai/techblog"
   title: HyperAccel Tech Blog
   description: "HyperAccel Tech Blog"
   keywords: [Blog, Tech, LPU, LLM, Inference, AI, Acceleration]
