@@ -1,0 +1,22 @@
+{{- /* Send readers who open the github.io address to the same page under site.Params.canonicalBase.
+
+     GitHub Pages cannot answer with a redirect, so the page does it. The check is on the host
+     because the proxy serves this same HTML: there the script must do nothing. The editor stays
+     on github.io (its pages, ?edit and ?review on a post, and browsers that have logged in to it). */}}
+{{- with site.Params.canonicalBase }}
+{{- if not (in (slice "editor" "editor-redirect") $.Layout) }}
+<script>
+(() => {
+  if (!location.hostname.endsWith(".github.io")) return
+  const params = new URLSearchParams(location.search)
+  if (params.has("edit") || params.has("review")) return
+  try {
+    if (localStorage.getItem("onsite:returning-editor") !== null) return
+  } catch (e) {
+    if (!(e instanceof DOMException)) throw e
+  }
+  location.replace({{ strings.TrimSuffix "/" . }} + location.pathname + location.search + location.hash)
+})()
+</script>
+{{- end }}
+{{- end }}
