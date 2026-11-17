@@ -123,10 +123,12 @@ params:
   math: true
 
   giscus:
-    repo: Hyper-Accel/hyper-accel.github.io
-    repoID: R_kgDOQL9hnw
+    # Comments live in a separate public repository so this one can be private.
+    # giscus can only read Discussions of a public repository.
+    repo: Hyper-Accel/techblog-comments
+    repoID: TODO_REPO_ID # fill in once Hyper-Accel/techblog-comments exists
     category: Announcements
-    categoryID: DIC_kwDOQL9hn84CxP6H
+    categoryID: TODO_CATEGORY_ID # fill in once the Announcements category exists
     mapping: pathname
     strict: 0
     reactionsEnabled: 1
