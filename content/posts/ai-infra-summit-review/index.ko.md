@@ -12,7 +12,7 @@ cover:
 comments: true
 ---
 
-안녕하세요. HyperAccel Marketing 박소영입니다.
+안녕하세요. HyperAccel Marketing팀의 박소영입니다.
 
 AI 모델이 고도화되고 적용 범위가 넓어질수록, 이를 실제로 구동하고 운영하는 AI 추론 인프라(Inference Infrastructure)의 중요성이 그 어느 때보다 커지고 있습니다. 특히 엔터프라이즈 환경에서는 단순한 모델 성능을 넘어 LLM 추론 비용, 전력 소비량, 시스템 전체의 TCO(총소유비용)가 서비스의 성패를 가르는 핵심 지표가 되었습니다.
 
@@ -81,7 +81,7 @@ Google, Meta, AWS 등 글로벌 빅테크는 급증하는 추론 수요에 대�
 
 ▲ NVIDIA Ian Buck 키노트 내용을 바탕으로 재구성한 도식: DSX MaxLPS 기반 데이터센터 전력 최적화 및 Extreme Co-design
 
-- NVIDIA Ian Buck은 키노트에서 DSX AI Factory Platform과 DSX MaxLPS 기술을 공개하며, 데이터센터 내 유휴 전력을 효율적으로 재분배해 활용도를 높이는 방식으로, 적합한 구축 환경에서는 동일한 전력 예산으로 최대 40% 더 많은 GPU 용량을 확보할 수 있다고 설명했습니다.
+- NVIDIA의 Ian Buck은 키노트에서 DSX AI Factory Platform과 DSX MaxLPS를 소개했습니다. 이 기술은 데이터센터 내 유휴 전력을 효율적으로 재분배해 활용도를 높이며, 적합한 구축 환경에서는 동일한 전력 예산으로 최대 40% 더 많은 GPU 용량을 확보할 수 있다고 설명했습니다.
 - Vera Rubin, Groq 3 LPX, d-Matrix 등과의 연동 사례에서 보듯, 이제 개별 칩 성능을 넘어 전력 관리, 인터커넥트, 스토리지까지 랙 전체를 하나의 시스템으로 설계(Extreme Co-design)하는 방향으로 진화하고 있습니다.
 
 ![AI 클라우드와 인프라 조달 생태계 부스](images/pasted-20261029-013621-e4176e.jpg)
@@ -96,7 +96,7 @@ Google, Meta, AWS 등 글로벌 빅테크는 급증하는 추론 수요에 대�
 
 ▲ d-Matrix 세션 내용을 바탕으로 재구성한 도식: Disaggregated Inference 기반 Ultra Low Latency 아키텍처
 
-- **d-Matrix 세션:** 에이전틱(Agentic) 워크로드와 Long-Context 처리가 늘어나면서, Prefill 단계는 연산 특화 영역에, Decode 단계는 메모리 대역폭 특화 영역에 분리 배치해 Ultra Low Latency와 높은 TPS를 동시에 달성하는 아키텍처가 AI 데이터센터의 표준으로 자리 잡고 있음을 다루었습니다.
+- **d-Matrix 세션:** 에이전틱(Agentic) 워크로드와 Long-Context 처리가 늘어나면서, Prefill 단계는 연산 특화 영역에, Decode 단계는 메모리 대역폭 특화 영역에 분리 배치해 Ultra Low Latency와 높은 TPS를 동시에 달성하는 아키텍처가 AI 데이터센터의 주요 설계 방향으로 주목받고 있음을 보여주었습니다.
 
 ![인터커넥트 주요 기업 부스](images/pasted-20261029-014521-5776df.jpg)
 
@@ -122,7 +122,7 @@ Google, Meta, AWS 등 글로벌 빅테크는 급증하는 추론 수요에 대�
 결국 토큰당 단가를 낮추는 단편적인 접근을 넘어, 전체 추론 과정에서 토큰을 얼마나 효율적으로 처리할 수 있는 인프라를 구축하느냐가 핵심 과제입니다. HyperAccel은 이를 위한 3가지 접근 방식을 제시했습니다.
 
 - **Token Efficiency (토큰 효율성):** LLM 추론에 최적화된 LPU 아키텍처를 소개했습니다. Big Core 연산 엔진과 메모리·연산 공동 설계(Co-design) 기반의 Streamlined Dataflow를 통해 메모리 대역폭 활용률을 극대화했으며, LLM 추론 시 평균 83%, 최대 90% 이상의 대역폭 활용률을 달성했습니다.
-- **Enterprise Performance & Cost (성능 및 비용):** 엔터프라이즈 AI 인프라의 핵심 지표인 처리량(TPS), 전력 효율, TCO 관점에서 BERTHA의 성능을 공유했습니다. 워크로드와 비교 대상에 따라 와트당 및 달러당 처리 효율이 최대 3\~5배 향상될 수 있음을 보여주었습니다.
+- **Enterprise Performance & Cost (성능 및 비용):** 엔터프라이즈 AI 인프라의 핵심 지표인 처리량(TPS), 전력 효율, TCO 관점에서 BERTHA의 성능을 공유했습니다. 워크로드와 비교 대상에 따라 와트당 및 달러당 성능이 최대 3\~5배 향상될 수 있음을 보여주었습니다.
 - **Disaggregation & Edge (아키텍처 및 엣지 확장성):** Prefill과 Decode 단계를 분리해 추론 성능과 효율을 극대화하는 아키텍처 구성과 함께, 데이터센터용 BERTHA부터 온디바이스 AI용 BERTHA-Edge까지 이어지는 제품 로드맵을 선보였습니다.
 
 발표 직후 많은 참석자들이 HyperAccel 부스를 찾아 BERTHA의 실시간 추론 시연을 지켜보고 자사 인프라 적용 가능성을 논의했습니다.
@@ -133,7 +133,7 @@ Google, Meta, AWS 등 글로벌 빅테크는 급증하는 추론 수요에 대�
 
 ![HyperAccel LPU 라이브 데모 시연 현장](images/pasted-20261028-042836-90ee59.jpg)
 
-▲ HyperAccel LPU Live Demo 시연 현장
+▲ HyperAccel LPU 라이브 데모 현장
 
 HyperAccel 부스는 전시장 안쪽에 위치했음에도 불구하고, 실제 LLM 추론이 구동되는 실시간 시연을 통해 방문객들의 관심을 끌었습니다. 행사 기간 3일 동안 300명 이상의 AI 인프라 관계자가 부스를 찾았고, 현장의 관심은 기술 논의와 비즈니스 상담으로 이어졌습니다.
 
@@ -157,7 +157,7 @@ AI 반도체처럼 깊은 기술적 이해가 필요한 딥테크 제품은 아�
 
 B2B AI 인프라 시장에서는 더 이상 이론적인 Peak FLOPS나 스펙 시트만으로는 고객을 설득하기 어렵습니다. 실제 LLM 워크로드 기반의 실시간 추론 데모, 메모리 효율을 극대화한 데이터플로우 설계, Prefill/Decode 분리 아키텍처처럼 현장에서 검증 가능한 결과가 글로벌 고객의 도입 결정을 이끄는 기준이 되고 있습니다.
 
-### 3. HyperAccel의 다음 걸음과 문의 채널
+## HyperAccel의 다음 걸음과 문의 채널
 
 HyperAccel은 앞으로도 LPU 기술력을 바탕으로 글로벌 AI 인프라 시장에서 효율적인 AI 추론 솔루션을 제시해 나가겠습니다.
 

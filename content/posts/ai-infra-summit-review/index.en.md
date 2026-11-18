@@ -32,7 +32,7 @@ This post shares what we saw at AI Infra Summit 2026 in Santa Clara, Silicon Val
 
 AI Infra Summit 2026 is a global conference dedicated to AI infrastructure. It was held from September 15 to 17 at the Santa Clara Convention Center in California.
 
-This was the ninth edition. It drew 9,200 registrations and more than 250 partner companies. The program covered the whole AI infrastructure ecosystem, from AI Data Center, Compute, and Data Movement to Data & Models and Physical AI.
+This was the ninth edition. It recorded 9,200 registrations and more than 250 partner companies. The program covered the whole AI infrastructure ecosystem, from AI Data Center, Compute, and Data Movement to Data & Models and Physical AI.
 
 Leaders from NVIDIA, AMD, AWS, Meta, Google, and Intel spoke in the main stage keynotes. Korean sponsors included SK hynix, Samsung Electronics, Rebellions, FuriosaAI, MangoBoost, Moreh, and HyperAccel.
 
@@ -96,7 +96,7 @@ Big tech and global chip companies are raising data center efficiency with rack-
 
 ▲ Diagram recreated from the d-Matrix session: an ultra low latency architecture based on Disaggregated Inference
 
-- **d-Matrix session:** Agentic workloads and long-context processing keep growing. In response, an architecture that places the Prefill stage on compute-specialized hardware and the Decode stage on memory-bandwidth-specialized hardware is becoming the standard for AI data centers. It achieves ultra low latency and high TPS at the same time.
+- **d-Matrix session:** Agentic workloads and long-context processing keep growing. The session highlighted the growing adoption of architectures that place the Prefill stage on compute-specialized hardware and the Decode stage on memory-bandwidth-specialized hardware. These architectures enable ultra low latency and high TPS at the same time.
 
 ![Booths of leading interconnect companies](images/pasted-20261029-014521-5776df.jpg)
 
@@ -157,7 +157,7 @@ Token demand surged in a single year. The main bottleneck in data centers has mo
 
 In the B2B AI infrastructure market, theoretical peak FLOPS and spec sheets alone no longer persuade customers. Results that can be verified on the floor now drive global customers' adoption decisions. Examples are real-time inference demos on real LLM workloads, a dataflow design that maximizes memory efficiency, and a Prefill/Decode disaggregated architecture.
 
-### 3. HyperAccel's Next Steps and How to Reach Us
+## HyperAccel's Next Steps and How to Reach Us
 
 HyperAccel will keep building on its LPU technology. Our goal is to offer an efficient AI inference solution in the global AI infrastructure market.
 
