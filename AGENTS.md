@@ -48,7 +48,7 @@ HyperAccel tech blog. Hugo 0.152.2 extended + PaperMod theme (git submodule). Bi
 - Custom taxonomies beyond stock PaperMod: `authors` (profile pages) and `series` (+ `series_idx`).
 - `layouts/` holds only intentional overrides; everything else falls through to the submodule.
 - Math via MathJax and Naver site verification are wired in `layouts/partials/extend_head.html`.
-- Comments: Giscus (GitHub Discussions), toggled per post with `comments:` front matter.
+- Comments: Giscus (GitHub Discussions), toggled per post with `comments:` front matter. The discussions live in the public `Hyper-Accel/techblog-comments` repository, not here.
 
 ## ANTI-PATTERNS (THIS PROJECT)
 - NEVER edit `themes/PaperMod/` (submodule) - override in `layouts/` instead.
