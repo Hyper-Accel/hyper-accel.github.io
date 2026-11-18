@@ -61,8 +61,6 @@ Google, Meta, AWS 등 글로벌 빅테크는 급증하는 추론 수요에 대�
 
 ### ② '단순 칩'을 넘어선 랙 스케일(Rack-Scale) 경쟁과 Sovereign AI의 부상
 
-![주요 AI 반도체 기업의 랙 스케일 시스템](images/pasted-20261029-011146-e2576e.jpg)
-
 ![주요 AI 반도체 기업의 칩과 시스템 전시](images/pasted-20261029-013543-6b5e0d.jpg)
 
 ▲ 주요 AI 반도체 및 인프라 기업들의 랙 스케일(Rack-Scale) 시스템 현장 스케치

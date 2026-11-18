@@ -61,8 +61,6 @@ Big tech and global chip companies are raising data center efficiency with rack-
 
 ### ② The rack-scale race beyond "just chips" and the rise of Sovereign AI
 
-![Rack-scale systems from major AI chip companies](images/pasted-20261029-011146-e2576e.jpg)
-
 ![Chips and systems from major AI chip companies on the exhibition floor](images/pasted-20261029-013543-6b5e0d.jpg)
 
 ▲ Rack-scale systems from major AI chip and infrastructure companies, as seen on the floor
