@@ -150,19 +150,22 @@ The experience confirmed once more that what matters more than booth size or loc
 
 The structural shifts we saw in the global AI infrastructure market at AI Infra Summit 2026 come down to two points.
 
-- **A paradigm shift from "scaling compute" to "maximizing tokens per unit of power"**
+### 1. From "Scaling Compute" to "Maximizing Tokens per Unit of Power"
 
-  Token demand surged in a single year. The main bottleneck in data centers has moved from model size to power limits and cost per token ($/token). Infrastructure competition will now be won by architectures that maximize token efficiency per watt and per dollar, not by chip specs.
-- **From the era of paper specs to the era of real workload validation**
+Token demand surged in a single year. The main bottleneck in data centers has moved from model size to power limits and cost per token ($/token). Infrastructure competition will now be won by architectures that maximize token efficiency per watt and per dollar, not by chip specs.
+### 2. From the Era of Paper Specs to Real Workload Validation
 
-  In the B2B AI infrastructure market, theoretical peak FLOPS and spec sheets alone no longer persuade customers. Results that can be verified on the floor now drive global customers' adoption decisions. Examples are real-time inference demos on real LLM workloads, a dataflow design that maximizes memory efficiency, and a Prefill/Decode disaggregated architecture.
+In the B2B AI infrastructure market, theoretical peak FLOPS and spec sheets alone no longer persuade customers. Results that can be verified on the floor now drive global customers' adoption decisions. Examples are real-time inference demos on real LLM workloads, a dataflow design that maximizes memory efficiency, and a Prefill/Decode disaggregated architecture.
+
+### 3. HyperAccel's Next Steps and How to Reach Us
 
 HyperAccel will keep building on its LPU technology. Our goal is to offer the most efficient AI inference solution in the global AI infrastructure market.
 
 For questions about BERTHA's technical specifications or building LPU-based inference infrastructure, please contact us through the [HyperAccel official channel](https://hyperaccel.ai/contact/).
 
 ✉️ **Contact:** [contact@hyperaccel.ai](mailto:contact@hyperaccel.ai)  
-🔗 **LinkedIn:** [HyperAccel Official LinkedIn](https://www.linkedin.com/company/hyperaccel)  
+🔗 **LinkedIn:** [HyperAccel](https://www.linkedin.com/company/hyperaccel)  
+🐦 **X:** [@HyperAccelAI](https://x.com/HyperAccelAI)  
 🌐 **Website:** [www.hyperaccel.ai](https://www.hyperaccel.ai)
 
 ---

@@ -150,19 +150,22 @@ AI 반도체처럼 깊은 기술적 이해가 필요한 딥테크 제품은 아�
 
 이번 AI Infra Summit 2026에서 확인한 글로벌 AI 인프라 시장의 구조적 변화는 다음 두 가지로 정리할 수 있습니다.
 
-- **'컴퓨팅 파워 확장'에서 '단위 전력당 토큰 처리량 극대화'로의 패러다임 전환**
+### 1. '컴퓨팅 파워 확장'에서 '단위 전력당 토큰 처리량 극대화'로의 전환
 
-  1년 만에 토큰 수요가 폭증하면서, 데이터센터의 핵심 병목은 모델 크기가 아닌 전력 한계와 토큰당 비용($/token)으로 이동했습니다. 인프라 경쟁의 승패는 이제 칩 스펙이 아니라 와트당·달러당 토큰 효율을 극대화하는 아키텍처에 달려 있습니다.
-- **스펙 시트(Paper Spec)의 시대에서 '실제 워크로드 검증'의 시대로**
+1년 만에 토큰 수요가 폭증하면서, 데이터센터의 핵심 병목은 모델 크기가 아닌 전력 한계와 토큰당 비용($/token)으로 이동했습니다. 인프라 경쟁의 승패는 이제 칩 스펙이 아니라 와트당·달러당 토큰 효율을 극대화하는 아키텍처에 달려 있습니다.
+### 2. 스펙 시트(Paper Spec)의 시대에서 '실제 워크로드 검증'의 시대로
 
-  B2B AI 인프라 시장에서는 더 이상 이론적인 Peak FLOPS나 스펙 시트만으로는 고객을 설득하기 어렵습니다. 실제 LLM 워크로드 기반의 실시간 추론 데모, 메모리 효율을 극대화한 데이터플로우 설계, Prefill/Decode 분리 아키텍처처럼 현장에서 검증 가능한 결과가 글로벌 고객의 도입 결정을 이끄는 기준이 되고 있습니다.
+B2B AI 인프라 시장에서는 더 이상 이론적인 Peak FLOPS나 스펙 시트만으로는 고객을 설득하기 어렵습니다. 실제 LLM 워크로드 기반의 실시간 추론 데모, 메모리 효율을 극대화한 데이터플로우 설계, Prefill/Decode 분리 아키텍처처럼 현장에서 검증 가능한 결과가 글로벌 고객의 도입 결정을 이끄는 기준이 되고 있습니다.
+
+### 3. HyperAccel의 다음 걸음과 문의 채널
 
 HyperAccel은 앞으로도 LPU 기술력을 바탕으로 글로벌 AI 인프라 시장에서 가장 효율적인 AI 추론 솔루션을 제시해 나가겠습니다.
 
 BERTHA의 기술 사양이나 LPU 기반 추론 인프라 구축에 관해 궁금한 점은 언제든 [HyperAccel 공식 채널](https://hyperaccel.ai/contact/)로 문의해 주시기 바랍니다.
 
 ✉️ **Contact:** [contact@hyperaccel.ai](mailto:contact@hyperaccel.ai)  
-🔗 **LinkedIn:** [HyperAccel Official LinkedIn](https://www.linkedin.com/company/hyperaccel)  
+🔗 **LinkedIn:** [HyperAccel](https://www.linkedin.com/company/hyperaccel)  
+🐦 **X:** [@HyperAccelAI](https://x.com/HyperAccelAI)  
 🌐 **Website:** [www.hyperaccel.ai](https://www.hyperaccel.ai)
 
 ---
