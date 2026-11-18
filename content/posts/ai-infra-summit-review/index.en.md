@@ -32,7 +32,7 @@ This post shares what we saw at AI Infra Summit 2026 in Santa Clara, Silicon Val
 
 AI Infra Summit 2026 is a global conference dedicated to AI infrastructure. It was held from September 15 to 17 at the Santa Clara Convention Center in California.
 
-This was the ninth edition. It brought together about 8,000 attendees from around the world, more than 400 expert speakers, and over 250 partner companies. The program covered the whole AI infrastructure ecosystem, from AI Data Center, Compute, and Data Movement to Data & Models and Physical AI.
+This was the ninth edition. It drew 9,200 registrations and more than 250 partner companies. The program covered the whole AI infrastructure ecosystem, from AI Data Center, Compute, and Data Movement to Data & Models and Physical AI.
 
 Leaders from NVIDIA, AMD, AWS, Meta, Google, and Intel spoke in the main stage keynotes. Korean sponsors included SK hynix, Samsung Electronics, Rebellions, FuriosaAI, MangoBoost, Moreh, and HyperAccel.
 
@@ -67,7 +67,7 @@ Big tech and global chip companies are raising data center efficiency with rack-
 
 ▲ Rack-scale systems from major AI chip and infrastructure companies, as seen on the floor
 
-- **Rack-scale strategies of global chip companies:** AMD (Helios rack-scale platform) and Qualcomm (Dragonfly lineup) put rack-level system optimization front and center. Challengers such as Tenstorrent (a live Galaxy Blackhole system), SambaNova, and Cerebras also made their presence felt. Each ran a consultation-focused booth built on its own architecture and demos.
+- **Rack-scale strategies of global chip companies:** AMD (Helios rack-scale platform) and Qualcomm (Dragonfly rack-scale AI infrastructure portfolio) put rack-level system optimization front and center. Challengers such as Tenstorrent (a live Galaxy Blackhole system), SambaNova, and Cerebras also made their presence felt. Each ran a consultation-focused booth built on its own architecture and demos.
 
 ![A diagram of the Rebellions platform scaling from chip to server, rack, and POD](images/trend2-chip-to-pod-platform.png)
 
@@ -81,7 +81,7 @@ Big tech and global chip companies are raising data center efficiency with rack-
 
 ▲ Diagram recreated from NVIDIA's Ian Buck keynote: data center power optimization with DSX MaxLPS, and Extreme Co-design
 
-- In his keynote, NVIDIA's Ian Buck unveiled the DSX AI Factory Platform and DSX MaxLPS. The approach recovers idle power that data centers would otherwise waste, and it can deliver up to 40% higher compute performance and throughput.
+- In his keynote, NVIDIA's Ian Buck unveiled the DSX AI Factory Platform and DSX MaxLPS. The approach dynamically reallocates available power across workloads, helping data centers recover otherwise stranded power capacity. NVIDIA noted that DSX MaxLPS could enable up to 40% more GPU capacity within the same power budget in suitable deployment environments.
 - Integrations with Vera Rubin, Groq 3 LPX, and d-Matrix point the same way. The focus is moving beyond single-chip performance to designing the whole rack as one system, including power management, interconnect, and storage (Extreme Co-design).
 
 ![Booths of AI cloud, agent operations, and infrastructure procurement companies](images/pasted-20261029-013621-e4176e.jpg)
@@ -122,7 +122,7 @@ The price per token is falling fast. Ironically, the cost of building and runnin
 Lowering the price per token is therefore not enough. The real challenge is building infrastructure that processes tokens efficiently across the whole inference process. HyperAccel presented three approaches for this.
 
 - **Token Efficiency:** We introduced an LPU architecture optimized for LLM inference. A Big Core compute engine and a Streamlined Dataflow, based on memory-compute co-design, maximize memory bandwidth utilization. The LPU reaches 83% bandwidth utilization on average in LLM inference, and over 90% at peak.
-- **Enterprise Performance & Cost:** We shared BERTHA's results on the metrics that matter for enterprise AI infrastructure: throughput (TPS), power efficiency, and TCO. Depending on the workload and the comparison target, we showed efficiency gains of up to 3 to 5 times per watt and per dollar.
+- **Enterprise Performance & Cost:** We shared BERTHA's results on the metrics that matter for enterprise AI infrastructure: throughput (TPS), power efficiency, and TCO. Depending on the workload and comparison target, we demonstrated up to 3 to 5 times better performance per watt and per dollar.
 - **Disaggregation & Edge:** We showed an architecture that separates the Prefill and Decode stages to maximize inference performance and efficiency. We also showed a product roadmap that runs from BERTHA for data centers to BERTHA-Edge for on-device AI.
 
 Right after the talk, many attendees visited our booth. They watched BERTHA run inference in real time and discussed whether it could fit their own infrastructure.
@@ -135,9 +135,9 @@ For a detailed summary of the talk, see the [HyperAccel LinkedIn post](https://w
 
 ▲ The HyperAccel LPU live demo at the booth
 
-Even with our booth located deeper inside the hall, the real-time demo, running actual LLM inference, caught visitors' eyes. More than 300 AI infrastructure professionals visited the booth over the three days. Their interest turned into technical discussions and business talks.
+Even with our booth located deeper inside the hall, the real-time demo, running actual LLM inference, drew visitors' attention. More than 300 AI infrastructure professionals visited the booth over the three days. Their interest turned into technical discussions and business talks.
 
-A deep-tech product like an AI chip is hard to sell by explaining its architecture or spec sheet alone. That changes the moment people see working hardware and its performance with their own eyes. Visitors grasped how realistic the technology is and began asking how to apply it in their own environments.
+A deep-tech product like an AI chip is hard to sell by explaining its architecture or spec sheet alone. That changes the moment people see working hardware and its performance with their own eyes. Seeing the product run, visitors confirmed how the technology works in practice and discussed concrete ways to apply it in their own infrastructure.
 
 Data center operators, cloud companies, and server distributors visited the booth to check whether adopting the LPU made sense for them. Ian Cutress (TechTechPotato), a global tech content creator, also visited. He covered the BERTHA live demo and interviewed us.
 
@@ -159,7 +159,7 @@ In the B2B AI infrastructure market, theoretical peak FLOPS and spec sheets alon
 
 ### 3. HyperAccel's Next Steps and How to Reach Us
 
-HyperAccel will keep building on its LPU technology. Our goal is to offer the most efficient AI inference solution in the global AI infrastructure market.
+HyperAccel will keep building on its LPU technology. Our goal is to offer an efficient AI inference solution in the global AI infrastructure market.
 
 For questions about BERTHA's technical specifications or building LPU-based inference infrastructure, please contact us through the [HyperAccel official channel](https://hyperaccel.ai/contact/).
 
